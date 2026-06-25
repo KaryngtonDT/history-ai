@@ -1,0 +1,41 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PHP / Symfony
+/backend/vendor/
+/backend/var/
+/backend/.phpunit.cache/
+/backend/.php-cs-fixer.cache/
+
+# Node / Frontend
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.vite/
+/frontend/coverage/
+
+# Python / Worker
+/worker/.venv/
+/worker/__pycache__/
+/worker/**/__pycache__/
+/worker/.pytest_cache/
+/worker/.ruff_cache/
+/worker/tmp/
+/worker/*.egg-info/
+
+# Docker
+*.log
+
+# Build artifacts
+*.cache

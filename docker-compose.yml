@@ -1,0 +1,6 @@
+# History AI — Docker Compose
+# Service definitions will be added in a future task.
+
+name: history-ai
+
+services: {}

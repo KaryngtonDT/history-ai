@@ -1,0 +1,32 @@
+# History AI
+
+AI-powered platform that transforms educational content into structured learning experiences.
+
+## Status
+
+Milestone 1 — Project Foundation (in progress)
+
+## Prerequisites
+
+- Docker & Docker Compose
+- Make (WSL2 or Git Bash on Windows)
+- Git
+
+## Getting started
+
+1. Copy `.env.example` to `.env`
+2. Read [START_HERE.md](START_HERE.md)
+3. Run `make up` once infrastructure is configured
+
+## Documentation
+
+| Document | Purpose |
+| -------- | ------- |
+| [START_HERE.md](START_HERE.md) | Developer onboarding |
+| [AGENTS.md](AGENTS.md) | AI assistant rules |
+| [planning/WORKFLOW.md](planning/WORKFLOW.md) | Delivery workflow |
+| [docs/](docs/) | Product and architecture |
+
+## License
+
+MIT — see [LICENSE](LICENSE).
