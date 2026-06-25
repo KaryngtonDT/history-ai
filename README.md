@@ -25,6 +25,7 @@ Milestone 1 — Project Foundation (in progress)
 | [START_HERE.md](START_HERE.md) | Developer onboarding |
 | [AGENTS.md](AGENTS.md) | AI assistant rules |
 | [planning/WORKFLOW.md](planning/WORKFLOW.md) | Delivery workflow |
+| [.ai/system/](.ai/system/) | Cursor system prompt and review checklists |
 | [docs/](docs/) | Product and architecture |
 
 ## License

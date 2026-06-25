@@ -29,7 +29,14 @@ Planning detail: `planning/Milestone-XX/`
 
 → Architecture Review → Commit → TASK-0002
 
-Task file: [Milestone-01/TASK-0001.md](Milestone-01/TASK-0001.md)
+Task file: [Milestone-01/Sprint-00/TASK-0002.md](Milestone-01/Sprint-00/TASK-0002.md)
+
+Cursor prompt:
+
+```text
+Read: .ai/system/cursor-system-prompt.md
+Implement: planning/Milestone-01/Sprint-00/TASK-0002.md
+```
 
 ---
 

@@ -110,18 +110,34 @@ A Task is complete only when **all applicable gates** pass.
 
 ---
 
+# Repository Zones
+
+| Path | Purpose |
+| ---- | ------- |
+| `docs/` | Product documentation |
+| `engineering/` | Engineering standards and ADRs |
+| `planning/` | Backlog, milestones, tasks |
+| `.ai/` | AI collaboration (prompts, reviews, decisions, context) |
+
+After each Task: save prompt to `.ai/prompts/` and review to `.ai/reviews/`.
+
+Cursor reads `.ai/system/cursor-system-prompt.md` — not a long inline prompt.
+
+---
+
 # Planning Layout
 
 ```text
 planning/
-├── WORKFLOW.md          ← this file
+├── WORKFLOW.md
 ├── DELIVERY_ROADMAP.md
 ├── Milestone-01/
-│   ├── Sprint-00.md
-│   ├── TASK-0001.md
-│   └── ...
+│   └── Sprint-00/
+│       ├── Sprint-00.md
+│       ├── TASK-0001.md
+│       └── ...
 ├── Milestone-02/
 └── ...
 ```
 
-One Task = one file.
+One Task = one file under `Milestone-XX/Sprint-YY/`.

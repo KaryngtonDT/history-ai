@@ -28,13 +28,26 @@ docker compose up → everything running, all health checks green
 
 | Task | File | Gate | Status |
 | ---- | ---- | ---- | ------ |
-| TASK-0001 | [TASK-0001.md](TASK-0001.md) | Gate 1 | Ready for review |
-| TASK-0002 | [TASK-0002.md](TASK-0002.md) | Gate 1 | Planned |
+| TASK-0001 | [TASK-0001.md](TASK-0001.md) | Gate 1 | Done |
+| TASK-0002 | [TASK-0002.md](TASK-0002.md) | Gate 1 | Ready for review |
 | TASK-0003 | [TASK-0003.md](TASK-0003.md) | Gate 1 | Planned |
 | TASK-0004 | [TASK-0004.md](TASK-0004.md) | Gate 1 | Planned |
-| TASK-0005 | [TASK-0005.md](TASK-0005.md) | Gate 1 | Planned |
+
+WP-0001 complete after TASK-0004.
 
 Execute in order. One commit per Task.
+
+---
+
+# Cursor invocation
+
+```text
+Read:
+.ai/system/cursor-system-prompt.md
+
+Implement:
+planning/Milestone-01/Sprint-00/TASK-XXXX.md
+```
 
 ---
 
@@ -48,16 +61,13 @@ Execute in order. One commit per Task.
 | WP-0005 | Worker Foundation | Planned |
 | WP-0006 | CI/CD Foundation | Planned |
 
-Task files for WP-0002+ will be created when WP-0001 is complete.
-
 ---
 
 # References
 
-* [WORKFLOW.md](../WORKFLOW.md)
-* [DELIVERY_ROADMAP.md](../DELIVERY_ROADMAP.md)
-* `docs/02_ARCHITECTURE/SYSTEM_BLUEPRINT.md`
-* `docs/02_ARCHITECTURE/TECH_STACK.md`
+* [WORKFLOW.md](../../WORKFLOW.md)
+* [DELIVERY_ROADMAP.md](../../DELIVERY_ROADMAP.md)
+* `.ai/system/cursor-system-prompt.md`
 
 ---
 

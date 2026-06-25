@@ -1,43 +1,39 @@
 # AI Agent Instructions
 
-This repository is AI-assisted.
-
-Before generating code:
-
-1. Read START_HERE.md
-2. Read planning/WORKFLOW.md
-3. Read the current Task file in planning/Milestone-XX/
-4. Read all required documentation
-5. Never skip documentation
-6. Respect engineering standards
-7. Implement only one Task at a time
-8. Never anticipate future tasks
-9. Ask when requirements are ambiguous
-
-Documentation precedence:
-
-Engineering
-↓
-Architecture
-↓
-Product
-↓
-Task file (planning/Milestone-XX/TASK-XXXX.md)
-↓
-Code
-
-Never violate this hierarchy.
+Entry point for AI assistants. Stable implementation rules live in `.ai/system/`.
 
 ---
 
-# Delivery Mode
+# Before implementing
 
-Architecture is frozen. Code is the source of truth.
+1. Read `.ai/system/cursor-system-prompt.md`
+2. Read `START_HERE.md`
+3. Read the current Task file in `planning/Milestone-XX/Sprint-YY/`
+4. Read `.ai/context/` if relevant to the milestone
+5. Read documentation referenced by the Task
 
-Implement **Tasks** — never "code the project".
+---
 
-**1 Task = 1 Prompt = 1 Commit = 1 Architecture Review**
+# Standard Cursor prompt
 
-Cycle: see planning/WORKFLOW.md
+```text
+Read:
+.ai/system/cursor-system-prompt.md
 
-Current Task: planning/Milestone-01/TASK-0001.md
+Implement:
+planning/Milestone-01/Sprint-00/TASK-XXXX.md
+```
+
+---
+
+# After implementing
+
+Archive to `.ai/prompts/` and `.ai/reviews/` (see `planning/WORKFLOW.md`).
+
+---
+
+# Documentation precedence
+
+Engineering → Architecture → Product → Task file → Code
+
+Current focus: `planning/DELIVERY_ROADMAP.md`
