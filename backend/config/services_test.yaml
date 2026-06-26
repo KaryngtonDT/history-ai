@@ -1,0 +1,6 @@
+# Services exposed to integration / functional tests via TestContainer.
+when@test:
+    services:
+        App\Domain\Processing\ProcessingJobRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\Processing\DoctrineProcessingJobRepository
+            public: true

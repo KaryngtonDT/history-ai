@@ -20,5 +20,8 @@ services:
     App\Domain\Content\ContentRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Content\DoctrineContentRepository
 
+    App\Domain\Processing\ProcessingJobRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Processing\DoctrineProcessingJobRepository
+
     App\Shared\:
         resource: '../src/Shared/'

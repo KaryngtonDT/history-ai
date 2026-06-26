@@ -1,6 +1,6 @@
-# S3-SLICE-02 — Start Processing API
+# S3-SLICE-02 — ProcessingJob Persistence
 
-Status: **Planned**
+Status: **Done**
 
 Epic: **Epic 03 — Asynchronous Processing Pipeline**
 
@@ -10,92 +10,72 @@ Depends on: S3-SLICE-01
 
 # Goal
 
-Expose an endpoint that **creates** a ProcessingJob without executing processing.
+Persist `ProcessingJob` with Doctrine without polluting the domain layer.
+
+```text
+ProcessingJob (domain)
+  ↓
+ProcessingJobRepositoryInterface
+  ↓
+DoctrineProcessingJobRepository
+  ↓
+ProcessingJobRecord
+  ↓
+processing_jobs table
+```
 
 ---
 
-# Endpoint
+# Created
 
-```http
-POST /api/contents/{id}/process
+```text
+Infrastructure/Persistence/Doctrine/Processing/
+  ProcessingJobRecord.php
+  DoctrineProcessingJobRepository.php
+
+migrations/Version20260626140000.php
+
+tests/Integration/Persistence/Processing/
+  DoctrineProcessingJobRepositoryTest.php
 ```
 
-## Request
+---
 
-No body required (Sprint 3).
+# Table `processing_jobs`
 
-## Response `201`
-
-```json
-{
-  "processingJobId": "550e8400-e29b-41d4-a716-446655440000"
-}
-```
-
-## Errors
-
-| Status | When |
+| Column | Type |
 | ------ | ---- |
-| 404 | Content not found |
-| 409 | ProcessingJob already active for this content (optional — document decision) |
-| 422 | Content in invalid state for processing |
+| id | UUID PK |
+| content_id | UUID (indexed) |
+| type | VARCHAR(32) |
+| status | VARCHAR(32) |
+| progress | SMALLINT |
+| started_at | TIMESTAMP nullable |
+| completed_at | TIMESTAMP nullable |
+| failed_at | TIMESTAMP nullable |
+| created_at | TIMESTAMP |
+| updated_at | TIMESTAMP |
 
 ---
 
-# Application layer
+# Architectural decisions
 
-```text
-StartProcessingCommand(contentId)
-  → StartProcessingHandler
-    → load Content
-    → create ProcessingJob(status: Pending)
-    → persist
-    → return processingJobId
-```
-
-Uses CQRS pattern matching `CreateContentHandler`.
-
----
-
-# Presentation
-
-```text
-Presentation/Http/Controller/StartProcessingController.php
-```
-
-Route name: `api_contents_process`
-
----
-
-# Tests
-
-| Test | Assert |
-| ---- | ------ |
-| POST valid content id | 201 + UUID in response |
-| POST unknown content id | 404 |
-| DB row created | status = pending, progress = 0 |
-
-Functional test with SQLite in-memory (existing pattern).
+- **Record pattern** — mirrors `ContentRecord`; domain aggregate unchanged
+- **Mapping** — `fromDomain` / `syncFromDomain` / `toDomain` on record
+- **Progress** — stored as integer; rehydrated via `ProcessingJobProgress::fromPercentage()`
+- **No FK** — consistent with `contents` table (content_id is logical reference)
+- **DI** — `ProcessingJobRepositoryInterface` aliased in `services.yaml`
 
 ---
 
 # Out of scope
 
-- Worker picking up job
-- Updating Content.status
-- Frontend wiring
-
----
-
-# Acceptance criteria
-
-- [ ] Endpoint registered and documented
-- [ ] CQRS handler + functional tests
-- [ ] ProcessingJob persisted with Pending status
-- [ ] No inline processing logic in controller
+- HTTP controller / handler
+- Worker / queue
+- Frontend
 
 ---
 
 # Next
 
-**S3-SLICE-03** — ProcessingStatus enum refinement (may merge with S3-01 if already done)
+**S3-SLICE-03** — Start processing API (`POST /api/contents/{id}/process`)
