@@ -7,6 +7,7 @@ namespace App\Infrastructure\Persistence\Doctrine\Artifact;
 use App\Domain\Artifact\Artifact;
 use App\Domain\Artifact\ArtifactId;
 use App\Domain\Artifact\ArtifactRepositoryInterface;
+use App\Domain\Content\ContentId;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class DoctrineArtifactRepository implements ArtifactRepositoryInterface
@@ -33,5 +34,17 @@ final class DoctrineArtifactRepository implements ArtifactRepositoryInterface
         $record = $this->entityManager->find(ArtifactRecord::class, $id->value);
 
         return $record?->toDomain();
+    }
+
+    public function findByContentId(ContentId $contentId): array
+    {
+        $records = $this->entityManager
+            ->getRepository(ArtifactRecord::class)
+            ->findBy(['contentId' => $contentId->value], ['createdAt' => 'ASC']);
+
+        return array_map(
+            static fn (ArtifactRecord $record): Artifact => $record->toDomain(),
+            $records,
+        );
     }
 }

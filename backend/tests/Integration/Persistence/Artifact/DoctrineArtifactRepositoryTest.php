@@ -127,6 +127,48 @@ final class DoctrineArtifactRepositoryTest extends KernelTestCase
         self::assertSame(ArtifactType::Quiz, $foundQuiz->type());
     }
 
+    public function testFindByContentIdReturnsArtifactsForContent(): void
+    {
+        $contentId = ContentId::generate();
+        $otherContentId = ContentId::generate();
+        $summary = Artifact::create(
+            ArtifactId::generate(),
+            $contentId,
+            ProcessingJobId::generate(),
+            ArtifactType::Summary,
+            ArtifactContent::fromString('Summary artifact'),
+        );
+        $quiz = Artifact::create(
+            ArtifactId::generate(),
+            $contentId,
+            ProcessingJobId::generate(),
+            ArtifactType::Quiz,
+            ArtifactContent::fromString('Quiz artifact'),
+        );
+        $other = Artifact::create(
+            ArtifactId::generate(),
+            $otherContentId,
+            ProcessingJobId::generate(),
+            ArtifactType::Summary,
+            ArtifactContent::fromString('Other content artifact'),
+        );
+
+        $this->repository->save($summary);
+        $this->repository->save($quiz);
+        $this->repository->save($other);
+
+        $found = $this->repository->findByContentId($contentId);
+
+        self::assertCount(2, $found);
+        self::assertTrue($found[0]->id()->equals($summary->id()));
+        self::assertTrue($found[1]->id()->equals($quiz->id()));
+    }
+
+    public function testFindByContentIdReturnsEmptyListWhenMissing(): void
+    {
+        self::assertSame([], $this->repository->findByContentId(ContentId::generate()));
+    }
+
     public function testSaveIsIdempotentForExistingArtifact(): void
     {
         $artifact = Artifact::create(

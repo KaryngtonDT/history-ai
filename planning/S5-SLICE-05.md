@@ -37,4 +37,4 @@ POST /jobs/execute
 
 # Next
 
-**S5-SLICE-06** — End-to-end validation: import → processing → artifact persisted
+**S5-SLICE-06** — Public Artifact Read API (done)
