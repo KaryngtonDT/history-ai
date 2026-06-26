@@ -4,8 +4,9 @@
 docs/
 planning/
 engineering/
-frontend/
 worker/
 backend/var/
 backend/vendor/
 backend/.phpunit.cache
+frontend/node_modules/
+frontend/dist/
