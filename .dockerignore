@@ -4,9 +4,9 @@
 docs/
 planning/
 engineering/
-worker/
 backend/var/
 backend/vendor/
 backend/.phpunit.cache
 frontend/node_modules/
 frontend/dist/
+worker/.venv/

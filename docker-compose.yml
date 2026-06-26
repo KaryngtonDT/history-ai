@@ -108,10 +108,11 @@ services:
 
   worker:
     build:
-      context: infrastructure/docker/worker
+      context: .
+      dockerfile: infrastructure/docker/worker/Dockerfile
     restart: unless-stopped
     ports:
-      - "8001:80"
+      - "8001:8001"
     networks:
       - history-ai
     depends_on:
@@ -122,11 +123,11 @@ services:
       backend:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8001/health"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 5s
+      start_period: 10s
 
 networks:
   history-ai:
