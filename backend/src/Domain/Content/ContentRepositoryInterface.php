@@ -9,4 +9,9 @@ interface ContentRepositoryInterface
     public function save(Content $content): void;
 
     public function findById(ContentId $id): ?Content;
+
+    /**
+     * @return list<Content>
+     */
+    public function findAll(): array;
 }

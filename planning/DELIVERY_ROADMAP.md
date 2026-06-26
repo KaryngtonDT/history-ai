@@ -1,6 +1,6 @@
 # Delivery Roadmap
 
-Version: 1.0
+Version: 2.1
 
 Status: Active
 
@@ -8,49 +8,56 @@ See [WORKFLOW.md](WORKFLOW.md) for roles, cycle, and quality gates.
 
 ---
 
-# Milestones
+# Delivery Model
+
+```text
+Feature Contract → Vertical Implementation (UI + Frontend + API + Domain + Tests)
+```
+
+Backlog: [BACKLOG.md](BACKLOG.md)
+
+Planning: [README.md](README.md)
+
+---
+
+# Milestone 2 — Product Experience
+
+| Phase | Name | Scope | Status |
+| ----- | ---- | ----- | ------ |
+| **0** | Product Design | Design System, wireframes, mockups | **Current** |
+| A | UI Foundation | Storybook, components | Next |
+| B | PDF Upload | Feature-0001 vertical slice | Planned |
+| C | YouTube Import | Feature-0002 | Planned |
+| D | Library | Library vertical slice | Planned |
+| E | Processing | Processing Dashboard | Planned |
+
+---
+
+# Milestones (overview)
 
 | # | Name | Scope |
 | - | ---- | ----- |
-| 1 | Foundation | Repository, Infrastructure, Backend, Frontend, Worker, CI |
-| 2 | Content Processing | Upload, yt-dlp, Whisper, Translation |
-| 3 | Learning Package | Summary, Timeline, Glossary, Flashcards, Quiz, Podcast |
-| 4 | Learning Platform | Library, Search, Progress, Resume |
-| 5 | AI Tutor | Chat, Context Retrieval, RAG, Recommendations |
-| 6 | Production | Monitoring, Observability, Billing, Security, Performance |
-
-Planning detail: `planning/Milestone-XX/`
+| 1 | Foundation | Infrastructure, Backend, Frontend scaffold, Worker — **Complete** |
+| 2 | Product Experience | UI Foundation + Content Ingestion Features — **In Progress** |
+| 3 | AI Processing | Transcript, Summary, Quiz, Podcast |
+| 4 | Learning Platform | Search, Tags, Tutor |
+| 5 | Production | CI/CD, Security, Observability |
 
 ---
 
 # Current Focus
 
-**Milestone 1 / Sprint 0 / TASK-0001**
+**Phase 0 — Product Design System**
 
-→ Architecture Review → Commit → TASK-0002
+`docs/07_DESIGN_SYSTEM/` + `design/wireframes/`
 
-Task file: [Milestone-01/Sprint-00/TASK-0002.md](Milestone-01/Sprint-00/TASK-0002.md)
-
-Cursor prompt:
-
-```text
-Read: .ai/system/cursor-system-prompt.md
-Implement: planning/Milestone-01/Sprint-00/TASK-0002.md
-```
-
----
-
-# Milestone 1 Deliverable
-
-```text
-docker compose up → all services running, all health checks green
-```
+Backend and frontend code: **frozen** until design validation.
 
 ---
 
 # Governance
 
-* Code is the source of truth
-* Architecture changes: ADR → Code → Documentation
-* Product changes: FEATURES.md + USER_STORIES.md
-* One Task = one file = one commit = one review
+* Product: [PRODUCT_MANIFESTO](../docs/00_PROJECT/PRODUCT_MANIFESTO.md)
+* Engineering: [Constitution](../engineering/00_ENGINEERING_PRINCIPLES.md)
+* Architecture: [RFC-0001](../docs/06_RFC/RFC-0001-content-processing-pipeline.md)
+* UI Features use `COMPONENT_CATALOG.md` instead of `API_CONTRACT.md`

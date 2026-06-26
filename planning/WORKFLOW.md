@@ -1,8 +1,8 @@
 # Workflow — History AI
 
-Version: 1.0
+Version: 2.0
 
-Status: Frozen
+Status: Active
 
 ---
 
@@ -10,15 +10,15 @@ Status: Frozen
 
 ## Product Owner & Lead Developer (You)
 
-* Define product priorities
+* Define product priorities and Features
 * Validate functional choices
-* Launch Cursor with Task prompts
+* Launch Cursor with Task prompts (within a Feature)
 * Make commits
 * Learn architecture decisions
 
 ## Cursor — Senior Software Engineer
 
-* Implement **one Task at a time**
+* Implement **one Task at a time** within the current Feature
 * Follow all documentation
 * Never make architecture decisions
 * Write tests when the Task requires them
@@ -27,7 +27,7 @@ Status: Frozen
 ## ChatGPT — CTO & Software Architect
 
 * Architecture
-* Sprint and Task breakdown
+* Epic / Feature / Story / Task breakdown
 * Code review
 * Architecture review
 * Optimization
@@ -36,28 +36,70 @@ Status: Frozen
 
 ---
 
-# Development Cycle
-
-Every Task follows this cycle. **No exceptions.**
+# Delivery Hierarchy
 
 ```text
-1. Planning
+Product Manifesto
+  ↓
+Engineering Constitution
+  ↓
+RFC → ADR
+  ↓
+Epic
+  ↓
+Feature Contract
+  ├── FEATURE.md
+  ├── STORIES.md
+  ├── ACCEPTANCE_TESTS.md
+  └── API_CONTRACT.md
+  ↓
+Technical Task
+  ↓
+Code
+```
+
+---
+
+# Feature Contract Gate
+
+**No technical Task is created or implemented until the four contract documents are validated.**
+
+Contract validation confirms:
+
+* User flow is defined
+* Stories cover the flow
+* Acceptance tests are written
+* API contract is stable
+
+Then tasks are added under `tasks/` and implementation begins.
+
+---
+
+# Development Cycle
+
+Every **Task** follows this cycle. **No exceptions.**
+
+```text
+1. Planning (Feature + Story context)
 2. Prompt Cursor
 3. Implementation
-4. Architecture Review
+4. Architecture Review (Manifesto → RFC → Constitution → Code)
 5. Corrections
 6. Quality Gate
 7. Commit
-8. Next Task
+8. Next Task (same Feature until Feature DoD)
 ```
+
+A **Feature** is complete when all Stories and its Definition of Done pass.
 
 ---
 
 # Task Template
 
-Every Task file in `planning/Milestone-XX/` must contain:
+Every Task file under `planning/Epics/.../Feature-XXXX/tasks/` must contain:
 
 * ID
+* Feature and Story reference
 * Objective
 * Context
 * Prerequisites
@@ -73,40 +115,47 @@ Every Task file in `planning/Milestone-XX/` must contain:
 
 A Task is complete only when **all applicable gates** pass.
 
-## Gate 1 — Structure
+## Gate 1 — Product
+
+* Aligns with Product Manifesto
+* Improves learning or ingestion path (not hype)
+
+## Gate 2 — Structure
 
 * Correct directory tree
 * Naming conventions respected
 * No unnecessary files
 
-## Gate 2 — Build
+## Gate 3 — Build
 
 * Project compiles
 * Containers start
 * Commands work
 
-## Gate 3 — Quality
+## Gate 4 — Quality
 
 * Lint OK
 * Static analysis OK
-* Tests OK
+* Tests OK (zero PHPUnit notices)
 
-## Gate 4 — Architecture
+## Gate 5 — Architecture
 
+* RFC and ADR respected
+* Engineering Constitution respected
 * DDD respected
 * Dependencies respected
-* Conventions respected
 * No obvious technical debt
 
 ---
 
 # Rules
 
+* **1 Feature = vertical slice** (backend + frontend + infra needed for user value)
 * **1 Task = 1 Prompt = 1 Commit = 1 Review**
-* Implement Tasks — never "code the project"
+* Implement Tasks — never "code the whole Feature" in one prompt
 * Code is the source of truth; documentation follows code
-* Architecture changes: ADR → Code → Documentation
-* Product changes: `FEATURES.md` + `USER_STORIES.md`
+* Architecture changes: RFC → ADR → Code → Documentation
+* Legacy Milestone tasks (M1, early M2) remain historical reference
 
 ---
 
@@ -115,8 +164,8 @@ A Task is complete only when **all applicable gates** pass.
 | Path | Purpose |
 | ---- | ------- |
 | `docs/` | Product documentation |
-| `engineering/` | Engineering standards and ADRs |
-| `planning/` | Backlog, milestones, tasks |
+| `engineering/` | Engineering Constitution and ADRs |
+| `planning/` | Backlog, Epics, Features, Stories, Tasks |
 | `.ai/` | AI collaboration (prompts, reviews, decisions, context) |
 
 After each Task: save prompt to `.ai/prompts/` and review to `.ai/reviews/`.
@@ -129,15 +178,21 @@ Cursor reads `.ai/system/cursor-system-prompt.md` — not a long inline prompt.
 
 ```text
 planning/
+├── README.md
+├── BACKLOG.md
 ├── WORKFLOW.md
 ├── DELIVERY_ROADMAP.md
-├── Milestone-01/
-│   └── Sprint-00/
-│       ├── Sprint-00.md
-│       ├── TASK-0001.md
-│       └── ...
-├── Milestone-02/
-└── ...
+├── Epics/
+│   └── Epic-01-Content-Ingestion/
+│       ├── EPIC.md
+│       └── Feature-0001-PDF-Upload/
+│           ├── FEATURE.md
+│           ├── STORIES.md
+│           ├── ACCEPTANCE_TESTS.md
+│           ├── API_CONTRACT.md
+│           └── tasks/
+│               └── TASK-XXXX.md
+└── Milestone-XX/          ← legacy
 ```
 
-One Task = one file under `Milestone-XX/Sprint-YY/`.
+See [README.md](README.md) for current focus.

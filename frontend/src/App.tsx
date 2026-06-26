@@ -1,10 +1,5 @@
-import { Route, Routes } from "react-router";
-import { HomePage } from "@/pages/HomePage";
+import { AppRouter } from "@/app/router";
 
 export function App() {
-	return (
-		<Routes>
-			<Route path="/" element={<HomePage />} />
-		</Routes>
-	);
+	return <AppRouter />;
 }

@@ -12,6 +12,10 @@ If you are joining the project for the first time, start here.
 
 Read in this order:
 
+docs/00_PROJECT/PRODUCT_MANIFESTO.md
+
+docs/07_DESIGN_SYSTEM/README.md
+
 docs/00_PROJECT/OVERVIEW.md
 
 docs/00_PROJECT/VISION.md
@@ -62,23 +66,25 @@ PROMPTS.md
 
 # Step 5 — Understand the Engineering Rules
 
-Read:
+Read in this order:
 
-engineering/
+engineering/00_ENGINEERING_PRINCIPLES.md
 
-00_ENGINEERING_PRINCIPLES.md
+docs/06_RFC/README.md
 
-01_CODING_STANDARDS.md
-
-...
+.ai/system/architecture-rules.md
 
 ---
 
-# Step 6 — Read Current Sprint
+# Step 6 — Read Current Work
 
-planning/
+planning/BACKLOG.md
 
-Sprint-00.md
+planning/Epics/.../Feature-XXXX/FEATURE.md
+
+Current Feature: Feature UI-0001 — Design System (Phase A)
+
+Backend frozen until Phase B (Feature-0001 PDF Upload).
 
 ---
 

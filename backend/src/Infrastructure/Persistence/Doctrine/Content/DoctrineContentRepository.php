@@ -37,4 +37,18 @@ final class DoctrineContentRepository implements ContentRepositoryInterface
 
         return $record?->toDomain();
     }
+
+    public function findAll(): array
+    {
+        /** @var list<ContentRecord> $records */
+        $records = $this->entityManager->getRepository(ContentRecord::class)->findBy(
+            [],
+            ['createdAt' => 'DESC'],
+        );
+
+        return array_map(
+            static fn (ContentRecord $record): Content => $record->toDomain(),
+            $records,
+        );
+    }
 }
