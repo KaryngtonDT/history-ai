@@ -1,0 +1,20 @@
+# Local development overrides (auto-merged by Docker Compose).
+# Mounts application source so code changes apply without rebuilding images.
+
+name: history-ai
+
+services:
+  frontend:
+    build:
+      dockerfile: infrastructure/docker/frontend/Dockerfile.dev
+    environment:
+      VITE_USE_MOCK: ${VITE_USE_MOCK:-true}
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    command: npm run dev -- --host 0.0.0.0 --port 5173
+
+volumes:
+  frontend_node_modules:
+    name: history-ai-frontend-node-modules
