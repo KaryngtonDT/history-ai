@@ -37,7 +37,7 @@ RUN composer run-script post-install-cmd --no-interaction \
 
 COPY infrastructure/docker/backend/nginx.conf /etc/nginx/http.d/default.conf
 COPY infrastructure/docker/backend/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
 
 EXPOSE 80
 

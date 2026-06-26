@@ -9,6 +9,7 @@
         "ext-iconv": "*",
         "ext-pdo": "*",
         "doctrine/doctrine-bundle": "^3.2",
+        "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.6",
         "symfony/console": "7.2.*",
         "symfony/doctrine-messenger": "7.2.*",

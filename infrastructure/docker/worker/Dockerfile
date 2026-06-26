@@ -20,6 +20,6 @@ ENV PATH="/app/.venv/bin:${PATH}"
 EXPOSE 8001
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=5 \
-    CMD wget -q --spider http://127.0.0.1:8001/health || exit 1
+    CMD wget -q -O /dev/null http://127.0.0.1:8001/health || exit 1
 
 CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
