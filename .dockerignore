@@ -1,0 +1,11 @@
+.git
+.ai
+.cursor
+docs/
+planning/
+engineering/
+frontend/
+worker/
+backend/var/
+backend/vendor/
+backend/.phpunit.cache

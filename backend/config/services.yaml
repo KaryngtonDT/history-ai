@@ -1,0 +1,23 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+parameters:
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\Presentation\:
+        resource: '../src/Presentation/'
+
+    App\Application\:
+        resource: '../src/Application/'
+
+    App\Infrastructure\:
+        resource: '../src/Infrastructure/'
+        exclude:
+            - '../src/Infrastructure/Persistence/Entity/'
+
+    App\Shared\:
+        resource: '../src/Shared/'

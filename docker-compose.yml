@@ -63,8 +63,14 @@ services:
 
   backend:
     build:
-      context: infrastructure/docker/backend
+      context: .
+      dockerfile: infrastructure/docker/backend/Dockerfile
     restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV:-dev}
+      APP_SECRET: ${APP_SECRET:-change-me}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://history_ai:history_ai@postgres:5432/history_ai?serverVersion=17&charset=utf8}
+      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=0}
     ports:
       - "8000:80"
     networks:
@@ -75,11 +81,11 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/health"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 5s
+      start_period: 15s
 
   frontend:
     build:
