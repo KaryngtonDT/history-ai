@@ -24,7 +24,7 @@ describe("Sprint 1 — app shell", () => {
 		await user.click(screen.getByRole("link", { name: "Import" }));
 		expect(screen.getByRole("heading", { name: "Import" })).toBeInTheDocument();
 		expect(
-			screen.getByRole("button", { name: "Import PDF" }),
+			screen.getByRole("button", { name: "Select PDF" }),
 		).toBeInTheDocument();
 
 		await user.click(screen.getByRole("link", { name: "Library" }));

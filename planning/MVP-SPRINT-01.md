@@ -21,7 +21,8 @@ No monolithic sprint prompts. One slice → review → next slice.
 | **3A** | Dashboard composition (`S1-SLICE-03A`) | **Done** |
 | **3B** | Dashboard mock data (`S1-SLICE-03B`) | **Done** |
 | **4** | Library with mock list (`S1-SLICE-04`) | **Done** |
-| 5 | Import PDF simulated (`S1-SLICE-05`) | Next |
+| **5** | Import PDF simulated (`S1-SLICE-05`) | **Done** |
+| 6 | Processing simulated (`S1-SLICE-06`) | Next |
 | 4 | Library with mock list | Planned |
 | 5 | Import PDF simulated | Planned |
 | 6 | Processing simulated | Planned |

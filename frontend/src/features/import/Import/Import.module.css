@@ -1,0 +1,8 @@
+.root {
+	display: flex;
+	flex-direction: column;
+}
+
+.content {
+	max-width: var(--size-content-narrow);
+}
