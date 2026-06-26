@@ -1,0 +1,25 @@
+.header {
+	border-bottom: 1px solid var(--shell-border);
+	background-color: color-mix(in srgb, var(--shell-surface) 95%, transparent);
+	padding: var(--space-4) var(--space-5);
+	backdrop-filter: blur(4px);
+}
+
+@media (min-width: 1024px) {
+	.header {
+		padding: var(--space-4) var(--space-6);
+	}
+}
+
+.title {
+	margin: 0;
+	font-size: var(--font-md);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.subtitle {
+	margin: var(--space-1) 0 0;
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}

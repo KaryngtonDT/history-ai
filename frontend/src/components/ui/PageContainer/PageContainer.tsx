@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import styles from "./PageContainer.module.css";
 
 interface PageContainerProps {
 	children: ReactNode;
@@ -7,9 +8,5 @@ interface PageContainerProps {
 }
 
 export function PageContainer({ children, className }: PageContainerProps) {
-	return (
-		<main className={cn("flex-1 px-6 py-8 lg:px-8", className)}>
-			{children}
-		</main>
-	);
+	return <main className={cn(styles.main, className)}>{children}</main>;
 }

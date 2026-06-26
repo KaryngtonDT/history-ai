@@ -22,12 +22,15 @@ describe("Sprint 1 Slice 1 — app shell", () => {
 
 		await user.click(screen.getByRole("link", { name: "Import" }));
 		expect(screen.getByRole("heading", { name: "Import" })).toBeInTheDocument();
-		expect(screen.getByText("Coming soon")).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: "Import PDF" }),
+		).toBeInTheDocument();
 
 		await user.click(screen.getByRole("link", { name: "Library" }));
 		expect(
 			screen.getByRole("heading", { name: "Library" }),
 		).toBeInTheDocument();
+		expect(screen.getByText("No content yet")).toBeInTheDocument();
 
 		await user.click(screen.getByRole("link", { name: "Settings" }));
 		expect(

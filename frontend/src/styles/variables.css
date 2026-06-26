@@ -1,0 +1,61 @@
+@import "./tokens.css";
+
+/*
+ * Semantic variables — components and layout consume these only.
+ * No raw hex values. All references resolve to tokens.css.
+ */
+
+:root {
+	/* Button */
+	--button-primary-bg: var(--color-primary);
+	--button-primary-bg-hover: var(--color-primary-hover);
+	--button-primary-text: var(--color-on-primary);
+	--button-secondary-bg: var(--color-surface);
+	--button-secondary-bg-hover: var(--color-surface-muted);
+	--button-secondary-border: var(--color-border);
+	--button-secondary-text: var(--color-text);
+	--button-ghost-text: var(--color-text);
+	--button-ghost-bg-hover: var(--color-surface-muted);
+	--button-focus-ring: var(--shadow-focus);
+
+	/* Card */
+	--card-bg: var(--color-surface);
+	--card-border: var(--color-border);
+	--card-shadow: var(--shadow-card);
+
+	/* Badge */
+	--badge-success-bg: var(--color-success-subtle);
+	--badge-success-text: var(--color-success);
+	--badge-warning-bg: var(--color-warning-subtle);
+	--badge-warning-text: var(--color-warning);
+	--badge-danger-bg: var(--color-danger-subtle);
+	--badge-danger-text: var(--color-danger);
+	--badge-info-bg: var(--color-primary-subtle);
+	--badge-info-text: var(--color-primary);
+	--badge-neutral-bg: var(--color-surface-muted);
+	--badge-neutral-text: var(--color-text-muted);
+
+	/* Progress */
+	--progress-track: var(--color-surface-muted);
+	--progress-fill: var(--color-primary);
+
+	/* Spinner */
+	--spinner-border: var(--color-border);
+	--spinner-accent: var(--color-primary);
+
+	/* Empty state */
+	--empty-state-bg: var(--color-surface-muted);
+	--empty-state-border: var(--color-border);
+	--empty-state-title: var(--color-text);
+	--empty-state-description: var(--color-text-muted);
+
+	/* App shell (Slice 1 — migrated to token vocabulary) */
+	--shell-bg: var(--color-background);
+	--shell-surface: var(--color-surface);
+	--shell-border: var(--color-border);
+	--shell-text: var(--color-text);
+	--shell-text-muted: var(--color-text-muted);
+	--shell-nav-active-bg: var(--color-primary-subtle);
+	--shell-nav-active-text: var(--color-primary);
+	--shell-nav-hover-bg: var(--color-surface-muted);
+}

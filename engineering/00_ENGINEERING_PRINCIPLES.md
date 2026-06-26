@@ -228,6 +228,20 @@ Never by accident.
 
 ---
 
+# Principle 16 — Design Tokens
+
+Shared UI components must not contain hardcoded visual values (colors, spacing, sizes) when an appropriate Design Token exists.
+
+Primitive tokens live in `frontend/src/styles/tokens.css`.
+
+Semantic variables live in `frontend/src/styles/variables.css`.
+
+Components consume semantic variables only.
+
+Theme or brand changes must require token updates — not component rewrites.
+
+---
+
 # Engineering Oath
 
 Every engineer working on History AI agrees to protect:

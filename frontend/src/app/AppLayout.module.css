@@ -1,0 +1,19 @@
+.root {
+	display: flex;
+	min-height: 100vh;
+	flex-direction: column;
+	background-color: var(--shell-bg);
+}
+
+@media (min-width: 1024px) {
+	.root {
+		flex-direction: row;
+	}
+}
+
+.main {
+	display: flex;
+	min-height: 100vh;
+	flex: 1;
+	flex-direction: column;
+}

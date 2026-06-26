@@ -1,0 +1,15 @@
+.title {
+	margin: 0;
+	font-size: var(--font-lg);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.description {
+	margin: var(--space-2) 0 0;
+	color: var(--shell-text-muted);
+}
+
+.action {
+	margin-top: var(--space-5);
+}

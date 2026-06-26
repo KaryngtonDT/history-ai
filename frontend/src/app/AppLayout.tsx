@@ -2,12 +2,13 @@ import { Outlet } from "react-router";
 import { PageContainer } from "@/components/ui/PageContainer";
 import { Sidebar } from "@/components/ui/Sidebar";
 import { Topbar } from "@/components/ui/Topbar";
+import styles from "./AppLayout.module.css";
 
 export function AppLayout() {
 	return (
-		<div className="flex min-h-screen flex-col bg-[var(--color-bg-base)] lg:flex-row">
+		<div className={styles.root}>
 			<Sidebar />
-			<div className="flex min-h-screen flex-1 flex-col">
+			<div className={styles.main}>
 				<Topbar />
 				<PageContainer>
 					<Outlet />

@@ -1,0 +1,10 @@
+.main {
+	flex: 1;
+	padding: var(--space-6) var(--space-5);
+}
+
+@media (min-width: 1024px) {
+	.main {
+		padding: var(--space-6);
+	}
+}

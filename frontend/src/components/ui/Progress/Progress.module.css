@@ -1,0 +1,15 @@
+.progress {
+	display: block;
+	width: 100%;
+	height: var(--size-progress-height);
+	overflow: hidden;
+	border-radius: var(--radius-full);
+}
+
+.track {
+	fill: var(--progress-track);
+}
+
+.fill {
+	fill: var(--progress-fill);
+}
