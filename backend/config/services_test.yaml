@@ -8,3 +8,7 @@ when@test:
         App\Application\Processing\Ports\ProcessingOrchestratorInterface:
             class: App\Infrastructure\Processing\NoOpProcessingOrchestrator
             public: true
+
+        App\Domain\Artifact\ArtifactRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\Artifact\DoctrineArtifactRepository
+            public: true

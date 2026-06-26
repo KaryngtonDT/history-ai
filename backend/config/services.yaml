@@ -24,6 +24,9 @@ services:
     App\Domain\Processing\ProcessingJobRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Processing\DoctrineProcessingJobRepository
 
+    App\Domain\Artifact\ArtifactRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Artifact\DoctrineArtifactRepository
+
     App\Application\Processing\Ports\ProcessingOrchestratorInterface:
         alias: App\Infrastructure\Processing\HttpWorkerDispatcher
 
