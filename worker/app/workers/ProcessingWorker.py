@@ -7,4 +7,4 @@ class ProcessingWorker:
         self._service = service
 
     async def execute(self, job: ProcessingJob) -> None:
-        await self._service.execute(job.id)
+        await self._service.execute(job)

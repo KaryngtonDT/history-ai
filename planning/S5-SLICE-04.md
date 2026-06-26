@@ -32,4 +32,4 @@ tests/Functional/Artifact/CreateArtifactInternalControllerTest.php
 
 # Next
 
-**S5-SLICE-05** — Worker integration to call internal artifact API
+**S5-SLICE-05** — Worker integration to call internal artifact API (done)
