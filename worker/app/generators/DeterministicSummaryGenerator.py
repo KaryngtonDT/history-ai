@@ -1,5 +1,7 @@
 import re
 
+from app.generators.SummaryGeneratorInterface import SummaryGeneratorInterface
+
 SENTENCE_PATTERN = re.compile(r"[^.!?]+[.!?]+|[^.!?]+$")
 
 
@@ -7,7 +9,7 @@ class SummaryGenerationError(Exception):
     """Raised when a summary cannot be generated from a transcript."""
 
 
-class SummaryGenerator:
+class DeterministicSummaryGenerator(SummaryGeneratorInterface):
     DEFAULT_MAX_SENTENCES = 3
 
     def __init__(self, max_sentences: int = DEFAULT_MAX_SENTENCES) -> None:

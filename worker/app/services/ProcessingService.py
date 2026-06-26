@@ -1,7 +1,8 @@
 import asyncio
 from collections.abc import Awaitable, Callable
 
-from app.generators.SummaryGenerator import SummaryGenerator
+from app.generators.SummaryGeneratorFactory import SummaryGeneratorFactory
+from app.generators.SummaryGeneratorInterface import SummaryGeneratorInterface
 from app.models.ProcessingJob import ProcessingJob
 from app.repositories.SymfonyApiRepository import SymfonyApiRepository
 from app.services.DocumentExtractionService import DocumentExtractionService
@@ -23,14 +24,16 @@ class ProcessingService:
         self,
         repository: SymfonyApiRepository,
         document_extraction: DocumentExtractionService | None = None,
-        summary_generator: SummaryGenerator | None = None,
+        summary_generator: SummaryGeneratorInterface | None = None,
         sleep_fn: SleepFn = _default_sleep,
     ) -> None:
         self._repository = repository
         self._document_extraction = (
             document_extraction or DocumentExtractionService()
         )
-        self._summary_generator = summary_generator or SummaryGenerator()
+        self._summary_generator = (
+            summary_generator or SummaryGeneratorFactory.create()
+        )
         self._sleep = sleep_fn
 
     async def execute(self, job: ProcessingJob) -> None:

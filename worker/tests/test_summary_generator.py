@@ -1,10 +1,13 @@
 import pytest
 
-from app.generators.SummaryGenerator import SummaryGenerationError, SummaryGenerator
+from app.generators.DeterministicSummaryGenerator import (
+    DeterministicSummaryGenerator,
+    SummaryGenerationError,
+)
 
 
 def test_returns_first_three_meaningful_sentences() -> None:
-    generator = SummaryGenerator()
+    generator = DeterministicSummaryGenerator()
     transcript = (
         "The Roman Empire was vast. It lasted many centuries. "
         "Its legacy shaped Europe. Modern law still reflects Roman ideas. "
@@ -20,7 +23,7 @@ def test_returns_first_three_meaningful_sentences() -> None:
 
 
 def test_handles_short_transcript_with_fewer_than_three_sentences() -> None:
-    generator = SummaryGenerator()
+    generator = DeterministicSummaryGenerator()
     transcript = "The Roman Empire was a vast civilization."
 
     summary = generator.generate(transcript)
@@ -29,14 +32,14 @@ def test_handles_short_transcript_with_fewer_than_three_sentences() -> None:
 
 
 def test_rejects_empty_transcript() -> None:
-    generator = SummaryGenerator()
+    generator = DeterministicSummaryGenerator()
 
     with pytest.raises(SummaryGenerationError, match="Transcript is empty"):
         generator.generate("")
 
 
 def test_rejects_whitespace_only_transcript() -> None:
-    generator = SummaryGenerator()
+    generator = DeterministicSummaryGenerator()
 
     with pytest.raises(SummaryGenerationError, match="Transcript is empty"):
         generator.generate("   \n\t  ")

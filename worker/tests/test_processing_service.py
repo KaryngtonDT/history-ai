@@ -2,7 +2,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from app.generators.SummaryGenerator import SummaryGenerator
+from app.generators.DeterministicSummaryGenerator import DeterministicSummaryGenerator
+from app.generators.SummaryGeneratorInterface import SummaryGeneratorInterface
 from app.models.ProcessingJob import ProcessingJob
 from app.services.ProcessingService import ProcessingService
 
@@ -16,7 +17,7 @@ async def test_execute_creates_summary_from_transcript_not_placeholder() -> None
         "Its legacy shaped Europe. Modern law still reflects Roman ideas."
     )
     document_extraction.extract_transcript.return_value = transcript
-    summary_generator = SummaryGenerator()
+    summary_generator = DeterministicSummaryGenerator()
     service = ProcessingService(
         repository=repository,
         document_extraction=document_extraction,
@@ -52,6 +53,36 @@ async def test_execute_creates_summary_from_transcript_not_placeholder() -> None
         "Its legacy shaped Europe.",
     )
     repository.complete.assert_called_once_with("job-123")
+
+
+@pytest.mark.asyncio
+async def test_execute_uses_injected_summary_generator_interface() -> None:
+    repository = MagicMock()
+    document_extraction = MagicMock()
+    document_extraction.extract_transcript.return_value = "Input transcript."
+    summary_generator = MagicMock(spec=SummaryGeneratorInterface)
+    summary_generator.generate.return_value = "Generated via interface."
+    service = ProcessingService(
+        repository=repository,
+        document_extraction=document_extraction,
+        summary_generator=summary_generator,
+        sleep_fn=_instant_sleep,
+    )
+    job = ProcessingJob(
+        id="job-123",
+        content_id="content-456",
+        type="summary",
+    )
+
+    await service.execute(job)
+
+    summary_generator.generate.assert_called_once_with("Input transcript.")
+    repository.create_artifact.assert_any_call(
+        "content-456",
+        "job-123",
+        "summary",
+        "Generated via interface.",
+    )
 
 
 @pytest.mark.asyncio
