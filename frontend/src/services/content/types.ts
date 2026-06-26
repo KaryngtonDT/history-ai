@@ -1,6 +1,9 @@
 /**
  * Frontend Content aggregate — aligned with backend Domain\Content.
  * `progress` is a UI field until ProcessingJob is connected (Sprint 2+).
+ *
+ * TODO(TECH-DEBT): use API enum values here (`upload_pdf`, not `pdf`).
+ * @see planning/TECH-DEBT-sourceType-alignment.md
  */
 
 export type ContentSourceType = "pdf" | "audio" | "video" | "youtube";

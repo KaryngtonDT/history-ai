@@ -1,6 +1,7 @@
 import type { ContentRepository } from "./ContentRepository";
 import { createContentRepository } from "./ContentRepositoryFactory";
 import { computeStatistics } from "./computeStatistics";
+import { deriveTitleFromPdfFileName } from "./deriveTitleFromPdfFileName";
 import type {
 	CreateContentInput,
 	CreateContentResult,
@@ -33,6 +34,19 @@ export class ContentService {
 
 	createContent(input: CreateContentInput): Promise<CreateContentResult> {
 		return this.repository.createContent(input);
+	}
+
+	async importPdf(file: File): Promise<CreateContentResult> {
+		const validation = this.validatePdf(file);
+
+		if (!validation.valid) {
+			throw new Error(validation.error);
+		}
+
+		return this.createContent({
+			title: deriveTitleFromPdfFileName(file.name),
+			sourceType: "pdf",
+		});
 	}
 
 	validatePdf(file: File): PdfValidationResult {

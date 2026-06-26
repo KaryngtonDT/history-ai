@@ -1,11 +1,16 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
 import { ImportPage } from "@/pages/Import/ImportPage";
+import { contentService } from "@/services/content/ContentService";
 
-describe("DashboardPage — S1-SLICE-03B mock data", () => {
+describe("DashboardPage — S2-SLICE-05 real backend data", () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
 	it("renders dashboard data from the service layer", async () => {
 		render(
 			<MemoryRouter>
@@ -27,6 +32,47 @@ describe("DashboardPage — S1-SLICE-03B mock data", () => {
 		expect(screen.getByText("French Revolution")).toBeInTheDocument();
 		expect(screen.getByText("Contents")).toBeInTheDocument();
 		expect(screen.getByText("12")).toBeInTheDocument();
+	});
+
+	it("shows EmptyState when there is no content", async () => {
+		vi.spyOn(contentService, "getDashboardData").mockResolvedValue({
+			recentContents: [],
+			statistics: {
+				contents: 0,
+				completed: 0,
+				processing: 0,
+				artifacts: 0,
+			},
+		});
+
+		render(
+			<MemoryRouter>
+				<DashboardPage />
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("No content yet")).toBeInTheDocument();
+		});
+
+		expect(screen.getByText("Contents")).toBeInTheDocument();
+		expect(screen.getAllByText("0")).toHaveLength(4);
+	});
+
+	it("shows EmptyState when the backend is unavailable", async () => {
+		vi.spyOn(contentService, "getDashboardData").mockRejectedValue(
+			new Error("network"),
+		);
+
+		render(
+			<MemoryRouter>
+				<DashboardPage />
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("Unable to load dashboard")).toBeInTheDocument();
+		});
 	});
 
 	it("logs content route on card click", async () => {

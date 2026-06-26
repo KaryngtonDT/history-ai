@@ -1,3 +1,7 @@
+/**
+ * Bridge until frontend adopts backend enum values (upload_pdf, …).
+ * @see planning/TECH-DEBT-sourceType-alignment.md
+ */
 import type { ContentSourceType } from "./types";
 
 const TO_API: Record<ContentSourceType, string> = {

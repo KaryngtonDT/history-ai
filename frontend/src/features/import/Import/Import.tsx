@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 import { contentService } from "@/services/content/ContentService";
 import { ImportHeader } from "../ImportHeader";
 import { PdfDropzone } from "../PdfDropzone";
@@ -9,16 +8,20 @@ import { UploadProgress } from "../UploadProgress";
 import { UploadSuccess } from "../UploadSuccess";
 import styles from "./Import.module.css";
 
+const CREATE_CONTENT_ERROR =
+	"Could not create content. Check that the backend is running and try again.";
+
 export function Import() {
-	const navigate = useNavigate();
 	const [phase, setPhase] = useState<ImportPhase>("idle");
 	const [fileName, setFileName] = useState("");
+	const [contentId, setContentId] = useState("");
 	const [progress, setProgress] = useState(0);
 	const [errorMessage, setErrorMessage] = useState("");
 
 	const reset = () => {
 		setPhase("idle");
 		setFileName("");
+		setContentId("");
 		setProgress(0);
 		setErrorMessage("");
 	};
@@ -36,11 +39,18 @@ export function Import() {
 		setProgress(0);
 		setPhase("uploading");
 
-		await contentService.simulateUpload({
-			onProgress: setProgress,
-		});
+		try {
+			await contentService.simulateUpload({
+				onProgress: setProgress,
+			});
 
-		navigate("/processing/1");
+			const result = await contentService.importPdf(file);
+			setContentId(result.id);
+			setPhase("success");
+		} catch {
+			setErrorMessage(CREATE_CONTENT_ERROR);
+			setPhase("error");
+		}
 	};
 
 	return (
@@ -54,7 +64,11 @@ export function Import() {
 					<UploadProgress fileName={fileName} progress={progress} />
 				) : null}
 				{phase === "success" ? (
-					<UploadSuccess fileName={fileName} onImportAnother={reset} />
+					<UploadSuccess
+						fileName={fileName}
+						contentId={contentId}
+						onImportAnother={reset}
+					/>
 				) : null}
 				{phase === "error" ? (
 					<UploadError message={errorMessage} onTryAgain={reset} />

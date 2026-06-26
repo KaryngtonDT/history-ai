@@ -56,6 +56,19 @@ describe("ContentService", () => {
 		expect(values.at(-1)).toBe(100);
 		vi.useRealTimers();
 	});
+
+	it("creates content from a valid PDF file", async () => {
+		const service = new ContentService(new MockContentRepository());
+		const pdf = new File(["x"], "Roman Empire.pdf", {
+			type: "application/pdf",
+		});
+
+		const result = await service.importPdf(pdf);
+
+		expect(result.id).toBe("4");
+		const contents = await service.listContents();
+		expect(contents.at(-1)?.title).toBe("Roman Empire");
+	});
 });
 
 describe("computeStatistics", () => {

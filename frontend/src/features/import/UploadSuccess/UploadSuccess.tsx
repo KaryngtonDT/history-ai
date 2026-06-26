@@ -5,11 +5,13 @@ import styles from "./UploadSuccess.module.css";
 
 interface UploadSuccessProps {
 	fileName: string;
+	contentId: string;
 	onImportAnother: () => void;
 }
 
 export function UploadSuccess({
 	fileName,
+	contentId,
 	onImportAnother,
 }: UploadSuccessProps) {
 	return (
@@ -20,8 +22,12 @@ export function UploadSuccess({
 			</div>
 			<p className={styles.fileName}>{fileName}</p>
 			<p className={styles.message}>
-				Your PDF is ready for processing. Content will appear in your library
-				soon.
+				Content created successfully. ID:{" "}
+				<span className={styles.contentId}>{contentId}</span>
+			</p>
+			<p className={styles.hint}>
+				The PDF file was not uploaded yet. Your content will appear in the
+				library.
 			</p>
 			<div className={styles.action}>
 				<Button variant="secondary" onClick={onImportAnother}>

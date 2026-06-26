@@ -28,6 +28,17 @@
 	color: var(--shell-text-muted);
 }
 
+.contentId {
+	font-family: var(--font-mono, monospace);
+	color: var(--shell-text);
+}
+
+.hint {
+	margin: var(--space-2) 0 0;
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
 .action {
 	margin-top: var(--space-5);
 }

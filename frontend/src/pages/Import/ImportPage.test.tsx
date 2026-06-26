@@ -1,11 +1,15 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, Route, Routes } from "react-router";
-import { describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ImportPage } from "@/pages/Import/ImportPage";
-import { ProcessingPage } from "@/pages/Processing/ProcessingPage";
+import { contentService } from "@/services/content/ContentService";
 
-describe("ImportPage — S1-SLICE-05 simulated upload", () => {
+describe("ImportPage — S2-SLICE-04 real content creation", () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
 	it("rejects non-PDF files", () => {
 		render(
 			<MemoryRouter>
@@ -26,16 +30,16 @@ describe("ImportPage — S1-SLICE-05 simulated upload", () => {
 		).toBeInTheDocument();
 	});
 
-	it("navigates to processing after simulated PDF upload", async () => {
-		vi.useFakeTimers({ shouldAdvanceTime: true });
+	it("shows success with content id after PDF import", async () => {
+		vi.spyOn(contentService, "simulateUpload").mockResolvedValue();
+		vi.spyOn(contentService, "importPdf").mockResolvedValue({
+			id: "test-content-id",
+		});
 		const user = userEvent.setup();
 
 		render(
-			<MemoryRouter initialEntries={["/import"]}>
-				<Routes>
-					<Route path="/import" element={<ImportPage />} />
-					<Route path="/processing/:id" element={<ProcessingPage />} />
-				</Routes>
+			<MemoryRouter>
+				<ImportPage />
 			</MemoryRouter>,
 		);
 
@@ -48,16 +52,39 @@ describe("ImportPage — S1-SLICE-05 simulated upload", () => {
 
 		await user.upload(input, pdfFile);
 
-		expect(screen.getByText("Uploading")).toBeInTheDocument();
-
-		await vi.runAllTimersAsync();
-
 		await waitFor(() => {
-			expect(
-				screen.getByRole("heading", { name: "Processing" }),
-			).toBeInTheDocument();
+			expect(screen.getByText("Upload complete")).toBeInTheDocument();
 		});
 
-		vi.useRealTimers();
+		expect(screen.getByText("test-content-id")).toBeInTheDocument();
+	});
+
+	it("shows error when content creation fails", async () => {
+		vi.spyOn(contentService, "simulateUpload").mockResolvedValue();
+		vi.spyOn(contentService, "importPdf").mockRejectedValue(
+			new Error("network"),
+		);
+		const user = userEvent.setup();
+
+		render(
+			<MemoryRouter>
+				<ImportPage />
+			</MemoryRouter>,
+		);
+
+		const input = document.querySelector(
+			'input[type="file"]',
+		) as HTMLInputElement;
+		const pdfFile = new File(["pdf"], "roman-empire.pdf", {
+			type: "application/pdf",
+		});
+
+		await user.upload(input, pdfFile);
+
+		await waitFor(() => {
+			expect(screen.getByText("Upload failed")).toBeInTheDocument();
+		});
+
+		expect(screen.getByText(/Could not create content/i)).toBeInTheDocument();
 	});
 });
