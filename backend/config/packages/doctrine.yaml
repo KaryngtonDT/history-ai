@@ -24,8 +24,8 @@ doctrine:
 when@test:
     doctrine:
         dbal:
-            # "TEST_TOKEN" is typically set by ParaTest
-            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+            # Functional tests use sqlite:///:memory: (see phpunit.dist.xml).
+            dbname_suffix: null
 
 when@prod:
     doctrine:
