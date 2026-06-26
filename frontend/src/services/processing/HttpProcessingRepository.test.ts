@@ -50,4 +50,26 @@ describe("HttpProcessingRepository", () => {
 			ApiError,
 		);
 	});
+
+	it("creates processing job via POST /api/contents/{id}/processing-jobs", async () => {
+		const post = vi.fn().mockResolvedValue({
+			id: "job-1",
+			status: "pending",
+			progress: 0,
+		});
+		const httpClient = { get: vi.fn(), post } as unknown as HttpClient;
+
+		const repository = new HttpProcessingRepository(httpClient);
+		const result = await repository.createProcessingJob("content-1", "summary");
+
+		expect(post).toHaveBeenCalledWith(
+			"/api/contents/content-1/processing-jobs",
+			{ type: "summary" },
+		);
+		expect(result).toEqual({
+			id: "job-1",
+			status: "pending",
+			progress: 0,
+		});
+	});
 });

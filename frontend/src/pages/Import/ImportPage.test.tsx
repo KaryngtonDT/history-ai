@@ -1,13 +1,16 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ImportPage } from "@/pages/Import/ImportPage";
+import { ProcessingPage } from "@/pages/Processing/ProcessingPage";
 import { contentService } from "@/services/content/ContentService";
+import { processingService } from "@/services/processing/ProcessingService";
 
-describe("ImportPage — S2-SLICE-04 real content creation", () => {
+describe("ImportPage — S4-SLICE-04 end-to-end processing flow", () => {
 	afterEach(() => {
 		vi.restoreAllMocks();
+		vi.useRealTimers();
 	});
 
 	it("rejects non-PDF files", () => {
@@ -30,16 +33,26 @@ describe("ImportPage — S2-SLICE-04 real content creation", () => {
 		).toBeInTheDocument();
 	});
 
-	it("shows success with content id after PDF import", async () => {
+	it("creates content and processing job then navigates to processing", async () => {
+		vi.useFakeTimers({ shouldAdvanceTime: true });
 		vi.spyOn(contentService, "simulateUpload").mockResolvedValue();
 		vi.spyOn(contentService, "importPdf").mockResolvedValue({
 			id: "test-content-id",
 		});
+		vi.spyOn(processingService, "createProcessingJob").mockResolvedValue({
+			id: "1",
+			status: "pending",
+			progress: 0,
+		});
+
 		const user = userEvent.setup();
 
 		render(
-			<MemoryRouter>
-				<ImportPage />
+			<MemoryRouter initialEntries={["/import"]}>
+				<Routes>
+					<Route path="/import" element={<ImportPage />} />
+					<Route path="/processing/:id" element={<ProcessingPage />} />
+				</Routes>
 			</MemoryRouter>,
 		);
 
@@ -53,10 +66,25 @@ describe("ImportPage — S2-SLICE-04 real content creation", () => {
 		await user.upload(input, pdfFile);
 
 		await waitFor(() => {
-			expect(screen.getByText("Upload complete")).toBeInTheDocument();
+			expect(processingService.createProcessingJob).toHaveBeenCalledWith(
+				"test-content-id",
+				"summary",
+			);
 		});
 
-		expect(screen.getByText("test-content-id")).toBeInTheDocument();
+		await waitFor(() => {
+			expect(
+				screen.getByRole("heading", { name: "Processing" }),
+			).toBeInTheDocument();
+		});
+
+		expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+
+		await vi.runAllTimersAsync();
+
+		await waitFor(() => {
+			expect(screen.getByText("Processing complete")).toBeInTheDocument();
+		});
 	});
 
 	it("shows error when content creation fails", async () => {
@@ -85,6 +113,6 @@ describe("ImportPage — S2-SLICE-04 real content creation", () => {
 			expect(screen.getByText("Upload failed")).toBeInTheDocument();
 		});
 
-		expect(screen.getByText(/Could not create content/i)).toBeInTheDocument();
+		expect(screen.getByText(/Could not start processing/i)).toBeInTheDocument();
 	});
 });

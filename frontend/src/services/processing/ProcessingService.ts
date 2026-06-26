@@ -4,7 +4,11 @@ import type {
 	ProcessingUpdateCallback,
 } from "./ProcessingMonitor";
 import { createProcessingMonitor } from "./ProcessingMonitorFactory";
-import type { ProcessingRepository } from "./ProcessingRepository";
+import type {
+	CreateProcessingJobResult,
+	ProcessingJobType,
+	ProcessingRepository,
+} from "./ProcessingRepository";
 import { createProcessingRepository } from "./ProcessingRepositoryFactory";
 import type { ProcessingData } from "./types";
 
@@ -19,6 +23,13 @@ export class ProcessingService {
 
 	getProcessing(id: string): Promise<ProcessingData | null> {
 		return this.repository.getProcessing(id);
+	}
+
+	createProcessingJob(
+		contentId: string,
+		type: ProcessingJobType = "summary",
+	): Promise<CreateProcessingJobResult> {
+		return this.repository.createProcessingJob(contentId, type);
 	}
 
 	subscribeToProcessing(

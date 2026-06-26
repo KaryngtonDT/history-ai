@@ -15,6 +15,15 @@ function createRunningData(progress: number): ProcessingData {
 	};
 }
 
+function createRepositoryMock(
+	getProcessing: ProcessingRepository["getProcessing"],
+): ProcessingRepository {
+	return {
+		getProcessing,
+		createProcessingJob: vi.fn(),
+	};
+}
+
 describe("PollingProcessingMonitor", () => {
 	it("polls immediately and on each interval", async () => {
 		vi.useFakeTimers();
@@ -23,7 +32,10 @@ describe("PollingProcessingMonitor", () => {
 			.fn<ProcessingRepository["getProcessing"]>()
 			.mockResolvedValue(createRunningData(20));
 
-		const monitor = new PollingProcessingMonitor({ getProcessing }, 2000);
+		const monitor = new PollingProcessingMonitor(
+			createRepositoryMock(getProcessing),
+			2000,
+		);
 		const updates: number[] = [];
 
 		monitor.subscribe("job-1", (data) => {
@@ -52,7 +64,10 @@ describe("PollingProcessingMonitor", () => {
 				currentStep: "Completed",
 			});
 
-		const monitor = new PollingProcessingMonitor({ getProcessing }, 2000);
+		const monitor = new PollingProcessingMonitor(
+			createRepositoryMock(getProcessing),
+			2000,
+		);
 		const updates: ProcessingData["status"][] = [];
 
 		monitor.subscribe("job-1", (data) => {
@@ -80,7 +95,10 @@ describe("PollingProcessingMonitor", () => {
 					status,
 				});
 
-			const monitor = new PollingProcessingMonitor({ getProcessing }, 2000);
+			const monitor = new PollingProcessingMonitor(
+				createRepositoryMock(getProcessing),
+				2000,
+			);
 
 			monitor.subscribe("job-1", () => {});
 
@@ -100,7 +118,10 @@ describe("PollingProcessingMonitor", () => {
 			.fn<ProcessingRepository["getProcessing"]>()
 			.mockResolvedValue(createRunningData(20));
 
-		const monitor = new PollingProcessingMonitor({ getProcessing }, 2000);
+		const monitor = new PollingProcessingMonitor(
+			createRepositoryMock(getProcessing),
+			2000,
+		);
 
 		const unsubscribe = monitor.subscribe("job-1", () => {});
 

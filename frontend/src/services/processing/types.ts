@@ -31,6 +31,12 @@ export interface ProcessingJobApiDto {
 	failedAt: string | null;
 }
 
+export interface CreateProcessingJobApiResponseDto {
+	id: string;
+	status: string;
+	progress: number;
+}
+
 const TYPE_LABELS: Record<string, string> = {
 	summary: "Summary",
 	quiz: "Quiz",

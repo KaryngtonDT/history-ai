@@ -43,4 +43,18 @@ describe("ProcessingService", () => {
 
 		vi.useRealTimers();
 	});
+
+	it("creates a summary processing job for content", async () => {
+		const repository = new MockProcessingRepository();
+		const service = new ProcessingService(
+			repository,
+			new SimulatedProcessingMonitor(repository),
+		);
+
+		const job = await service.createProcessingJob("content-1", "summary");
+
+		expect(job.id).toBe("1");
+		expect(job.status).toBe("pending");
+		expect(job.progress).toBe(0);
+	});
 });
