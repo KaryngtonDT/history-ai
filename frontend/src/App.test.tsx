@@ -31,7 +31,7 @@ describe("Sprint 1 — app shell", () => {
 		expect(
 			screen.getByRole("heading", { name: "Library" }),
 		).toBeInTheDocument();
-		expect(screen.getByText("No content yet")).toBeInTheDocument();
+		expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
 
 		await user.click(screen.getByRole("link", { name: "Settings" }));
 		expect(

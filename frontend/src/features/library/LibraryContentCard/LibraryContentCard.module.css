@@ -1,0 +1,47 @@
+.card {
+	padding: var(--space-4);
+	cursor: pointer;
+	transition: box-shadow var(--duration-fast);
+}
+
+.card:hover {
+	box-shadow: var(--shadow-card);
+}
+
+.card:focus-visible {
+	outline: none;
+	box-shadow: var(--button-focus-ring);
+}
+
+.header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: var(--space-3);
+}
+
+.title {
+	margin: 0;
+	font-size: var(--font-md);
+	font-weight: var(--font-weight-medium);
+	color: var(--shell-text);
+}
+
+.badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2);
+}
+
+.progress {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+	margin-top: var(--space-4);
+}
+
+.progressLabel {
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}

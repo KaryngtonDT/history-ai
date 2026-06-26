@@ -1,16 +1,5 @@
-import { EmptyState } from "@/components/ui/EmptyState";
-import styles from "./LibraryPage.module.css";
+import { Library } from "@/features/library";
 
 export function LibraryPage() {
-	return (
-		<section>
-			<h2 className={styles.title}>Library</h2>
-			<div className={styles.content}>
-				<EmptyState
-					title="No content yet"
-					description="Import your first PDF."
-				/>
-			</div>
-		</section>
-	);
+	return <Library />;
 }
