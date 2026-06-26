@@ -5,6 +5,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { isTerminalProcessingStatus } from "@/services/processing/ProcessingMonitor";
 import { processingService } from "@/services/processing/ProcessingService";
 import type { ProcessingData } from "@/services/processing/types";
+import { ProcessingArtifacts } from "../ProcessingArtifacts";
 import { ProcessingHeader } from "../ProcessingHeader";
 import { ProcessingStatus } from "../ProcessingStatus";
 import { ProcessingSummary } from "../ProcessingSummary";
@@ -119,7 +120,10 @@ export function Processing() {
 				<ProcessingStatus data={data} />
 				<ProcessingTimeline steps={data.steps} />
 				{data.status === "completed" ? (
-					<ProcessingSummary title={data.title} />
+					<>
+						<ProcessingSummary title={data.title} />
+						<ProcessingArtifacts contentId={data.contentId} />
+					</>
 				) : null}
 			</div>
 		</div>

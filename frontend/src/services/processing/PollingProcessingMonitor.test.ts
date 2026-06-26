@@ -7,6 +7,7 @@ import type { ProcessingData } from "./types";
 function createRunningData(progress: number): ProcessingData {
 	return {
 		id: "job-1",
+		contentId: "content-1",
 		title: "Summary processing",
 		progress,
 		status: "running",

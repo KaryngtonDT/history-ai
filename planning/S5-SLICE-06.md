@@ -39,4 +39,4 @@ Infrastructure: DoctrineArtifactRepository::findByContentId()
 
 # Next
 
-**S5-SLICE-07** — Frontend displays summary artifact after processing completes
+**S5-SLICE-07** — Frontend displays summary artifact after processing completes (done)

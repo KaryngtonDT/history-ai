@@ -13,6 +13,7 @@ export interface ProcessingStepState {
 
 export interface ProcessingData {
 	id: string;
+	contentId: string;
 	title: string;
 	progress: number;
 	status: ProcessingStatus;
@@ -122,6 +123,7 @@ export function mapProcessingFromApi(dto: ProcessingJobApiDto): ProcessingData {
 
 	return {
 		id: dto.id,
+		contentId: dto.contentId,
 		title: `${typeLabel} processing`,
 		progress: dto.progress,
 		status,

@@ -3,6 +3,7 @@ import type { ProcessingData } from "@/services/processing/types";
 export const processingMocks: Record<string, ProcessingData> = {
 	"1": {
 		id: "1",
+		contentId: "1",
 		title: "The Roman Empire",
 		progress: 0,
 		status: "pending",

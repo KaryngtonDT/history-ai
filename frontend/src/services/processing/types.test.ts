@@ -16,6 +16,7 @@ describe("mapProcessingFromApi", () => {
 
 		expect(data).toMatchObject({
 			id: "job-1",
+			contentId: "content-1",
 			title: "Summary processing",
 			status: "pending",
 			progress: 0,
