@@ -17,6 +17,11 @@ export class ArtifactService {
 		const artifacts = await this.repository.listByContentId(contentId);
 		return artifacts.find((artifact) => artifact.type === "summary") ?? null;
 	}
+
+	async getTranscriptArtifact(contentId: string): Promise<Artifact | null> {
+		const artifacts = await this.repository.listByContentId(contentId);
+		return artifacts.find((artifact) => artifact.type === "transcript") ?? null;
+	}
 }
 
 export const artifactService = new ArtifactService(createArtifactRepository());

@@ -60,4 +60,21 @@ describe("ArtifactService", () => {
 
 		await expect(service.getSummaryArtifact("content-1")).resolves.toBeNull();
 	});
+
+	it("returns transcript artifact when present", async () => {
+		const transcriptArtifact: Artifact = {
+			...summaryArtifact,
+			id: "artifact-3",
+			type: "transcript",
+			content: "Extracted transcript text",
+		};
+		const listByContentId = vi
+			.fn<ArtifactRepository["listByContentId"]>()
+			.mockResolvedValue([transcriptArtifact, summaryArtifact]);
+		const service = new ArtifactService(createRepositoryMock(listByContentId));
+
+		const transcript = await service.getTranscriptArtifact("content-1");
+
+		expect(transcript).toEqual(transcriptArtifact);
+	});
 });

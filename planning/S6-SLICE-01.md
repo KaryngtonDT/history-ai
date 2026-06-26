@@ -48,4 +48,4 @@ MinIO upload is not ready. Until then:
 
 # Next
 
-**S6-SLICE-02** — Transcript artifact surfaced in frontend / pipeline hardening
+**S6-SLICE-02** — Transcript artifact surfaced in frontend (done)

@@ -4,6 +4,12 @@
 	padding: var(--space-4) 0;
 }
 
+.list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4);
+}
+
 .card {
 	padding: var(--space-5);
 }
@@ -23,4 +29,11 @@
 	line-height: 1.6;
 	color: var(--shell-text);
 	white-space: pre-wrap;
+}
+
+.transcriptContent {
+	composes: content;
+	max-height: 16rem;
+	overflow-y: auto;
+	padding-right: var(--space-2);
 }

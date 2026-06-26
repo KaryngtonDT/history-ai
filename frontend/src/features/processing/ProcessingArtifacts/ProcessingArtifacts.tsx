@@ -10,8 +10,30 @@ interface ProcessingArtifactsProps {
 	contentId: string;
 }
 
+interface ArtifactCardProps {
+	label: string;
+	content: string;
+	scrollable?: boolean;
+}
+
+function ArtifactCard({
+	label,
+	content,
+	scrollable = false,
+}: ArtifactCardProps) {
+	return (
+		<Card className={styles.card}>
+			<p className={styles.label}>{label}</p>
+			<p className={scrollable ? styles.transcriptContent : styles.content}>
+				{content}
+			</p>
+		</Card>
+	);
+}
+
 export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 	const [summary, setSummary] = useState<Artifact | null>(null);
+	const [transcript, setTranscript] = useState<Artifact | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [loadError, setLoadError] = useState<string | null>(null);
 	const [isEmpty, setIsEmpty] = useState(false);
@@ -23,21 +45,29 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 		setLoadError(null);
 		setIsEmpty(false);
 		setSummary(null);
+		setTranscript(null);
 
 		void artifactService
-			.getSummaryArtifact(contentId)
-			.then((artifact) => {
+			.listByContentId(contentId)
+			.then((artifacts) => {
 				if (cancelled) {
 					return;
 				}
 
-				if (!artifact) {
+				const summaryArtifact =
+					artifacts.find((artifact) => artifact.type === "summary") ?? null;
+				const transcriptArtifact =
+					artifacts.find((artifact) => artifact.type === "transcript") ?? null;
+
+				if (!summaryArtifact && !transcriptArtifact) {
 					setIsEmpty(true);
 					setSummary(null);
+					setTranscript(null);
 					return;
 				}
 
-				setSummary(artifact);
+				setSummary(summaryArtifact);
+				setTranscript(transcriptArtifact);
 				setIsEmpty(false);
 			})
 			.catch(() => {
@@ -46,6 +76,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 						"Could not load artifacts. Check that the backend is running.",
 					);
 					setSummary(null);
+					setTranscript(null);
 					setIsEmpty(false);
 				}
 			})
@@ -74,7 +105,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 		);
 	}
 
-	if (isEmpty || !summary) {
+	if (isEmpty) {
 		return (
 			<EmptyState
 				title="No artifacts yet"
@@ -84,9 +115,17 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 	}
 
 	return (
-		<Card className={styles.card}>
-			<p className={styles.label}>Summary</p>
-			<p className={styles.content}>{summary.content}</p>
-		</Card>
+		<div className={styles.list}>
+			{summary ? (
+				<ArtifactCard label="Summary" content={summary.content} />
+			) : null}
+			{transcript ? (
+				<ArtifactCard
+					label="Transcript"
+					content={transcript.content}
+					scrollable
+				/>
+			) : null}
+		</div>
 	);
 }

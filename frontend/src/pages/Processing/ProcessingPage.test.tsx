@@ -43,6 +43,12 @@ describe("ProcessingPage — S1-SLICE-06 simulated progress", () => {
 			).toBeInTheDocument();
 		});
 
+		await waitFor(() => {
+			expect(
+				screen.getByText("The Roman Empire was a vast civilization."),
+			).toBeInTheDocument();
+		});
+
 		vi.useRealTimers();
 	});
 

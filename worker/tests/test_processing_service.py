@@ -2,20 +2,25 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from app.generators.SummaryGenerator import SummaryGenerator
 from app.models.ProcessingJob import ProcessingJob
 from app.services.ProcessingService import ProcessingService
 
 
 @pytest.mark.asyncio
-async def test_execute_creates_transcript_and_summary_before_complete() -> None:
+async def test_execute_creates_summary_from_transcript_not_placeholder() -> None:
     repository = MagicMock()
     document_extraction = MagicMock()
-    document_extraction.extract_transcript.return_value = (
-        "The Roman Empire was a vast civilization."
+    transcript = (
+        "The Roman Empire was vast. It lasted many centuries. "
+        "Its legacy shaped Europe. Modern law still reflects Roman ideas."
     )
+    document_extraction.extract_transcript.return_value = transcript
+    summary_generator = SummaryGenerator()
     service = ProcessingService(
         repository=repository,
         document_extraction=document_extraction,
+        summary_generator=summary_generator,
         sleep_fn=_instant_sleep,
     )
     job = ProcessingJob(
@@ -37,13 +42,14 @@ async def test_execute_creates_transcript_and_summary_before_complete() -> None:
         "content-456",
         "job-123",
         "transcript",
-        "The Roman Empire was a vast civilization.",
+        transcript,
     )
     repository.create_artifact.assert_any_call(
         "content-456",
         "job-123",
         "summary",
-        ProcessingService.SUMMARY_ARTIFACT_CONTENT,
+        "The Roman Empire was vast. It lasted many centuries. "
+        "Its legacy shaped Europe.",
     )
     repository.complete.assert_called_once_with("job-123")
 
