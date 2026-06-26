@@ -27,4 +27,4 @@ tests/Unit/Application/Artifact/CreateArtifactHandlerTest.php
 
 # Next
 
-**S5-SLICE-04** — Internal HTTP endpoint for Worker to call CreateArtifactHandler
+**S5-SLICE-04** — Internal HTTP endpoint for Worker to call CreateArtifactHandler (done)
