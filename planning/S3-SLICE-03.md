@@ -1,85 +1,66 @@
-# S3-SLICE-03 — ProcessingStatus Lifecycle
+# S3-SLICE-03 — Create ProcessingJob Use Case
 
-Status: **Planned**
+Status: **Done**
 
 Epic: **Epic 03 — Asynchronous Processing Pipeline**
 
-Depends on: S3-SLICE-01
+Depends on: S3-SLICE-02
 
 ---
 
 # Goal
 
-Formalize and enforce the ProcessingJob lifecycle in the domain layer.
-
----
-
-# ProcessingStatus
+First application use case: create a `ProcessingJob` for a given Content and type.
 
 ```text
-Pending
-Running
-Completed
-Failed
+ContentId + ProcessingJobType
+  ↓
+CreateProcessingJobCommand
+  ↓
+CreateProcessingJobHandler
+  ↓
+ProcessingJob::create()
+  ↓
+ProcessingJobRepositoryInterface::save()
+  ↓
+CreateProcessingJobResult
 ```
-
-PHP enum: `ProcessingStatus` with string backing values matching API JSON (`pending`, `running`, `completed`, `failed`).
 
 ---
 
-# Domain methods
-
-On `ProcessingJob` aggregate:
+# Created
 
 ```text
-start()      Pending  → Running   (throws if not Pending)
-complete()   Running  → Completed (sets progress = 100)
-fail(reason) Running  → Failed
-updateProgress(progress, currentStep)  Running only
+Application/Processing/
+  Commands/CreateProcessingJobCommand.php
+  Handlers/CreateProcessingJobHandler.php
+  DTO/CreateProcessingJobResult.php
+
+tests/Unit/Application/Processing/
+  CreateProcessingJobHandlerTest.php
 ```
 
-Invalid transitions throw domain exceptions (e.g. `InvalidProcessingTransition`).
-
 ---
 
-# Tests
+# Result DTO
 
-| Transition | Expected |
-| ---------- | -------- |
-| Pending → Running | OK |
-| Running → Completed | OK, progress = 100 |
-| Running → Failed | OK |
-| Pending → Completed | Exception |
-| Completed → Running | Exception |
-| Failed → Running | Exception |
-
-100% unit coverage on transition matrix.
-
----
-
-# Note
-
-If S3-SLICE-01 already implements this fully, this slice is a **review + test hardening** slice only. Mark Done with no code changes if criteria already met.
+| Field | Type |
+| ----- | ---- |
+| processingJobId | ProcessingJobId |
+| status | ProcessingJobStatus (Pending) |
+| progress | int (0) |
 
 ---
 
 # Out of scope
 
-- HTTP
-- Worker
+- HTTP controller
+- Worker / queue
+- Content existence validation (deferred to API slice)
 - Frontend
-
----
-
-# Acceptance criteria
-
-- [ ] All four statuses defined
-- [ ] Transition rules enforced in aggregate
-- [ ] Unit tests cover invalid transitions
-- [ ] Domain exceptions are typed (not generic `\Exception`)
 
 ---
 
 # Next
 
-**S3-SLICE-04** — `GET /api/processing/{id}`
+**S3-SLICE-04** — `POST /api/contents/{id}/process` controller wiring
