@@ -7,9 +7,17 @@ from app.services.ProcessingService import ProcessingService
 
 
 @pytest.mark.asyncio
-async def test_execute_creates_summary_artifact_before_complete() -> None:
+async def test_execute_creates_transcript_and_summary_before_complete() -> None:
     repository = MagicMock()
-    service = ProcessingService(repository=repository, sleep_fn=_instant_sleep)
+    document_extraction = MagicMock()
+    document_extraction.extract_transcript.return_value = (
+        "The Roman Empire was a vast civilization."
+    )
+    service = ProcessingService(
+        repository=repository,
+        document_extraction=document_extraction,
+        sleep_fn=_instant_sleep,
+    )
     job = ProcessingJob(
         id="job-123",
         content_id="content-456",
@@ -23,7 +31,15 @@ async def test_execute_creates_summary_artifact_before_complete() -> None:
     repository.update_progress.assert_any_call("job-123", 45)
     repository.update_progress.assert_any_call("job-123", 80)
     assert repository.update_progress.call_count == 3
-    repository.create_artifact.assert_called_once_with(
+    document_extraction.extract_transcript.assert_called_once_with("content-456")
+    assert repository.create_artifact.call_count == 2
+    repository.create_artifact.assert_any_call(
+        "content-456",
+        "job-123",
+        "transcript",
+        "The Roman Empire was a vast civilization.",
+    )
+    repository.create_artifact.assert_any_call(
         "content-456",
         "job-123",
         "summary",
@@ -35,7 +51,12 @@ async def test_execute_creates_summary_artifact_before_complete() -> None:
 @pytest.mark.asyncio
 async def test_execute_skips_artifact_creation_for_non_summary_job() -> None:
     repository = MagicMock()
-    service = ProcessingService(repository=repository, sleep_fn=_instant_sleep)
+    document_extraction = MagicMock()
+    service = ProcessingService(
+        repository=repository,
+        document_extraction=document_extraction,
+        sleep_fn=_instant_sleep,
+    )
     job = ProcessingJob(
         id="job-123",
         content_id="content-456",
@@ -44,6 +65,7 @@ async def test_execute_skips_artifact_creation_for_non_summary_job() -> None:
 
     await service.execute(job)
 
+    document_extraction.extract_transcript.assert_not_called()
     repository.create_artifact.assert_not_called()
     repository.complete.assert_called_once_with("job-123")
 
