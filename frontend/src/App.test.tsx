@@ -4,7 +4,7 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 import { AppRouter } from "@/app/router";
 
-describe("Sprint 1 Slice 1 — app shell", () => {
+describe("Sprint 1 — app shell", () => {
 	it("renders layout and navigates between pages", async () => {
 		const user = userEvent.setup();
 
@@ -16,9 +16,10 @@ describe("Sprint 1 Slice 1 — app shell", () => {
 
 		expect(screen.getByText("Knowledge Operating System")).toBeInTheDocument();
 		expect(
-			screen.getByRole("heading", { name: "Dashboard" }),
+			screen.getByText("Transform knowledge into understanding."),
 		).toBeInTheDocument();
-		expect(screen.getByText("Welcome to History AI")).toBeInTheDocument();
+		expect(screen.getByText("Recent Content")).toBeInTheDocument();
+		expect(screen.getAllByText("Loading...").length).toBeGreaterThanOrEqual(1);
 
 		await user.click(screen.getByRole("link", { name: "Import" }));
 		expect(screen.getByRole("heading", { name: "Import" })).toBeInTheDocument();

@@ -17,8 +17,10 @@ No monolithic sprint prompts. One slice → review → next slice.
 | Slice | Deliverable | Status |
 | ----- | ----------- | ------ |
 | **1** | App shell + navigation (`S1-SLICE-01`) | **Done** |
-| **2** | UI Foundation — Button, Card, Badge, Progress… (`S1-SLICE-02`) | **Done** |
-| 3 | Dashboard with mock data (`S1-SLICE-03`) | Next |
+| **2** | UI Foundation — Design Tokens + components (`S1-SLICE-02`) | **Done** |
+| **3A** | Dashboard composition (`S1-SLICE-03A`) | **Done** |
+| 3B | Dashboard mock data (`S1-SLICE-03B`) | Next |
+| 4 | Library with mock list (`S1-SLICE-04`) | Planned |
 | 4 | Library with mock list | Planned |
 | 5 | Import PDF simulated | Planned |
 | 6 | Processing simulated | Planned |

@@ -1,0 +1,1 @@
+export { RecentContents } from "./RecentContents";

@@ -1,0 +1,18 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4);
+}
+
+.heading {
+	margin: 0;
+	font-size: var(--font-md);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.placeholder {
+	margin: 0;
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}

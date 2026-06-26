@@ -1,3 +1,7 @@
+.header {
+	margin-bottom: var(--space-5);
+}
+
 .title {
 	margin: 0;
 	font-size: var(--font-lg);
@@ -5,17 +9,8 @@
 	color: var(--shell-text);
 }
 
-.card {
-	margin-top: var(--space-5);
-}
-
-.cardContent {
-	display: flex;
-	align-items: center;
-	gap: var(--space-3);
-}
-
-.description {
-	margin: 0;
+.tagline {
+	margin: var(--space-2) 0 0;
+	font-size: var(--font-md);
 	color: var(--shell-text-muted);
 }
