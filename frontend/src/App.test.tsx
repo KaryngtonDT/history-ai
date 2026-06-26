@@ -19,7 +19,7 @@ describe("Sprint 1 — app shell", () => {
 			screen.getByText("Transform knowledge into understanding."),
 		).toBeInTheDocument();
 		expect(screen.getByText("Recent Content")).toBeInTheDocument();
-		expect(screen.getAllByText("Loading...").length).toBeGreaterThanOrEqual(1);
+		expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
 
 		await user.click(screen.getByRole("link", { name: "Import" }));
 		expect(screen.getByRole("heading", { name: "Import" })).toBeInTheDocument();

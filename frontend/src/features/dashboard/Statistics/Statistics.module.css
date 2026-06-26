@@ -11,8 +11,25 @@
 	color: var(--shell-text);
 }
 
-.placeholder {
+.grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: var(--space-3);
+}
+
+.statCard {
+	padding: var(--space-4);
+}
+
+.label {
 	margin: 0;
 	font-size: var(--font-sm);
 	color: var(--shell-text-muted);
+}
+
+.value {
+	margin: var(--space-1) 0 0;
+	font-size: var(--font-lg);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
 }

@@ -1,37 +1,40 @@
 # S1-SLICE-03B — Dashboard Mock Data
 
-Status: **Planned**
-
-Depends on: **S1-SLICE-03A**
+Status: **Done**
 
 ---
 
-# Objective
-
-Wire mock data into the dashboard composition.
-
----
-
-# Mock data
+# Data flow
 
 ```text
-services/mock/
-    contents.ts
-    statistics.ts
+Dashboard
+    ↓
+DashboardService.getDashboard()
+    ↓
+DashboardRepository (interface)
+    ↓
+MockDashboardRepository
+    ↓
+mock/dashboard.ts
+```
+
+Components never import `mock/` directly.
+
+---
+
+# Files
+
+```text
+mock/dashboard.ts
+services/dashboard/
+    types.ts
+    DashboardRepository.ts
+    MockDashboardRepository.ts
+    DashboardService.ts
 ```
 
 ---
 
-# Changes
+# Next
 
-- `RecentContents` — render content list from mocks
-- `Statistics` — render stats panel from mocks
-- Add `RecentContentCard` sub-module if needed
-
-`Dashboard.tsx` remains a pure orchestrator — no data logic.
-
----
-
-# Constraints
-
-- No backend, React Query, Zustand
+**S1-SLICE-04** — Library with mock list

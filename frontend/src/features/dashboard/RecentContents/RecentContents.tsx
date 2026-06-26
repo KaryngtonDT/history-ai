@@ -1,15 +1,22 @@
-import { Card } from "@/components/ui/Card";
+import type { DashboardContent } from "@/services/dashboard/types";
+import { RecentContentCard } from "./RecentContentCard";
 import styles from "./RecentContents.module.css";
 
-export function RecentContents() {
+interface RecentContentsProps {
+	contents: DashboardContent[];
+}
+
+export function RecentContents({ contents }: RecentContentsProps) {
 	return (
 		<section className={styles.root} aria-labelledby="recent-contents-heading">
 			<h3 id="recent-contents-heading" className={styles.heading}>
 				Recent Content
 			</h3>
-			<Card>
-				<p className={styles.placeholder}>Loading...</p>
-			</Card>
+			<div className={styles.list}>
+				{contents.map((content) => (
+					<RecentContentCard key={content.id} content={content} />
+				))}
+			</div>
 		</section>
 	);
 }
