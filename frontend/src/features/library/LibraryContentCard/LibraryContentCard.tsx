@@ -1,15 +1,15 @@
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/Progress";
-import type { LibraryContent } from "@/services/library/types";
+import type { Content } from "@/services/content/types";
 import styles from "./LibraryContentCard.module.css";
 
 interface LibraryContentCardProps {
-	content: LibraryContent;
+	content: Content;
 }
 
-function sourceTypeLabel(sourceType: LibraryContent["sourceType"]): string {
-	const labels: Record<LibraryContent["sourceType"], string> = {
+function sourceTypeLabel(sourceType: Content["sourceType"]): string {
+	const labels: Record<Content["sourceType"], string> = {
 		pdf: "PDF",
 		audio: "Audio",
 		video: "Video",
@@ -18,13 +18,11 @@ function sourceTypeLabel(sourceType: LibraryContent["sourceType"]): string {
 	return labels[sourceType];
 }
 
-function statusLabel(status: LibraryContent["status"]): string {
+function statusLabel(status: Content["status"]): string {
 	return status === "processing" ? "Processing" : "Completed";
 }
 
-function statusVariant(
-	status: LibraryContent["status"],
-): "warning" | "success" {
+function statusVariant(status: Content["status"]): "warning" | "success" {
 	return status === "processing" ? "warning" : "success";
 }
 

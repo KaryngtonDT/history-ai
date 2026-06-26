@@ -1,20 +1,18 @@
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/Progress";
-import type { DashboardContent } from "@/services/dashboard/types";
+import type { Content } from "@/services/content/types";
 import styles from "./RecentContentCard.module.css";
 
 interface RecentContentCardProps {
-	content: DashboardContent;
+	content: Content;
 }
 
-function statusLabel(status: DashboardContent["status"]): string {
+function statusLabel(status: Content["status"]): string {
 	return status === "processing" ? "Processing" : "Completed";
 }
 
-function statusVariant(
-	status: DashboardContent["status"],
-): "warning" | "success" {
+function statusVariant(status: Content["status"]): "warning" | "success" {
 	return status === "processing" ? "warning" : "success";
 }
 

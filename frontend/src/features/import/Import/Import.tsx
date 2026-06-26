@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { importService } from "@/services/import/ImportService";
-import type { ImportPhase } from "@/services/import/types";
+import { useNavigate } from "react-router";
+import { contentService } from "@/services/content/ContentService";
 import { ImportHeader } from "../ImportHeader";
 import { PdfDropzone } from "../PdfDropzone";
+import type { ImportPhase } from "../types";
 import { UploadError } from "../UploadError";
 import { UploadProgress } from "../UploadProgress";
 import { UploadSuccess } from "../UploadSuccess";
 import styles from "./Import.module.css";
 
 export function Import() {
+	const navigate = useNavigate();
 	const [phase, setPhase] = useState<ImportPhase>("idle");
 	const [fileName, setFileName] = useState("");
 	const [progress, setProgress] = useState(0);
@@ -22,7 +24,7 @@ export function Import() {
 	};
 
 	const handleFileSelected = async (file: File) => {
-		const validation = importService.validatePdf(file);
+		const validation = contentService.validatePdf(file);
 
 		if (!validation.valid) {
 			setErrorMessage(validation.error);
@@ -34,11 +36,11 @@ export function Import() {
 		setProgress(0);
 		setPhase("uploading");
 
-		await importService.simulateUpload({
+		await contentService.simulateUpload({
 			onProgress: setProgress,
 		});
 
-		setPhase("success");
+		navigate("/processing/1");
 	};
 
 	return (

@@ -1,9 +1,9 @@
-import type { DashboardContent } from "@/services/dashboard/types";
+import type { Content } from "@/services/content/types";
 import { RecentContentCard } from "./RecentContentCard";
 import styles from "./RecentContents.module.css";
 
 interface RecentContentsProps {
-	contents: DashboardContent[];
+	contents: Content[];
 }
 
 export function RecentContents({ contents }: RecentContentsProps) {

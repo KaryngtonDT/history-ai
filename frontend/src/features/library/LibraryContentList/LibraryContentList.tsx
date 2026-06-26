@@ -1,9 +1,9 @@
-import type { LibraryContent } from "@/services/library/types";
+import type { Content } from "@/services/content/types";
 import { LibraryContentCard } from "../LibraryContentCard";
 import styles from "./LibraryContentList.module.css";
 
 interface LibraryContentListProps {
-	contents: LibraryContent[];
+	contents: Content[];
 }
 
 export function LibraryContentList({ contents }: LibraryContentListProps) {

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
@@ -18,8 +18,14 @@ describe("Sprint 1 — app shell", () => {
 		expect(
 			screen.getByText("Transform knowledge into understanding."),
 		).toBeInTheDocument();
-		expect(screen.getByText("Recent Content")).toBeInTheDocument();
-		expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+
+		await waitFor(() => {
+			expect(screen.getByText("Recent Content")).toBeInTheDocument();
+		});
+
+		await waitFor(() => {
+			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+		});
 
 		await user.click(screen.getByRole("link", { name: "Import" }));
 		expect(screen.getByRole("heading", { name: "Import" })).toBeInTheDocument();
@@ -31,7 +37,10 @@ describe("Sprint 1 — app shell", () => {
 		expect(
 			screen.getByRole("heading", { name: "Library" }),
 		).toBeInTheDocument();
-		expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+
+		await waitFor(() => {
+			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+		});
 
 		await user.click(screen.getByRole("link", { name: "Settings" }));
 		expect(

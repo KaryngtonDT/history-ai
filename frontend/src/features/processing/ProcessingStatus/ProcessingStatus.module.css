@@ -1,0 +1,50 @@
+.card {
+	padding: var(--space-5);
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-3);
+	margin-bottom: var(--space-4);
+}
+
+.label {
+	margin: 0;
+	font-size: var(--font-md);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.percent {
+	margin: var(--space-2) 0 0;
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
+.currentStep {
+	margin-top: var(--space-5);
+	padding-top: var(--space-5);
+	border-top: 1px solid var(--shell-border);
+}
+
+.currentLabel {
+	margin: 0;
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
+.currentValue {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	margin-top: var(--space-2);
+}
+
+.currentText {
+	margin: 0;
+	font-size: var(--font-md);
+	font-weight: var(--font-weight-medium);
+	color: var(--shell-text);
+}

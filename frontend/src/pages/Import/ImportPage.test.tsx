@@ -1,11 +1,17 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import { ImportPage } from "@/pages/Import/ImportPage";
+import { ProcessingPage } from "@/pages/Processing/ProcessingPage";
 
 describe("ImportPage — S1-SLICE-05 simulated upload", () => {
 	it("rejects non-PDF files", () => {
-		render(<ImportPage />);
+		render(
+			<MemoryRouter>
+				<ImportPage />
+			</MemoryRouter>,
+		);
 
 		const input = document.querySelector(
 			'input[type="file"]',
@@ -20,11 +26,18 @@ describe("ImportPage — S1-SLICE-05 simulated upload", () => {
 		).toBeInTheDocument();
 	});
 
-	it("simulates PDF upload through success state", async () => {
+	it("navigates to processing after simulated PDF upload", async () => {
 		vi.useFakeTimers({ shouldAdvanceTime: true });
 		const user = userEvent.setup();
 
-		render(<ImportPage />);
+		render(
+			<MemoryRouter initialEntries={["/import"]}>
+				<Routes>
+					<Route path="/import" element={<ImportPage />} />
+					<Route path="/processing/:id" element={<ProcessingPage />} />
+				</Routes>
+			</MemoryRouter>,
+		);
 
 		const input = document.querySelector(
 			'input[type="file"]',
@@ -36,15 +49,14 @@ describe("ImportPage — S1-SLICE-05 simulated upload", () => {
 		await user.upload(input, pdfFile);
 
 		expect(screen.getByText("Uploading")).toBeInTheDocument();
-		expect(screen.getByText("roman-empire.pdf")).toBeInTheDocument();
 
 		await vi.runAllTimersAsync();
 
 		await waitFor(() => {
-			expect(screen.getByText("Upload complete")).toBeInTheDocument();
+			expect(
+				screen.getByRole("heading", { name: "Processing" }),
+			).toBeInTheDocument();
 		});
-
-		expect(screen.getByText("Completed")).toBeInTheDocument();
 
 		vi.useRealTimers();
 	});

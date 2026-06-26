@@ -1,10 +1,7 @@
-import type {
-	DashboardContent,
-	DashboardStatistics,
-} from "@/services/dashboard/types";
+import type { Content } from "@/services/content/types";
 
-export const dashboardMock = {
-	recentContents: [
+export const contentMock: { contents: Content[] } = {
+	contents: [
 		{
 			id: "1",
 			title: "The Roman Empire",
@@ -26,12 +23,5 @@ export const dashboardMock = {
 			status: "completed",
 			progress: 100,
 		},
-	] satisfies DashboardContent[],
-
-	statistics: {
-		contents: 3,
-		completed: 2,
-		processing: 1,
-		artifacts: 12,
-	} satisfies DashboardStatistics,
+	],
 };

@@ -1,0 +1,26 @@
+.step {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
+.step[data-active="true"] {
+	color: var(--shell-text);
+	font-weight: var(--font-weight-medium);
+}
+
+.step[data-completed="true"] {
+	color: var(--shell-text);
+}
+
+.icon {
+	width: var(--space-4);
+	flex-shrink: 0;
+	text-align: center;
+}
+
+.label {
+	margin: 0;
+}

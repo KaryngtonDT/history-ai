@@ -1,12 +1,12 @@
 import { Card } from "@/components/ui/Card";
-import type { DashboardStatistics } from "@/services/dashboard/types";
+import type { ContentStatistics } from "@/services/content/types";
 import styles from "./Statistics.module.css";
 
 interface StatisticsProps {
-	statistics: DashboardStatistics;
+	statistics: ContentStatistics;
 }
 
-const statItems: { key: keyof DashboardStatistics; label: string }[] = [
+const statItems: { key: keyof ContentStatistics; label: string }[] = [
 	{ key: "contents", label: "Contents" },
 	{ key: "completed", label: "Completed" },
 	{ key: "processing", label: "Processing" },

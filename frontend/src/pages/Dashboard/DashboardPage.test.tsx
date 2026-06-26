@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it, vi } from "vitest";
@@ -6,17 +6,20 @@ import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
 import { ImportPage } from "@/pages/Import/ImportPage";
 
 describe("DashboardPage — S1-SLICE-03B mock data", () => {
-	it("renders dashboard data from the service layer", () => {
+	it("renders dashboard data from the service layer", async () => {
 		render(
 			<MemoryRouter>
 				<DashboardPage />
 			</MemoryRouter>,
 		);
 
+		await waitFor(() => {
+			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+		});
+
 		expect(
 			screen.getByText("Transform knowledge into understanding."),
 		).toBeInTheDocument();
-		expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
 		expect(screen.getByRole("progressbar")).toHaveAttribute(
 			"aria-valuenow",
 			"62",
@@ -36,6 +39,12 @@ describe("DashboardPage — S1-SLICE-03B mock data", () => {
 			</MemoryRouter>,
 		);
 
+		await waitFor(() => {
+			expect(
+				screen.getByRole("button", { name: /The Roman Empire/i }),
+			).toBeInTheDocument();
+		});
+
 		await user.click(screen.getByRole("button", { name: /The Roman Empire/i }));
 		expect(logSpy).toHaveBeenCalledWith("/content/1");
 
@@ -53,6 +62,12 @@ describe("DashboardPage — S1-SLICE-03B mock data", () => {
 				</Routes>
 			</MemoryRouter>,
 		);
+
+		await waitFor(() => {
+			expect(
+				screen.getByRole("button", { name: "Import Video" }),
+			).toBeInTheDocument();
+		});
 
 		await user.click(screen.getByRole("button", { name: "Import Video" }));
 		expect(screen.getByRole("heading", { name: "Import" })).toBeInTheDocument();

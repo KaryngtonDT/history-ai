@@ -1,0 +1,18 @@
+.header {
+	margin-bottom: var(--space-5);
+	padding-bottom: var(--space-5);
+	border-bottom: 1px solid var(--shell-border);
+}
+
+.heading {
+	margin: 0;
+	font-size: var(--font-lg);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.title {
+	margin: var(--space-2) 0 0;
+	font-size: var(--font-md);
+	color: var(--shell-text-muted);
+}
