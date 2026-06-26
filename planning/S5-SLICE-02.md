@@ -26,4 +26,4 @@ migrations/Version20260626150000.php
 
 # Next
 
-**S5-SLICE-03** — Produce first artifact from Worker or Application handler
+**S5-SLICE-03** — Create Artifact use case (done)
