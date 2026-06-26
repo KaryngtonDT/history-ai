@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Application\Processing;
 
 use App\Application\Processing\Commands\CreateProcessingJobCommand;
 use App\Application\Processing\Handlers\CreateProcessingJobHandler;
+use App\Application\Processing\Ports\ProcessingOrchestratorInterface;
 use App\Domain\Content\ContentId;
 use App\Domain\Content\Exception\InvalidContentIdException;
 use App\Domain\Processing\ProcessingJob;
@@ -30,7 +31,13 @@ final class CreateProcessingJobHandlerTest extends TestCase
                     && 0 === $job->progress()->percentage();
             }));
 
-        $handler = new CreateProcessingJobHandler($repository);
+        $orchestrator = $this->createMock(ProcessingOrchestratorInterface::class);
+        $orchestrator
+            ->expects(self::once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(ProcessingJob::class));
+
+        $handler = new CreateProcessingJobHandler($repository, $orchestrator);
 
         $result = $handler(new CreateProcessingJobCommand(
             contentId: $contentId->value,
@@ -52,7 +59,10 @@ final class CreateProcessingJobHandlerTest extends TestCase
                 return ProcessingJobType::Quiz === $job->type();
             }));
 
-        $handler = new CreateProcessingJobHandler($repository);
+        $orchestrator = $this->createMock(ProcessingOrchestratorInterface::class);
+        $orchestrator->expects(self::once())->method('dispatch');
+
+        $handler = new CreateProcessingJobHandler($repository, $orchestrator);
 
         $result = $handler(new CreateProcessingJobCommand(
             contentId: ContentId::generate()->value,
@@ -67,7 +77,9 @@ final class CreateProcessingJobHandlerTest extends TestCase
         $repository = $this->createMock(ProcessingJobRepositoryInterface::class);
         $repository->expects(self::once())->method('save');
 
-        $handler = new CreateProcessingJobHandler($repository);
+        $orchestrator = $this->createStub(ProcessingOrchestratorInterface::class);
+
+        $handler = new CreateProcessingJobHandler($repository, $orchestrator);
 
         $handler(new CreateProcessingJobCommand(
             contentId: ContentId::generate()->value,
@@ -80,7 +92,10 @@ final class CreateProcessingJobHandlerTest extends TestCase
         $repository = $this->createMock(ProcessingJobRepositoryInterface::class);
         $repository->expects(self::never())->method('save');
 
-        $handler = new CreateProcessingJobHandler($repository);
+        $orchestrator = $this->createMock(ProcessingOrchestratorInterface::class);
+        $orchestrator->expects(self::never())->method('dispatch');
+
+        $handler = new CreateProcessingJobHandler($repository, $orchestrator);
 
         $this->expectException(InvalidContentIdException::class);
 

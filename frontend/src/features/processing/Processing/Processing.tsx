@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Spinner } from "@/components/ui/Spinner";
+import { FEATURES } from "@/config/features";
 import { processingService } from "@/services/processing/ProcessingService";
 import type { ProcessingData } from "@/services/processing/types";
 import { ProcessingHeader } from "../ProcessingHeader";
@@ -12,37 +14,72 @@ import styles from "./Processing.module.css";
 export function Processing() {
 	const { id } = useParams();
 	const [data, setData] = useState<ProcessingData | null>(null);
+	const [loading, setLoading] = useState(true);
 	const [notFound, setNotFound] = useState(false);
+	const [loadError, setLoadError] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (!id) {
+			setLoading(false);
 			setNotFound(true);
 			return;
 		}
-
-		const initial = processingService.getProcessing(id);
-		if (!initial) {
-			setNotFound(true);
-			return;
-		}
-
-		setData(initial);
-		setNotFound(false);
 
 		let cancelled = false;
 
-		void processingService.simulateProcessing(id, {
-			onUpdate: (update) => {
-				if (!cancelled) {
-					setData(update);
+		void processingService
+			.getProcessing(id)
+			.then((initial) => {
+				if (cancelled) {
+					return;
 				}
-			},
-		});
+
+				if (!initial) {
+					setNotFound(true);
+					setData(null);
+					setLoadError(null);
+					setLoading(false);
+					return;
+				}
+
+				setData(initial);
+				setNotFound(false);
+				setLoadError(null);
+				setLoading(false);
+
+				if (FEATURES.USE_MOCK) {
+					void processingService.simulateProcessing(id, {
+						onUpdate: (update) => {
+							if (!cancelled) {
+								setData(update);
+							}
+						},
+					});
+				}
+			})
+			.catch(() => {
+				if (!cancelled) {
+					setLoadError(
+						"Could not reach the server. Check that the backend is running.",
+					);
+					setData(null);
+					setNotFound(false);
+					setLoading(false);
+				}
+			});
 
 		return () => {
 			cancelled = true;
 		};
 	}, [id]);
+
+	if (loading) {
+		return (
+			<div className={styles.loading}>
+				<Spinner label="Loading processing status" />
+			</div>
+		);
+	}
 
 	if (notFound) {
 		return (
@@ -50,6 +87,12 @@ export function Processing() {
 				title="Processing job not found"
 				description="Return to the dashboard to continue."
 			/>
+		);
+	}
+
+	if (loadError !== null) {
+		return (
+			<EmptyState title="Unable to load processing" description={loadError} />
 		);
 	}
 

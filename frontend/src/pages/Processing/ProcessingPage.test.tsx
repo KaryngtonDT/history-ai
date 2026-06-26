@@ -15,9 +15,12 @@ describe("ProcessingPage — S1-SLICE-06 simulated progress", () => {
 			</MemoryRouter>,
 		);
 
-		expect(
-			screen.getByRole("heading", { name: "Processing" }),
-		).toBeInTheDocument();
+		await waitFor(() => {
+			expect(
+				screen.getByRole("heading", { name: "Processing" }),
+			).toBeInTheDocument();
+		});
+
 		expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
 		expect(screen.getByRole("progressbar")).toHaveAttribute(
 			"aria-valuenow",
@@ -35,7 +38,7 @@ describe("ProcessingPage — S1-SLICE-06 simulated progress", () => {
 		vi.useRealTimers();
 	});
 
-	it("shows empty state for unknown processing id", () => {
+	it("shows empty state for unknown processing id", async () => {
 		render(
 			<MemoryRouter initialEntries={["/processing/unknown"]}>
 				<Routes>
@@ -44,6 +47,8 @@ describe("ProcessingPage — S1-SLICE-06 simulated progress", () => {
 			</MemoryRouter>,
 		);
 
-		expect(screen.getByText("Processing job not found")).toBeInTheDocument();
+		await waitFor(() => {
+			expect(screen.getByText("Processing job not found")).toBeInTheDocument();
+		});
 	});
 });

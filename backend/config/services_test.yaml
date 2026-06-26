@@ -4,3 +4,7 @@ when@test:
         App\Domain\Processing\ProcessingJobRepositoryInterface:
             alias: App\Infrastructure\Persistence\Doctrine\Processing\DoctrineProcessingJobRepository
             public: true
+
+        App\Application\Processing\Ports\ProcessingOrchestratorInterface:
+            class: App\Infrastructure\Processing\NoOpProcessingOrchestrator
+            public: true

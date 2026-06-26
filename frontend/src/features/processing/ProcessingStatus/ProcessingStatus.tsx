@@ -11,12 +11,15 @@ interface ProcessingStatusProps {
 
 function statusBadgeVariant(
 	status: ProcessingData["status"],
-): "neutral" | "info" | "success" {
+): "neutral" | "info" | "success" | "danger" {
 	if (status === "completed") {
 		return "success";
 	}
 	if (status === "running") {
 		return "info";
+	}
+	if (status === "failed") {
+		return "danger";
 	}
 	return "neutral";
 }
@@ -27,6 +30,12 @@ function statusLabel(status: ProcessingData["status"]): string {
 	}
 	if (status === "running") {
 		return "Running";
+	}
+	if (status === "failed") {
+		return "Failed";
+	}
+	if (status === "cancelled") {
+		return "Cancelled";
 	}
 	return "Pending";
 }

@@ -71,6 +71,7 @@ services:
       APP_SECRET: ${APP_SECRET:-change-me}
       DATABASE_URL: ${DATABASE_URL:-postgresql://history_ai:history_ai@postgres:5432/history_ai?serverVersion=17&charset=utf8}
       MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=0}
+      WORKER_BASE_URL: ${WORKER_BASE_URL:-http://worker:8001}
     ports:
       - "8000:80"
     networks:
@@ -114,6 +115,8 @@ services:
       context: .
       dockerfile: infrastructure/docker/worker/Dockerfile
     restart: unless-stopped
+    environment:
+      SYMFONY_API_BASE_URL: ${SYMFONY_API_BASE_URL:-http://backend}
     ports:
       - "8001:8001"
     networks:

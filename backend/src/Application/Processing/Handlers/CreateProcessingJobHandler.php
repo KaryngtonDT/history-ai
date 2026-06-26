@@ -6,6 +6,7 @@ namespace App\Application\Processing\Handlers;
 
 use App\Application\Processing\Commands\CreateProcessingJobCommand;
 use App\Application\Processing\DTO\CreateProcessingJobResult;
+use App\Application\Processing\Ports\ProcessingOrchestratorInterface;
 use App\Domain\Content\ContentId;
 use App\Domain\Processing\ProcessingJob;
 use App\Domain\Processing\ProcessingJobId;
@@ -15,6 +16,7 @@ final class CreateProcessingJobHandler
 {
     public function __construct(
         private readonly ProcessingJobRepositoryInterface $processingJobRepository,
+        private readonly ProcessingOrchestratorInterface $processingOrchestrator,
     ) {
     }
 
@@ -27,6 +29,7 @@ final class CreateProcessingJobHandler
         );
 
         $this->processingJobRepository->save($job);
+        $this->processingOrchestrator->dispatch($job);
 
         return new CreateProcessingJobResult(
             $job->id(),

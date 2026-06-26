@@ -2,6 +2,7 @@
 # Files in the packages/ subdirectory configure your dependencies.
 
 parameters:
+    worker.base_url: '%env(WORKER_BASE_URL)%'
 
 services:
     _defaults:
@@ -22,6 +23,13 @@ services:
 
     App\Domain\Processing\ProcessingJobRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Processing\DoctrineProcessingJobRepository
+
+    App\Application\Processing\Ports\ProcessingOrchestratorInterface:
+        alias: App\Infrastructure\Processing\HttpWorkerDispatcher
+
+    App\Infrastructure\Processing\HttpWorkerDispatcher:
+        arguments:
+            $workerBaseUrl: '%worker.base_url%'
 
     App\Shared\:
         resource: '../src/Shared/'

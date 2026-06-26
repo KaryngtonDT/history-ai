@@ -1,5 +1,5 @@
-import { MockProcessingRepository } from "./MockProcessingRepository";
 import type { ProcessingRepository } from "./ProcessingRepository";
+import { createProcessingRepository } from "./ProcessingRepositoryFactory";
 import type {
 	ProcessingData,
 	ProcessingStepState,
@@ -64,7 +64,7 @@ export class ProcessingService {
 		this.repository = repository;
 	}
 
-	getProcessing(id: string): ProcessingData | null {
+	getProcessing(id: string): Promise<ProcessingData | null> {
 		return this.repository.getProcessing(id);
 	}
 
@@ -72,7 +72,7 @@ export class ProcessingService {
 		id: string,
 		options: SimulateProcessingOptions,
 	): Promise<void> {
-		const base = this.repository.getProcessing(id);
+		const base = await this.repository.getProcessing(id);
 		if (!base) {
 			return;
 		}
@@ -105,5 +105,5 @@ export class ProcessingService {
 }
 
 export const processingService = new ProcessingService(
-	new MockProcessingRepository(),
+	createProcessingRepository(),
 );

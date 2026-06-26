@@ -9,3 +9,9 @@
 	gap: var(--space-5);
 	max-width: var(--size-content-narrow);
 }
+
+.loading {
+	display: flex;
+	justify-content: center;
+	padding: var(--space-12) 0;
+}

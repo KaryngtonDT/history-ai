@@ -3,17 +3,17 @@ import { MockProcessingRepository } from "./MockProcessingRepository";
 import { ProcessingService } from "./ProcessingService";
 
 describe("ProcessingService", () => {
-	it("returns processing data by id", () => {
+	it("returns processing data by id", async () => {
 		const service = new ProcessingService(new MockProcessingRepository());
-		const data = service.getProcessing("1");
+		const data = await service.getProcessing("1");
 
 		expect(data?.title).toBe("The Roman Empire");
 		expect(data?.steps).toHaveLength(5);
 	});
 
-	it("returns null for unknown processing id", () => {
+	it("returns null for unknown processing id", async () => {
 		const service = new ProcessingService(new MockProcessingRepository());
-		expect(service.getProcessing("unknown")).toBeNull();
+		await expect(service.getProcessing("unknown")).resolves.toBeNull();
 	});
 
 	it("simulates progress from pending to completed", async () => {
