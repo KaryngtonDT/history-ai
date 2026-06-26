@@ -20,11 +20,6 @@ export interface ProcessingData {
 	steps: ProcessingStepState[];
 }
 
-export interface SimulateProcessingOptions {
-	onUpdate: (data: ProcessingData) => void;
-	stepMs?: number;
-}
-
 export interface ProcessingJobApiDto {
 	id: string;
 	contentId: string;

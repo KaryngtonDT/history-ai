@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
-import { FEATURES } from "@/config/features";
+import { isTerminalProcessingStatus } from "@/services/processing/ProcessingMonitor";
 import { processingService } from "@/services/processing/ProcessingService";
 import type { ProcessingData } from "@/services/processing/types";
 import { ProcessingHeader } from "../ProcessingHeader";
@@ -26,6 +26,7 @@ export function Processing() {
 		}
 
 		let cancelled = false;
+		let unsubscribe: (() => void) | undefined;
 
 		void processingService
 			.getProcessing(id)
@@ -47,14 +48,24 @@ export function Processing() {
 				setLoadError(null);
 				setLoading(false);
 
-				if (FEATURES.USE_MOCK) {
-					void processingService.simulateProcessing(id, {
-						onUpdate: (update) => {
+				if (!isTerminalProcessingStatus(initial.status)) {
+					unsubscribe = processingService.subscribeToProcessing(
+						id,
+						(update) => {
 							if (!cancelled) {
 								setData(update);
 							}
 						},
-					});
+						() => {
+							if (!cancelled) {
+								setLoadError(
+									"Could not reach the server. Check that the backend is running.",
+								);
+								setData(null);
+								setNotFound(false);
+							}
+						},
+					);
 				}
 			})
 			.catch(() => {
@@ -70,6 +81,7 @@ export function Processing() {
 
 		return () => {
 			cancelled = true;
+			unsubscribe?.();
 		};
 	}, [id]);
 
