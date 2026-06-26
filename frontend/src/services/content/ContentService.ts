@@ -1,6 +1,6 @@
 import type { ContentRepository } from "./ContentRepository";
+import { createContentRepository } from "./ContentRepositoryFactory";
 import { computeStatistics } from "./computeStatistics";
-import { MockContentRepository } from "./MockContentRepository";
 import type {
 	CreateContentInput,
 	CreateContentResult,
@@ -59,4 +59,4 @@ export class ContentService {
 	}
 }
 
-export const contentService = new ContentService(new MockContentRepository());
+export const contentService = new ContentService(createContentRepository());

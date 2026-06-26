@@ -22,10 +22,7 @@ describe("Sprint 1 — app shell", () => {
 		await waitFor(() => {
 			expect(screen.getByText("Recent Content")).toBeInTheDocument();
 		});
-
-		await waitFor(() => {
-			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
-		});
+		expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
 
 		await user.click(screen.getByRole("link", { name: "Import" }));
 		expect(screen.getByRole("heading", { name: "Import" })).toBeInTheDocument();
