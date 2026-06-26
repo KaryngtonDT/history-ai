@@ -1,10 +1,16 @@
 import { CONTENTS_PATH } from "@/config/api";
 import type { HttpClient } from "@/services/http/HttpClient";
-import type { ContentApiItem, CreateContentApiResponse } from "./apiTypes";
+import type {
+	ContentApiDto,
+	CreateContentApiResponseDto,
+} from "./api/ContentApiDto";
 import type { ContentRepository } from "./ContentRepository";
-import { mapContentFromApi } from "./mapContentFromApi";
-import { mapSourceTypeToApi } from "./mapSourceType";
-import type { Content, CreateContentInput, CreateContentResult } from "./types";
+import type {
+	Content,
+	CreateContentInput,
+	CreateContentResult,
+} from "./domain/Content";
+import { ContentMapper } from "./mappers/ContentMapper";
 
 /**
  * HTTP adapter for Symfony Content API.
@@ -19,17 +25,14 @@ export class HttpContentRepository implements ContentRepository {
 	}
 
 	async listContents(): Promise<Content[]> {
-		const items = await this.httpClient.get<ContentApiItem[]>(CONTENTS_PATH);
-		return items.map(mapContentFromApi);
+		const items = await this.httpClient.get<ContentApiDto[]>(CONTENTS_PATH);
+		return items.map(ContentMapper.fromApi);
 	}
 
 	async createContent(input: CreateContentInput): Promise<CreateContentResult> {
-		const data = await this.httpClient.post<CreateContentApiResponse>(
+		const data = await this.httpClient.post<CreateContentApiResponseDto>(
 			CONTENTS_PATH,
-			{
-				title: input.title,
-				sourceType: mapSourceTypeToApi(input.sourceType),
-			},
+			ContentMapper.toCreateApiDto(input),
 		);
 		return { id: data.id };
 	}

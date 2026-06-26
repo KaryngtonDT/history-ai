@@ -1,5 +1,5 @@
 /** Shape returned by GET /api/contents (Symfony ListContentsResponse). */
-export interface ContentApiItem {
+export interface ContentApiDto {
 	id: string;
 	title: string;
 	sourceType: string;
@@ -9,12 +9,12 @@ export interface ContentApiItem {
 }
 
 /** Body accepted by POST /api/contents. */
-export interface CreateContentApiPayload {
+export interface CreateContentApiDto {
 	title: string;
 	sourceType: string;
 }
 
 /** Body returned by POST /api/contents (201). */
-export interface CreateContentApiResponse {
+export interface CreateContentApiResponseDto {
 	id: string;
 }

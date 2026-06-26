@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { ValidationError } from "@/shared/errors";
 import { ContentService } from "./ContentService";
 import { computeStatistics } from "./computeStatistics";
 import {
@@ -68,6 +69,15 @@ describe("ContentService", () => {
 		expect(result.id).toBe("4");
 		const contents = await service.listContents();
 		expect(contents.at(-1)?.title).toBe("Roman Empire");
+	});
+
+	it("throws ValidationError for invalid PDF import", async () => {
+		const service = new ContentService(new MockContentRepository());
+		const txt = new File(["x"], "doc.txt", { type: "text/plain" });
+
+		await expect(service.importPdf(txt)).rejects.toBeInstanceOf(
+			ValidationError,
+		);
 	});
 });
 

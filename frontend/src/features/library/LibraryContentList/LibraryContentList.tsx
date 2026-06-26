@@ -1,4 +1,4 @@
-import type { Content } from "@/services/content/types";
+import type { Content } from "@/services/content/domain/Content";
 import { LibraryContentCard } from "../LibraryContentCard";
 import styles from "./LibraryContentList.module.css";
 

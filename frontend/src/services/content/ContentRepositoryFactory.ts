@@ -1,15 +1,12 @@
 import { API_BASE_URL } from "@/config/api";
+import { FEATURES } from "@/config/features";
 import { HttpClient } from "@/services/http/HttpClient";
 import type { ContentRepository } from "./ContentRepository";
 import { HttpContentRepository } from "./HttpContentRepository";
 import { MockContentRepository } from "./MockContentRepository";
 
-function shouldUseMock(): boolean {
-	return import.meta.env.VITE_USE_MOCK === "true";
-}
-
 export function createContentRepository(): ContentRepository {
-	if (shouldUseMock()) {
+	if (FEATURES.USE_MOCK) {
 		return new MockContentRepository();
 	}
 

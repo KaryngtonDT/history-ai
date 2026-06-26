@@ -1,9 +1,10 @@
-export class ContentApiError extends Error {
+import { DomainError } from "./DomainError";
+
+export class ApiError extends DomainError {
 	readonly status: number;
 
 	constructor(message: string, status: number) {
 		super(message);
-		this.name = "ContentApiError";
 		this.status = status;
 	}
 }

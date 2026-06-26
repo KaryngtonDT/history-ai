@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/Progress";
-import type { Content } from "@/services/content/types";
+import type { Content } from "@/services/content/domain/Content";
 import styles from "./RecentContentCard.module.css";
 
 interface RecentContentCardProps {

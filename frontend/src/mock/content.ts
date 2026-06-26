@@ -1,4 +1,4 @@
-import type { Content } from "@/services/content/types";
+import type { Content } from "@/services/content/domain/Content";
 
 export const contentMock: { contents: Content[] } = {
 	contents: [

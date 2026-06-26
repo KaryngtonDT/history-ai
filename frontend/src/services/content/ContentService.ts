@@ -1,14 +1,15 @@
+import { ValidationError } from "@/shared/errors";
 import type { ContentRepository } from "./ContentRepository";
 import { createContentRepository } from "./ContentRepositoryFactory";
 import { computeStatistics } from "./computeStatistics";
-import { deriveTitleFromPdfFileName } from "./deriveTitleFromPdfFileName";
 import type {
 	CreateContentInput,
 	CreateContentResult,
 	DashboardView,
 	PdfValidationResult,
 	SimulateUploadOptions,
-} from "./types";
+} from "./domain/Content";
+import { deriveTitleFromPdfFileName } from "./domain/Content";
 
 const PDF_MIME = "application/pdf";
 const INVALID_FILE_MESSAGE = "Only PDF files are supported.";
@@ -40,7 +41,7 @@ export class ContentService {
 		const validation = this.validatePdf(file);
 
 		if (!validation.valid) {
-			throw new Error(validation.error);
+			throw new ValidationError(validation.error);
 		}
 
 		return this.createContent({

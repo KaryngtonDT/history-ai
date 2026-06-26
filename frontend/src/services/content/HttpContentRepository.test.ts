@@ -1,9 +1,13 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { HttpClient } from "@/services/http/HttpClient";
-import { ContentApiError } from "./ContentApiError";
+import { ApiError } from "@/shared/errors";
 import { HttpContentRepository } from "./HttpContentRepository";
 
 describe("HttpContentRepository", () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
 	it("lists contents from GET /api/contents", async () => {
 		const get = vi.fn().mockResolvedValue([
 			{
@@ -43,15 +47,11 @@ describe("HttpContentRepository", () => {
 	});
 
 	it("propagates HTTP errors from HttpClient", async () => {
-		const get = vi
-			.fn()
-			.mockRejectedValue(new ContentApiError("GET failed", 500));
+		const get = vi.fn().mockRejectedValue(new ApiError("GET failed", 500));
 		const httpClient = { get, post: vi.fn() } as unknown as HttpClient;
 
 		const repository = new HttpContentRepository(httpClient);
 
-		await expect(repository.listContents()).rejects.toBeInstanceOf(
-			ContentApiError,
-		);
+		await expect(repository.listContents()).rejects.toBeInstanceOf(ApiError);
 	});
 });

@@ -1,4 +1,4 @@
-import type { Content, ContentStatistics } from "./types";
+import type { Content, ContentStatistics } from "./domain/Content";
 
 const ARTIFACTS_PLACEHOLDER = 12;
 

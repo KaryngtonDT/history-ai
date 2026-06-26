@@ -47,11 +47,24 @@ Planning: [README.md](README.md)
 
 # Current Focus
 
-**Phase 0 — Product Design System**
+**Sprint 3 — Processing Domain** ([SPRINT-03.md](SPRINT-03.md))
 
-`docs/07_DESIGN_SYSTEM/` + `design/wireframes/`
+Introduce `ProcessingJob` aggregate, start/status API, real Processing page, simulated Worker.
 
-Backend and frontend code: **frozen** until design validation.
+Sprint 2 (Real Content Flow) — **Complete** ([SPRINT-02.md](SPRINT-02.md))
+
+---
+
+# Sprint Roadmap (MVP → Pipeline)
+
+| Sprint | Focus | Status |
+| ------ | ----- | ------ |
+| 1 | Clickable MVP (navigation + mocks) | **Complete** |
+| 2 | Real Content Flow (API integration) | **Complete** |
+| 3 | ProcessingJob + Worker (simulated) | **Current** |
+| 4 | Artifact domain (Summary) | Planned |
+| 5 | MinIO + real file upload | Planned |
+| 6 | AI pipeline (Whisper, LLM, Quiz, …) | Planned |
 
 ---
 

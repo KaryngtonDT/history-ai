@@ -1,6 +1,10 @@
 import { contentMock } from "@/mock/content";
 import type { ContentRepository } from "./ContentRepository";
-import type { Content, CreateContentInput, CreateContentResult } from "./types";
+import type {
+	Content,
+	CreateContentInput,
+	CreateContentResult,
+} from "./domain/Content";
 
 export class MockContentRepository implements ContentRepository {
 	async listContents(): Promise<Content[]> {

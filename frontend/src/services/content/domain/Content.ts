@@ -1,8 +1,8 @@
 /**
- * Frontend Content aggregate — aligned with backend Domain\Content.
- * `progress` is a UI field until ProcessingJob is connected (Sprint 2+).
+ * Content domain model — aligned with backend Domain\Content.
+ * `progress` is a UI field until ProcessingJob is connected.
  *
- * TODO(TECH-DEBT): use API enum values here (`upload_pdf`, not `pdf`).
+ * TODO(TECH-DEBT): use API enum values (`upload_pdf`, not `pdf`).
  * @see planning/TECH-DEBT-sourceType-alignment.md
  */
 
@@ -30,10 +30,6 @@ export interface DashboardView {
 	statistics: ContentStatistics;
 }
 
-export interface LibraryView {
-	contents: Content[];
-}
-
 export interface CreateContentInput {
 	title: string;
 	sourceType: ContentSourceType;
@@ -50,4 +46,10 @@ export type PdfValidationResult =
 export interface SimulateUploadOptions {
 	onProgress: (progress: number) => void;
 	stepMs?: number;
+}
+
+export function deriveTitleFromPdfFileName(fileName: string): string {
+	const withoutExtension = fileName.replace(/\.pdf$/i, "").trim();
+
+	return withoutExtension.length > 0 ? withoutExtension : fileName;
 }

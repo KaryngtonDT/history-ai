@@ -15,11 +15,11 @@ Status: Active
 | Phase | Name | Status |
 | ----- | ---- | ------ |
 | **1** | Navigation shell + mock data | **Done** |
-| **2** | Fake PDF upload | Next |
-| **3** | Fake processing progression | Planned |
-| **4** | Fake artifacts | Planned |
+| **2** | Real Content Flow (API integration) | **Done** — [SPRINT-02.md](SPRINT-02.md) |
+| **3** | ProcessingJob + Worker (simulated) | **Current** — [SPRINT-03.md](SPRINT-03.md) |
+| **4** | Artifact (Summary) | Planned |
 | **5** | Real MinIO upload | Planned |
-| **6** | Real Whisper | Planned |
+| **6** | Real Whisper / AI | Planned |
 | **B** | [Feature-0001 PDF Upload](Epics/Epic-01-Content-Ingestion/Feature-0001-PDF-Upload/FEATURE.md) | Contract Proposed |
 | **C** | Feature-0002 YouTube Import | Planned |
 | **D** | Library (vertical Feature) | Planned |
@@ -77,10 +77,10 @@ Status: Active
 | Sprint | Demo |
 | ------ | ---- |
 | 1 ✅ | Clickable MVP — navigation + mock data |
-| 2 | Fake upload |
-| 3 | Fake processing progression |
-| 4 | Fake artifacts |
+| 2 ✅ | Real Content — Dashboard, Library, Import on PostgreSQL |
+| 3 | ProcessingJob pipeline — start, poll, Worker completes |
+| 4 | First Artifact (Summary) |
 | 5 | Real MinIO upload |
-| 6 | Real Whisper |
+| 6 | Real Whisper + AI |
 
 See [MVP-SPRINT-01.md](MVP-SPRINT-01.md).

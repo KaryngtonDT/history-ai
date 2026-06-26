@@ -74,9 +74,11 @@ planning/
 
 # Current Focus
 
-**Feature-0001 — PDF Upload** — contract phase (Proposed)
+**Sprint 3 — Processing Domain** — [SPRINT-03.md](SPRINT-03.md)
 
-Path: `planning/Epics/Epic-01-Content-Ingestion/Feature-0001-PDF-Upload/`
+Sprint 2 closed — [SPRINT-02.md](SPRINT-02.md) · Architecture review — [SPRINT-02-ARCHITECTURE-REVIEW.md](SPRINT-02-ARCHITECTURE-REVIEW.md)
+
+Feature contracts for PDF Upload remain valid for Phase B+ vertical slices.
 
 ---
 

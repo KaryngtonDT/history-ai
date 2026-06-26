@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deriveTitleFromPdfFileName } from "./deriveTitleFromPdfFileName";
+import { deriveTitleFromPdfFileName } from "./Content";
 
 describe("deriveTitleFromPdfFileName", () => {
 	it("removes the .pdf extension", () => {

@@ -1,4 +1,4 @@
-import { ContentApiError } from "@/services/content/ContentApiError";
+import { ApiError, NetworkError } from "@/shared/errors";
 
 export class HttpClient {
 	private readonly baseUrl: string;
@@ -8,37 +8,53 @@ export class HttpClient {
 	}
 
 	async get<T>(path: string): Promise<T> {
-		const response = await fetch(`${this.baseUrl}${path}`, {
-			headers: { Accept: "application/json" },
-		});
+		try {
+			const response = await fetch(`${this.baseUrl}${path}`, {
+				headers: { Accept: "application/json" },
+			});
 
-		if (!response.ok) {
-			throw new ContentApiError(
-				`GET ${path} failed (${response.status})`,
-				response.status,
-			);
+			if (!response.ok) {
+				throw new ApiError(
+					`GET ${path} failed (${response.status})`,
+					response.status,
+				);
+			}
+
+			return (await response.json()) as T;
+		} catch (error) {
+			if (error instanceof ApiError) {
+				throw error;
+			}
+
+			throw new NetworkError(`GET ${path} failed`, error);
 		}
-
-		return (await response.json()) as T;
 	}
 
 	async post<T>(path: string, body: unknown): Promise<T> {
-		const response = await fetch(`${this.baseUrl}${path}`, {
-			method: "POST",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(body),
-		});
+		try {
+			const response = await fetch(`${this.baseUrl}${path}`, {
+				method: "POST",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(body),
+			});
 
-		if (!response.ok) {
-			throw new ContentApiError(
-				`POST ${path} failed (${response.status})`,
-				response.status,
-			);
+			if (!response.ok) {
+				throw new ApiError(
+					`POST ${path} failed (${response.status})`,
+					response.status,
+				);
+			}
+
+			return (await response.json()) as T;
+		} catch (error) {
+			if (error instanceof ApiError) {
+				throw error;
+			}
+
+			throw new NetworkError(`POST ${path} failed`, error);
 		}
-
-		return (await response.json()) as T;
 	}
 }

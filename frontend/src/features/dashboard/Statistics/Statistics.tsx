@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/Card";
-import type { ContentStatistics } from "@/services/content/types";
+import type { ContentStatistics } from "@/services/content/domain/Content";
 import styles from "./Statistics.module.css";
 
 interface StatisticsProps {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import { contentService } from "@/services/content/ContentService";
-import type { Content } from "@/services/content/types";
+import type { Content } from "@/services/content/domain/Content";
 import { LibraryContentList } from "../LibraryContentList";
 import { LibraryHeader } from "../LibraryHeader";
 import styles from "./Library.module.css";

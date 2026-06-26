@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import { contentService } from "@/services/content/ContentService";
-import type { DashboardView } from "@/services/content/types";
+import type { DashboardView } from "@/services/content/domain/Content";
 import { DashboardHeader } from "../DashboardHeader/DashboardHeader";
 import { QuickActions } from "../QuickActions/QuickActions";
 import { RecentContents } from "../RecentContents/RecentContents";

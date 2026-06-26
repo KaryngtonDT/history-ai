@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ContentApiError } from "@/services/content/ContentApiError";
+import { ApiError, NetworkError } from "@/shared/errors";
 import { HttpClient } from "./HttpClient";
 
 describe("HttpClient", () => {
@@ -52,15 +52,23 @@ describe("HttpClient", () => {
 		expect(data).toEqual({ id: "new-id" });
 	});
 
-	it("throws ContentApiError when the response is not ok", async () => {
+	it("throws ApiError when the response is not ok", async () => {
 		vi.spyOn(globalThis, "fetch").mockResolvedValue(
 			new Response(null, { status: 500 }),
 		);
 
 		const client = new HttpClient("http://localhost:8000");
 
+		await expect(client.get("/api/contents")).rejects.toBeInstanceOf(ApiError);
+	});
+
+	it("throws NetworkError when fetch fails", async () => {
+		vi.spyOn(globalThis, "fetch").mockRejectedValue(new TypeError("offline"));
+
+		const client = new HttpClient("http://localhost:8000");
+
 		await expect(client.get("/api/contents")).rejects.toBeInstanceOf(
-			ContentApiError,
+			NetworkError,
 		);
 	});
 });

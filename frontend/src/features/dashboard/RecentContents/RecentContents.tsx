@@ -1,4 +1,4 @@
-import type { Content } from "@/services/content/types";
+import type { Content } from "@/services/content/domain/Content";
 import { RecentContentCard } from "./RecentContentCard";
 import styles from "./RecentContents.module.css";
 
