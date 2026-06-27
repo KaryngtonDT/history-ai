@@ -2,14 +2,14 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { LibraryPage } from "@/pages/Library/LibraryPage";
-import { contentService } from "@/services/content/ContentService";
+import { libraryService } from "@/services/library/LibraryService";
 
-describe("LibraryPage — S1-SLICE-04 mock data", () => {
+describe("LibraryPage", () => {
 	afterEach(() => {
 		vi.restoreAllMocks();
 	});
 
-	it("renders library contents from the service layer", async () => {
+	it("displays library items from the service layer", async () => {
 		render(
 			<MemoryRouter>
 				<LibraryPage />
@@ -24,16 +24,15 @@ describe("LibraryPage — S1-SLICE-04 mock data", () => {
 			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
 		});
 
-		expect(screen.getAllByText("PDF")).toHaveLength(2);
-		expect(screen.getByText("YouTube")).toBeInTheDocument();
-		expect(screen.getByRole("progressbar")).toHaveAttribute(
-			"aria-valuenow",
-			"62",
-		);
+		expect(screen.getByText("Ancient Greece Quiz")).toBeInTheDocument();
+		expect(screen.getByText("YouTube Lecture Flashcards")).toBeInTheDocument();
+		expect(screen.getByText("Summary")).toBeInTheDocument();
+		expect(screen.getByText("Quiz")).toBeInTheDocument();
+		expect(screen.getByText("Flashcards")).toBeInTheDocument();
 	});
 
 	it("shows EmptyState when the library is empty", async () => {
-		vi.spyOn(contentService, "listContents").mockResolvedValue([]);
+		vi.spyOn(libraryService, "listItems").mockResolvedValue([]);
 
 		render(
 			<MemoryRouter>
@@ -42,12 +41,12 @@ describe("LibraryPage — S1-SLICE-04 mock data", () => {
 		);
 
 		await waitFor(() => {
-			expect(screen.getByText("No content yet")).toBeInTheDocument();
+			expect(screen.getByText("No library items yet")).toBeInTheDocument();
 		});
 	});
 
 	it("shows EmptyState when loading fails", async () => {
-		vi.spyOn(contentService, "listContents").mockRejectedValue(
+		vi.spyOn(libraryService, "listItems").mockRejectedValue(
 			new Error("network"),
 		);
 

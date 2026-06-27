@@ -1,25 +1,25 @@
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
-import { contentService } from "@/services/content/ContentService";
-import type { Content } from "@/services/content/domain/Content";
+import { libraryService } from "@/services/library/LibraryService";
+import type { LibraryItem } from "@/services/library/types";
 import { LibraryContentList } from "../LibraryContentList";
 import { LibraryHeader } from "../LibraryHeader";
 import styles from "./Library.module.css";
 
 export function Library() {
-	const [contents, setContents] = useState<Content[] | null>(null);
+	const [items, setItems] = useState<LibraryItem[] | null>(null);
 	const [loadError, setLoadError] = useState<string | null>(null);
 
 	useEffect(() => {
-		void contentService
-			.listContents()
-			.then((items) => {
-				setContents(items);
+		void libraryService
+			.listItems()
+			.then((libraryItems) => {
+				setItems(libraryItems);
 				setLoadError(null);
 			})
 			.catch(() => {
-				setContents([]);
+				setItems([]);
 				setLoadError(
 					"Could not reach the server. Check that the backend is running.",
 				);
@@ -29,19 +29,19 @@ export function Library() {
 	return (
 		<div className={styles.root}>
 			<LibraryHeader />
-			{contents === null ? (
+			{items === null ? (
 				<div className={styles.loading}>
 					<Spinner label="Loading library" />
 				</div>
 			) : loadError !== null ? (
 				<EmptyState title="Unable to load library" description={loadError} />
-			) : contents.length === 0 ? (
+			) : items.length === 0 ? (
 				<EmptyState
-					title="No content yet"
-					description="Import your first PDF."
+					title="No library items yet"
+					description="Saved learning artifacts will appear here once you add them to your library."
 				/>
 			) : (
-				<LibraryContentList contents={contents} />
+				<LibraryContentList items={items} />
 			)}
 		</div>
 	);

@@ -1,36 +1,28 @@
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
-import { Progress } from "@/components/ui/Progress";
-import type { Content } from "@/services/content/domain/Content";
+import type { LibraryItem } from "@/services/library/types";
 import styles from "./LibraryContentCard.module.css";
 
 interface LibraryContentCardProps {
-	content: Content;
+	item: LibraryItem;
 }
 
-function sourceTypeLabel(sourceType: Content["sourceType"]): string {
-	const labels: Record<Content["sourceType"], string> = {
-		pdf: "PDF",
-		audio: "Audio",
-		video: "Video",
-		youtube: "YouTube",
+function typeLabel(type: LibraryItem["type"]): string {
+	const labels: Record<LibraryItem["type"], string> = {
+		summary: "Summary",
+		quiz: "Quiz",
+		flashcards: "Flashcards",
+		transcript: "Transcript",
+		timeline: "Timeline",
+		podcast: "Podcast",
 	};
-	return labels[sourceType];
+
+	return labels[type];
 }
 
-function statusLabel(status: Content["status"]): string {
-	return status === "processing" ? "Processing" : "Completed";
-}
-
-function statusVariant(status: Content["status"]): "warning" | "success" {
-	return status === "processing" ? "warning" : "success";
-}
-
-export function LibraryContentCard({ content }: LibraryContentCardProps) {
-	const isProcessing = content.status === "processing";
-
+export function LibraryContentCard({ item }: LibraryContentCardProps) {
 	const handleClick = () => {
-		console.log(`/content/${content.id}`);
+		console.log(`/content/${item.contentId}`);
 	};
 
 	return (
@@ -47,20 +39,11 @@ export function LibraryContentCard({ content }: LibraryContentCardProps) {
 			}}
 		>
 			<div className={styles.header}>
-				<h3 className={styles.title}>{content.title}</h3>
+				<h3 className={styles.title}>{item.title}</h3>
 				<div className={styles.badges}>
-					<Badge variant="neutral">{sourceTypeLabel(content.sourceType)}</Badge>
-					<Badge variant={statusVariant(content.status)}>
-						{statusLabel(content.status)}
-					</Badge>
+					<Badge variant="neutral">{typeLabel(item.type)}</Badge>
 				</div>
 			</div>
-			{isProcessing ? (
-				<div className={styles.progress}>
-					<Progress value={content.progress} />
-					<span className={styles.progressLabel}>{content.progress} %</span>
-				</div>
-			) : null}
 		</Card>
 	);
 }
