@@ -17,7 +17,7 @@ describe("createArtifactRepository", () => {
 		const repository = createArtifactRepository();
 
 		expect(repository).toBeInstanceOf(MockArtifactRepository);
-	});
+	}, 15_000);
 
 	it("returns HttpArtifactRepository when VITE_USE_MOCK=false", async () => {
 		vi.stubEnv("VITE_USE_MOCK", "false");

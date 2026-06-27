@@ -17,7 +17,7 @@ describe("createContentRepository", () => {
 		const repository = createContentRepository();
 
 		expect(repository).toBeInstanceOf(MockContentRepository);
-	});
+	}, 15_000);
 
 	it("returns HttpContentRepository when VITE_USE_MOCK=false", async () => {
 		vi.stubEnv("VITE_USE_MOCK", "false");

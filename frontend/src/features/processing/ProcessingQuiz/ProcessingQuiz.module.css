@@ -1,0 +1,60 @@
+.card {
+	padding: var(--space-5);
+}
+
+.label {
+	margin: 0;
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.quizContent {
+	margin: var(--space-3) 0 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+	color: var(--shell-text);
+	font-size: var(--font-md);
+	line-height: 1.6;
+}
+
+.title {
+	margin: 0;
+	font-size: var(--font-lg);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.questionHeading {
+	margin: var(--space-3) 0 0;
+	font-size: var(--font-md);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.questionText {
+	margin: 0;
+}
+
+.option {
+	margin: 0;
+	padding-left: var(--space-2);
+}
+
+.answer {
+	margin: var(--space-2) 0 0;
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.line {
+	margin: 0;
+	white-space: pre-wrap;
+}
+
+.emptyState {
+	margin-top: var(--space-3);
+}
