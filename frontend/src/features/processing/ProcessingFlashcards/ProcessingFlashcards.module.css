@@ -1,0 +1,68 @@
+.card {
+	padding: var(--space-5);
+}
+
+.label {
+	margin: 0;
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.flashcardsContent {
+	margin: var(--space-3) 0 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4);
+}
+
+.flashcardItem {
+	padding: var(--space-4);
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-md);
+	background: var(--shell-surface);
+}
+
+.cardTitle {
+	margin: 0 0 var(--space-3);
+	font-size: var(--font-md);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.side {
+	margin: 0 0 var(--space-3);
+}
+
+.side:last-child {
+	margin-bottom: 0;
+}
+
+.sideLabel {
+	margin: 0 0 var(--space-1);
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text-muted);
+}
+
+.sideContent {
+	margin: 0;
+	color: var(--shell-text);
+	font-size: var(--font-md);
+	line-height: 1.6;
+	white-space: pre-wrap;
+}
+
+.fallbackContent {
+	margin: var(--space-3) 0 0;
+	color: var(--shell-text);
+	font-size: var(--font-md);
+	line-height: 1.6;
+	white-space: pre-wrap;
+}
+
+.emptyState {
+	margin-top: var(--space-3);
+}

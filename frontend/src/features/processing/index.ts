@@ -1,5 +1,6 @@
 export { Processing } from "./Processing";
 export { ProcessingArtifacts } from "./ProcessingArtifacts";
+export { ProcessingFlashcards } from "./ProcessingFlashcards";
 export { ProcessingHeader } from "./ProcessingHeader";
 export { ProcessingQuiz } from "./ProcessingQuiz";
 export { ProcessingStatus } from "./ProcessingStatus";

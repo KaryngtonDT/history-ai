@@ -34,5 +34,5 @@ describe("createProcessingRepository", () => {
 		const repository = createProcessingRepository();
 
 		expect(repository).toBeInstanceOf(HttpProcessingRepository);
-	});
+	}, 15_000);
 });

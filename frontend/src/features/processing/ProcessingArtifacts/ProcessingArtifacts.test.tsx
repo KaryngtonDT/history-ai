@@ -72,7 +72,32 @@ describe("ProcessingArtifacts", () => {
 		});
 	});
 
-	it("displays summary, transcript and quiz when all are present", async () => {
+	it("displays flashcards artifact content in a card", async () => {
+		vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
+			{
+				id: "artifact-4",
+				contentId: "content-1",
+				processingJobId: "job-1",
+				type: "flashcards",
+				content:
+					"# Flashcards\n\n## Card 1\n\nFront:\nSample term\n\nBack:\nSample definition",
+				createdAt: "2026-06-26T12:00:03+00:00",
+			},
+		]);
+
+		render(<ProcessingArtifacts contentId="content-1" />);
+
+		await waitFor(() => {
+			expect(screen.getByText("Flashcards")).toBeInTheDocument();
+			expect(
+				screen.getByRole("heading", { name: "Card 1" }),
+			).toBeInTheDocument();
+			expect(screen.getByText("Sample term")).toBeInTheDocument();
+			expect(screen.getByText("Sample definition")).toBeInTheDocument();
+		});
+	});
+
+	it("displays summary, transcript, quiz and flashcards when all are present", async () => {
 		vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
 			{
 				id: "artifact-2",
@@ -98,6 +123,15 @@ describe("ProcessingArtifacts", () => {
 				content: "# Quiz\n\n## Question 1\nQuiz question\nAnswer: A",
 				createdAt: "2026-06-26T12:00:02+00:00",
 			},
+			{
+				id: "artifact-4",
+				contentId: "content-1",
+				processingJobId: "job-1",
+				type: "flashcards",
+				content:
+					"# Flashcards\n\n## Card 1\n\nFront:\nTerm\n\nBack:\nDefinition",
+				createdAt: "2026-06-26T12:00:03+00:00",
+			},
 		]);
 
 		render(<ProcessingArtifacts contentId="content-1" />);
@@ -108,6 +142,47 @@ describe("ProcessingArtifacts", () => {
 			expect(
 				screen.getByRole("heading", { name: "Question 1" }),
 			).toBeInTheDocument();
+			expect(
+				screen.getByRole("heading", { name: "Card 1" }),
+			).toBeInTheDocument();
+			expect(screen.getByText("Term")).toBeInTheDocument();
+			expect(screen.getByText("Definition")).toBeInTheDocument();
+		});
+	});
+
+	it("shows flashcards empty state when other artifacts exist without flashcards", async () => {
+		vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
+			{
+				id: "artifact-1",
+				contentId: "content-1",
+				processingJobId: "job-1",
+				type: "summary",
+				content: "Generated summary text",
+				createdAt: "2026-06-26T12:00:00+00:00",
+			},
+			{
+				id: "artifact-2",
+				contentId: "content-1",
+				processingJobId: "job-1",
+				type: "transcript",
+				content: "Extracted transcript text",
+				createdAt: "2026-06-26T12:00:01+00:00",
+			},
+			{
+				id: "artifact-3",
+				contentId: "content-1",
+				processingJobId: "job-1",
+				type: "quiz",
+				content: "# Quiz\n\n## Question 1\nQuiz question\nAnswer: A",
+				createdAt: "2026-06-26T12:00:02+00:00",
+			},
+		]);
+
+		render(<ProcessingArtifacts contentId="content-1" />);
+
+		await waitFor(() => {
+			expect(screen.getByText("Generated summary text")).toBeInTheDocument();
+			expect(screen.getByText("No flashcards yet")).toBeInTheDocument();
 		});
 	});
 

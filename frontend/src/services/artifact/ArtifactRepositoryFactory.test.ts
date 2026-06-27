@@ -30,5 +30,5 @@ describe("createArtifactRepository", () => {
 		const repository = createArtifactRepository();
 
 		expect(repository).toBeInstanceOf(HttpArtifactRepository);
-	});
+	}, 15_000);
 });

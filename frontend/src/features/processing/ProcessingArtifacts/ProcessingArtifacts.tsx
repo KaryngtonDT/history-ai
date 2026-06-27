@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { ProcessingFlashcards } from "@/features/processing/ProcessingFlashcards";
 import { ProcessingQuiz } from "@/features/processing/ProcessingQuiz";
 import { artifactService } from "@/services/artifact/ArtifactService";
 import type { Artifact } from "@/services/artifact/types";
@@ -43,6 +44,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 	const [summary, setSummary] = useState<Artifact | null>(null);
 	const [transcript, setTranscript] = useState<Artifact | null>(null);
 	const [quiz, setQuiz] = useState<Artifact | null>(null);
+	const [flashcards, setFlashcards] = useState<Artifact | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [loadError, setLoadError] = useState<string | null>(null);
 	const [isEmpty, setIsEmpty] = useState(false);
@@ -56,6 +58,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 		setSummary(null);
 		setTranscript(null);
 		setQuiz(null);
+		setFlashcards(null);
 
 		void artifactService
 			.listByContentId(contentId)
@@ -67,18 +70,26 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 				const summaryArtifact = findArtifactByType(artifacts, "summary");
 				const transcriptArtifact = findArtifactByType(artifacts, "transcript");
 				const quizArtifact = findArtifactByType(artifacts, "quiz");
+				const flashcardsArtifact = findArtifactByType(artifacts, "flashcards");
 
-				if (!summaryArtifact && !transcriptArtifact && !quizArtifact) {
+				if (
+					!summaryArtifact &&
+					!transcriptArtifact &&
+					!quizArtifact &&
+					!flashcardsArtifact
+				) {
 					setIsEmpty(true);
 					setSummary(null);
 					setTranscript(null);
 					setQuiz(null);
+					setFlashcards(null);
 					return;
 				}
 
 				setSummary(summaryArtifact);
 				setTranscript(transcriptArtifact);
 				setQuiz(quizArtifact);
+				setFlashcards(flashcardsArtifact);
 				setIsEmpty(false);
 			})
 			.catch(() => {
@@ -89,6 +100,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 					setSummary(null);
 					setTranscript(null);
 					setQuiz(null);
+					setFlashcards(null);
 					setIsEmpty(false);
 				}
 			})
@@ -139,6 +151,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 				/>
 			) : null}
 			<ProcessingQuiz artifact={quiz} />
+			<ProcessingFlashcards artifact={flashcards} />
 		</div>
 	);
 }

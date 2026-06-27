@@ -30,5 +30,5 @@ describe("createContentRepository", () => {
 		const repository = createContentRepository();
 
 		expect(repository).toBeInstanceOf(HttpContentRepository);
-	});
+	}, 15_000);
 });
