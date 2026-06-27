@@ -1,0 +1,19 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: History AI API
+            description: Public REST API for content, artifacts, library, and collections.
+            version: 1.0.0
+        openapi: 3.1.0
+        servers:
+            - url: http://localhost:8000
+              description: Local development
+    models:
+        names:
+            - { alias: ErrorResponse, type: App\Presentation\OpenApi\Schema\ErrorResponse }
+    areas:
+        default:
+            path_patterns:
+                - ^/api(?!/docs)
+            with_attribute: false
+            disable_default_routes: true

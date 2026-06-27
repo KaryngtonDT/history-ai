@@ -72,6 +72,8 @@ See [architecture-rules.md](./architecture-rules.md) for automated dependency en
 
 See [ci.md](./ci.md) for the GitHub Actions pipeline.
 
+See [openapi.md](./openapi.md) for OpenAPI / Swagger UI documentation.
+
 ---
 
 # Project architecture overview
