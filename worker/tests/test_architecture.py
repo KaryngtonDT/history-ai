@@ -72,7 +72,10 @@ def test_gemini_provider_is_confined_to_ai_package_and_tests() -> None:
         if "GeminiProvider" not in source:
             continue
 
-        if not any(relative.startswith(prefix) for prefix in GEMINI_PROVIDER_ALLOWED_PREFIXES):
+        if not any(
+            relative.startswith(prefix)
+            for prefix in GEMINI_PROVIDER_ALLOWED_PREFIXES
+        ):
             violations.append(
                 f"{relative} references GeminiProvider outside app/ai",
             )

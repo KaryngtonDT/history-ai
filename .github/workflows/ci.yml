@@ -35,6 +35,9 @@ jobs:
           restore-keys: |
             composer-${{ runner.os }}-
 
+      - name: Create backend env
+        run: cp .env.test .env
+
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
