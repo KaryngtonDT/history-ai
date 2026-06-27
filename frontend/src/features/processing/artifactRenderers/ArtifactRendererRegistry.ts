@@ -3,6 +3,7 @@ import type { ArtifactRenderer } from "./ArtifactRenderer";
 import { FlashcardsArtifactRenderer } from "./FlashcardsArtifactRenderer";
 import { QuizArtifactRenderer } from "./QuizArtifactRenderer";
 import { SummaryArtifactRenderer } from "./SummaryArtifactRenderer";
+import { TimelineArtifactRenderer } from "./TimelineArtifactRenderer";
 import { TranscriptArtifactRenderer } from "./TranscriptArtifactRenderer";
 import { UnsupportedArtifactRenderer } from "./UnsupportedArtifactRenderer";
 
@@ -11,6 +12,7 @@ export const ARTIFACT_DISPLAY_ORDER: readonly ArtifactType[] = [
 	"transcript",
 	"quiz",
 	"flashcards",
+	"timeline",
 ] as const;
 
 const registry = new Map<string, ArtifactRenderer>([
@@ -18,6 +20,7 @@ const registry = new Map<string, ArtifactRenderer>([
 	["transcript", TranscriptArtifactRenderer],
 	["quiz", QuizArtifactRenderer],
 	["flashcards", FlashcardsArtifactRenderer],
+	["timeline", TimelineArtifactRenderer],
 ]);
 
 export function getArtifactRenderer(type: string): ArtifactRenderer {

@@ -10,5 +10,6 @@ export {
 export { FlashcardsArtifactRenderer } from "./FlashcardsArtifactRenderer";
 export { QuizArtifactRenderer } from "./QuizArtifactRenderer";
 export { SummaryArtifactRenderer } from "./SummaryArtifactRenderer";
+export { TimelineArtifactRenderer } from "./TimelineArtifactRenderer";
 export { TranscriptArtifactRenderer } from "./TranscriptArtifactRenderer";
 export { UnsupportedArtifactRenderer } from "./UnsupportedArtifactRenderer";

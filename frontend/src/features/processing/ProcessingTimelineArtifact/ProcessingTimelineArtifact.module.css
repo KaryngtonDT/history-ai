@@ -1,0 +1,59 @@
+.card {
+	padding: var(--space-5);
+}
+
+.label {
+	margin: 0;
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.timelineContent {
+	margin: var(--space-3) 0 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4);
+}
+
+.section {
+	padding: var(--space-4);
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-md);
+	background: var(--shell-surface);
+}
+
+.sectionTitle {
+	margin: 0 0 var(--space-3);
+	font-size: var(--font-md);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.entryList {
+	margin: 0;
+	padding-left: var(--space-5);
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+}
+
+.entry {
+	color: var(--shell-text);
+	font-size: var(--font-md);
+	line-height: 1.6;
+}
+
+.fallbackContent {
+	margin: var(--space-3) 0 0;
+	color: var(--shell-text);
+	font-size: var(--font-md);
+	line-height: 1.6;
+	white-space: pre-wrap;
+}
+
+.emptyState {
+	margin-top: var(--space-3);
+}

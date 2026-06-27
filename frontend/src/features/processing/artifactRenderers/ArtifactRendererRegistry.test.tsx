@@ -8,15 +8,16 @@ import {
 import { FlashcardsArtifactRenderer } from "./FlashcardsArtifactRenderer";
 import { QuizArtifactRenderer } from "./QuizArtifactRenderer";
 import { SummaryArtifactRenderer } from "./SummaryArtifactRenderer";
+import { TimelineArtifactRenderer } from "./TimelineArtifactRenderer";
 import { TranscriptArtifactRenderer } from "./TranscriptArtifactRenderer";
 import { UnsupportedArtifactRenderer } from "./UnsupportedArtifactRenderer";
 
 const unsupportedArtifact: Artifact = {
-	id: "artifact-timeline-1",
+	id: "artifact-podcast-1",
 	contentId: "content-1",
 	processingJobId: "job-1",
-	type: "timeline",
-	content: "Timeline content preview",
+	type: "podcast",
+	content: "Podcast content preview",
 	createdAt: "2026-06-26T12:00:04+00:00",
 };
 
@@ -37,22 +38,26 @@ describe("ArtifactRendererRegistry", () => {
 		expect(getArtifactRenderer("flashcards")).toBe(FlashcardsArtifactRenderer);
 	});
 
+	it("returns timeline renderer", () => {
+		expect(getArtifactRenderer("timeline")).toBe(TimelineArtifactRenderer);
+	});
+
 	it("returns unsupported renderer for unknown types", () => {
-		expect(getArtifactRenderer("timeline")).toBe(UnsupportedArtifactRenderer);
+		expect(getArtifactRenderer("podcast")).toBe(UnsupportedArtifactRenderer);
 	});
 
 	it("renders unsupported type with fallback card", () => {
-		const Renderer = getArtifactRenderer("timeline");
+		const Renderer = getArtifactRenderer("podcast");
 
 		render(<Renderer artifact={unsupportedArtifact} contentId="content-1" />);
 
-		expect(screen.getByText("timeline")).toBeInTheDocument();
+		expect(screen.getByText("podcast")).toBeInTheDocument();
 		expect(
 			screen.getByText(
 				"This artifact type is not yet supported in the viewer.",
 			),
 		).toBeInTheDocument();
-		expect(screen.getByText("Timeline content preview")).toBeInTheDocument();
+		expect(screen.getByText("Podcast content preview")).toBeInTheDocument();
 	});
 
 	it("defines display order for known artifact types", () => {
@@ -61,6 +66,7 @@ describe("ArtifactRendererRegistry", () => {
 			"transcript",
 			"quiz",
 			"flashcards",
+			"timeline",
 		]);
 	});
 });
