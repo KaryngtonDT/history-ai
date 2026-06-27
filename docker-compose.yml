@@ -118,6 +118,7 @@ services:
     environment:
       SYMFONY_API_BASE_URL: ${SYMFONY_API_BASE_URL:-http://backend}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      SUMMARY_GENERATOR: ${SUMMARY_GENERATOR:-deterministic}
       AI_PROVIDER: ${AI_PROVIDER:-mock}
       AI_EXECUTION_MODE: ${AI_EXECUTION_MODE:-balanced}
     ports:
