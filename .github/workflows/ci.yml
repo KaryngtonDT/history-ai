@@ -43,11 +43,15 @@ jobs:
 
       - name: Prepare test database
         run: |
-          echo 'DATABASE_URL="sqlite:///%kernel.project_dir%/var/test_ci.db"' >> .env.local
+          mkdir -p var
+          export DATABASE_URL="sqlite:///$PWD/var/test_ci.db"
+          echo "DATABASE_URL=$DATABASE_URL" >> .env.test.local
           php bin/console doctrine:database:create --env=test --if-not-exists
           php bin/console doctrine:migrations:migrate --env=test --no-interaction
 
       - name: PHPUnit
+        env:
+          DATABASE_URL: sqlite:///${{ github.workspace }}/backend/var/test_ci.db
         run: php bin/phpunit
 
       - name: Architecture tests
