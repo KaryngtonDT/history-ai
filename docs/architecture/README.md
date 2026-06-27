@@ -70,6 +70,8 @@ When adding a new ADR:
 
 See [architecture-rules.md](./architecture-rules.md) for automated dependency enforcement.
 
+See [ci.md](./ci.md) for the GitHub Actions pipeline.
+
 ---
 
 # Project architecture overview
