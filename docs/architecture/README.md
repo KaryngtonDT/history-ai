@@ -72,7 +72,23 @@ See [architecture-rules.md](./architecture-rules.md) for automated dependency en
 
 See [ci.md](./ci.md) for the GitHub Actions pipeline.
 
-See [openapi.md](./openapi.md) for OpenAPI / Swagger UI documentation.
+See [openapi.md](./openapi.md) for OpenAPI / Swagger UI documentation (includes `GET /api/timeline/{artifactId}` since Sprint 14).
+
+---
+
+# Sprint 14 — Interactive Timeline (2026-06)
+
+Sprint 14 extended the Sprint 13 timeline artifact with:
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `Timeline`, `TimelineSection`, `TimelineEvent` + `TimelineParser` |
+| Backend API | `GET /api/timeline/{artifactId}` → structured JSON projection |
+| Frontend | `TimelineService`, `InteractiveTimeline`, markdown fallback |
+| OpenAPI | `Timeline`, `TimelineSection`, `TimelineEvent` schemas |
+| Architecture | Timeline layer rules (backend + frontend transport guards) |
+
+Verification: [Sprint14-Verification.md](../reports/Sprint14-Verification.md)
 
 ---
 
