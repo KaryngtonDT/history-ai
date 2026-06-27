@@ -62,6 +62,17 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testMapDomainDoesNotDependOnOuterLayersOrFrameworks(): void
+    {
+        $this->assertNoViolations(
+            'Map domain',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Domain/Map',
+                self::DOMAIN_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testApplicationDoesNotDependOnInfrastructureOrPresentation(): void
     {
         $this->assertNoViolations(
