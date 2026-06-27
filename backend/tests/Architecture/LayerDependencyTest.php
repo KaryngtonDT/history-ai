@@ -106,6 +106,17 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testMapApplicationMayDependOnMapAndTimelineDomainOnly(): void
+    {
+        $this->assertNoViolations(
+            'Map application',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Application/Map',
+                self::APPLICATION_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testPresentationDoesNotDependOnInfrastructure(): void
     {
         $this->assertNoViolations(
@@ -157,6 +168,25 @@ final class LayerDependencyTest extends TestCase
         }
 
         $this->assertNoViolations('Timeline presentation', $violations);
+    }
+
+    public function testMapPresentationMayDependOnMapApplicationOnly(): void
+    {
+        $mapPresentationPaths = [
+            $this->srcRoot . '/Presentation/Http/Controller/Map',
+            $this->srcRoot . '/Presentation/Http/Response/Map',
+        ];
+
+        $violations = [];
+
+        foreach ($mapPresentationPaths as $path) {
+            $violations = array_merge(
+                $violations,
+                LayerDependencyRules::findViolations($path, ['App\\Infrastructure\\']),
+            );
+        }
+
+        $this->assertNoViolations('Map presentation', $violations);
     }
 
     public function testInfrastructureDoesNotDependOnPresentation(): void
