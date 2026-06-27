@@ -185,11 +185,99 @@ export function findFeatureSearchTransportViolations(): ArchitectureViolation[] 
 	return violations;
 }
 
+export function findFeatureTimelineTransportViolations(): ArchitectureViolation[] {
+	const violations: ArchitectureViolation[] = [];
+	const featuresRoot = path.join(FRONTEND_SRC, "features");
+
+	if (!directoryExists(featuresRoot)) {
+		return violations;
+	}
+
+	const forbiddenPatterns: Array<{ pattern: RegExp; detail: string }> = [
+		{
+			pattern: /from\s+["']@\/services\/timeline\/HttpTimelineRepository["']/,
+			detail:
+				"Feature components must use TimelineService, not HttpTimelineRepository",
+		},
+		{
+			pattern:
+				/from\s+["']@\/services\/timeline\/TimelineRepositoryFactory["']/,
+			detail: "Feature components must not wire TimelineRepositoryFactory",
+		},
+		{
+			pattern: /from\s+["']@\/services\/timeline\/TimelineRepository["']/,
+			detail:
+				"Feature components must use TimelineService, not TimelineRepository",
+		},
+	];
+
+	for (const filePath of collectSourceFiles(featuresRoot)) {
+		const content = readFileSync(filePath, "utf8");
+
+		for (const { pattern, detail } of forbiddenPatterns) {
+			if (!pattern.test(content)) {
+				continue;
+			}
+
+			violations.push({
+				rule: "feature-timeline-transport",
+				file: toRelativePath(filePath),
+				detail,
+			});
+		}
+	}
+
+	return violations;
+}
+
+export function findInteractiveTimelineServiceViolations(): ArchitectureViolation[] {
+	const violations: ArchitectureViolation[] = [];
+	const interactiveTimelineRoot = path.join(
+		FRONTEND_SRC,
+		"features/processing/InteractiveTimeline",
+	);
+
+	if (!directoryExists(interactiveTimelineRoot)) {
+		return violations;
+	}
+
+	const forbiddenPatterns: Array<{ pattern: RegExp; detail: string }> = [
+		{
+			pattern: /from\s+["']@\/services\//,
+			detail: "InteractiveTimeline must not import services",
+		},
+		{
+			pattern: /Repository["']/,
+			detail: "InteractiveTimeline must not import repositories",
+		},
+	];
+
+	for (const filePath of collectSourceFiles(interactiveTimelineRoot)) {
+		const content = readFileSync(filePath, "utf8");
+
+		for (const { pattern, detail } of forbiddenPatterns) {
+			if (!pattern.test(content)) {
+				continue;
+			}
+
+			violations.push({
+				rule: "interactive-timeline-props-only",
+				file: toRelativePath(filePath),
+				detail,
+			});
+		}
+	}
+
+	return violations;
+}
+
 export function collectArchitectureViolations(): ArchitectureViolation[] {
 	return [
 		...findFetchViolations(),
 		...findFeatureHttpRepositoryViolations(),
 		...findFeatureHttpClientViolations(),
 		...findFeatureSearchTransportViolations(),
+		...findFeatureTimelineTransportViolations(),
+		...findInteractiveTimelineServiceViolations(),
 	];
 }

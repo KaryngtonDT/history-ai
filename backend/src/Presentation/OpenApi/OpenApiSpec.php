@@ -17,6 +17,8 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'Artifacts', description: 'Generated learning artifacts for a content resource')]
 #[OA\Tag(name: 'Library', description: 'Saved library items curated by the user')]
 #[OA\Tag(name: 'Collections', description: 'Themed groups of library items')]
+#[OA\Tag(name: 'Search', description: 'Library search')]
+#[OA\Tag(name: 'Timeline', description: 'Structured timeline projections for timeline artifacts')]
 final class OpenApiSpec
 {
 }

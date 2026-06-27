@@ -84,6 +84,17 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testTimelineApplicationMayDependOnTimelineDomainOnly(): void
+    {
+        $this->assertNoViolations(
+            'Timeline application',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Application/Timeline',
+                self::APPLICATION_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testPresentationDoesNotDependOnInfrastructure(): void
     {
         $this->assertNoViolations(
@@ -113,6 +124,28 @@ final class LayerDependencyTest extends TestCase
         }
 
         $this->assertNoViolations('Search presentation', $violations);
+    }
+
+    public function testTimelinePresentationMayDependOnTimelineApplicationOnly(): void
+    {
+        $timelinePresentationPaths = [
+            $this->srcRoot . '/Presentation/Http/Controller/Timeline',
+            $this->srcRoot . '/Presentation/Http/Response/Timeline',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/Timeline.php',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/TimelineSection.php',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/TimelineEvent.php',
+        ];
+
+        $violations = [];
+
+        foreach ($timelinePresentationPaths as $path) {
+            $violations = array_merge(
+                $violations,
+                LayerDependencyRules::findViolations($path, ['App\\Infrastructure\\']),
+            );
+        }
+
+        $this->assertNoViolations('Timeline presentation', $violations);
     }
 
     public function testInfrastructureDoesNotDependOnPresentation(): void

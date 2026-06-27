@@ -15,6 +15,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/collections',
         '/api/collections/{collectionId}/items',
         '/api/search/library',
+        '/api/timeline/{artifactId}',
     ];
 
     public function testSwaggerUiIsAvailable(): void
@@ -52,6 +53,7 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('get', $spec['paths']['/api/collections']);
         self::assertArrayHasKey('post', $spec['paths']['/api/collections/{collectionId}/items']);
         self::assertArrayHasKey('get', $spec['paths']['/api/search/library']);
+        self::assertArrayHasKey('get', $spec['paths']['/api/timeline/{artifactId}']);
     }
 
     public function testOpenApiSpecDocumentsSearchLibraryQueryParameter(): void
@@ -138,6 +140,82 @@ final class ApiDocumentationTest extends WebTestCase
         $typeProperty = $spec['paths']['/api/library/items']['post']['requestBody']['content']['application/json']['schema']['properties']['type'];
 
         self::assertSame('#/components/schemas/LibraryItemType', $typeProperty['$ref']);
+    }
+
+    public function testOpenApiSpecDocumentsGetTimelinePathParameter(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/timeline/{artifactId}']['get'];
+
+        self::assertSame('getTimeline', $operation['operationId']);
+
+        $pathParameter = null;
+
+        foreach ($operation['parameters'] as $parameter) {
+            if (($parameter['name'] ?? null) === 'artifactId') {
+                $pathParameter = $parameter;
+                break;
+            }
+        }
+
+        self::assertNotNull($pathParameter, 'Missing path parameter: artifactId');
+        self::assertSame('path', $pathParameter['in']);
+        self::assertTrue($pathParameter['required']);
+        self::assertSame('string', $pathParameter['schema']['type']);
+        self::assertSame('uuid', $pathParameter['schema']['format']);
+        self::assertSame('550e8400-e29b-41d4-a716-446655440000', $pathParameter['example']);
+    }
+
+    public function testOpenApiSpecDocumentsGetTimelineResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/timeline/{artifactId}']['get']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Structured timeline', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/Timeline',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('404', $responses);
+        self::assertSame('Timeline artifact not found', $responses['404']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['404']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsTimelineSchema(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $timelineSchema = $spec['components']['schemas']['Timeline'];
+        $sectionSchema = $spec['components']['schemas']['TimelineSection'];
+        $eventSchema = $spec['components']['schemas']['TimelineEvent'];
+
+        self::assertContains('sections', $timelineSchema['required']);
+        self::assertSame('array', $timelineSchema['properties']['sections']['type']);
+        self::assertSame(
+            '#/components/schemas/TimelineSection',
+            $timelineSchema['properties']['sections']['items']['$ref'],
+        );
+
+        self::assertContains('title', $sectionSchema['required']);
+        self::assertContains('events', $sectionSchema['required']);
+        self::assertSame(
+            '#/components/schemas/TimelineEvent',
+            $sectionSchema['properties']['events']['items']['$ref'],
+        );
+
+        self::assertContains('text', $eventSchema['required']);
+        self::assertSame('string', $eventSchema['properties']['text']['type']);
     }
 
     /**

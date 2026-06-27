@@ -59,6 +59,9 @@ Presentation may reference Domain value objects and exceptions when parsing HTTP
 6. **Search application** — `Application/Search` depends on `Domain/Search` only (via handlers and DTOs).
 7. **Search infrastructure** — `Infrastructure/Persistence/Doctrine/Search` may depend on `Domain/Search` and `Domain/Library`; must not import Presentation.
 8. **Search presentation** — controllers, requests, and responses under `Presentation/Http/.../Search` may depend on `Application/Search` and Domain value objects; must not import Infrastructure.
+9. **Timeline domain** — `Domain/Timeline` follows the same purity rules as other domains (no Symfony, Doctrine, Infrastructure, or Presentation).
+10. **Timeline application** — `Application/Timeline` depends on Domain only (via handlers and DTOs); must not import Infrastructure or Presentation.
+11. **Timeline presentation** — controllers, responses, and OpenAPI schemas under `Presentation/Http/.../Timeline` and `Presentation/OpenApi/Schema/Timeline*` may depend on `Application/Timeline` and Domain value objects; must not import Infrastructure.
 
 ### Search example (passes CI)
 
@@ -151,6 +154,9 @@ HttpClient + Repository (Http / Mock)
 | Feature modules must not import `Http*Repository` | UI talks to services, not transport |
 | Feature modules must not import `HttpClient` | Same as above |
 | Feature modules must not import Search transport (`HttpSearchRepository`, `SearchRepositoryFactory`, `SearchRepository`) | Library search UI uses `SearchService` only |
+| Feature modules must not import Timeline transport (`HttpTimelineRepository`, `TimelineRepositoryFactory`, `TimelineRepository`) | Timeline UI uses `TimelineService` only |
+| `InteractiveTimeline` must not import services or repositories | Structured timeline rendering is props-only |
+| Timeline artifact renderers may import `TimelineService` | Service layer owns HTTP/mock wiring |
 
 Repository factories and Http repositories live under `services/` and are consumed by service classes only.
 
@@ -167,6 +173,24 @@ SearchRepositoryFactory → HttpSearchRepository | MockSearchRepository
       │
       ▼
 HttpClient (HTTP mode only)
+```
+
+### Timeline service layer
+
+```text
+features/processing/artifactRenderers/TimelineArtifactRenderer
+      │
+      ▼
+TimelineService.getTimeline()
+      │
+      ▼
+TimelineRepositoryFactory → HttpTimelineRepository | MockTimelineRepository
+      │
+      ▼
+HttpClient (HTTP mode only)
+      │
+      ▼
+InteractiveTimeline (props-only, no services)
 ```
 
 ## Enforcement
@@ -197,6 +221,20 @@ import { HttpSearchRepository } from "@/services/search/HttpSearchRepository"; /
 ```
 
 **Fix:** import `searchService` from `@/services/search/SearchService`.
+
+```tsx
+// frontend/src/features/processing/artifactRenderers/TimelineArtifactRenderer.tsx
+import { HttpTimelineRepository } from "@/services/timeline/HttpTimelineRepository"; // ❌ forbidden
+```
+
+**Fix:** import `timelineService` from `@/services/timeline/TimelineService`.
+
+```tsx
+// frontend/src/features/processing/InteractiveTimeline/InteractiveTimeline.tsx
+import { timelineService } from "@/services/timeline/TimelineService"; // ❌ forbidden
+```
+
+**Fix:** receive `Timeline` data via props from the parent renderer.
 
 ---
 

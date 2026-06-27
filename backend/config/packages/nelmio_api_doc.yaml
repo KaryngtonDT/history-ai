@@ -16,6 +16,9 @@ nelmio_api_doc:
             - { alias: Artifact, type: App\Presentation\OpenApi\Schema\Artifact }
             - { alias: LibraryItem, type: App\Presentation\OpenApi\Schema\LibraryItem }
             - { alias: SearchLibraryItem, type: App\Presentation\OpenApi\Schema\SearchLibraryItem }
+            - { alias: Timeline, type: App\Presentation\OpenApi\Schema\Timeline }
+            - { alias: TimelineSection, type: App\Presentation\OpenApi\Schema\TimelineSection }
+            - { alias: TimelineEvent, type: App\Presentation\OpenApi\Schema\TimelineEvent }
     areas:
         default:
             path_patterns:

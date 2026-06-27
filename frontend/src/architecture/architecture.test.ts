@@ -44,4 +44,20 @@ describe("Frontend architecture rules", () => {
 
 		expect(searchViolations).toEqual([]);
 	});
+
+	it("prevents feature modules from importing Timeline transport directly", () => {
+		const timelineViolations = violations.filter(
+			(violation) => violation.rule === "feature-timeline-transport",
+		);
+
+		expect(timelineViolations).toEqual([]);
+	});
+
+	it("keeps InteractiveTimeline props-only without service imports", () => {
+		const interactiveTimelineViolations = violations.filter(
+			(violation) => violation.rule === "interactive-timeline-props-only",
+		);
+
+		expect(interactiveTimelineViolations).toEqual([]);
+	});
 });
