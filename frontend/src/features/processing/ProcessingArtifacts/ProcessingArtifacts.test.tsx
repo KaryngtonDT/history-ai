@@ -224,6 +224,31 @@ describe("ProcessingArtifacts", () => {
 		});
 	});
 
+	it("renders unsupported artifact types with fallback card", async () => {
+		vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
+			{
+				id: "artifact-timeline-1",
+				contentId: "content-1",
+				processingJobId: "job-1",
+				type: "timeline",
+				content: "Timeline preview content",
+				createdAt: "2026-06-26T12:00:04+00:00",
+			},
+		]);
+
+		render(<ProcessingArtifacts contentId="content-1" />);
+
+		await waitFor(() => {
+			expect(screen.getByText("timeline")).toBeInTheDocument();
+			expect(
+				screen.getByText(
+					"This artifact type is not yet supported in the viewer.",
+				),
+			).toBeInTheDocument();
+			expect(screen.getByText("Timeline preview content")).toBeInTheDocument();
+		});
+	});
+
 	it("loads artifacts with a single API request", async () => {
 		const listSpy = vi
 			.spyOn(artifactService, "listByContentId")

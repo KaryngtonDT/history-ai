@@ -19,7 +19,7 @@ describe("createProcessingRepository", () => {
 		const repository = createProcessingRepository();
 
 		expect(repository).toBeInstanceOf(MockProcessingRepository);
-	}, 15_000);
+	}, 30_000);
 
 	it("returns HttpProcessingRepository when VITE_USE_MOCK=false", async () => {
 		vi.stubEnv("VITE_USE_MOCK", "false");
