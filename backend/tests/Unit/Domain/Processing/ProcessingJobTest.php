@@ -66,6 +66,29 @@ final class ProcessingJobTest extends TestCase
         self::assertFalse($summary->id()->equals($quiz->id()));
     }
 
+    #[DataProvider('processingJobTypeProvider')]
+    public function testSupportsAllProcessingJobTypes(ProcessingJobType $type): void
+    {
+        $job = ProcessingJob::create(
+            ProcessingJobId::generate(),
+            ContentId::generate(),
+            $type,
+        );
+
+        self::assertSame($type, $job->type());
+        self::assertSame(ProcessingJobStatus::Pending, $job->status());
+    }
+
+    /**
+     * @return iterable<string, array{ProcessingJobType}>
+     */
+    public static function processingJobTypeProvider(): iterable
+    {
+        foreach (ProcessingJobType::cases() as $type) {
+            yield $type->value => [$type];
+        }
+    }
+
     public function testStartTransitionsPendingToRunningAndRecordsStartedAt(): void
     {
         $job = $this->createPendingJob();
