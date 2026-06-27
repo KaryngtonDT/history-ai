@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { AssignToCollectionDialog } from "@/features/collection/AssignToCollectionDialog";
 import { libraryService } from "@/services/library/LibraryService";
 import type { LibraryItem } from "@/services/library/types";
 import { LibraryContentList } from "../LibraryContentList";
@@ -10,6 +11,9 @@ import styles from "./Library.module.css";
 export function Library() {
 	const [items, setItems] = useState<LibraryItem[] | null>(null);
 	const [loadError, setLoadError] = useState<string | null>(null);
+	const [assignLibraryItemId, setAssignLibraryItemId] = useState<string | null>(
+		null,
+	);
 
 	useEffect(() => {
 		void libraryService
@@ -41,8 +45,16 @@ export function Library() {
 					description="Saved learning artifacts will appear here once you add them to your library."
 				/>
 			) : (
-				<LibraryContentList items={items} />
+				<LibraryContentList
+					items={items}
+					onAssignToCollection={setAssignLibraryItemId}
+				/>
 			)}
+			<AssignToCollectionDialog
+				open={assignLibraryItemId !== null}
+				onClose={() => setAssignLibraryItemId(null)}
+				libraryItemId={assignLibraryItemId ?? ""}
+			/>
 		</div>
 	);
 }
