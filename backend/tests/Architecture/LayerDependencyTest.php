@@ -51,6 +51,17 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testTimelineDomainDoesNotDependOnOuterLayersOrFrameworks(): void
+    {
+        $this->assertNoViolations(
+            'Timeline domain',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Domain/Timeline',
+                self::DOMAIN_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testApplicationDoesNotDependOnInfrastructureOrPresentation(): void
     {
         $this->assertNoViolations(

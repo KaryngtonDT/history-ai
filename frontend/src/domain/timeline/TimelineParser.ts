@@ -1,8 +1,8 @@
+import type { Timeline } from "./Timeline";
 import { createTimeline } from "./Timeline";
 import { createTimelineEvent } from "./TimelineEvent";
-import { createTimelineSection } from "./TimelineSection";
-import type { Timeline } from "./Timeline";
 import type { TimelineSection } from "./TimelineSection";
+import { createTimelineSection } from "./TimelineSection";
 
 const DEFAULT_SECTION_TITLE = "Timeline";
 
