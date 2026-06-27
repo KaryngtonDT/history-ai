@@ -105,10 +105,16 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 				const Renderer = getArtifactRenderer(type);
 				const artifact = findArtifactByType(artifacts, type);
 
-				return <Renderer key={type} artifact={artifact} />;
+				return (
+					<Renderer key={type} artifact={artifact} contentId={contentId} />
+				);
 			})}
 			{unsupportedArtifacts.map((artifact) => (
-				<UnsupportedArtifactRenderer key={artifact.id} artifact={artifact} />
+				<UnsupportedArtifactRenderer
+					key={artifact.id}
+					artifact={artifact}
+					contentId={contentId}
+				/>
 			))}
 		</div>
 	);

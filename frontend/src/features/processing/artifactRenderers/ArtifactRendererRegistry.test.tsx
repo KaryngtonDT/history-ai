@@ -44,7 +44,7 @@ describe("ArtifactRendererRegistry", () => {
 	it("renders unsupported type with fallback card", () => {
 		const Renderer = getArtifactRenderer("timeline");
 
-		render(<Renderer artifact={unsupportedArtifact} />);
+		render(<Renderer artifact={unsupportedArtifact} contentId="content-1" />);
 
 		expect(screen.getByText("timeline")).toBeInTheDocument();
 		expect(

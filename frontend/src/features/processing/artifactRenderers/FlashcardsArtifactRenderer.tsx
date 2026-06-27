@@ -3,6 +3,7 @@ import type { ArtifactRendererProps } from "./ArtifactRenderer";
 
 export function FlashcardsArtifactRenderer({
 	artifact,
+	contentId,
 }: ArtifactRendererProps) {
-	return <ProcessingFlashcards artifact={artifact} />;
+	return <ProcessingFlashcards artifact={artifact} contentId={contentId} />;
 }

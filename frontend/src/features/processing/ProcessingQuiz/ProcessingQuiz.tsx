@@ -1,10 +1,12 @@
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ArtifactCardHeader } from "@/features/processing/artifactRenderers/ArtifactCardHeader";
 import type { Artifact } from "@/services/artifact/types";
 import styles from "./ProcessingQuiz.module.css";
 
 interface ProcessingQuizProps {
 	artifact: Artifact | null;
+	contentId?: string;
 }
 
 function renderQuizLine(line: string, index: number) {
@@ -64,7 +66,7 @@ function QuizContent({ content }: { content: string }) {
 	);
 }
 
-export function ProcessingQuiz({ artifact }: ProcessingQuizProps) {
+export function ProcessingQuiz({ artifact, contentId }: ProcessingQuizProps) {
 	if (artifact === null) {
 		return (
 			<Card className={styles.card}>
@@ -80,7 +82,15 @@ export function ProcessingQuiz({ artifact }: ProcessingQuizProps) {
 
 	return (
 		<Card className={styles.card}>
-			<p className={styles.label}>Quiz</p>
+			{contentId ? (
+				<ArtifactCardHeader
+					label="Quiz"
+					artifact={artifact}
+					contentId={contentId}
+				/>
+			) : (
+				<p className={styles.label}>Quiz</p>
+			)}
 			<QuizContent content={artifact.content} />
 		</Card>
 	);

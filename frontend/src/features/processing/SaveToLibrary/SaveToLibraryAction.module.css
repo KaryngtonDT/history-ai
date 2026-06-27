@@ -1,0 +1,19 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: var(--space-1);
+}
+
+.success {
+	margin: 0;
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--color-success, #15803d);
+}
+
+.error {
+	margin: 0;
+	font-size: var(--font-sm);
+	color: var(--color-danger, #b91c1c);
+}

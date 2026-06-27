@@ -1,10 +1,12 @@
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ArtifactCardHeader } from "@/features/processing/artifactRenderers/ArtifactCardHeader";
 import type { Artifact } from "@/services/artifact/types";
 import styles from "./ProcessingFlashcards.module.css";
 
 interface ProcessingFlashcardsProps {
 	artifact: Artifact | null;
+	contentId?: string;
 }
 
 interface ParsedFlashcard {
@@ -108,7 +110,10 @@ function FlashcardsContent({ content }: { content: string }) {
 	);
 }
 
-export function ProcessingFlashcards({ artifact }: ProcessingFlashcardsProps) {
+export function ProcessingFlashcards({
+	artifact,
+	contentId,
+}: ProcessingFlashcardsProps) {
 	if (artifact === null) {
 		return (
 			<Card className={styles.card}>
@@ -124,7 +129,15 @@ export function ProcessingFlashcards({ artifact }: ProcessingFlashcardsProps) {
 
 	return (
 		<Card className={styles.card}>
-			<p className={styles.label}>Flashcards</p>
+			{contentId ? (
+				<ArtifactCardHeader
+					label="Flashcards"
+					artifact={artifact}
+					contentId={contentId}
+				/>
+			) : (
+				<p className={styles.label}>Flashcards</p>
+			)}
 			<FlashcardsContent content={artifact.content} />
 		</Card>
 	);

@@ -1,8 +1,16 @@
 import { LIBRARY_ITEMS_PATH } from "@/config/api";
 import type { HttpClient } from "@/services/http/HttpClient";
 import type { LibraryRepository } from "./LibraryRepository";
-import type { LibraryItem, LibraryItemApiDto } from "./types";
-import { mapLibraryItemFromApi } from "./types";
+import type {
+	AddLibraryItemApiResponse,
+	AddLibraryItemInput,
+	LibraryItem,
+	LibraryItemApiDto,
+} from "./types";
+import {
+	mapAddLibraryItemResponseFromApi,
+	mapLibraryItemFromApi,
+} from "./types";
 
 export class HttpLibraryRepository implements LibraryRepository {
 	private readonly httpClient: HttpClient;
@@ -16,5 +24,14 @@ export class HttpLibraryRepository implements LibraryRepository {
 			await this.httpClient.get<LibraryItemApiDto[]>(LIBRARY_ITEMS_PATH);
 
 		return items.map(mapLibraryItemFromApi);
+	}
+
+	async addItem(input: AddLibraryItemInput): Promise<LibraryItem> {
+		const response = await this.httpClient.post<AddLibraryItemApiResponse>(
+			LIBRARY_ITEMS_PATH,
+			input,
+		);
+
+		return mapAddLibraryItemResponseFromApi(response, input);
 	}
 }

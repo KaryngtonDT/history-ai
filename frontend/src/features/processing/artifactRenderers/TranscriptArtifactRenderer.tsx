@@ -1,9 +1,11 @@
 import { Card } from "@/components/ui/Card";
+import { ArtifactCardHeader } from "./ArtifactCardHeader";
 import type { ArtifactRendererProps } from "./ArtifactRenderer";
 import styles from "./TranscriptArtifactRenderer.module.css";
 
 export function TranscriptArtifactRenderer({
 	artifact,
+	contentId,
 }: ArtifactRendererProps) {
 	if (artifact === null) {
 		return null;
@@ -11,7 +13,11 @@ export function TranscriptArtifactRenderer({
 
 	return (
 		<Card className={styles.card}>
-			<p className={styles.label}>Transcript</p>
+			<ArtifactCardHeader
+				label="Transcript"
+				artifact={artifact}
+				contentId={contentId}
+			/>
 			<p className={styles.content}>{artifact.content}</p>
 		</Card>
 	);

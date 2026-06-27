@@ -1,6 +1,6 @@
 import type { LibraryRepository } from "./LibraryRepository";
 import { createLibraryRepository } from "./LibraryRepositoryFactory";
-import type { LibraryItem } from "./types";
+import type { AddLibraryItemInput, LibraryItem } from "./types";
 
 export class LibraryService {
 	private readonly repository: LibraryRepository;
@@ -11,6 +11,10 @@ export class LibraryService {
 
 	listItems(): Promise<LibraryItem[]> {
 		return this.repository.listItems();
+	}
+
+	addItem(input: AddLibraryItemInput): Promise<LibraryItem> {
+		return this.repository.addItem(input);
 	}
 }
 
