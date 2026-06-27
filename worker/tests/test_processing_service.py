@@ -86,6 +86,37 @@ async def test_execute_uses_injected_summary_generator_interface() -> None:
 
 
 @pytest.mark.asyncio
+async def test_execute_uses_deterministic_generator_by_default() -> None:
+    repository = MagicMock()
+    document_extraction = MagicMock()
+    transcript = (
+        "The Roman Empire was vast. It lasted many centuries. "
+        "Its legacy shaped Europe."
+    )
+    document_extraction.extract_transcript.return_value = transcript
+    service = ProcessingService(
+        repository=repository,
+        document_extraction=document_extraction,
+        sleep_fn=_instant_sleep,
+    )
+    job = ProcessingJob(
+        id="job-123",
+        content_id="content-456",
+        type="summary",
+    )
+
+    await service.execute(job)
+
+    repository.create_artifact.assert_any_call(
+        "content-456",
+        "job-123",
+        "summary",
+        "The Roman Empire was vast. It lasted many centuries. "
+        "Its legacy shaped Europe.",
+    )
+
+
+@pytest.mark.asyncio
 async def test_execute_skips_artifact_creation_for_non_summary_job() -> None:
     repository = MagicMock()
     document_extraction = MagicMock()
