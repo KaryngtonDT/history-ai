@@ -3,9 +3,9 @@ import type { HttpClient } from "@/services/http/HttpClient";
 import { ApiError } from "@/shared/errors";
 import type { TimelineRepository } from "./TimelineRepository";
 import {
+	mapTimelineFromApi,
 	type Timeline,
 	type TimelineApiDto,
-	mapTimelineFromApi,
 } from "./types";
 
 export class HttpTimelineRepository implements TimelineRepository {

@@ -12,6 +12,10 @@ export const COLLECTIONS_PATH = "/api/collections";
 
 export const SEARCH_LIBRARY_PATH = "/api/search/library";
 
+export function timelinePath(artifactId: string): string {
+	return `/api/timeline/${artifactId}`;
+}
+
 export function contentArtifactsPath(contentId: string): string {
 	return `${CONTENTS_PATH}/${contentId}/artifacts`;
 }
