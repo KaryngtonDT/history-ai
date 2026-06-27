@@ -27,6 +27,9 @@ services:
     App\Domain\Artifact\ArtifactRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Artifact\DoctrineArtifactRepository
 
+    App\Domain\Library\LibraryItemRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Library\DoctrineLibraryRepository
+
     App\Application\Processing\Ports\ProcessingOrchestratorInterface:
         alias: App\Infrastructure\Processing\HttpWorkerDispatcher
 

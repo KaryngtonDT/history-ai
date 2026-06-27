@@ -12,3 +12,7 @@ when@test:
         App\Domain\Artifact\ArtifactRepositoryInterface:
             alias: App\Infrastructure\Persistence\Doctrine\Artifact\DoctrineArtifactRepository
             public: true
+
+        App\Domain\Library\LibraryItemRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\Library\DoctrineLibraryRepository
+            public: true
