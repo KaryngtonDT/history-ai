@@ -8,6 +8,12 @@ export const PROCESSING_JOBS_PATH = "/api/processing-jobs";
 
 export const LIBRARY_ITEMS_PATH = "/api/library/items";
 
+export const COLLECTIONS_PATH = "/api/collections";
+
 export function contentArtifactsPath(contentId: string): string {
 	return `${CONTENTS_PATH}/${contentId}/artifacts`;
+}
+
+export function collectionItemsPath(collectionId: string): string {
+	return `${COLLECTIONS_PATH}/${collectionId}/items`;
 }
