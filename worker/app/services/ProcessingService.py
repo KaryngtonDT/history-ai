@@ -4,7 +4,11 @@ from collections.abc import Awaitable, Callable
 from app.generators.ArtifactGenerationRequest import ArtifactGenerationRequest
 from app.generators.ArtifactGeneratorFactory import ArtifactGeneratorFactory
 from app.generators.ArtifactGeneratorInterface import ArtifactGeneratorInterface
-from app.generators.ArtifactType import ARTIFACT_TYPE_FLASHCARDS, ARTIFACT_TYPE_QUIZ
+from app.generators.ArtifactType import (
+    ARTIFACT_TYPE_FLASHCARDS,
+    ARTIFACT_TYPE_QUIZ,
+    ARTIFACT_TYPE_TIMELINE,
+)
 from app.generators.SummaryGeneratorFactory import SummaryGeneratorFactory
 from app.generators.SummaryGeneratorInterface import SummaryGeneratorInterface
 from app.models.ProcessingJob import ProcessingJob
@@ -26,6 +30,7 @@ class ProcessingService:
     TRANSCRIPT_ARTIFACT_TYPE = "transcript"
     QUIZ_ARTIFACT_TYPE = ARTIFACT_TYPE_QUIZ
     FLASHCARDS_ARTIFACT_TYPE = ARTIFACT_TYPE_FLASHCARDS
+    TIMELINE_ARTIFACT_TYPE = ARTIFACT_TYPE_TIMELINE
 
     def __init__(
         self,
@@ -75,6 +80,10 @@ class ProcessingService:
                 self._generate_flashcards,
                 transcript,
             )
+            timeline = await asyncio.to_thread(
+                self._generate_timeline,
+                transcript,
+            )
             await asyncio.to_thread(
                 self._repository.create_artifact,
                 job.content_id,
@@ -103,6 +112,13 @@ class ProcessingService:
                 self.FLASHCARDS_ARTIFACT_TYPE,
                 flashcards,
             )
+            await asyncio.to_thread(
+                self._repository.create_artifact,
+                job.content_id,
+                job.id,
+                self.TIMELINE_ARTIFACT_TYPE,
+                timeline,
+            )
 
         await self._sleep(self.SLEEP_SECONDS)
         await asyncio.to_thread(self._repository.complete, job.id)
@@ -112,6 +128,9 @@ class ProcessingService:
 
     def _generate_flashcards(self, transcript: str) -> str:
         return self._generate_artifact(self.FLASHCARDS_ARTIFACT_TYPE, transcript)
+
+    def _generate_timeline(self, transcript: str) -> str:
+        return self._generate_artifact(self.TIMELINE_ARTIFACT_TYPE, transcript)
 
     def _generate_artifact(self, artifact_type: str, transcript: str) -> str:
         generator = self._create_artifact_generator(artifact_type)
