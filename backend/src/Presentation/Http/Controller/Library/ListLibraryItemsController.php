@@ -25,17 +25,7 @@ final class ListLibraryItemsController extends AbstractController
                 description: 'Library item list',
                 content: new OA\JsonContent(
                     type: 'array',
-                    items: new OA\Items(
-                        required: ['id', 'contentId', 'artifactId', 'type', 'title', 'createdAt'],
-                        properties: [
-                            new OA\Property(property: 'id', type: 'string', format: 'uuid'),
-                            new OA\Property(property: 'contentId', type: 'string', format: 'uuid'),
-                            new OA\Property(property: 'artifactId', type: 'string', format: 'uuid'),
-                            new OA\Property(property: 'type', type: 'string', example: 'summary'),
-                            new OA\Property(property: 'title', type: 'string', example: 'Roman Empire Summary'),
-                            new OA\Property(property: 'createdAt', type: 'string', format: 'date-time'),
-                        ],
-                    ),
+                    items: new OA\Items(ref: '#/components/schemas/LibraryItem'),
                 ),
             ),
         ],

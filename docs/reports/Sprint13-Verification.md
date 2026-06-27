@@ -1,0 +1,321 @@
+# Sprint 13 — Final Verification Report
+
+Version: 1.0
+
+Status: Accepted
+
+Date: 2026-06-27
+
+---
+
+# Executive summary
+
+Sprint 13 delivered the **Timeline artifact** end-to-end: domain type consistency, worker generation, processing pipeline integration, frontend rendering via `ArtifactRendererRegistry`, Library save/open flow, OpenAPI documentation, and this verification report. All verification suites passed on 2026-06-27. Slice 6 changed **documentation and OpenAPI only** — no business logic in backend, frontend, or worker.
+
+| Area | Result |
+| ---- | ------ |
+| Backend PHPUnit | ✅ 249 tests, 806 assertions |
+| Backend architecture | ✅ 9 tests |
+| Backend OpenAPI | ✅ 8 tests |
+| Frontend build | ✅ OK |
+| Frontend Vitest | ✅ 164 tests |
+| Frontend Biome | ✅ clean |
+| Worker pytest | ✅ 127 tests |
+| Worker Ruff | ✅ All checks passed |
+| OpenAPI / Swagger | ✅ Timeline documented as official artifact type |
+
+---
+
+# Sprint 13 scope (slices 01–06)
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| S13-SLICE-01 | Timeline in domain enums + `ArtifactKindConsistencyTest` | ✅ |
+| S13-SLICE-02 | `TimelineArtifactGenerator` + factory registration | ✅ |
+| S13-SLICE-03 | `ProcessingService` generates timeline via factory | ✅ |
+| S13-SLICE-04 | `TimelineArtifactRenderer`, `ProcessingTimelineArtifact`, registry | ✅ |
+| S13-SLICE-05 | Timeline Library save/open (mock data + tests) | ✅ |
+| S13-SLICE-06 | OpenAPI schemas, docs, verification report (this slice) | ✅ |
+
+---
+
+# Executed commands and results
+
+## Backend
+
+```bash
+docker compose exec backend php bin/phpunit
+```
+
+```
+OK (249 tests, 806 assertions)
+Time: ~56s
+```
+
+```bash
+docker compose exec backend php bin/phpunit tests/Architecture/
+```
+
+```
+OK (9 tests, 10 assertions)
+Time: ~4s
+```
+
+```bash
+docker compose exec backend php bin/phpunit tests/Functional/OpenApi/
+```
+
+```
+OK (8 tests, 51 assertions)
+Time: ~29s
+```
+
+## Frontend
+
+```bash
+docker compose exec frontend npm run build
+```
+
+```
+✓ built in ~21s
+dist/assets/index-*.js   ~306 kB │ gzip: ~94 kB
+```
+
+```bash
+docker compose exec frontend npm test
+```
+
+```
+Test Files  39 passed (39)
+Tests       164 passed (164)
+Duration    ~69s
+```
+
+```bash
+docker compose exec frontend npm run check
+```
+
+```
+Checked 284 files. No fixes applied.
+```
+
+## Worker
+
+```bash
+docker compose exec worker pytest
+```
+
+```
+127 passed, 1 warning in ~7s
+```
+
+```bash
+docker compose exec worker ruff check .
+```
+
+```
+All checks passed!
+```
+
+---
+
+# Timeline architecture
+
+## Domain (backend)
+
+```text
+ArtifactType::Timeline  ←→  LibraryItemType::Timeline  ←→  ProcessingJobType::Timeline
+```
+
+Enforced by `ArtifactKindConsistencyTest` — all three enums stay aligned.
+
+## Worker pipeline
+
+```text
+ProcessingService.execute()
+        │
+        ▼
+ArtifactGeneratorFactory.create("timeline")
+        │
+        ▼
+TimelineArtifactGenerator
+        │
+        ▼
+AIProviderInterface (markdown timeline from transcript)
+        │
+        ▼
+POST /api/internal/artifacts (type: timeline)
+```
+
+The worker never imports concrete generators from `ProcessingService`; it uses the factory only (ADR-0003).
+
+## Frontend rendering
+
+```text
+GET /api/contents/{contentId}/artifacts  (single fetch)
+        │
+        ▼
+ProcessingArtifacts
+        │
+        ▼
+ArtifactRendererRegistry.getArtifactRenderer("timeline")
+        │
+        ▼
+TimelineArtifactRenderer → ProcessingTimelineArtifact
+        │
+        └── SaveToLibraryAction (when not readOnly)
+```
+
+Renderers receive props only — **no HTTP inside renderers**.
+
+## Library integration
+
+```text
+Timeline artifact
+        │
+        ▼
+SaveToLibraryAction → POST /api/library/items { type: "timeline", title: "Timeline" }
+        │
+        ▼
+LibraryItem (type=timeline)
+        │
+        ▼
+/library/:libraryItemId
+        │
+        ▼
+LibraryItemDetails → ArtifactRendererRegistry (readOnly)
+        │
+        ▼
+TimelineArtifactRenderer
+```
+
+Timeline follows the same product path as Summary, Quiz, and Flashcards.
+
+---
+
+# OpenAPI / Swagger status
+
+Verified via `tests/Functional/OpenApi/ApiDocumentationTest.php`:
+
+| Check | Status |
+| ----- | ------ |
+| `/api/docs` (Swagger UI) available | ✅ |
+| `/api/docs.json` generates OpenAPI 3.1 | ✅ |
+| Shared schema `ArtifactType` includes `timeline` | ✅ |
+| Shared schema `LibraryItemType` includes `timeline` | ✅ |
+| `Artifact` schema references `ArtifactType` | ✅ |
+| `POST /api/library/items` uses `LibraryItemType` | ✅ |
+| Timeline example on artifact content | ✅ |
+
+**New shared schemas (Presentation only):**
+
+| Schema | File |
+| ------ | ---- |
+| `ArtifactType` | `backend/src/Presentation/OpenApi/Schema/ArtifactTypeSchema.php` |
+| `LibraryItemType` | `backend/src/Presentation/OpenApi/Schema/LibraryItemTypeSchema.php` |
+| `Artifact` | `backend/src/Presentation/OpenApi/Schema/Artifact.php` |
+| `LibraryItem` | `backend/src/Presentation/OpenApi/Schema/LibraryItem.php` |
+
+Browse locally: `http://localhost:8000/api/docs`
+
+**Supported artifact types in contract:**
+
+| Type | Documented | Generated by worker |
+| ---- | ---------- | ------------------- |
+| `transcript` | ✅ | ✅ |
+| `summary` | ✅ | ✅ |
+| `quiz` | ✅ | ✅ |
+| `flashcards` | ✅ | ✅ |
+| `timeline` | ✅ | ✅ |
+| `podcast` | ✅ | ❌ (future) |
+
+---
+
+# Documentation verification
+
+| Document | Location | Status |
+| -------- | -------- | ------ |
+| OpenAPI guide | `docs/architecture/openapi.md` | ✅ Updated (artifact types + schemas) |
+| Architecture README | `docs/architecture/README.md` | ✅ Updated (domain model lists timeline) |
+| ADR-0003 Artifact Pipeline | `docs/architecture/ADR-0003-artifact-pipeline.md` | ✅ Unchanged (Timeline fits extensible pipeline) |
+| Sprint 13 report | `docs/reports/Sprint13-Verification.md` | ✅ This document |
+
+---
+
+# Functional coverage (Sprint 13)
+
+| Capability | Worker | Backend | Frontend | OpenAPI |
+| ---------- | ------ | ------- | -------- | ------- |
+| Generate timeline from transcript | ✅ | ✅ (persist) | ✅ (display) | ✅ |
+| List timeline in artifacts response | — | ✅ | ✅ | ✅ |
+| Save timeline to Library | — | ✅ | ✅ | ✅ |
+| Open timeline from Library details | — | ✅ | ✅ | ✅ |
+| Read-only Library details (no Save) | — | — | ✅ | — |
+| Single GET /artifacts on processing page | — | — | ✅ | — |
+| No Artifact creation from frontend | — | — | ✅ | — |
+
+---
+
+# Known limitations
+
+1. **Markdown-only timeline** — chronological events rendered as structured markdown; no interactive timeline UI, date filtering, or zoom.
+2. **No map integration** — events are text-only; no geographic visualization.
+3. **No cross-artifact links** — Timeline, Summary, and Quiz are independent views; no navigation between related content.
+4. **Podcast documented but not generated** — OpenAPI lists `podcast`; worker does not produce it yet.
+5. **Worker image rebuild required** — worker code changes need `docker compose build worker`; frontend uses bind mount.
+6. **React `act(...)` warnings** — non-blocking stderr in Processing/Import page tests (pre-existing).
+7. **Flaky Symfony test cache** — occasional `Failed to remove directory` in PHPUnit cache cleanup; re-run clears it.
+
+---
+
+# Future work (Sprint 14 recommendations)
+
+| Priority | Topic | Rationale |
+| -------- | ----- | --------- |
+| High | **Interactive timeline UI** | Navigation, period filters, event detail panels |
+| High | **Semantic search (RAG)** | Search across Library + artifact content, not title-only |
+| Medium | **Historical map** | Geographic context for timeline events |
+| Medium | **Cross-artifact linking** | Jump from Timeline event → Summary section → Quiz question |
+| Medium | **Podcast artifact** | Complete the sixth documented type |
+| Low | **Mind Map artifact** | Visual learning mode; extends pipeline pattern |
+| Low | **OpenAPI contract tests** | Consumer-driven tests from `/api/docs.json` |
+
+**Recommendation:** Do not add new artifact types immediately. Increase value of the five existing types (transcript, summary, quiz, flashcards, timeline) before expanding the type matrix.
+
+---
+
+# CTO criteria (Sprint 13 closure)
+
+| Criterion | Status |
+| --------- | ------ |
+| No business logic modified in final slice | ✅ |
+| All test suites green | ✅ |
+| Architecture tests green | ✅ |
+| OpenAPI officially documents `timeline` | ✅ |
+| Documentation up to date | ✅ |
+| Verification report generated | ✅ |
+
+**Sprint 13 is officially closed.**
+
+---
+
+# Related commits (main branch)
+
+| Commit | Message |
+| ------ | ------- |
+| `83b87ce` | test(artifact): enforce timeline type consistency |
+| `43f8b13` | feat(worker): add timeline artifact generator |
+| `cee6241` | feat(worker): generate timeline artifact in processing pipeline |
+| `4f0bb85` | feat(frontend): render timeline artifact |
+| *(pending)* | feat(frontend): integrate timeline with library |
+| *(pending)* | docs(api): document timeline artifact in OpenAPI |
+
+---
+
+# Sign-off
+
+Verified by: automated suite execution + OpenAPI schema tests
+
+Environment: Docker Compose (backend PHP 8.4, frontend Node 22, worker Python 3.13)
+
+Next sprint: **Sprint 14** — deepen artifact value (interactive timeline, RAG search, cross-linking)

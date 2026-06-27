@@ -32,6 +32,7 @@ describe("LibraryPage", () => {
 
 		expect(screen.getByText("Ancient Greece Quiz")).toBeInTheDocument();
 		expect(screen.getByText("YouTube Lecture Flashcards")).toBeInTheDocument();
+		expect(screen.getByText("Ancient Rome Events")).toBeInTheDocument();
 		expect(searchSpy).not.toHaveBeenCalled();
 	});
 
@@ -263,9 +264,11 @@ describe("LibraryPage", () => {
 
 		expect(screen.getByText("Ancient Greece Quiz")).toBeInTheDocument();
 		expect(screen.getByText("YouTube Lecture Flashcards")).toBeInTheDocument();
+		expect(screen.getByText("Ancient Rome Events")).toBeInTheDocument();
 		expect(screen.getByText("Summary")).toBeInTheDocument();
 		expect(screen.getByText("Quiz")).toBeInTheDocument();
 		expect(screen.getByText("Flashcards")).toBeInTheDocument();
+		expect(screen.getByText("Timeline")).toBeInTheDocument();
 	});
 
 	it("shows EmptyState when the library is empty", async () => {
@@ -327,7 +330,7 @@ describe("LibraryPage", () => {
 
 		expect(
 			screen.getAllByRole("button", { name: "Add to Collection" }),
-		).toHaveLength(3);
+		).toHaveLength(4);
 	});
 
 	it("opens AssignToCollectionDialog when Add to Collection is clicked", async () => {

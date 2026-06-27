@@ -123,7 +123,7 @@ flowchart TB
 ```text
 Content
   └── ProcessingJob
-        └── Artifact (summary, quiz, flashcards, transcript, …)
+        └── Artifact (transcript, summary, quiz, flashcards, timeline, podcast, …)
               └── LibraryItem (saved artifact reference)
                     └── CollectionItem (many-to-many via junction)
                           └── Collection

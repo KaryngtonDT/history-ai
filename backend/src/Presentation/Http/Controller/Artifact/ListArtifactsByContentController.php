@@ -20,7 +20,7 @@ final class ListArtifactsByContentController extends AbstractController
     #[OA\Get(
         operationId: 'listArtifactsByContent',
         summary: 'List artifacts for content',
-        description: 'Returns generated artifacts (summary, quiz, flashcards, etc.) for a content resource.',
+        description: 'Returns generated artifacts (transcript, summary, quiz, flashcards, timeline, podcast) for a content resource.',
         tags: ['Artifacts'],
         parameters: [
             new OA\Parameter(
@@ -37,17 +37,7 @@ final class ListArtifactsByContentController extends AbstractController
                 description: 'Artifact list',
                 content: new OA\JsonContent(
                     type: 'array',
-                    items: new OA\Items(
-                        required: ['id', 'contentId', 'processingJobId', 'type', 'content', 'createdAt'],
-                        properties: [
-                            new OA\Property(property: 'id', type: 'string', format: 'uuid'),
-                            new OA\Property(property: 'contentId', type: 'string', format: 'uuid'),
-                            new OA\Property(property: 'processingJobId', type: 'string', format: 'uuid'),
-                            new OA\Property(property: 'type', type: 'string', example: 'summary'),
-                            new OA\Property(property: 'content', type: 'string'),
-                            new OA\Property(property: 'createdAt', type: 'string', format: 'date-time'),
-                        ],
-                    ),
+                    items: new OA\Items(ref: '#/components/schemas/Artifact'),
                 ),
             ),
             new OA\Response(

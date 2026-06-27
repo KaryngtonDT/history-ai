@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
 #[OA\Info(
     title: 'History AI API',
     version: '1.0.0',
-    description: 'Public REST API for content, artifacts, library, and collections.',
+    description: 'Public REST API for content, artifacts, library, and collections. Supported artifact types: transcript, summary, quiz, flashcards, timeline, and podcast.',
 )]
 #[OA\Server(url: 'http://localhost:8000', description: 'Local development')]
 #[OA\Tag(name: 'Contents', description: 'Content resources imported for processing')]

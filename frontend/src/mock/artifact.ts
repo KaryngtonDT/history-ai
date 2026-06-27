@@ -6,6 +6,20 @@ export const MOCK_TRANSCRIPT =
 
 export const MOCK_SUMMARY = generateSummaryFromTranscript(MOCK_TRANSCRIPT);
 
+export const MOCK_TIMELINE = [
+	"# Timeline",
+	"",
+	"## Ancient Rome",
+	"",
+	"- 753 BC — Foundation of Rome",
+	"- Republic established",
+	"",
+	"## Empire",
+	"",
+	"- Augustus becomes emperor",
+	"- Pax Romana",
+].join("\n");
+
 function buildMockArtifactsForContent(
 	contentId: string,
 	processingJobId: string,
@@ -81,6 +95,16 @@ export const artifactMocksByContentId: Record<string, Artifact[]> = {
 				"Rome",
 			].join("\n"),
 			createdAt: "2026-06-26T12:00:03+00:00",
+		},
+	],
+	"content-4": [
+		{
+			id: "artifact-4",
+			contentId: "content-4",
+			processingJobId: "job-4",
+			type: "timeline",
+			content: MOCK_TIMELINE,
+			createdAt: "2026-06-26T12:00:04+00:00",
 		},
 	],
 };

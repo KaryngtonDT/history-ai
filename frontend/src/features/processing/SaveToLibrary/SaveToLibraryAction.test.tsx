@@ -68,6 +68,41 @@ describe("SaveToLibraryAction", () => {
 		});
 	});
 
+	it("saves timeline artifact with type timeline and title Timeline", async () => {
+		const user = userEvent.setup();
+		const timelineArtifact: Artifact = {
+			id: "artifact-4",
+			contentId: "content-4",
+			processingJobId: "job-4",
+			type: "timeline",
+			content: "# Timeline\n\n## Ancient Rome\n\n- 753 BC — Foundation of Rome",
+			createdAt: "2026-06-26T12:00:04+00:00",
+		};
+		const addItem = vi.spyOn(libraryService, "addItem").mockResolvedValue({
+			id: "library-item-4",
+			contentId: "content-4",
+			artifactId: "artifact-4",
+			type: "timeline",
+			title: "Timeline",
+			createdAt: "2026-06-26T12:00:05+00:00",
+		});
+
+		render(
+			<SaveToLibraryAction artifact={timelineArtifact} contentId="content-4" />,
+		);
+
+		await user.click(screen.getByRole("button", { name: "Save to Library" }));
+
+		await waitFor(() => {
+			expect(addItem).toHaveBeenCalledWith({
+				contentId: "content-4",
+				artifactId: "artifact-4",
+				type: "timeline",
+				title: "Timeline",
+			});
+		});
+	});
+
 	it("displays error state when save fails", async () => {
 		const user = userEvent.setup();
 		vi.spyOn(libraryService, "addItem").mockRejectedValue(new Error("failed"));

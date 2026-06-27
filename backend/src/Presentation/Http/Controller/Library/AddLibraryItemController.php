@@ -33,13 +33,8 @@ final class AddLibraryItemController extends AbstractController
                 properties: [
                     new OA\Property(property: 'contentId', type: 'string', format: 'uuid'),
                     new OA\Property(property: 'artifactId', type: 'string', format: 'uuid'),
-                    new OA\Property(
-                        property: 'type',
-                        type: 'string',
-                        enum: ['summary', 'quiz', 'flashcards', 'transcript'],
-                        example: 'summary',
-                    ),
-                    new OA\Property(property: 'title', type: 'string', example: 'Roman Empire Summary'),
+                    new OA\Property(property: 'type', ref: '#/components/schemas/LibraryItemType'),
+                    new OA\Property(property: 'title', type: 'string', example: 'Timeline'),
                 ],
             ),
         ),
@@ -51,8 +46,8 @@ final class AddLibraryItemController extends AbstractController
                     required: ['id', 'type', 'title', 'createdAt'],
                     properties: [
                         new OA\Property(property: 'id', type: 'string', format: 'uuid'),
-                        new OA\Property(property: 'type', type: 'string', example: 'summary'),
-                        new OA\Property(property: 'title', type: 'string', example: 'Roman Empire Summary'),
+                        new OA\Property(property: 'type', ref: '#/components/schemas/LibraryItemType'),
+                        new OA\Property(property: 'title', type: 'string', example: 'Timeline'),
                         new OA\Property(property: 'createdAt', type: 'string', format: 'date-time'),
                     ],
                 ),

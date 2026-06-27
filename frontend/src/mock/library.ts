@@ -26,5 +26,13 @@ export const libraryMock: { items: LibraryItem[] } = {
 			title: "YouTube Lecture Flashcards",
 			createdAt: "2026-06-26T10:00:00+00:00",
 		},
+		{
+			id: "library-item-4",
+			contentId: "content-4",
+			artifactId: "artifact-4",
+			type: "timeline",
+			title: "Ancient Rome Events",
+			createdAt: "2026-06-26T09:00:00+00:00",
+		},
 	],
 };

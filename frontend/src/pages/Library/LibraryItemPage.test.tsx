@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MOCK_SUMMARY } from "@/mock/artifact";
+import { MOCK_SUMMARY, MOCK_TIMELINE } from "@/mock/artifact";
 import { LibraryItemPage } from "@/pages/Library/LibraryItemPage";
 import { artifactService } from "@/services/artifact/ArtifactService";
 import type { Artifact } from "@/services/artifact/types";
@@ -116,6 +116,61 @@ describe("LibraryItemPage — S9-SLICE-08", () => {
 		});
 
 		expect(listByContentIdSpy).not.toHaveBeenCalled();
+		expect(addItemSpy).not.toHaveBeenCalled();
+	});
+});
+
+describe("LibraryItemPage — S13-SLICE-05", () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
+	it("renders timeline artifact via ArtifactRendererRegistry in read-only mode", async () => {
+		const timelineLibraryItem: LibraryItem = {
+			id: "library-item-4",
+			contentId: "content-4",
+			artifactId: "artifact-4",
+			type: "timeline",
+			title: "Ancient Rome Events",
+			createdAt: "2026-06-26T09:00:00+00:00",
+		};
+		const timelineArtifact: Artifact = {
+			id: "artifact-4",
+			contentId: "content-4",
+			processingJobId: "job-4",
+			type: "timeline",
+			content: MOCK_TIMELINE,
+			createdAt: "2026-06-26T12:00:04+00:00",
+		};
+
+		vi.spyOn(libraryService, "listItems").mockResolvedValue([
+			timelineLibraryItem,
+		]);
+		vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
+			timelineArtifact,
+		]);
+		const addItemSpy = vi.spyOn(libraryService, "addItem");
+
+		renderLibraryItemPage("library-item-4");
+
+		await waitFor(() => {
+			expect(
+				screen.getByText("753 BC — Foundation of Rome"),
+			).toBeInTheDocument();
+		});
+
+		expect(
+			screen.getByRole("heading", { name: "Ancient Rome Events" }),
+		).toBeInTheDocument();
+		expect(screen.getByText("Timeline")).toBeInTheDocument();
+		expect(
+			screen.getByRole("heading", { name: "Ancient Rome" }),
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole("button", { name: "Save to Library" }),
+		).toBeNull();
+		expect(libraryService.listItems).toHaveBeenCalledTimes(1);
+		expect(artifactService.listByContentId).toHaveBeenCalledWith("content-4");
 		expect(addItemSpy).not.toHaveBeenCalled();
 	});
 });

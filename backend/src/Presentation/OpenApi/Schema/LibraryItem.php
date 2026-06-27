@@ -7,7 +7,7 @@ namespace App\Presentation\OpenApi\Schema;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: 'SearchLibraryItem',
+    schema: 'LibraryItem',
     required: ['id', 'contentId', 'artifactId', 'type', 'title', 'createdAt'],
     properties: [
         new OA\Property(property: 'id', type: 'string', format: 'uuid'),
@@ -18,6 +18,6 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'createdAt', type: 'string', format: 'date-time'),
     ],
 )]
-final class SearchLibraryItem
+final class LibraryItem
 {
 }

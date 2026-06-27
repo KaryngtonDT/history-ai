@@ -100,6 +100,46 @@ final class ApiDocumentationTest extends WebTestCase
         );
     }
 
+    public function testOpenApiSpecDocumentsArtifactTypeSchemaIncludesTimeline(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $artifactType = $spec['components']['schemas']['ArtifactType'];
+
+        self::assertSame('string', $artifactType['type']);
+        self::assertContains('timeline', $artifactType['enum']);
+        self::assertSame('timeline', $artifactType['example']);
+    }
+
+    public function testOpenApiSpecDocumentsLibraryItemTypeSchemaIncludesTimeline(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $libraryItemType = $spec['components']['schemas']['LibraryItemType'];
+
+        self::assertSame('string', $libraryItemType['type']);
+        self::assertContains('timeline', $libraryItemType['enum']);
+        self::assertSame('timeline', $libraryItemType['example']);
+    }
+
+    public function testOpenApiSpecDocumentsArtifactSchemaUsesArtifactType(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $artifactSchema = $spec['components']['schemas']['Artifact'];
+
+        self::assertSame(
+            '#/components/schemas/ArtifactType',
+            $artifactSchema['properties']['type']['$ref'],
+        );
+        self::assertStringContainsString('Timeline', $artifactSchema['properties']['content']['example']);
+    }
+
+    public function testOpenApiSpecDocumentsAddLibraryItemRequestUsesLibraryItemType(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $typeProperty = $spec['paths']['/api/library/items']['post']['requestBody']['content']['application/json']['schema']['properties']['type'];
+
+        self::assertSame('#/components/schemas/LibraryItemType', $typeProperty['$ref']);
+    }
+
     /**
      * @return array<string, mixed>
      */

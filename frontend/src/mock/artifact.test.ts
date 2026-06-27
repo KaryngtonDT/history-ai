@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
 	artifactMocksByContentId,
 	MOCK_SUMMARY,
+	MOCK_TIMELINE,
 	MOCK_TRANSCRIPT,
 } from "./artifact";
 import { generateSummaryFromTranscript } from "./summaryGenerator";
@@ -33,5 +34,13 @@ describe("artifact mocks", () => {
 
 		expect(summary?.content).not.toContain("simulated summary");
 		expect(summary?.content).not.toContain("processing worker");
+	});
+
+	it("includes timeline artifact for mock content-4", () => {
+		const timeline = artifactMocksByContentId["content-4"].find(
+			(artifact) => artifact.type === "timeline",
+		);
+
+		expect(timeline?.content).toBe(MOCK_TIMELINE);
 	});
 });

@@ -11,6 +11,10 @@ nelmio_api_doc:
     models:
         names:
             - { alias: ErrorResponse, type: App\Presentation\OpenApi\Schema\ErrorResponse }
+            - { alias: ArtifactType, type: App\Presentation\OpenApi\Schema\ArtifactTypeSchema }
+            - { alias: LibraryItemType, type: App\Presentation\OpenApi\Schema\LibraryItemTypeSchema }
+            - { alias: Artifact, type: App\Presentation\OpenApi\Schema\Artifact }
+            - { alias: LibraryItem, type: App\Presentation\OpenApi\Schema\LibraryItem }
             - { alias: SearchLibraryItem, type: App\Presentation\OpenApi\Schema\SearchLibraryItem }
     areas:
         default:
