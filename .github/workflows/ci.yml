@@ -58,10 +58,12 @@ jobs:
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Prepare test database
-        run: php bin/console doctrine:migrations:migrate --env=test --no-interaction
+        run: |
+          DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:5432/history_ai_test?serverVersion=17&charset=utf8' php bin/console doctrine:migrations:migrate --env=test --no-interaction
 
       - name: PHPUnit
-        run: php bin/phpunit
+        run: |
+          DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:5432/history_ai_test?serverVersion=17&charset=utf8' php bin/phpunit
 
       - name: Architecture tests
         run: composer architecture
