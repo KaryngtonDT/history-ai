@@ -7,7 +7,12 @@ from app.generators.ArtifactGeneratorConfigurationError import (
 )
 from app.generators.ArtifactGeneratorFactory import ArtifactGeneratorFactory
 from app.generators.ArtifactGeneratorInterface import ArtifactGeneratorInterface
-from app.generators.ArtifactType import ARTIFACT_TYPE_QUIZ, ARTIFACT_TYPE_SUMMARY
+from app.generators.ArtifactType import (
+    ARTIFACT_TYPE_FLASHCARDS,
+    ARTIFACT_TYPE_QUIZ,
+    ARTIFACT_TYPE_SUMMARY,
+)
+from app.generators.FlashcardsArtifactGenerator import FlashcardsArtifactGenerator
 from app.generators.QuizArtifactGenerator import QuizArtifactGenerator
 from app.generators.SummaryArtifactGenerator import SummaryArtifactGenerator
 
@@ -74,6 +79,37 @@ def test_create_quiz_artifact_generator_respects_mock_ai_env(
     assert result.content.startswith("Mock response:")
 
 
+def test_create_returns_flashcards_artifact_generator(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("AI_PROVIDER", "mock")
+    monkeypatch.setenv("AI_EXECUTION_MODE", "balanced")
+
+    generator = ArtifactGeneratorFactory.create(ARTIFACT_TYPE_FLASHCARDS)
+
+    assert isinstance(generator, FlashcardsArtifactGenerator)
+    assert isinstance(generator, ArtifactGeneratorInterface)
+
+
+def test_create_flashcards_artifact_generator_respects_mock_ai_env(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("AI_PROVIDER", "mock")
+    monkeypatch.setenv("AI_EXECUTION_MODE", "balanced")
+
+    generator = ArtifactGeneratorFactory.create(ARTIFACT_TYPE_FLASHCARDS)
+    result = generator.generate(
+        ArtifactGenerationRequest(
+            artifact_type=ARTIFACT_TYPE_FLASHCARDS,
+            transcript="The Roman Empire was vast.",
+        ),
+    )
+
+    assert isinstance(generator, FlashcardsArtifactGenerator)
+    assert result.artifact_type == ARTIFACT_TYPE_FLASHCARDS
+    assert result.content.startswith("Mock response:")
+
+
 def test_create_rejects_unsupported_artifact_type() -> None:
     with pytest.raises(
         ArtifactGeneratorConfigurationError,
@@ -87,7 +123,7 @@ def test_create_rejects_future_artifact_type_not_yet_implemented() -> None:
         ArtifactGeneratorConfigurationError,
         match="Unsupported artifact type",
     ):
-        ArtifactGeneratorFactory.create("flashcards")
+        ArtifactGeneratorFactory.create("timeline")
 
 
 def test_create_summary_without_gemini_key_fails_clearly(
@@ -111,3 +147,14 @@ def test_create_quiz_without_gemini_key_fails_clearly(
 
     with pytest.raises(AIProviderConfigurationError, match="GEMINI_API_KEY"):
         ArtifactGeneratorFactory.create(ARTIFACT_TYPE_QUIZ)
+
+
+def test_create_flashcards_without_gemini_key_fails_clearly(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("AI_PROVIDER", "gemini")
+    monkeypatch.setenv("AI_EXECUTION_MODE", "balanced")
+    monkeypatch.setenv("GEMINI_API_KEY", "")
+
+    with pytest.raises(AIProviderConfigurationError, match="GEMINI_API_KEY"):
+        ArtifactGeneratorFactory.create(ARTIFACT_TYPE_FLASHCARDS)
