@@ -56,6 +56,7 @@
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
+        "architecture": "php bin/phpunit tests/Architecture",
         "post-install-cmd": [
             "@auto-scripts"
         ],

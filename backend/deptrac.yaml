@@ -1,0 +1,40 @@
+deptrac:
+  paths:
+    - ./src
+  exclude_files:
+    - '#.*Test\.php#'
+
+  layers:
+    - name: Domain
+      collectors:
+        - type: className
+          regex: ^App\\Domain\\
+    - name: Application
+      collectors:
+        - type: className
+          regex: ^App\\Application\\
+    - name: Infrastructure
+      collectors:
+        - type: className
+          regex: ^App\\Infrastructure\\
+    - name: Presentation
+      collectors:
+        - type: className
+          regex: ^App\\Presentation\\
+
+  ruleset:
+    Domain:
+      - Domain
+    Application:
+      - Domain
+      - Application
+    Infrastructure:
+      - Domain
+      - Application
+      - Infrastructure
+    Presentation:
+      - Domain
+      - Application
+      - Presentation
+
+  skip_violations: {}
