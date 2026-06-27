@@ -1,10 +1,12 @@
 import pytest
 
 from app.ai.AIExecutionMode import AIExecutionMode
-from app.ai.AIProviderFactory import AIProviderFactory, UnsupportedAIProviderError
+from app.ai.AIProviderFactory import AIProviderFactory
 from app.ai.AIProviderInterface import AIProviderInterface
 from app.ai.AIProviderType import AIProviderType
+from app.ai.GeminiProvider import GeminiProvider
 from app.ai.MockAIProvider import MOCK_BALANCED_MODEL, MockAIProvider
+from app.ai.UnsupportedAIProviderError import UnsupportedAIProviderError
 
 
 def test_factory_returns_mock_provider() -> None:
@@ -22,6 +24,15 @@ def test_factory_returns_mock_provider() -> None:
 def test_factory_supports_all_provider_enums(
     provider_type: AIProviderType,
 ) -> None:
+    if provider_type is AIProviderType.GEMINI:
+        provider = AIProviderFactory.create(
+            provider=provider_type,
+            mode=AIExecutionMode.BALANCED,
+        )
+        assert isinstance(provider, GeminiProvider)
+        assert provider.model.model_name == "gemini-flash"
+        return
+
     if provider_type in {AIProviderType.AUTO, AIProviderType.MOCK}:
         provider = AIProviderFactory.create(
             provider=provider_type,
@@ -76,8 +87,8 @@ def test_auto_resolves_to_mock_provider_with_mode_model(
 
 
 def test_unsupported_provider_raises_explicit_exception() -> None:
-    with pytest.raises(UnsupportedAIProviderError, match="gemini"):
+    with pytest.raises(UnsupportedAIProviderError, match="openai"):
         AIProviderFactory.create(
-            provider=AIProviderType.GEMINI,
+            provider=AIProviderType.OPENAI,
             mode=AIExecutionMode.FAST,
         )

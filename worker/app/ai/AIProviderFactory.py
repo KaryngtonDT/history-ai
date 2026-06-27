@@ -2,11 +2,9 @@ from app.ai.AIExecutionMode import AIExecutionMode
 from app.ai.AIModel import AIModel
 from app.ai.AIProviderInterface import AIProviderInterface
 from app.ai.AIProviderType import AIProviderType
+from app.ai.GeminiProvider import MODE_TO_GEMINI_MODEL, GeminiProvider
 from app.ai.MockAIProvider import MODE_TO_MOCK_MODEL, MockAIProvider
-
-
-class UnsupportedAIProviderError(Exception):
-    """Raised when a provider type is not implemented yet."""
+from app.ai.UnsupportedAIProviderError import UnsupportedAIProviderError
 
 
 class AIProviderFactory:
@@ -23,6 +21,10 @@ class AIProviderFactory:
             model = AIProviderFactory.resolve_model(resolved_provider, mode)
             return MockAIProvider(model=model)
 
+        if resolved_provider is AIProviderType.GEMINI:
+            model = AIProviderFactory.resolve_model(resolved_provider, mode)
+            return GeminiProvider(model=model)
+
         msg = f"Provider {provider.value!r} is not implemented yet."
         raise UnsupportedAIProviderError(msg)
 
@@ -33,6 +35,9 @@ class AIProviderFactory:
     ) -> AIModel:
         if provider is AIProviderType.MOCK:
             return MODE_TO_MOCK_MODEL[mode]
+
+        if provider is AIProviderType.GEMINI:
+            return MODE_TO_GEMINI_MODEL[mode]
 
         msg = f"Provider {provider.value!r} is not implemented yet."
         raise UnsupportedAIProviderError(msg)
