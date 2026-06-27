@@ -1,9 +1,7 @@
 import pytest
 
-from app.generators.DeterministicSummaryGenerator import (
-    DeterministicSummaryGenerator,
-    SummaryGenerationError,
-)
+from app.generators.DeterministicSummaryGenerator import DeterministicSummaryGenerator
+from app.generators.SummaryGenerationError import SummaryGenerationError
 
 
 def test_returns_first_three_meaningful_sentences() -> None:

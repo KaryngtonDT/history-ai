@@ -1,5 +1,5 @@
 from app.ai.AIProviderInterface import AIProviderInterface
-from app.generators.DeterministicSummaryGenerator import SummaryGenerationError
+from app.generators.SummaryGenerationError import SummaryGenerationError
 from app.generators.SummaryGeneratorInterface import SummaryGeneratorInterface
 
 

@@ -1,12 +1,9 @@
 import re
 
+from app.generators.SummaryGenerationError import SummaryGenerationError
 from app.generators.SummaryGeneratorInterface import SummaryGeneratorInterface
 
 SENTENCE_PATTERN = re.compile(r"[^.!?]+[.!?]+|[^.!?]+$")
-
-
-class SummaryGenerationError(Exception):
-    """Raised when a summary cannot be generated from a transcript."""
 
 
 class DeterministicSummaryGenerator(SummaryGeneratorInterface):

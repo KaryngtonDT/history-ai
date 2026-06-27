@@ -6,7 +6,7 @@ from app.ai.AIProviderInterface import AIProviderInterface
 from app.ai.AIProviderResponse import AIProviderResponse
 from app.ai.MockAIProvider import MOCK_BALANCED_MODEL, MockAIProvider
 from app.generators.AISummaryGenerator import AISummaryGenerator
-from app.generators.DeterministicSummaryGenerator import SummaryGenerationError
+from app.generators.SummaryGenerationError import SummaryGenerationError
 
 
 def test_calls_ai_provider_interface() -> None:
