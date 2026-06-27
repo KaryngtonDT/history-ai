@@ -11,10 +11,12 @@ from app.generators.ArtifactType import (
     ARTIFACT_TYPE_FLASHCARDS,
     ARTIFACT_TYPE_QUIZ,
     ARTIFACT_TYPE_SUMMARY,
+    ARTIFACT_TYPE_TIMELINE,
 )
 from app.generators.FlashcardsArtifactGenerator import FlashcardsArtifactGenerator
 from app.generators.QuizArtifactGenerator import QuizArtifactGenerator
 from app.generators.SummaryArtifactGenerator import SummaryArtifactGenerator
+from app.generators.TimelineArtifactGenerator import TimelineArtifactGenerator
 
 
 def test_create_returns_summary_artifact_generator(
@@ -110,6 +112,37 @@ def test_create_flashcards_artifact_generator_respects_mock_ai_env(
     assert result.content.startswith("Mock response:")
 
 
+def test_create_returns_timeline_artifact_generator(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("AI_PROVIDER", "mock")
+    monkeypatch.setenv("AI_EXECUTION_MODE", "balanced")
+
+    generator = ArtifactGeneratorFactory.create(ARTIFACT_TYPE_TIMELINE)
+
+    assert isinstance(generator, TimelineArtifactGenerator)
+    assert isinstance(generator, ArtifactGeneratorInterface)
+
+
+def test_create_timeline_artifact_generator_respects_mock_ai_env(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("AI_PROVIDER", "mock")
+    monkeypatch.setenv("AI_EXECUTION_MODE", "balanced")
+
+    generator = ArtifactGeneratorFactory.create(ARTIFACT_TYPE_TIMELINE)
+    result = generator.generate(
+        ArtifactGenerationRequest(
+            artifact_type=ARTIFACT_TYPE_TIMELINE,
+            transcript="The Roman Empire was vast.",
+        ),
+    )
+
+    assert isinstance(generator, TimelineArtifactGenerator)
+    assert result.artifact_type == ARTIFACT_TYPE_TIMELINE
+    assert result.content.startswith("Mock response:")
+
+
 def test_create_rejects_unsupported_artifact_type() -> None:
     with pytest.raises(
         ArtifactGeneratorConfigurationError,
@@ -123,7 +156,7 @@ def test_create_rejects_future_artifact_type_not_yet_implemented() -> None:
         ArtifactGeneratorConfigurationError,
         match="Unsupported artifact type",
     ):
-        ArtifactGeneratorFactory.create("timeline")
+        ArtifactGeneratorFactory.create("translation")
 
 
 def test_create_summary_without_gemini_key_fails_clearly(
