@@ -30,6 +30,9 @@ services:
     App\Domain\Library\LibraryItemRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Library\DoctrineLibraryRepository
 
+    App\Domain\Search\LibrarySearchRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Search\DoctrineLibrarySearchRepository
+
     App\Domain\Collection\CollectionRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Collection\DoctrineCollectionRepository
 

@@ -17,6 +17,10 @@ when@test:
             alias: App\Infrastructure\Persistence\Doctrine\Library\DoctrineLibraryRepository
             public: true
 
+        App\Domain\Search\LibrarySearchRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\Search\DoctrineLibrarySearchRepository
+            public: true
+
         App\Domain\Collection\CollectionRepositoryInterface:
             alias: App\Infrastructure\Persistence\Doctrine\Collection\DoctrineCollectionRepository
             public: true
