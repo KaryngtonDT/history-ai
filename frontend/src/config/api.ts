@@ -10,6 +10,8 @@ export const LIBRARY_ITEMS_PATH = "/api/library/items";
 
 export const COLLECTIONS_PATH = "/api/collections";
 
+export const SEARCH_LIBRARY_PATH = "/api/search/library";
+
 export function contentArtifactsPath(contentId: string): string {
 	return `${CONTENTS_PATH}/${contentId}/artifacts`;
 }
