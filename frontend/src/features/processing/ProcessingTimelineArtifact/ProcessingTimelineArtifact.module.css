@@ -57,3 +57,9 @@
 .emptyState {
 	margin-top: var(--space-3);
 }
+
+.loadingState {
+	display: flex;
+	justify-content: center;
+	margin: var(--space-4) 0 var(--space-2);
+}

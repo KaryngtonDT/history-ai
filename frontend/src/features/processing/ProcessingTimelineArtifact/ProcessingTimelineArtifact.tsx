@@ -1,12 +1,17 @@
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Spinner } from "@/components/ui/Spinner";
+import type { Timeline } from "@/domain/timeline";
 import { ArtifactCardHeader } from "@/features/processing/artifactRenderers/ArtifactCardHeader";
+import { InteractiveTimeline } from "@/features/processing/InteractiveTimeline";
 import type { Artifact } from "@/services/artifact/types";
 import styles from "./ProcessingTimelineArtifact.module.css";
 
 interface ProcessingTimelineArtifactProps {
 	artifact: Artifact | null;
 	contentId?: string;
+	isLoading?: boolean;
+	structuredTimeline?: Timeline;
 }
 
 interface TimelineSection {
@@ -54,7 +59,7 @@ function parseTimelineSections(content: string): TimelineSection[] {
 	return sections;
 }
 
-function TimelineContent({ content }: { content: string }) {
+function TimelineMarkdownContent({ content }: { content: string }) {
 	const sections = parseTimelineSections(content);
 
 	if (sections.length === 0) {
@@ -84,6 +89,8 @@ function TimelineContent({ content }: { content: string }) {
 export function ProcessingTimelineArtifact({
 	artifact,
 	contentId,
+	isLoading = false,
+	structuredTimeline,
 }: ProcessingTimelineArtifactProps) {
 	if (artifact === null) {
 		return (
@@ -109,7 +116,15 @@ export function ProcessingTimelineArtifact({
 			) : (
 				<p className={styles.label}>Timeline</p>
 			)}
-			<TimelineContent content={artifact.content} />
+			{isLoading ? (
+				<div className={styles.loadingState}>
+					<Spinner label="Loading timeline" />
+				</div>
+			) : structuredTimeline ? (
+				<InteractiveTimeline timeline={structuredTimeline} />
+			) : (
+				<TimelineMarkdownContent content={artifact.content} />
+			)}
 		</Card>
 	);
 }
