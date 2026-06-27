@@ -16,3 +16,7 @@ when@test:
         App\Domain\Library\LibraryItemRepositoryInterface:
             alias: App\Infrastructure\Persistence\Doctrine\Library\DoctrineLibraryRepository
             public: true
+
+        App\Domain\Collection\CollectionRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\Collection\DoctrineCollectionRepository
+            public: true
