@@ -16,6 +16,10 @@ export function timelinePath(artifactId: string): string {
 	return `/api/timeline/${artifactId}`;
 }
 
+export function timelineMapPath(artifactId: string): string {
+	return `/api/maps/timeline/${artifactId}`;
+}
+
 export function contentArtifactsPath(contentId: string): string {
 	return `${CONTENTS_PATH}/${contentId}/artifacts`;
 }
