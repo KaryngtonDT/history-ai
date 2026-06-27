@@ -6,6 +6,7 @@ import styles from "./SummaryArtifactRenderer.module.css";
 export function SummaryArtifactRenderer({
 	artifact,
 	contentId,
+	readOnly = false,
 }: ArtifactRendererProps) {
 	if (artifact === null) {
 		return null;
@@ -17,6 +18,7 @@ export function SummaryArtifactRenderer({
 				label="Summary"
 				artifact={artifact}
 				contentId={contentId}
+				showSave={!readOnly}
 			/>
 			<p className={styles.content}>{artifact.content}</p>
 		</Card>

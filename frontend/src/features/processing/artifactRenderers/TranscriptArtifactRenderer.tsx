@@ -6,6 +6,7 @@ import styles from "./TranscriptArtifactRenderer.module.css";
 export function TranscriptArtifactRenderer({
 	artifact,
 	contentId,
+	readOnly = false,
 }: ArtifactRendererProps) {
 	if (artifact === null) {
 		return null;
@@ -17,6 +18,7 @@ export function TranscriptArtifactRenderer({
 				label="Transcript"
 				artifact={artifact}
 				contentId={contentId}
+				showSave={!readOnly}
 			/>
 			<p className={styles.content}>{artifact.content}</p>
 		</Card>

@@ -32,4 +32,55 @@ function buildMockArtifactsForContent(
 
 export const artifactMocksByContentId: Record<string, Artifact[]> = {
 	"1": buildMockArtifactsForContent("1", "1"),
+	"content-1": [
+		{
+			id: "artifact-1",
+			contentId: "content-1",
+			processingJobId: "job-1",
+			type: "summary",
+			content: MOCK_SUMMARY,
+			createdAt: "2026-06-26T12:00:01+00:00",
+		},
+	],
+	"content-2": [
+		{
+			id: "artifact-2",
+			contentId: "content-2",
+			processingJobId: "job-2",
+			type: "quiz",
+			content: [
+				"# Quiz",
+				"",
+				"## Question 1",
+				"What was the capital of the Roman Empire?",
+				"- A) Athens",
+				"- B) Rome",
+				"- C) Carthage",
+				"- D) Alexandria",
+				"",
+				"Answer: B",
+			].join("\n"),
+			createdAt: "2026-06-26T12:00:02+00:00",
+		},
+	],
+	"content-3": [
+		{
+			id: "artifact-3",
+			contentId: "content-3",
+			processingJobId: "job-3",
+			type: "flashcards",
+			content: [
+				"# Flashcards",
+				"",
+				"## Card 1",
+				"",
+				"Front:",
+				"What was the capital of the Roman Empire?",
+				"",
+				"Back:",
+				"Rome",
+			].join("\n"),
+			createdAt: "2026-06-26T12:00:03+00:00",
+		},
+	],
 };

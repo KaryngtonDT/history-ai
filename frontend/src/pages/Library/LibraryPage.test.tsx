@@ -60,4 +60,20 @@ describe("LibraryPage", () => {
 			expect(screen.getByText("Unable to load library")).toBeInTheDocument();
 		});
 	});
+
+	it("links library cards to the item details page", async () => {
+		render(
+			<MemoryRouter>
+				<LibraryPage />
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+		});
+
+		expect(
+			screen.getByRole("link", { name: "The Roman Empire Summary" }),
+		).toHaveAttribute("href", "/library/library-item-1");
+	});
 });

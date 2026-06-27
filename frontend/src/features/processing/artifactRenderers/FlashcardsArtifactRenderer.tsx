@@ -4,6 +4,12 @@ import type { ArtifactRendererProps } from "./ArtifactRenderer";
 export function FlashcardsArtifactRenderer({
 	artifact,
 	contentId,
+	readOnly = false,
 }: ArtifactRendererProps) {
-	return <ProcessingFlashcards artifact={artifact} contentId={contentId} />;
+	return (
+		<ProcessingFlashcards
+			artifact={artifact}
+			contentId={readOnly ? undefined : contentId}
+		/>
+	);
 }

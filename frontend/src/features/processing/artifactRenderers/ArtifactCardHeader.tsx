@@ -6,17 +6,21 @@ interface ArtifactCardHeaderProps {
 	label: string;
 	artifact: Artifact;
 	contentId: string;
+	showSave?: boolean;
 }
 
 export function ArtifactCardHeader({
 	label,
 	artifact,
 	contentId,
+	showSave = true,
 }: ArtifactCardHeaderProps) {
 	return (
 		<div className={styles.header}>
 			<p className={styles.label}>{label}</p>
-			<SaveToLibraryAction artifact={artifact} contentId={contentId} />
+			{showSave ? (
+				<SaveToLibraryAction artifact={artifact} contentId={contentId} />
+			) : null}
 		</div>
 	);
 }
