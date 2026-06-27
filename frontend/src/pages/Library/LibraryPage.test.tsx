@@ -6,10 +6,244 @@ import { LibraryPage } from "@/pages/Library/LibraryPage";
 import { collectionService } from "@/services/collection/CollectionService";
 import { CollectionAssignmentConflictError } from "@/services/collection/MockCollectionRepository";
 import { libraryService } from "@/services/library/LibraryService";
+import { searchService } from "@/services/search/SearchService";
 
 describe("LibraryPage", () => {
 	afterEach(() => {
 		vi.restoreAllMocks();
+	});
+
+	it("shows the normal library list when the search query is empty", async () => {
+		const searchSpy = vi.spyOn(searchService, "searchLibrary");
+
+		render(
+			<MemoryRouter>
+				<LibraryPage />
+			</MemoryRouter>,
+		);
+
+		expect(
+			screen.getByRole("searchbox", { name: "Search library" }),
+		).toHaveValue("");
+
+		await waitFor(() => {
+			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+		});
+
+		expect(screen.getByText("Ancient Greece Quiz")).toBeInTheDocument();
+		expect(screen.getByText("YouTube Lecture Flashcards")).toBeInTheDocument();
+		expect(searchSpy).not.toHaveBeenCalled();
+	});
+
+	it("calls SearchService when typing a search query", async () => {
+		const user = userEvent.setup();
+		const searchSpy = vi
+			.spyOn(searchService, "searchLibrary")
+			.mockResolvedValue([
+				{
+					id: "library-item-1",
+					contentId: "content-1",
+					artifactId: "artifact-1",
+					type: "summary",
+					title: "The Roman Empire",
+					createdAt: "2026-06-26T12:00:00+00:00",
+				},
+			]);
+
+		render(
+			<MemoryRouter>
+				<LibraryPage />
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+		});
+
+		await user.type(
+			screen.getByRole("searchbox", { name: "Search library" }),
+			"Roman",
+		);
+
+		await waitFor(() => {
+			expect(searchSpy).toHaveBeenCalledWith("Roman");
+		});
+	});
+
+	it("renders search results from SearchService", async () => {
+		const user = userEvent.setup();
+		vi.spyOn(searchService, "searchLibrary").mockResolvedValue([
+			{
+				id: "library-item-1",
+				contentId: "content-1",
+				artifactId: "artifact-1",
+				type: "summary",
+				title: "The Roman Empire",
+				createdAt: "2026-06-26T12:00:00+00:00",
+			},
+		]);
+
+		render(
+			<MemoryRouter>
+				<LibraryPage />
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+		});
+
+		await user.type(
+			screen.getByRole("searchbox", { name: "Search library" }),
+			"Roman",
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+		});
+
+		expect(screen.queryByText("Ancient Greece Quiz")).not.toBeInTheDocument();
+		expect(
+			screen.queryByText("YouTube Lecture Flashcards"),
+		).not.toBeInTheDocument();
+	});
+
+	it("shows empty state when search returns no results", async () => {
+		const user = userEvent.setup();
+		vi.spyOn(searchService, "searchLibrary").mockResolvedValue([]);
+
+		render(
+			<MemoryRouter>
+				<LibraryPage />
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+		});
+
+		await user.type(
+			screen.getByRole("searchbox", { name: "Search library" }),
+			"nothing",
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("No results found")).toBeInTheDocument();
+		});
+
+		expect(
+			screen.getByText("Try a different search term."),
+		).toBeInTheDocument();
+	});
+
+	it("shows error state when search fails", async () => {
+		const user = userEvent.setup();
+		vi.spyOn(searchService, "searchLibrary").mockRejectedValue(
+			new Error("network"),
+		);
+
+		render(
+			<MemoryRouter>
+				<LibraryPage />
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+		});
+
+		await user.type(
+			screen.getByRole("searchbox", { name: "Search library" }),
+			"Roman",
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("Unable to search library")).toBeInTheDocument();
+		});
+	});
+
+	it("links search result cards to the item details page", async () => {
+		const user = userEvent.setup();
+		vi.spyOn(searchService, "searchLibrary").mockResolvedValue([
+			{
+				id: "library-item-1",
+				contentId: "content-1",
+				artifactId: "artifact-1",
+				type: "summary",
+				title: "The Roman Empire",
+				createdAt: "2026-06-26T12:00:00+00:00",
+			},
+		]);
+
+		render(
+			<MemoryRouter>
+				<LibraryPage />
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+		});
+
+		await user.type(
+			screen.getByRole("searchbox", { name: "Search library" }),
+			"Roman",
+		);
+
+		await waitFor(() => {
+			expect(
+				screen.getByRole("link", { name: "The Roman Empire" }),
+			).toHaveAttribute("href", "/library/library-item-1");
+		});
+	});
+
+	it("shows Add to Collection on search result cards", async () => {
+		const user = userEvent.setup();
+		vi.spyOn(searchService, "searchLibrary").mockResolvedValue([
+			{
+				id: "library-item-1",
+				contentId: "content-1",
+				artifactId: "artifact-1",
+				type: "summary",
+				title: "The Roman Empire",
+				createdAt: "2026-06-26T12:00:00+00:00",
+			},
+		]);
+		vi.spyOn(collectionService, "listCollections").mockResolvedValue([
+			{
+				id: "collection-1",
+				name: "Ancient Rome",
+				description: "Resources about Roman history",
+				createdAt: "2026-06-27T12:00:00+00:00",
+			},
+		]);
+
+		render(
+			<MemoryRouter>
+				<LibraryPage />
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+		});
+
+		await user.type(
+			screen.getByRole("searchbox", { name: "Search library" }),
+			"Roman",
+		);
+
+		await waitFor(() => {
+			expect(
+				screen.getByRole("button", { name: "Add to Collection" }),
+			).toBeInTheDocument();
+		});
+
+		await user.click(screen.getByRole("button", { name: "Add to Collection" }));
+
+		expect(
+			screen.getByRole("dialog", { name: "Assign to collection" }),
+		).toBeInTheDocument();
 	});
 
 	it("displays library items from the service layer", async () => {
