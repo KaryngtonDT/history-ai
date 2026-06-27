@@ -33,6 +33,9 @@ services:
     App\Domain\Collection\CollectionRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Collection\DoctrineCollectionRepository
 
+    App\Domain\CollectionItem\CollectionItemRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\CollectionItem\DoctrineCollectionItemRepository
+
     App\Application\Processing\Ports\ProcessingOrchestratorInterface:
         alias: App\Infrastructure\Processing\HttpWorkerDispatcher
 

@@ -20,3 +20,7 @@ when@test:
         App\Domain\Collection\CollectionRepositoryInterface:
             alias: App\Infrastructure\Persistence\Doctrine\Collection\DoctrineCollectionRepository
             public: true
+
+        App\Domain\CollectionItem\CollectionItemRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\CollectionItem\DoctrineCollectionItemRepository
+            public: true
