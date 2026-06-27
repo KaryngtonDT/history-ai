@@ -6,6 +6,7 @@ const navItems = [
 	{ to: "/", label: "Dashboard", end: true },
 	{ to: "/import", label: "Import", end: false },
 	{ to: "/library", label: "Library", end: false },
+	{ to: "/collections", label: "Collections", end: false },
 	{ to: "/settings", label: "Settings", end: false },
 ];
 

@@ -1,0 +1,30 @@
+.card {
+	padding: var(--space-4);
+}
+
+.header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: var(--space-3);
+}
+
+.title {
+	margin: 0;
+	font-size: var(--font-md);
+	font-weight: var(--font-weight-medium);
+	color: var(--shell-text);
+}
+
+.itemCount {
+	flex-shrink: 0;
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-medium);
+	color: var(--shell-text-muted);
+}
+
+.description {
+	margin: var(--space-3) 0 0;
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}

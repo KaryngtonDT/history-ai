@@ -1,0 +1,50 @@
+.overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 50;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--space-4);
+}
+
+.backdrop {
+	position: absolute;
+	inset: 0;
+	border: none;
+	padding: 0;
+	background-color: rgb(15 23 42 / 0.45);
+	cursor: default;
+}
+
+.dialog {
+	position: relative;
+	z-index: 1;
+	width: 100%;
+	max-width: var(--size-content-narrow);
+	border-radius: var(--radius-lg);
+	border: 1px solid var(--card-border);
+	background-color: var(--card-bg);
+	box-shadow: var(--shadow-card);
+}
+
+.header {
+	padding: var(--space-5) var(--space-5) 0;
+}
+
+.title {
+	margin: 0;
+	font-size: var(--font-lg);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.description {
+	margin: var(--space-2) 0 0;
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
+.content {
+	padding: var(--space-5);
+}

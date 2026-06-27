@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router";
 import { AppLayout } from "@/app/AppLayout";
+import { CollectionsPage } from "@/pages/Collections/CollectionsPage";
 import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
 import { ImportPage } from "@/pages/Import/ImportPage";
 import { LibraryItemPage } from "@/pages/Library/LibraryItemPage";
@@ -15,6 +16,7 @@ export function AppRouter() {
 				<Route path="/import" element={<ImportPage />} />
 				<Route path="/library" element={<LibraryPage />} />
 				<Route path="/library/:libraryItemId" element={<LibraryItemPage />} />
+				<Route path="/collections" element={<CollectionsPage />} />
 				<Route path="/processing/:id" element={<ProcessingPage />} />
 				<Route path="/settings" element={<SettingsPage />} />
 			</Route>
