@@ -12,6 +12,22 @@ jobs:
   backend:
     name: Backend
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/history_ai_test?serverVersion=17&charset=utf8
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: history_ai_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d history_ai_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     defaults:
       run:
         working-directory: backend
@@ -24,7 +40,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
-          extensions: ctype, iconv, intl, pdo_sqlite
+          extensions: ctype, iconv, intl, pdo_pgsql
           coverage: none
 
       - name: Cache Composer dependencies
@@ -42,15 +58,9 @@ jobs:
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Prepare test database
-        run: |
-          mkdir -p var
-          touch var/test_ci.db
-          echo "DATABASE_URL=sqlite:///$PWD/var/test_ci.db" >> .env.test.local
-          php bin/console doctrine:migrations:migrate --env=test --no-interaction
+        run: php bin/console doctrine:migrations:migrate --env=test --no-interaction
 
       - name: PHPUnit
-        env:
-          DATABASE_URL: sqlite:///${{ github.workspace }}/backend/var/test_ci.db
         run: php bin/phpunit
 
       - name: Architecture tests
