@@ -4,7 +4,7 @@ from collections.abc import Awaitable, Callable
 from app.generators.ArtifactGenerationRequest import ArtifactGenerationRequest
 from app.generators.ArtifactGeneratorFactory import ArtifactGeneratorFactory
 from app.generators.ArtifactGeneratorInterface import ArtifactGeneratorInterface
-from app.generators.ArtifactType import ARTIFACT_TYPE_QUIZ
+from app.generators.ArtifactType import ARTIFACT_TYPE_FLASHCARDS, ARTIFACT_TYPE_QUIZ
 from app.generators.SummaryGeneratorFactory import SummaryGeneratorFactory
 from app.generators.SummaryGeneratorInterface import SummaryGeneratorInterface
 from app.models.ProcessingJob import ProcessingJob
@@ -25,6 +25,7 @@ class ProcessingService:
     SUMMARY_ARTIFACT_TYPE = "summary"
     TRANSCRIPT_ARTIFACT_TYPE = "transcript"
     QUIZ_ARTIFACT_TYPE = ARTIFACT_TYPE_QUIZ
+    FLASHCARDS_ARTIFACT_TYPE = ARTIFACT_TYPE_FLASHCARDS
 
     def __init__(
         self,
@@ -70,6 +71,10 @@ class ProcessingService:
                 self._generate_quiz,
                 transcript,
             )
+            flashcards = await asyncio.to_thread(
+                self._generate_flashcards,
+                transcript,
+            )
             await asyncio.to_thread(
                 self._repository.create_artifact,
                 job.content_id,
@@ -91,15 +96,28 @@ class ProcessingService:
                 self.QUIZ_ARTIFACT_TYPE,
                 quiz,
             )
+            await asyncio.to_thread(
+                self._repository.create_artifact,
+                job.content_id,
+                job.id,
+                self.FLASHCARDS_ARTIFACT_TYPE,
+                flashcards,
+            )
 
         await self._sleep(self.SLEEP_SECONDS)
         await asyncio.to_thread(self._repository.complete, job.id)
 
     def _generate_quiz(self, transcript: str) -> str:
-        quiz_generator = self._create_artifact_generator(self.QUIZ_ARTIFACT_TYPE)
-        result = quiz_generator.generate(
+        return self._generate_artifact(self.QUIZ_ARTIFACT_TYPE, transcript)
+
+    def _generate_flashcards(self, transcript: str) -> str:
+        return self._generate_artifact(self.FLASHCARDS_ARTIFACT_TYPE, transcript)
+
+    def _generate_artifact(self, artifact_type: str, transcript: str) -> str:
+        generator = self._create_artifact_generator(artifact_type)
+        result = generator.generate(
             ArtifactGenerationRequest(
-                artifact_type=self.QUIZ_ARTIFACT_TYPE,
+                artifact_type=artifact_type,
                 transcript=transcript,
             ),
         )
