@@ -117,6 +117,9 @@ services:
     restart: unless-stopped
     environment:
       SYMFONY_API_BASE_URL: ${SYMFONY_API_BASE_URL:-http://backend}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      AI_PROVIDER: ${AI_PROVIDER:-mock}
+      AI_EXECUTION_MODE: ${AI_EXECUTION_MODE:-balanced}
     ports:
       - "8001:8001"
     networks:

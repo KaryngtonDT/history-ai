@@ -1,2 +1,2 @@
 class AIProviderConfigurationError(Exception):
-    """Raised when a provider is configured with an invalid model."""
+    """Raised when a provider is misconfigured or receives invalid input."""
