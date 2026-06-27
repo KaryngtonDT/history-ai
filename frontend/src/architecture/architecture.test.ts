@@ -36,4 +36,12 @@ describe("Frontend architecture rules", () => {
 
 		expect(clientViolations).toEqual([]);
 	});
+
+	it("prevents feature modules from importing Search transport directly", () => {
+		const searchViolations = violations.filter(
+			(violation) => violation.rule === "feature-search-transport",
+		);
+
+		expect(searchViolations).toEqual([]);
+	});
 });

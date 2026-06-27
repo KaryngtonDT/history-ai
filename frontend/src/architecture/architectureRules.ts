@@ -142,10 +142,54 @@ export function findFeatureHttpClientViolations(): ArchitectureViolation[] {
 	return violations;
 }
 
+export function findFeatureSearchTransportViolations(): ArchitectureViolation[] {
+	const violations: ArchitectureViolation[] = [];
+	const featuresRoot = path.join(FRONTEND_SRC, "features");
+
+	if (!directoryExists(featuresRoot)) {
+		return violations;
+	}
+
+	const forbiddenPatterns: Array<{ pattern: RegExp; detail: string }> = [
+		{
+			pattern: /from\s+["']@\/services\/search\/HttpSearchRepository["']/,
+			detail:
+				"Feature components must use SearchService, not HttpSearchRepository",
+		},
+		{
+			pattern: /from\s+["']@\/services\/search\/SearchRepositoryFactory["']/,
+			detail: "Feature components must not wire SearchRepositoryFactory",
+		},
+		{
+			pattern: /from\s+["']@\/services\/search\/SearchRepository["']/,
+			detail: "Feature components must use SearchService, not SearchRepository",
+		},
+	];
+
+	for (const filePath of collectSourceFiles(featuresRoot)) {
+		const content = readFileSync(filePath, "utf8");
+
+		for (const { pattern, detail } of forbiddenPatterns) {
+			if (!pattern.test(content)) {
+				continue;
+			}
+
+			violations.push({
+				rule: "feature-search-transport",
+				file: toRelativePath(filePath),
+				detail,
+			});
+		}
+	}
+
+	return violations;
+}
+
 export function collectArchitectureViolations(): ArchitectureViolation[] {
 	return [
 		...findFetchViolations(),
 		...findFeatureHttpRepositoryViolations(),
 		...findFeatureHttpClientViolations(),
+		...findFeatureSearchTransportViolations(),
 	];
 }

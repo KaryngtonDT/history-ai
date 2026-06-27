@@ -8,6 +8,20 @@ use PHPUnit\Framework\TestCase;
 
 final class LayerDependencyTest extends TestCase
 {
+    /** @var list<string> */
+    private const DOMAIN_FORBIDDEN_PREFIXES = [
+        'Symfony\\',
+        'Doctrine\\',
+        'App\\Infrastructure\\',
+        'App\\Presentation\\',
+    ];
+
+    /** @var list<string> */
+    private const APPLICATION_FORBIDDEN_PREFIXES = [
+        'App\\Infrastructure\\',
+        'App\\Presentation\\',
+    ];
+
     private string $srcRoot;
 
     protected function setUp(): void
@@ -17,69 +31,110 @@ final class LayerDependencyTest extends TestCase
 
     public function testDomainDoesNotDependOnOuterLayersOrFrameworks(): void
     {
-        $violations = LayerDependencyRules::findViolations(
-            $this->srcRoot . '/Domain',
-            [
-                'Symfony\\',
-                'Doctrine\\',
-                'App\\Infrastructure\\',
-                'App\\Presentation\\',
-            ],
+        $this->assertNoViolations(
+            'Domain layer',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Domain',
+                self::DOMAIN_FORBIDDEN_PREFIXES,
+            ),
         );
+    }
 
-        self::assertSame(
-            [],
-            $violations,
-            "Domain layer dependency violations:\n" . implode("\n", $violations),
+    public function testSearchDomainDoesNotDependOnOuterLayersOrFrameworks(): void
+    {
+        $this->assertNoViolations(
+            'Search domain',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Domain/Search',
+                self::DOMAIN_FORBIDDEN_PREFIXES,
+            ),
         );
     }
 
     public function testApplicationDoesNotDependOnInfrastructureOrPresentation(): void
     {
-        $violations = LayerDependencyRules::findViolations(
-            $this->srcRoot . '/Application',
-            [
-                'App\\Infrastructure\\',
-                'App\\Presentation\\',
-            ],
+        $this->assertNoViolations(
+            'Application layer',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Application',
+                self::APPLICATION_FORBIDDEN_PREFIXES,
+            ),
         );
+    }
 
-        self::assertSame(
-            [],
-            $violations,
-            "Application layer dependency violations:\n" . implode("\n", $violations),
+    public function testSearchApplicationMayDependOnSearchDomainOnly(): void
+    {
+        $this->assertNoViolations(
+            'Search application',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Application/Search',
+                self::APPLICATION_FORBIDDEN_PREFIXES,
+            ),
         );
     }
 
     public function testPresentationDoesNotDependOnInfrastructure(): void
     {
-        $violations = LayerDependencyRules::findViolations(
-            $this->srcRoot . '/Presentation',
-            [
-                'App\\Infrastructure\\',
-            ],
+        $this->assertNoViolations(
+            'Presentation layer',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Presentation',
+                ['App\\Infrastructure\\'],
+            ),
         );
+    }
 
-        self::assertSame(
-            [],
-            $violations,
-            "Presentation layer dependency violations:\n" . implode("\n", $violations),
-        );
+    public function testSearchPresentationMayDependOnSearchApplicationOnly(): void
+    {
+        $searchPresentationPaths = [
+            $this->srcRoot . '/Presentation/Http/Controller/Search',
+            $this->srcRoot . '/Presentation/Http/Request/Search',
+            $this->srcRoot . '/Presentation/Http/Response/Search',
+        ];
+
+        $violations = [];
+
+        foreach ($searchPresentationPaths as $path) {
+            $violations = array_merge(
+                $violations,
+                LayerDependencyRules::findViolations($path, ['App\\Infrastructure\\']),
+            );
+        }
+
+        $this->assertNoViolations('Search presentation', $violations);
     }
 
     public function testInfrastructureDoesNotDependOnPresentation(): void
     {
-        $violations = LayerDependencyRules::findViolations(
-            $this->srcRoot . '/Infrastructure',
-            [
-                'App\\Presentation\\',
-            ],
+        $this->assertNoViolations(
+            'Infrastructure layer',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Infrastructure',
+                ['App\\Presentation\\'],
+            ),
         );
+    }
 
+    public function testSearchInfrastructureMayDependOnSearchAndLibraryDomain(): void
+    {
+        $this->assertNoViolations(
+            'Search infrastructure',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Infrastructure/Persistence/Doctrine/Search',
+                ['App\\Presentation\\'],
+            ),
+        );
+    }
+
+    /**
+     * @param list<string> $violations
+     */
+    private function assertNoViolations(string $scope, array $violations): void
+    {
         self::assertSame(
             [],
             $violations,
-            "Infrastructure layer dependency violations:\n" . implode("\n", $violations),
+            sprintf("%s dependency violations:\n%s", $scope, implode("\n", $violations)),
         );
     }
 }

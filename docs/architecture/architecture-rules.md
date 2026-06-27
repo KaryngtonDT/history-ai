@@ -55,6 +55,21 @@ Presentation may reference Domain value objects and exceptions when parsing HTTP
 2. **Application isolation** — no Infrastructure or Presentation imports.
 3. **Presentation boundary** — no direct Infrastructure imports (use Application handlers).
 4. **Infrastructure boundary** — no Presentation imports.
+5. **Search domain** — `Domain/Search` follows the same purity rules as other domains (no Symfony, Doctrine, Infrastructure, or Presentation).
+6. **Search application** — `Application/Search` depends on `Domain/Search` only (via handlers and DTOs).
+7. **Search infrastructure** — `Infrastructure/Persistence/Doctrine/Search` may depend on `Domain/Search` and `Domain/Library`; must not import Presentation.
+8. **Search presentation** — controllers, requests, and responses under `Presentation/Http/.../Search` may depend on `Application/Search` and Domain value objects; must not import Infrastructure.
+
+### Search example (passes CI)
+
+```php
+// backend/src/Application/Search/Handlers/SearchLibraryHandler.php
+use App\Domain\Search\LibrarySearchRepositoryInterface; // ✅ port in Domain
+
+// backend/src/Infrastructure/Persistence/Doctrine/Search/DoctrineLibrarySearchRepository.php
+use App\Domain\Search\SearchQuery;
+use App\Domain\Library\LibraryItem; // ✅ Search reads library items via Domain
+```
 
 ### Example violation (fails CI)
 
@@ -135,8 +150,24 @@ HttpClient + Repository (Http / Mock)
 | `fetch()` only in `services/http/HttpClient.ts` | Single HTTP gateway; testable mocks |
 | Feature modules must not import `Http*Repository` | UI talks to services, not transport |
 | Feature modules must not import `HttpClient` | Same as above |
+| Feature modules must not import Search transport (`HttpSearchRepository`, `SearchRepositoryFactory`, `SearchRepository`) | Library search UI uses `SearchService` only |
 
 Repository factories and Http repositories live under `services/` and are consumed by service classes only.
+
+### Search service layer
+
+```text
+features/library
+      │
+      ▼
+SearchService.searchLibrary()
+      │
+      ▼
+SearchRepositoryFactory → HttpSearchRepository | MockSearchRepository
+      │
+      ▼
+HttpClient (HTTP mode only)
+```
 
 ## Enforcement
 
@@ -159,6 +190,13 @@ import { HttpLibraryRepository } from "@/services/library/HttpLibraryRepository"
 ```
 
 **Fix:** import `libraryService` from `@/services/library/LibraryService`.
+
+```tsx
+// frontend/src/features/library/Library/Library.tsx
+import { HttpSearchRepository } from "@/services/search/HttpSearchRepository"; // ❌ forbidden
+```
+
+**Fix:** import `searchService` from `@/services/search/SearchService`.
 
 ---
 
