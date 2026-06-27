@@ -14,6 +14,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/library/items',
         '/api/collections',
         '/api/collections/{collectionId}/items',
+        '/api/search/library',
     ];
 
     public function testSwaggerUiIsAvailable(): void
@@ -50,5 +51,65 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('post', $spec['paths']['/api/collections']);
         self::assertArrayHasKey('get', $spec['paths']['/api/collections']);
         self::assertArrayHasKey('post', $spec['paths']['/api/collections/{collectionId}/items']);
+        self::assertArrayHasKey('get', $spec['paths']['/api/search/library']);
+    }
+
+    public function testOpenApiSpecDocumentsSearchLibraryQueryParameter(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/search/library']['get'];
+
+        self::assertSame('searchLibrary', $operation['operationId']);
+
+        $queryParameter = null;
+
+        foreach ($operation['parameters'] as $parameter) {
+            if (($parameter['name'] ?? null) === 'q') {
+                $queryParameter = $parameter;
+                break;
+            }
+        }
+
+        self::assertNotNull($queryParameter, 'Missing query parameter: q');
+        self::assertSame('query', $queryParameter['in']);
+        self::assertTrue($queryParameter['required']);
+        self::assertSame('string', $queryParameter['schema']['type']);
+        self::assertSame(1, $queryParameter['schema']['minLength']);
+        self::assertSame(255, $queryParameter['schema']['maxLength']);
+        self::assertSame('roman', $queryParameter['schema']['example']);
+    }
+
+    public function testOpenApiSpecDocumentsSearchLibraryResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/search/library']['get']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Search results', $responses['200']['description']);
+        self::assertSame('array', $responses['200']['content']['application/json']['schema']['type']);
+        self::assertSame(
+            '#/components/schemas/SearchLibraryItem',
+            $responses['200']['content']['application/json']['schema']['items']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function fetchOpenApiSpec(): array
+    {
+        $client = static::createClient();
+        $client->request('GET', '/api/docs.json');
+
+        self::assertResponseIsSuccessful();
+
+        return json_decode((string) $client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
     }
 }

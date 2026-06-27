@@ -51,6 +51,7 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Collections | POST | `/api/collections` |
 | Collections | GET | `/api/collections` |
 | Collections | POST | `/api/collections/{collectionId}/items` |
+| Search | GET | `/api/search/library` |
 
 ---
 
