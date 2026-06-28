@@ -24,6 +24,10 @@ export function contentArtifactsPath(contentId: string): string {
 	return `${CONTENTS_PATH}/${contentId}/artifacts`;
 }
 
+export function contentRelationsPath(contentId: string): string {
+	return `${CONTENTS_PATH}/${contentId}/relations`;
+}
+
 export function collectionItemsPath(collectionId: string): string {
 	return `${COLLECTIONS_PATH}/${collectionId}/items`;
 }

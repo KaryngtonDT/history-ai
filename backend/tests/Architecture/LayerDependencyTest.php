@@ -128,6 +128,17 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testRelationApplicationMayDependOnRelationArtifactAndContentDomainOnly(): void
+    {
+        $this->assertNoViolations(
+            'Relation application',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Application/Relation',
+                self::APPLICATION_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testPresentationDoesNotDependOnInfrastructure(): void
     {
         $this->assertNoViolations(
@@ -201,6 +212,25 @@ final class LayerDependencyTest extends TestCase
         }
 
         $this->assertNoViolations('Map presentation', $violations);
+    }
+
+    public function testRelationPresentationMayDependOnRelationApplicationOnly(): void
+    {
+        $relationPresentationPaths = [
+            $this->srcRoot . '/Presentation/Http/Controller/Relation',
+            $this->srcRoot . '/Presentation/Http/Response/Relation',
+        ];
+
+        $violations = [];
+
+        foreach ($relationPresentationPaths as $path) {
+            $violations = array_merge(
+                $violations,
+                LayerDependencyRules::findViolations($path, ['App\\Infrastructure\\']),
+            );
+        }
+
+        $this->assertNoViolations('Relation presentation', $violations);
     }
 
     public function testInfrastructureDoesNotDependOnPresentation(): void
