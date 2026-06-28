@@ -158,7 +158,9 @@ function findFirstByType(
 	artifacts: Artifact[],
 	type: ArtifactType,
 ): Artifact | undefined {
-	return sortArtifacts(artifacts.filter((artifact) => artifact.type === type))[0];
+	return sortArtifacts(
+		artifacts.filter((artifact) => artifact.type === type),
+	)[0];
 }
 
 function sortArtifacts(artifacts: Artifact[]): Artifact[] {
