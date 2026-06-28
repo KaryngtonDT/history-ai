@@ -798,15 +798,18 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('ChatRequest', $spec['components']['schemas']);
         self::assertArrayHasKey('ChatAnswer', $spec['components']['schemas']);
         self::assertArrayHasKey('ChatSource', $spec['components']['schemas']);
+        self::assertArrayHasKey('ChatCitation', $spec['components']['schemas']);
 
         $answerSchema = $spec['components']['schemas']['ChatAnswer'];
         $sourceSchema = $spec['components']['schemas']['ChatSource'];
+        $citationSchema = $spec['components']['schemas']['ChatCitation'];
 
         self::assertArrayHasKey('answer', $answerSchema['properties']);
         self::assertArrayHasKey('sources', $answerSchema['properties']);
+        self::assertArrayHasKey('citations', $answerSchema['properties']);
         self::assertSame('string', $answerSchema['properties']['answer']['type']);
         self::assertSame(
-            'Mock answer based on retrieved context.',
+            'Mock answer based on retrieved context [1].',
             $answerSchema['properties']['answer']['example'],
         );
         self::assertSame('array', $answerSchema['properties']['sources']['type']);
@@ -814,9 +817,15 @@ final class ApiDocumentationTest extends WebTestCase
             '#/components/schemas/ChatSource',
             $answerSchema['properties']['sources']['items']['$ref'],
         );
+        self::assertSame('array', $answerSchema['properties']['citations']['type']);
+        self::assertSame(
+            '#/components/schemas/ChatCitation',
+            $answerSchema['properties']['citations']['items']['$ref'],
+        );
         if (isset($answerSchema['required'])) {
             self::assertContains('answer', $answerSchema['required']);
             self::assertContains('sources', $answerSchema['required']);
+            self::assertContains('citations', $answerSchema['required']);
         }
 
         self::assertArrayHasKey('artifactId', $sourceSchema['properties']);
@@ -833,6 +842,24 @@ final class ApiDocumentationTest extends WebTestCase
             self::assertContains('chunkId', $sourceSchema['required']);
             self::assertContains('text', $sourceSchema['required']);
             self::assertContains('score', $sourceSchema['required']);
+        }
+
+        self::assertArrayHasKey('number', $citationSchema['properties']);
+        self::assertArrayHasKey('artifactId', $citationSchema['properties']);
+        self::assertArrayHasKey('chunkId', $citationSchema['properties']);
+        self::assertArrayHasKey('score', $citationSchema['properties']);
+        self::assertArrayNotHasKey('text', $citationSchema['properties']);
+        self::assertSame('integer', $citationSchema['properties']['number']['type']);
+        self::assertSame(1, $citationSchema['properties']['number']['minimum']);
+        self::assertSame('number', $citationSchema['properties']['score']['type']);
+        self::assertSame(0, $citationSchema['properties']['score']['minimum']);
+        self::assertSame(1, $citationSchema['properties']['score']['maximum']);
+        self::assertSame(0.87, $citationSchema['properties']['score']['example']);
+        if (isset($citationSchema['required'])) {
+            self::assertContains('number', $citationSchema['required']);
+            self::assertContains('artifactId', $citationSchema['required']);
+            self::assertContains('chunkId', $citationSchema['required']);
+            self::assertContains('score', $citationSchema['required']);
         }
     }
 

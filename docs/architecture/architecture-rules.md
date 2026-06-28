@@ -504,6 +504,36 @@ import { HttpChatRepository } from "@/services/chat/HttpChatRepository"; // ❌ 
 
 **Fix:** import `chatService` from `@/services/chat/ChatService` in `ChatPanel` only.
 
+### Interactive citations (UX-02)
+
+```text
+ChatResponse.citations[]
+        │
+        ▼
+ChatAnswer JSON (citations[] without text)
+        │
+        ▼
+Frontend ChatService / repositories
+        │
+        ▼
+ChatMessage [1] buttons + SourcesPanel rows
+        │
+        ▼
+ProcessingArtifacts.handleCitationClick
+        │
+        ├── scrollIntoView(#artifact-{type})
+        └── .history-ai-highlight (3s fade)
+```
+
+| Component | Rule |
+| --------- | ---- |
+| `ChatCitation` (API) | `number`, `artifactId`, `chunkId`, `score` — no `text` |
+| `ChatMessage` | Parses `/\[(\d+)\]/g`; emits `{ chunkId, artifactId }` on click |
+| `citationNavigation.ts` | Scroll + highlight utilities; no fetch |
+| `features/chat/ChatMessage` | Must not import `@/services/` (architecture test) |
+
+Citations are **presentation navigation** only — domain and provider logic unchanged after slice 1.
+
 ## Enforcement
 
 | Tool | Location | Command |

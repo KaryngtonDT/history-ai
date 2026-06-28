@@ -163,6 +163,7 @@ Shared OpenAPI schemas:
 | `ChatRequest` | `Presentation/OpenApi/Schema/ChatRequest.php` |
 | `ChatAnswer` | `Presentation/OpenApi/Schema/ChatAnswer.php` |
 | `ChatSource` | `Presentation/OpenApi/Schema/ChatSource.php` |
+| `ChatCitation` | `Presentation/OpenApi/Schema/ChatCitation.php` |
 
 `GET /api/timeline/{artifactId}` returns a `Timeline` with nested `sections[].events[].text`.
 
@@ -176,11 +177,13 @@ Shared OpenAPI schemas:
 
 `GET /api/contents/{contentId}/semantic-search?q=…` returns a `SemanticSearchResult` envelope with `results[]` entries (`artifactId`, `chunkId`, `position`, `text`, `score`). The `score` field is a float from 0.0 to 1.0 (cosine similarity; higher scores appear first in the API response). The required query parameter `q` accepts 1–500 characters.
 
-`POST /api/contents/{contentId}/chat` accepts a `ChatRequest` body (`question`, 1–2000 characters) and returns a `ChatAnswer` with `answer` and `sources[]` entries (`artifactId`, `chunkId`, `text`, `score`). Chat sources omit the `position` field present on semantic-search chunks. Invalid UUID, malformed JSON, or invalid question returns HTTP 400 with `ErrorResponse`.
+`POST /api/contents/{contentId}/chat` accepts a `ChatRequest` body (`question`, 1–2000 characters) and returns a `ChatAnswer` with `answer`, `sources[]` entries (`artifactId`, `chunkId`, `text`, `score`), and `citations[]` entries (`number`, `artifactId`, `chunkId`, `score`). Citations reference numbered markers in the answer (e.g. `[1]`) without duplicating chunk text — use `sources[]` for excerpt text. Chat sources omit the `position` field present on semantic-search chunks. Invalid UUID, malformed JSON, or invalid question returns HTTP 400 with `ErrorResponse`.
 
 **Sprint 22 note:** Embedding provider selection (`EMBEDDING_PROVIDER`, Gemini adapter) is internal to the backend. The semantic-search HTTP contract, OpenAPI schemas, and response shape are unchanged from Sprint 20.
 
 **UX-01 note:** Chat provider selection (`CHAT_PROVIDER`, Gemini adapter) is internal to the backend. The chat HTTP contract and OpenAPI schemas document the stable request/response shape only.
+
+**UX-02 note:** Interactive citations (`citations[]`) are documented in OpenAPI slice 5. Frontend navigation (click `[1]` → scroll + highlight) is a UI concern; the HTTP contract exposes citation metadata only.
 
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 

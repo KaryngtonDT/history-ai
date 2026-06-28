@@ -252,6 +252,31 @@ Verification: [UX01-Verification.md](../reports/UX01-Verification.md)
 
 ---
 
+# UX-02 — Interactive Citations (2026-06)
+
+UX-02 adds **numbered, navigable citations** to the RAG chat experience: domain `ChatCitation` model, API `citations[]` field, frontend mapping, and click-to-scroll highlight in `ProcessingArtifacts`.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| UX-02-SLICE-01 | Domain `ChatCitation`, `ChatCitationCollection`; `ChatResponse` enriched | ✅ |
+| UX-02-SLICE-02 | Application DTO + JSON `citations[]` on chat API | ✅ |
+| UX-02-SLICE-03 | Frontend citation mapping (`ChatService` layer) | ✅ |
+| UX-02-SLICE-04 | Interactive navigation (`[1]` click → scroll + highlight) | ✅ |
+| UX-02-SLICE-05 | OpenAPI `ChatCitation` schema + UX-02 verification report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `ChatCitation`, `ChatCitationCollection`; mock provider emits `[1]` markers |
+| Application | `ChatCitationResult`; `ChatAnswerResult.citations[]` |
+| Presentation | OpenAPI schemas `ChatCitation`; `ChatAnswer.citations[]` |
+| Frontend | `ChatCitation` type; clickable markers in `ChatMessage`; `citationNavigation.ts` |
+
+Citations omit `text` in JSON — frontend resolves `citation.chunkId` against `sources[]` for excerpt text.
+
+Verification: [UX02-Verification.md](../reports/UX02-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:
