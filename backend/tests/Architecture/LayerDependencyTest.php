@@ -172,6 +172,17 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testRecommendationApplicationMayDependOnRecommendationGraphRelationArtifactAndContentDomainOnly(): void
+    {
+        $this->assertNoViolations(
+            'Recommendation application',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Application/Recommendation',
+                self::APPLICATION_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testPresentationDoesNotDependOnInfrastructure(): void
     {
         $this->assertNoViolations(
@@ -289,6 +300,25 @@ final class LayerDependencyTest extends TestCase
         }
 
         $this->assertNoViolations('Graph presentation', $violations);
+    }
+
+    public function testRecommendationPresentationMayDependOnRecommendationApplicationOnly(): void
+    {
+        $recommendationPresentationPaths = [
+            $this->srcRoot . '/Presentation/Http/Controller/Recommendation',
+            $this->srcRoot . '/Presentation/Http/Response/Recommendation',
+        ];
+
+        $violations = [];
+
+        foreach ($recommendationPresentationPaths as $path) {
+            $violations = array_merge(
+                $violations,
+                LayerDependencyRules::findViolations($path, ['App\\Infrastructure\\']),
+            );
+        }
+
+        $this->assertNoViolations('Recommendation presentation', $violations);
     }
 
     public function testInfrastructureDoesNotDependOnPresentation(): void

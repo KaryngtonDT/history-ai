@@ -18,6 +18,8 @@ services:
     App\Infrastructure\:
         resource: '../src/Infrastructure/'
 
+    App\Domain\Recommendation\RecommendationEngine: ~
+
     App\Domain\Content\ContentRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Content\DoctrineContentRepository
 

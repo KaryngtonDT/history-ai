@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Application\Recommendation\DTO;
+
+use App\Domain\Recommendation\RecommendedArtifact;
+use App\Domain\Recommendation\RecommendedArtifactCollection;
+
+final readonly class ArtifactRecommendationsResult
+{
+    /**
+     * @param list<RecommendedArtifactResult> $recommendations
+     */
+    public function __construct(
+        public array $recommendations,
+    ) {
+    }
+
+    public static function fromDomain(RecommendedArtifactCollection $collection): self
+    {
+        return new self(
+            recommendations: array_map(
+                static fn (RecommendedArtifact $recommendation): RecommendedArtifactResult => RecommendedArtifactResult::fromDomain($recommendation),
+                $collection->recommendations(),
+            ),
+        );
+    }
+}
