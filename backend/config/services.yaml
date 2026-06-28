@@ -4,6 +4,8 @@
 parameters:
     worker.base_url: '%env(WORKER_BASE_URL)%'
     gemini.embedding_model_default: 'text-embedding-004'
+    embedding.provider_default: 'deterministic'
+    gemini.api_key_default: ''
 
 services:
     _defaults:
@@ -18,6 +20,8 @@ services:
 
     App\Infrastructure\:
         resource: '../src/Infrastructure/'
+        exclude:
+            - '../src/Infrastructure/Semantic/EmbeddingProviderFactory.php'
 
     App\Domain\Recommendation\RecommendationEngine: ~
     App\Domain\Recommendation\RecommendationScoringEngine: ~
@@ -49,18 +53,21 @@ services:
         alias: App\Infrastructure\Processing\HttpWorkerDispatcher
 
     App\Domain\Semantic\EmbeddingProviderInterface:
-        alias: App\Infrastructure\Semantic\DeterministicEmbeddingProvider
+        factory: ['@App\Infrastructure\Semantic\EmbeddingProviderFactory', 'create']
+
+    App\Infrastructure\Semantic\EmbeddingProviderFactory:
+        arguments:
+            $providerName: '%env(default:embedding.provider_default:EMBEDDING_PROVIDER)%'
+            $geminiApiKey: '%env(default:gemini.api_key_default:GEMINI_API_KEY)%'
+            $deterministicProvider: '@App\Infrastructure\Semantic\DeterministicEmbeddingProvider'
+            $geminiTransport: '@App\Infrastructure\Semantic\CurlGeminiEmbeddingTransport'
+            $geminiModel: '%env(default:gemini.embedding_model_default:GEMINI_EMBEDDING_MODEL)%'
 
     App\Domain\Semantic\EmbeddingGeneratorInterface:
         alias: App\Infrastructure\Semantic\DeterministicEmbeddingGenerator
 
     App\Domain\Semantic\VectorStoreInterface:
         alias: App\Infrastructure\Semantic\InMemoryVectorStore
-
-    App\Infrastructure\Semantic\GeminiEmbeddingProvider:
-        arguments:
-            $apiKey: '%env(default::GEMINI_API_KEY)%'
-            $model: '%env(default:gemini.embedding_model_default:GEMINI_EMBEDDING_MODEL)%'
 
     App\Infrastructure\Processing\HttpWorkerDispatcher:
         arguments:

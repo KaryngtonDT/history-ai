@@ -30,7 +30,7 @@ when@test:
             public: true
 
         App\Domain\Semantic\EmbeddingProviderInterface:
-            alias: App\Infrastructure\Semantic\DeterministicEmbeddingProvider
+            factory: ['@App\Infrastructure\Semantic\EmbeddingProviderFactory', 'create']
             public: true
 
         App\Domain\Semantic\EmbeddingGeneratorInterface:

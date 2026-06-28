@@ -210,10 +210,10 @@ Verification: [Sprint21-Verification.md](../reports/Sprint21-Verification.md)
 | Layer | Addition |
 | ----- | -------- |
 | Domain | `EmbeddingProviderInterface` — port for single-text embedding generation |
-| Infrastructure | `DeterministicEmbeddingProvider` (SHA-256, default); `GeminiEmbeddingProvider` (Gemini `embedContent`, optional, not default) |
+| Infrastructure | `DeterministicEmbeddingProvider` (SHA-256); `GeminiEmbeddingProvider` (Gemini `embedContent`); `EmbeddingProviderFactory` (config-driven selection) |
 | Refactor | `DeterministicEmbeddingGenerator` delegates to `EmbeddingProviderInterface` |
 
-Default wiring unchanged: `EmbeddingProviderInterface` → `DeterministicEmbeddingProvider`. Real Gemini activation deferred to a later slice.
+Provider selection via `EMBEDDING_PROVIDER` env var (`deterministic` default, `gemini` requires `GEMINI_API_KEY`). Test/CI env keeps `EMBEDDING_PROVIDER=deterministic`.
 
 ---
 
