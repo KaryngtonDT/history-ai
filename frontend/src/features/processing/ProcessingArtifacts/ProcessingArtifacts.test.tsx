@@ -38,6 +38,15 @@ vi.mock("@/services/semantic/SemanticSearchService", () => ({
 	},
 }));
 
+vi.mock("@/services/chat/ChatService", () => ({
+	chatService: {
+		askQuestion: vi.fn().mockResolvedValue({
+			answer: "Mock answer based on retrieved context.",
+			sources: [],
+		}),
+	},
+}));
+
 describe("ProcessingArtifacts", () => {
 	beforeEach(() => {
 		mockGetArtifactRelations.mockReset();
@@ -655,6 +664,33 @@ describe("ProcessingArtifacts", () => {
 		expect(await screen.findByText("Semantic Search")).toBeInTheDocument();
 		expect(
 			screen.getByRole("searchbox", { name: "Search query" }),
+		).toBeInTheDocument();
+		expect(listByContentId).toHaveBeenCalledTimes(1);
+	});
+
+	it("renders ChatPanel and still fetches artifacts once", async () => {
+		const listByContentId = vi
+			.spyOn(artifactService, "listByContentId")
+			.mockResolvedValue([
+				{
+					id: "550e8400-e29b-41d4-a716-446655440002",
+					contentId: "550e8400-e29b-41d4-a716-446655440000",
+					processingJobId: "job-1",
+					type: "summary",
+					content: "Generated summary text",
+					createdAt: "2026-06-26T12:00:00+00:00",
+				},
+			]);
+
+		render(
+			<ProcessingArtifacts contentId="550e8400-e29b-41d4-a716-446655440000" />,
+		);
+
+		expect(
+			await screen.findByText("Chat with this document"),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole("textbox", { name: "Ask a question" }),
 		).toBeInTheDocument();
 		expect(listByContentId).toHaveBeenCalledTimes(1);
 	});

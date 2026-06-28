@@ -1,0 +1,30 @@
+.message {
+	display: flex;
+	gap: var(--space-3);
+	align-items: flex-start;
+	padding: var(--space-3) var(--space-4);
+	border-radius: var(--radius-md);
+}
+
+.userMessage {
+	background: color-mix(in srgb, var(--shell-accent) 12%, var(--shell-bg));
+}
+
+.assistantMessage {
+	background: var(--shell-surface-muted, var(--shell-bg));
+	border: 1px solid var(--shell-border);
+}
+
+.prefix {
+	margin: 0;
+	font-size: var(--font-md);
+	line-height: 1;
+}
+
+.content {
+	margin: 0;
+	flex: 1;
+	white-space: pre-wrap;
+	word-break: break-word;
+	color: var(--shell-text);
+}

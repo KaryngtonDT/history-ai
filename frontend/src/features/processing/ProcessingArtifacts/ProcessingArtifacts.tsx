@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { ChatPanel } from "@/features/chat/ChatPanel";
 import { KnowledgeGraphPanel } from "@/features/graph/KnowledgeGraphPanel";
 import { ArtifactRelationsPanel } from "@/features/processing/ArtifactRelationsPanel";
 import {
@@ -139,6 +140,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 			<ArtifactRelationsPanel contentId={contentId} artifacts={artifacts} />
 			<KnowledgeGraphPanel contentId={contentId} />
 			<SemanticSearchPanel contentId={contentId} artifacts={artifacts} />
+			<ChatPanel contentId={contentId} artifacts={artifacts} />
 		</div>
 	);
 }

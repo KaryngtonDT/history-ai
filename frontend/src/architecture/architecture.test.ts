@@ -109,6 +109,14 @@ describe("Frontend architecture rules", () => {
 		expect(semanticViolations).toEqual([]);
 	});
 
+	it("prevents feature modules from importing Chat transport directly", () => {
+		const chatViolations = violations.filter(
+			(violation) => violation.rule === "feature-chat-transport",
+		);
+
+		expect(chatViolations).toEqual([]);
+	});
+
 	it("keeps InteractiveGraph props-only without service imports", () => {
 		const interactiveGraphViolations = violations.filter(
 			(violation) => violation.rule === "interactive-graph-props-only",

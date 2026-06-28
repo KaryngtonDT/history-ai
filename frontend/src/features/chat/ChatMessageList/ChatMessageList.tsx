@@ -1,0 +1,44 @@
+import type { ArtifactType } from "@/services/artifact/types";
+import type { ChatSource } from "@/services/chat/types";
+import { ChatMessage } from "../ChatMessage";
+import { SourcesPanel } from "../SourcesPanel";
+import styles from "./ChatMessageList.module.css";
+
+export interface ChatMessageItem {
+	id: string;
+	role: "user" | "assistant";
+	content: string;
+	sources?: ChatSource[];
+}
+
+export interface ChatMessageListProps {
+	messages: ChatMessageItem[];
+	artifactTypesById: Record<string, ArtifactType>;
+}
+
+export function ChatMessageList({
+	messages,
+	artifactTypesById,
+}: ChatMessageListProps) {
+	if (messages.length === 0) {
+		return null;
+	}
+
+	return (
+		<div className={styles.messageList}>
+			{messages.map((message) => (
+				<div key={message.id} className={styles.messageBlock}>
+					<ChatMessage speaker={message.role} content={message.content} />
+					{message.role === "assistant" &&
+					message.sources !== undefined &&
+					message.sources.length > 0 ? (
+						<SourcesPanel
+							sources={message.sources}
+							artifactTypesById={artifactTypesById}
+						/>
+					) : null}
+				</div>
+			))}
+		</div>
+	);
+}

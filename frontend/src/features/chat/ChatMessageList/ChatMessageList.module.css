@@ -1,0 +1,12 @@
+.messageList {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4);
+	margin-top: var(--space-4);
+}
+
+.messageBlock {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+}

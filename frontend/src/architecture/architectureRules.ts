@@ -578,6 +578,48 @@ export function findFeatureSemanticTransportViolations(): ArchitectureViolation[
 	return violations;
 }
 
+export function findFeatureChatTransportViolations(): ArchitectureViolation[] {
+	const violations: ArchitectureViolation[] = [];
+	const chatFeaturesRoot = path.join(FRONTEND_SRC, "features", "chat");
+
+	if (!directoryExists(chatFeaturesRoot)) {
+		return violations;
+	}
+
+	const forbiddenPatterns: Array<{ pattern: RegExp; detail: string }> = [
+		{
+			pattern: /from\s+["']@\/services\/chat\/HttpChatRepository["']/,
+			detail: "Feature components must use ChatService, not HttpChatRepository",
+		},
+		{
+			pattern: /from\s+["']@\/services\/chat\/ChatRepositoryFactory["']/,
+			detail: "Feature components must not wire ChatRepositoryFactory",
+		},
+		{
+			pattern: /from\s+["']@\/services\/chat\/ChatRepository["']/,
+			detail: "Feature components must use ChatService, not ChatRepository",
+		},
+	];
+
+	for (const filePath of collectSourceFiles(chatFeaturesRoot)) {
+		const content = readFileSync(filePath, "utf8");
+
+		for (const { pattern, detail } of forbiddenPatterns) {
+			if (!pattern.test(content)) {
+				continue;
+			}
+
+			violations.push({
+				rule: "feature-chat-transport",
+				file: toRelativePath(filePath),
+				detail,
+			});
+		}
+	}
+
+	return violations;
+}
+
 export function collectArchitectureViolations(): ArchitectureViolation[] {
 	return [
 		...findFetchViolations(),
@@ -590,6 +632,7 @@ export function collectArchitectureViolations(): ArchitectureViolation[] {
 		...findFeatureGraphTransportViolations(),
 		...findFeatureRecommendationTransportViolations(),
 		...findFeatureSemanticTransportViolations(),
+		...findFeatureChatTransportViolations(),
 		...findInteractiveTimelineServiceViolations(),
 		...findInteractiveMapServiceViolations(),
 		...findInteractiveGraphServiceViolations(),
