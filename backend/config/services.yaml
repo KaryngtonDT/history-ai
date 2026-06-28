@@ -35,6 +35,9 @@ services:
     App\Domain\Chat\ChatProviderInterface:
         factory: ['@App\Infrastructure\Chat\ChatProviderFactory', 'create']
 
+    App\Domain\Chat\StreamingChatProviderInterface:
+        alias: App\Infrastructure\Chat\MockChatProvider
+
     App\Infrastructure\Chat\ChatProviderFactory:
         arguments:
             $providerName: '%env(default:chat.provider_default:CHAT_PROVIDER)%'
