@@ -117,6 +117,19 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testSemanticVectorDomainDoesNotDependOnOuterLayersOrFrameworks(): void
+    {
+        self::assertFileExists($this->srcRoot . '/Domain/Semantic/VectorStoreInterface.php');
+
+        $this->assertNoViolations(
+            'Semantic vector store domain',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Domain/Semantic',
+                self::DOMAIN_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testRecommendationScoringDomainDoesNotDependOnOuterLayersOrFrameworks(): void
     {
         self::assertFileExists($this->srcRoot . '/Domain/Recommendation/RecommendationScoringEngine.php');
