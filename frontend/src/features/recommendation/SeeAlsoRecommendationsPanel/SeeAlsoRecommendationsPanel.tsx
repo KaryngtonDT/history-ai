@@ -7,8 +7,8 @@ import {
 } from "@/features/processing/ArtifactRelationsPanel/relationLabels";
 import { recommendationService } from "@/services/recommendation/RecommendationService";
 import type { RecommendedArtifact } from "@/services/recommendation/types";
-import styles from "./SeeAlsoRecommendationsPanel.module.css";
 import { REASON_LABELS } from "./recommendationLabels";
+import styles from "./SeeAlsoRecommendationsPanel.module.css";
 
 interface SeeAlsoRecommendationsPanelProps {
 	contentId: string;

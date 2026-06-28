@@ -9,6 +9,7 @@ import {
 	isKnownArtifactType,
 	UnsupportedArtifactRenderer,
 } from "@/features/processing/artifactRenderers";
+import { SeeAlsoRecommendationsPanel } from "@/features/recommendation/SeeAlsoRecommendationsPanel";
 import { artifactService } from "@/services/artifact/ArtifactService";
 import type { Artifact } from "@/services/artifact/types";
 import styles from "./ProcessingArtifacts.module.css";
@@ -113,15 +114,26 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 						id={artifact !== null ? `artifact-${type}` : undefined}
 					>
 						<Renderer artifact={artifact} contentId={contentId} />
+						{artifact !== null ? (
+							<SeeAlsoRecommendationsPanel
+								contentId={contentId}
+								artifactId={artifact.id}
+							/>
+						) : null}
 					</div>
 				);
 			})}
 			{unsupportedArtifacts.map((artifact) => (
-				<UnsupportedArtifactRenderer
-					key={artifact.id}
-					artifact={artifact}
-					contentId={contentId}
-				/>
+				<div key={artifact.id}>
+					<UnsupportedArtifactRenderer
+						artifact={artifact}
+						contentId={contentId}
+					/>
+					<SeeAlsoRecommendationsPanel
+						contentId={contentId}
+						artifactId={artifact.id}
+					/>
+				</div>
 			))}
 			<ArtifactRelationsPanel contentId={contentId} artifacts={artifacts} />
 			<KnowledgeGraphPanel contentId={contentId} />

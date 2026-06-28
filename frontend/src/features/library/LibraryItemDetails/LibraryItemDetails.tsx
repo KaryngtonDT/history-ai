@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import { getArtifactRenderer } from "@/features/processing/artifactRenderers";
+import { SeeAlsoRecommendationsPanel } from "@/features/recommendation/SeeAlsoRecommendationsPanel";
 import { artifactService } from "@/services/artifact/ArtifactService";
 import type { Artifact } from "@/services/artifact/types";
 import { libraryService } from "@/services/library/LibraryService";
@@ -140,6 +141,10 @@ export function LibraryItemDetails() {
 					artifact={details.artifact}
 					contentId={details.item.contentId}
 					readOnly
+				/>
+				<SeeAlsoRecommendationsPanel
+					contentId={details.item.contentId}
+					artifactId={details.artifact.id}
 				/>
 			</div>
 		</div>

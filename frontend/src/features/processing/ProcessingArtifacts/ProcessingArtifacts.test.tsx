@@ -1,15 +1,22 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ProcessingArtifacts } from "@/features/processing/ProcessingArtifacts";
 import { artifactService } from "@/services/artifact/ArtifactService";
 import { graphService } from "@/services/graph/GraphService";
 import { libraryService } from "@/services/library/LibraryService";
 import { relationService } from "@/services/relation/RelationService";
 
+const { mockGetArtifactRelations, mockGetArtifactRecommendations } = vi.hoisted(
+	() => ({
+		mockGetArtifactRelations: vi.fn(),
+		mockGetArtifactRecommendations: vi.fn().mockResolvedValue([]),
+	}),
+);
+
 vi.mock("@/services/relation/RelationService", () => ({
 	relationService: {
-		getArtifactRelations: vi.fn().mockResolvedValue([]),
+		getArtifactRelations: mockGetArtifactRelations,
 	},
 }));
 
@@ -19,7 +26,20 @@ vi.mock("@/services/graph/GraphService", () => ({
 	},
 }));
 
+vi.mock("@/services/recommendation/RecommendationService", () => ({
+	recommendationService: {
+		getArtifactRecommendations: mockGetArtifactRecommendations,
+	},
+}));
+
 describe("ProcessingArtifacts", () => {
+	beforeEach(() => {
+		mockGetArtifactRelations.mockReset();
+		mockGetArtifactRelations.mockResolvedValue([]);
+		mockGetArtifactRecommendations.mockReset();
+		mockGetArtifactRecommendations.mockResolvedValue([]);
+	});
+
 	afterEach(() => {
 		vi.restoreAllMocks();
 	});
@@ -606,5 +626,125 @@ describe("ProcessingArtifacts", () => {
 		expect(getKnowledgeGraph).toHaveBeenCalledWith(
 			"550e8400-e29b-41d4-a716-446655440000",
 		);
+	});
+
+	it("loads artifacts exactly once when recommendations panels are shown", async () => {
+		const listByContentId = vi
+			.spyOn(artifactService, "listByContentId")
+			.mockResolvedValue([
+				{
+					id: "550e8400-e29b-41d4-a716-446655440002",
+					contentId: "550e8400-e29b-41d4-a716-446655440000",
+					processingJobId: "job-1",
+					type: "summary",
+					content: "Generated summary text",
+					createdAt: "2026-06-26T12:00:00+00:00",
+				},
+				{
+					id: "550e8400-e29b-41d4-a716-446655440003",
+					contentId: "550e8400-e29b-41d4-a716-446655440000",
+					processingJobId: "job-1",
+					type: "quiz",
+					content: "# Quiz\n\n## Question 1\nQuiz question\nAnswer: A",
+					createdAt: "2026-06-26T12:00:02+00:00",
+				},
+			]);
+		const getArtifactRecommendations = mockGetArtifactRecommendations;
+
+		render(
+			<ProcessingArtifacts contentId="550e8400-e29b-41d4-a716-446655440000" />,
+		);
+
+		await waitFor(() => {
+			expect(screen.getAllByText("See also")).toHaveLength(2);
+		});
+
+		expect(listByContentId).toHaveBeenCalledTimes(1);
+		expect(getArtifactRecommendations).toHaveBeenCalledWith(
+			"550e8400-e29b-41d4-a716-446655440000",
+			"550e8400-e29b-41d4-a716-446655440002",
+		);
+		expect(getArtifactRecommendations).toHaveBeenCalledWith(
+			"550e8400-e29b-41d4-a716-446655440000",
+			"550e8400-e29b-41d4-a716-446655440003",
+		);
+	});
+
+	it("does not show recommendations for missing artifact placeholders", async () => {
+		vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
+			{
+				id: "550e8400-e29b-41d4-a716-446655440002",
+				contentId: "550e8400-e29b-41d4-a716-446655440000",
+				processingJobId: "job-1",
+				type: "summary",
+				content: "Generated summary text",
+				createdAt: "2026-06-26T12:00:00+00:00",
+			},
+		]);
+		const getArtifactRecommendations = mockGetArtifactRecommendations;
+
+		render(
+			<ProcessingArtifacts contentId="550e8400-e29b-41d4-a716-446655440000" />,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("Generated summary text")).toBeInTheDocument();
+			expect(screen.getByText("No quiz yet")).toBeInTheDocument();
+		});
+
+		expect(screen.getAllByText("See also")).toHaveLength(1);
+		expect(getArtifactRecommendations).toHaveBeenCalledTimes(1);
+		expect(getArtifactRecommendations).toHaveBeenCalledWith(
+			"550e8400-e29b-41d4-a716-446655440000",
+			"550e8400-e29b-41d4-a716-446655440002",
+		);
+	});
+
+	it("renders recommendation links from RecommendationService", async () => {
+		vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
+			{
+				id: "550e8400-e29b-41d4-a716-446655440002",
+				contentId: "550e8400-e29b-41d4-a716-446655440000",
+				processingJobId: "job-1",
+				type: "summary",
+				content: "Generated summary text",
+				createdAt: "2026-06-26T12:00:00+00:00",
+			},
+			{
+				id: "550e8400-e29b-41d4-a716-446655440003",
+				contentId: "550e8400-e29b-41d4-a716-446655440000",
+				processingJobId: "job-1",
+				type: "quiz",
+				content: "# Quiz\n\n## Question 1\nQuiz question\nAnswer: A",
+				createdAt: "2026-06-26T12:00:02+00:00",
+			},
+		]);
+		mockGetArtifactRecommendations.mockImplementation(
+			(_contentId, artifactId) => {
+				if (artifactId === "550e8400-e29b-41d4-a716-446655440002") {
+					return Promise.resolve([
+						{
+							artifactId: "550e8400-e29b-41d4-a716-446655440003",
+							type: "quiz",
+							title: "Practice Quiz",
+							reason: "next",
+						},
+					]);
+				}
+
+				return Promise.resolve([]);
+			},
+		);
+
+		render(
+			<ProcessingArtifacts contentId="550e8400-e29b-41d4-a716-446655440000" />,
+		);
+
+		expect(await screen.findByText("Practice Quiz")).toBeInTheDocument();
+		expect(screen.getByRole("link", { name: /Practice Quiz/ })).toHaveAttribute(
+			"href",
+			"#artifact-quiz",
+		);
+		expect(screen.getByText("Next")).toBeInTheDocument();
 	});
 });
