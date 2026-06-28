@@ -1,0 +1,66 @@
+.semanticSearchPanel {
+	padding: var(--space-5);
+	margin-top: var(--space-4);
+}
+
+.label {
+	margin: 0;
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.searchForm {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-3);
+	align-items: flex-end;
+	margin-top: var(--space-4);
+}
+
+.searchField {
+	display: flex;
+	flex: 1 1 16rem;
+	flex-direction: column;
+	gap: var(--space-2);
+	min-width: 0;
+}
+
+.searchLabel {
+	font-size: var(--font-xs);
+	font-weight: var(--font-weight-medium);
+	color: var(--shell-text-muted);
+}
+
+.searchInput {
+	width: 100%;
+	padding: var(--space-3) var(--space-4);
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-md);
+	background: var(--shell-bg);
+	color: var(--shell-text);
+	font: inherit;
+}
+
+.searchInput:focus {
+	outline: 2px solid var(--shell-accent);
+	outline-offset: 1px;
+}
+
+.searchHint {
+	margin: var(--space-2) 0 0;
+	font-size: var(--font-xs);
+	color: var(--shell-text-muted);
+}
+
+.loadingState {
+	display: flex;
+	justify-content: center;
+	margin: var(--space-4) 0 var(--space-2);
+}
+
+.emptyState {
+	margin-top: var(--space-3);
+}

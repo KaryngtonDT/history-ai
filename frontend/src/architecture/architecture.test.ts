@@ -101,6 +101,14 @@ describe("Frontend architecture rules", () => {
 		expect(recommendationViolations).toEqual([]);
 	});
 
+	it("prevents feature modules from importing Semantic transport directly", () => {
+		const semanticViolations = violations.filter(
+			(violation) => violation.rule === "feature-semantic-transport",
+		);
+
+		expect(semanticViolations).toEqual([]);
+	});
+
 	it("keeps InteractiveGraph props-only without service imports", () => {
 		const interactiveGraphViolations = violations.filter(
 			(violation) => violation.rule === "interactive-graph-props-only",

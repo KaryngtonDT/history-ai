@@ -531,6 +531,53 @@ export function findFeatureRecommendationTransportViolations(): ArchitectureViol
 	return violations;
 }
 
+export function findFeatureSemanticTransportViolations(): ArchitectureViolation[] {
+	const violations: ArchitectureViolation[] = [];
+	const featuresRoot = path.join(FRONTEND_SRC, "features");
+
+	if (!directoryExists(featuresRoot)) {
+		return violations;
+	}
+
+	const forbiddenPatterns: Array<{ pattern: RegExp; detail: string }> = [
+		{
+			pattern:
+				/from\s+["']@\/services\/semantic\/HttpSemanticSearchRepository["']/,
+			detail:
+				"Feature components must use SemanticSearchService, not HttpSemanticSearchRepository",
+		},
+		{
+			pattern:
+				/from\s+["']@\/services\/semantic\/SemanticSearchRepositoryFactory["']/,
+			detail:
+				"Feature components must not wire SemanticSearchRepositoryFactory",
+		},
+		{
+			pattern: /from\s+["']@\/services\/semantic\/SemanticSearchRepository["']/,
+			detail:
+				"Feature components must use SemanticSearchService, not SemanticSearchRepository",
+		},
+	];
+
+	for (const filePath of collectSourceFiles(featuresRoot)) {
+		const content = readFileSync(filePath, "utf8");
+
+		for (const { pattern, detail } of forbiddenPatterns) {
+			if (!pattern.test(content)) {
+				continue;
+			}
+
+			violations.push({
+				rule: "feature-semantic-transport",
+				file: toRelativePath(filePath),
+				detail,
+			});
+		}
+	}
+
+	return violations;
+}
+
 export function collectArchitectureViolations(): ArchitectureViolation[] {
 	return [
 		...findFetchViolations(),
@@ -542,6 +589,7 @@ export function collectArchitectureViolations(): ArchitectureViolation[] {
 		...findFeatureRelationTransportViolations(),
 		...findFeatureGraphTransportViolations(),
 		...findFeatureRecommendationTransportViolations(),
+		...findFeatureSemanticTransportViolations(),
 		...findInteractiveTimelineServiceViolations(),
 		...findInteractiveMapServiceViolations(),
 		...findInteractiveGraphServiceViolations(),

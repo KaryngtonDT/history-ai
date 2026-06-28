@@ -10,6 +10,7 @@ import {
 	UnsupportedArtifactRenderer,
 } from "@/features/processing/artifactRenderers";
 import { SeeAlsoRecommendationsPanel } from "@/features/recommendation/SeeAlsoRecommendationsPanel";
+import { SemanticSearchPanel } from "@/features/semantic/SemanticSearchPanel";
 import { artifactService } from "@/services/artifact/ArtifactService";
 import type { Artifact } from "@/services/artifact/types";
 import styles from "./ProcessingArtifacts.module.css";
@@ -137,6 +138,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 			))}
 			<ArtifactRelationsPanel contentId={contentId} artifacts={artifacts} />
 			<KnowledgeGraphPanel contentId={contentId} />
+			<SemanticSearchPanel contentId={contentId} artifacts={artifacts} />
 		</div>
 	);
 }
