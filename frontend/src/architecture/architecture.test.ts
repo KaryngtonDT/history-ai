@@ -76,4 +76,12 @@ describe("Frontend architecture rules", () => {
 
 		expect(interactiveMapViolations).toEqual([]);
 	});
+
+	it("prevents feature modules from importing Relation transport directly", () => {
+		const relationViolations = violations.filter(
+			(violation) => violation.rule === "feature-relation-transport",
+		);
+
+		expect(relationViolations).toEqual([]);
+	});
 });

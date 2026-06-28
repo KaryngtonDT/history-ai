@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { ArtifactRelationsPanel } from "@/features/processing/ArtifactRelationsPanel";
 import {
 	ARTIFACT_DISPLAY_ORDER,
 	getArtifactRenderer,
@@ -106,7 +107,12 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 				const artifact = findArtifactByType(artifacts, type);
 
 				return (
-					<Renderer key={type} artifact={artifact} contentId={contentId} />
+					<div
+						key={type}
+						id={artifact !== null ? `artifact-${type}` : undefined}
+					>
+						<Renderer artifact={artifact} contentId={contentId} />
+					</div>
 				);
 			})}
 			{unsupportedArtifacts.map((artifact) => (
@@ -116,6 +122,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 					contentId={contentId}
 				/>
 			))}
+			<ArtifactRelationsPanel contentId={contentId} artifacts={artifacts} />
 		</div>
 	);
 }

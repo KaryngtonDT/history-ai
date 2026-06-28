@@ -1,0 +1,64 @@
+.artifactRelationsPanel {
+	padding: var(--space-5);
+	margin-top: var(--space-4);
+}
+
+.label {
+	margin: 0;
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.loadingState {
+	display: flex;
+	justify-content: center;
+	margin: var(--space-4) 0 var(--space-2);
+}
+
+.emptyState {
+	margin-top: var(--space-3);
+}
+
+.relationsList {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+	margin: var(--space-4) 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.relationRow {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-2);
+	padding: var(--space-3) var(--space-4);
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-md);
+	background: var(--shell-surface-muted);
+}
+
+.relationLink {
+	color: var(--shell-accent);
+	font-weight: var(--font-weight-semibold);
+	text-decoration: none;
+}
+
+.relationLink:hover,
+.relationLink:focus-visible {
+	text-decoration: underline;
+}
+
+.relationType {
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
+.relationFallback {
+	font-size: var(--font-sm);
+	color: var(--shell-text);
+}

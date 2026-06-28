@@ -354,6 +354,51 @@ export function findInteractiveMapServiceViolations(): ArchitectureViolation[] {
 	return violations;
 }
 
+export function findFeatureRelationTransportViolations(): ArchitectureViolation[] {
+	const violations: ArchitectureViolation[] = [];
+	const featuresRoot = path.join(FRONTEND_SRC, "features");
+
+	if (!directoryExists(featuresRoot)) {
+		return violations;
+	}
+
+	const forbiddenPatterns: Array<{ pattern: RegExp; detail: string }> = [
+		{
+			pattern: /from\s+["']@\/services\/relation\/HttpRelationRepository["']/,
+			detail:
+				"Feature components must use RelationService, not HttpRelationRepository",
+		},
+		{
+			pattern:
+				/from\s+["']@\/services\/relation\/RelationRepositoryFactory["']/,
+			detail: "Feature components must not wire RelationRepositoryFactory",
+		},
+		{
+			pattern: /from\s+["']@\/services\/relation\/RelationRepository["']/,
+			detail:
+				"Feature components must use RelationService, not RelationRepository",
+		},
+	];
+
+	for (const filePath of collectSourceFiles(featuresRoot)) {
+		const content = readFileSync(filePath, "utf8");
+
+		for (const { pattern, detail } of forbiddenPatterns) {
+			if (!pattern.test(content)) {
+				continue;
+			}
+
+			violations.push({
+				rule: "feature-relation-transport",
+				file: toRelativePath(filePath),
+				detail,
+			});
+		}
+	}
+
+	return violations;
+}
+
 export function collectArchitectureViolations(): ArchitectureViolation[] {
 	return [
 		...findFetchViolations(),
@@ -362,6 +407,7 @@ export function collectArchitectureViolations(): ArchitectureViolation[] {
 		...findFeatureSearchTransportViolations(),
 		...findFeatureTimelineTransportViolations(),
 		...findFeatureMapTransportViolations(),
+		...findFeatureRelationTransportViolations(),
 		...findInteractiveTimelineServiceViolations(),
 		...findInteractiveMapServiceViolations(),
 	];

@@ -1,0 +1,1 @@
+export { ArtifactRelationsPanel } from "./ArtifactRelationsPanel";

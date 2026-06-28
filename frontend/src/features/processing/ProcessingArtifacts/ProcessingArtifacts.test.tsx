@@ -4,6 +4,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ProcessingArtifacts } from "@/features/processing/ProcessingArtifacts";
 import { artifactService } from "@/services/artifact/ArtifactService";
 import { libraryService } from "@/services/library/LibraryService";
+import { relationService } from "@/services/relation/RelationService";
+
+vi.mock("@/services/relation/RelationService", () => ({
+	relationService: {
+		getArtifactRelations: vi.fn().mockResolvedValue([]),
+	},
+}));
 
 describe("ProcessingArtifacts", () => {
 	afterEach(() => {
@@ -479,5 +486,78 @@ describe("ProcessingArtifacts", () => {
 			});
 			expect(screen.getByText("Saved to Library")).toBeInTheDocument();
 		});
+	});
+
+	it("loads artifacts exactly once and passes them to the relations panel", async () => {
+		const listByContentId = vi
+			.spyOn(artifactService, "listByContentId")
+			.mockResolvedValue([
+				{
+					id: "550e8400-e29b-41d4-a716-446655440002",
+					contentId: "550e8400-e29b-41d4-a716-446655440000",
+					processingJobId: "job-1",
+					type: "summary",
+					content: "Generated summary text",
+					createdAt: "2026-06-26T12:00:00+00:00",
+				},
+			]);
+		const getArtifactRelations = vi
+			.spyOn(relationService, "getArtifactRelations")
+			.mockResolvedValue([]);
+
+		render(
+			<ProcessingArtifacts contentId="550e8400-e29b-41d4-a716-446655440000" />,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("Artifact Relations")).toBeInTheDocument();
+		});
+
+		expect(listByContentId).toHaveBeenCalledTimes(1);
+		expect(getArtifactRelations).toHaveBeenCalledWith(
+			"550e8400-e29b-41d4-a716-446655440000",
+		);
+	});
+
+	it("renders relation rows from RelationService", async () => {
+		vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
+			{
+				id: "550e8400-e29b-41d4-a716-446655440001",
+				contentId: "550e8400-e29b-41d4-a716-446655440000",
+				processingJobId: "job-1",
+				type: "transcript",
+				content: "Transcript text",
+				createdAt: "2026-06-26T12:00:00+00:00",
+			},
+			{
+				id: "550e8400-e29b-41d4-a716-446655440002",
+				contentId: "550e8400-e29b-41d4-a716-446655440000",
+				processingJobId: "job-1",
+				type: "summary",
+				content: "Generated summary text",
+				createdAt: "2026-06-26T12:00:01+00:00",
+			},
+		]);
+		vi.spyOn(relationService, "getArtifactRelations").mockResolvedValue([
+			{
+				sourceArtifactId: "550e8400-e29b-41d4-a716-446655440002",
+				targetArtifactId: "550e8400-e29b-41d4-a716-446655440001",
+				type: "derived_from",
+			},
+		]);
+
+		render(
+			<ProcessingArtifacts contentId="550e8400-e29b-41d4-a716-446655440000" />,
+		);
+
+		expect(await screen.findByText("Derived from")).toBeInTheDocument();
+		expect(screen.getByRole("link", { name: "Summary" })).toHaveAttribute(
+			"href",
+			"#artifact-summary",
+		);
+		expect(screen.getByRole("link", { name: "Transcript" })).toHaveAttribute(
+			"href",
+			"#artifact-transcript",
+		);
 	});
 });
