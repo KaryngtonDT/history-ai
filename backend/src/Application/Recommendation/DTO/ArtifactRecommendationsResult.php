@@ -19,6 +19,16 @@ final readonly class ArtifactRecommendationsResult
     ) {
     }
 
+    public static function fromDomain(RecommendedArtifactCollection $collection): self
+    {
+        return new self(
+            recommendations: array_map(
+                static fn (RecommendedArtifact $recommendation): RecommendedArtifactResult => RecommendedArtifactResult::fromDomain($recommendation),
+                $collection->recommendations(),
+            ),
+        );
+    }
+
     public static function fromScoredDomain(ScoredRecommendationCollection $collection): self
     {
         return new self(

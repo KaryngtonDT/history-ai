@@ -16,10 +16,19 @@ use App\Domain\Content\ContentId;
 use App\Domain\Content\Exception\InvalidContentIdException;
 use App\Domain\Processing\ProcessingJobId;
 use App\Domain\Recommendation\RecommendationEngine;
+use App\Domain\Recommendation\RecommendationScoringEngine;
 use PHPUnit\Framework\TestCase;
 
 final class GetArtifactRecommendationsHandlerTest extends TestCase
 {
+    private function createHandler(ArtifactRepositoryInterface $repository): GetArtifactRecommendationsHandler
+    {
+        return new GetArtifactRecommendationsHandler(
+            $repository,
+            new RecommendationEngine(),
+            new RecommendationScoringEngine(),
+        );
+    }
     public function testReturnsEmptyRecommendationsWhenNoArtifactsExist(): void
     {
         $contentId = ContentId::generate();
@@ -32,7 +41,7 @@ final class GetArtifactRecommendationsHandlerTest extends TestCase
             ->with(self::callback(static fn (ContentId $id): bool => $id->equals($contentId)))
             ->willReturn([]);
 
-        $handler = new GetArtifactRecommendationsHandler($repository, new RecommendationEngine());
+        $handler = $this->createHandler($repository);
         $result = $handler(new GetArtifactRecommendationsQuery($contentId->value, $artifactId));
 
         self::assertSame([], $result->recommendations);
@@ -57,7 +66,7 @@ final class GetArtifactRecommendationsHandlerTest extends TestCase
             ->method('findByContentId')
             ->willReturn($artifacts);
 
-        $handler = new GetArtifactRecommendationsHandler($repository, new RecommendationEngine());
+        $handler = $this->createHandler($repository);
         $result = $handler(new GetArtifactRecommendationsQuery($contentId->value, $summaryId));
 
         self::assertSame(2, count($result->recommendations));
@@ -83,6 +92,102 @@ final class GetArtifactRecommendationsHandlerTest extends TestCase
         }
     }
 
+    public function testOrdersRecommendationsByScoreDescending(): void
+    {
+        $contentId = ContentId::generate();
+        $transcriptId = '550e8400-e29b-41d4-a716-446655440001';
+        $summaryId = '550e8400-e29b-41d4-a716-446655440002';
+        $quizId = '550e8400-e29b-41d4-a716-446655440003';
+        $flashcardsId = '550e8400-e29b-41d4-a716-446655440004';
+
+        $artifacts = [
+            $this->createArtifact($quizId, $contentId, ArtifactType::Quiz),
+            $this->createArtifact($flashcardsId, $contentId, ArtifactType::Flashcards),
+            $this->createArtifact($transcriptId, $contentId, ArtifactType::Transcript),
+            $this->createArtifact($summaryId, $contentId, ArtifactType::Summary),
+        ];
+
+        $repository = $this->createMock(ArtifactRepositoryInterface::class);
+        $repository
+            ->expects(self::once())
+            ->method('findByContentId')
+            ->willReturn($artifacts);
+
+        $handler = $this->createHandler($repository);
+        $result = $handler(new GetArtifactRecommendationsQuery($contentId->value, $summaryId));
+
+        self::assertSame(
+            ['derived_from', 'references', 'references'],
+            array_map(static fn (object $item): string => $item->reason, $result->recommendations),
+        );
+        self::assertSame(
+            [$transcriptId, $quizId, $flashcardsId],
+            array_map(static fn (object $item): string => $item->artifactId, $result->recommendations),
+        );
+    }
+
+    public function testPreservesStableOrderForEqualScores(): void
+    {
+        $contentId = ContentId::generate();
+        $transcriptId = '550e8400-e29b-41d4-a716-446655440001';
+        $summaryId = '550e8400-e29b-41d4-a716-446655440002';
+        $quizId = '550e8400-e29b-41d4-a716-446655440003';
+        $flashcardsId = '550e8400-e29b-41d4-a716-446655440004';
+
+        $artifacts = [
+            $this->createArtifact($transcriptId, $contentId, ArtifactType::Transcript),
+            $this->createArtifact($summaryId, $contentId, ArtifactType::Summary),
+            $this->createArtifact($quizId, $contentId, ArtifactType::Quiz),
+            $this->createArtifact($flashcardsId, $contentId, ArtifactType::Flashcards),
+        ];
+
+        $repository = $this->createMock(ArtifactRepositoryInterface::class);
+        $repository
+            ->expects(self::once())
+            ->method('findByContentId')
+            ->willReturn($artifacts);
+
+        $handler = $this->createHandler($repository);
+        $result = $handler(new GetArtifactRecommendationsQuery($contentId->value, $summaryId));
+
+        self::assertSame(
+            [$quizId, $flashcardsId],
+            array_map(
+                static fn (object $item): string => $item->artifactId,
+                array_values(array_filter(
+                    $result->recommendations,
+                    static fn (object $item): bool => 'references' === $item->reason,
+                )),
+            ),
+        );
+    }
+
+    public function testDoesNotExposeScoreInResult(): void
+    {
+        $contentId = ContentId::generate();
+        $transcriptId = '550e8400-e29b-41d4-a716-446655440001';
+        $summaryId = '550e8400-e29b-41d4-a716-446655440002';
+
+        $repository = $this->createMock(ArtifactRepositoryInterface::class);
+        $repository
+            ->expects(self::once())
+            ->method('findByContentId')
+            ->willReturn([
+                $this->createArtifact($transcriptId, $contentId, ArtifactType::Transcript),
+                $this->createArtifact($summaryId, $contentId, ArtifactType::Summary),
+            ]);
+
+        $handler = $this->createHandler($repository);
+        $result = $handler(new GetArtifactRecommendationsQuery($contentId->value, $summaryId));
+
+        foreach ($result->recommendations as $recommendation) {
+            self::assertSame(
+                ['artifactId', 'type', 'title', 'reason'],
+                array_keys(get_object_vars($recommendation)),
+            );
+        }
+    }
+
     public function testReturnsEmptyRecommendationsWhenCurrentArtifactIsUnknown(): void
     {
         $contentId = ContentId::generate();
@@ -99,7 +204,7 @@ final class GetArtifactRecommendationsHandlerTest extends TestCase
                 $this->createArtifact($summaryId, $contentId, ArtifactType::Summary),
             ]);
 
-        $handler = new GetArtifactRecommendationsHandler($repository, new RecommendationEngine());
+        $handler = $this->createHandler($repository);
         $result = $handler(new GetArtifactRecommendationsQuery($contentId->value, $unknownId));
 
         self::assertSame([], $result->recommendations);
@@ -110,7 +215,7 @@ final class GetArtifactRecommendationsHandlerTest extends TestCase
         $repository = $this->createMock(ArtifactRepositoryInterface::class);
         $repository->expects(self::never())->method('findByContentId');
 
-        $handler = new GetArtifactRecommendationsHandler($repository, new RecommendationEngine());
+        $handler = $this->createHandler($repository);
 
         $this->expectException(InvalidContentIdException::class);
 
@@ -125,7 +230,7 @@ final class GetArtifactRecommendationsHandlerTest extends TestCase
         $repository = $this->createMock(ArtifactRepositoryInterface::class);
         $repository->expects(self::never())->method('findByContentId');
 
-        $handler = new GetArtifactRecommendationsHandler($repository, new RecommendationEngine());
+        $handler = $this->createHandler($repository);
 
         $this->expectException(InvalidArtifactException::class);
 

@@ -65,6 +65,21 @@ final class GetArtifactRecommendationsControllerTest extends WebTestCase
         $response = json_decode($client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
         self::assertArrayHasKey('recommendations', $response);
         self::assertSame(2, count($response['recommendations']));
+        self::assertSame(
+            ['derived_from', 'references'],
+            array_column($response['recommendations'], 'reason'),
+        );
+        self::assertSame(
+            [$transcriptId->value, $quizId->value],
+            array_column($response['recommendations'], 'artifactId'),
+        );
+        foreach ($response['recommendations'] as $recommendation) {
+            self::assertArrayHasKey('artifactId', $recommendation);
+            self::assertArrayHasKey('type', $recommendation);
+            self::assertArrayHasKey('title', $recommendation);
+            self::assertArrayHasKey('reason', $recommendation);
+            self::assertArrayNotHasKey('score', $recommendation);
+        }
         self::assertTrue($this->containsRecommendation(
             $response['recommendations'],
             $transcriptId->value,
