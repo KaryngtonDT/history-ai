@@ -84,6 +84,17 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testGraphDomainDoesNotDependOnOuterLayersOrFrameworks(): void
+    {
+        $this->assertNoViolations(
+            'Graph domain',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Domain/Graph',
+                self::DOMAIN_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testApplicationDoesNotDependOnInfrastructureOrPresentation(): void
     {
         $this->assertNoViolations(
@@ -134,6 +145,17 @@ final class LayerDependencyTest extends TestCase
             'Relation application',
             LayerDependencyRules::findViolations(
                 $this->srcRoot . '/Application/Relation',
+                self::APPLICATION_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
+    public function testGraphApplicationMayDependOnGraphRelationArtifactAndContentDomainOnly(): void
+    {
+        $this->assertNoViolations(
+            'Graph application',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Application/Graph',
                 self::APPLICATION_FORBIDDEN_PREFIXES,
             ),
         );
@@ -234,6 +256,25 @@ final class LayerDependencyTest extends TestCase
         }
 
         $this->assertNoViolations('Relation presentation', $violations);
+    }
+
+    public function testGraphPresentationMayDependOnGraphApplicationOnly(): void
+    {
+        $graphPresentationPaths = [
+            $this->srcRoot . '/Presentation/Http/Controller/Graph',
+            $this->srcRoot . '/Presentation/Http/Response/Graph',
+        ];
+
+        $violations = [];
+
+        foreach ($graphPresentationPaths as $path) {
+            $violations = array_merge(
+                $violations,
+                LayerDependencyRules::findViolations($path, ['App\\Infrastructure\\']),
+            );
+        }
+
+        $this->assertNoViolations('Graph presentation', $violations);
     }
 
     public function testInfrastructureDoesNotDependOnPresentation(): void
