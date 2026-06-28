@@ -9,10 +9,12 @@ use App\Domain\Chat\Exception\InvalidChatQuestionException;
 final readonly class ChatResponse
 {
     private string $answer;
+    private ChatCitationCollection $citations;
 
     public function __construct(
         string $answer,
         private ChatSourceCollection $sources,
+        ?ChatCitationCollection $citations = null,
     ) {
         $trimmed = trim($answer);
 
@@ -21,6 +23,7 @@ final readonly class ChatResponse
         }
 
         $this->answer = $trimmed;
+        $this->citations = $citations ?? ChatCitationCollection::empty();
     }
 
     public function answer(): string
@@ -31,5 +34,10 @@ final readonly class ChatResponse
     public function sources(): ChatSourceCollection
     {
         return $this->sources;
+    }
+
+    public function citations(): ChatCitationCollection
+    {
+        return $this->citations;
     }
 }

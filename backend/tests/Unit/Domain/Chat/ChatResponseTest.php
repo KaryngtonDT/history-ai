@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Domain\Chat;
 
 use App\Domain\Artifact\ArtifactId;
+use App\Domain\Chat\ChatCitation;
+use App\Domain\Chat\ChatCitationCollection;
 use App\Domain\Chat\ChatResponse;
 use App\Domain\Chat\ChatSource;
 use App\Domain\Chat\ChatSourceCollection;
@@ -29,6 +31,22 @@ final class ChatResponseTest extends TestCase
 
         self::assertSame('Several factors contributed to the collapse.', $response->answer());
         self::assertSame($sources, $response->sources());
+        self::assertTrue($response->citations()->isEmpty());
+    }
+
+    public function testExposesExplicitCitations(): void
+    {
+        $source = $this->createSource('Summary excerpt', 0.9);
+        $sources = new ChatSourceCollection([$source]);
+        $citations = new ChatCitationCollection([
+            new ChatCitation(1, $source),
+        ]);
+
+        $response = new ChatResponse('Answer with reference [1].', $sources, $citations);
+
+        self::assertSame($citations, $response->citations());
+        self::assertSame(1, $response->citations()->citations()[0]->number());
+        self::assertSame($source, $response->citations()->citations()[0]->source());
     }
 
     public function testTrimsAnswer(): void

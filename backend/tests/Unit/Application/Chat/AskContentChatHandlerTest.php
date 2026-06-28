@@ -126,7 +126,7 @@ final class AskContentChatHandlerTest extends TestCase
         $result = $this->createHandler($repository)
             ->__invoke(new AskContentChatCommand($contentId->value, $queryText));
 
-        self::assertSame(MockChatProvider::MOCK_ANSWER, $result->answer);
+        self::assertSame('Mock answer based on retrieved context [1].', $result->answer);
         self::assertNotSame([], $result->sources);
         self::assertSame($summaryId, $result->sources[0]->artifactId);
         self::assertNotSame('', $result->sources[0]->chunkId);

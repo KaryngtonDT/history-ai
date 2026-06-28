@@ -47,7 +47,7 @@ final class AskContentChatControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(200);
 
         $response = json_decode($client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
-        self::assertSame(MockChatProvider::MOCK_ANSWER, $response['answer']);
+        self::assertSame('Mock answer based on retrieved context [1].', $response['answer']);
         self::assertNotSame([], $response['sources']);
         self::assertSame($summaryId->value, $response['sources'][0]['artifactId']);
         self::assertArrayHasKey('chunkId', $response['sources'][0]);
