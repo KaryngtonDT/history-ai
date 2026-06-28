@@ -95,6 +95,17 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testRecommendationDomainDoesNotDependOnOuterLayersOrFrameworks(): void
+    {
+        $this->assertNoViolations(
+            'Recommendation domain',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Domain/Recommendation',
+                self::DOMAIN_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testApplicationDoesNotDependOnInfrastructureOrPresentation(): void
     {
         $this->assertNoViolations(
