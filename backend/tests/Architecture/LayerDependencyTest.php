@@ -106,6 +106,19 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testRecommendationScoringDomainDoesNotDependOnOuterLayersOrFrameworks(): void
+    {
+        self::assertFileExists($this->srcRoot . '/Domain/Recommendation/RecommendationScoringEngine.php');
+
+        $this->assertNoViolations(
+            'Recommendation scoring domain',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Domain/Recommendation',
+                self::DOMAIN_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testApplicationDoesNotDependOnInfrastructureOrPresentation(): void
     {
         $this->assertNoViolations(

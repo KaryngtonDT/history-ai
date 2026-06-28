@@ -6,6 +6,8 @@ namespace App\Application\Recommendation\DTO;
 
 use App\Domain\Recommendation\RecommendedArtifact;
 use App\Domain\Recommendation\RecommendedArtifactCollection;
+use App\Domain\Recommendation\ScoredRecommendation;
+use App\Domain\Recommendation\ScoredRecommendationCollection;
 
 final readonly class ArtifactRecommendationsResult
 {
@@ -17,11 +19,13 @@ final readonly class ArtifactRecommendationsResult
     ) {
     }
 
-    public static function fromDomain(RecommendedArtifactCollection $collection): self
+    public static function fromScoredDomain(ScoredRecommendationCollection $collection): self
     {
         return new self(
             recommendations: array_map(
-                static fn (RecommendedArtifact $recommendation): RecommendedArtifactResult => RecommendedArtifactResult::fromDomain($recommendation),
+                static fn (ScoredRecommendation $scored): RecommendedArtifactResult => RecommendedArtifactResult::fromDomain(
+                    $scored->recommendation(),
+                ),
                 $collection->recommendations(),
             ),
         );
