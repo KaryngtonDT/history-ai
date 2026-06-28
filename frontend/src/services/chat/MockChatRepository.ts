@@ -4,7 +4,9 @@ import {
 	buildMockAnswerWithCitationMarkers,
 	buildMockChatCitationsFromSources,
 	buildMockChatSourcesFromArtifacts,
+	buildMockStreamTokens,
 	type ChatAnswer,
+	type ChatStreamCallbacks,
 } from "./types";
 
 export class MockChatRepository implements ChatRepository {
@@ -26,5 +28,20 @@ export class MockChatRepository implements ChatRepository {
 			sources,
 			citations: buildMockChatCitationsFromSources(sources),
 		};
+	}
+
+	async streamQuestion(
+		contentId: string,
+		question: string,
+		callbacks: ChatStreamCallbacks,
+	): Promise<void> {
+		const answer = await this.askQuestion(contentId, question);
+		const tokens = buildMockStreamTokens(answer.sources.length);
+
+		for (const [index, text] of tokens.entries()) {
+			callbacks.onToken({ index, text });
+		}
+
+		callbacks.onDone();
 	}
 }

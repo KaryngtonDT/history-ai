@@ -11,5 +11,5 @@ export function createChatRepository(): ChatRepository {
 	}
 
 	const httpClient = new HttpClient(API_BASE_URL);
-	return new HttpChatRepository(httpClient);
+	return new HttpChatRepository(httpClient, API_BASE_URL);
 }

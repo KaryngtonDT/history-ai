@@ -53,6 +53,31 @@ export const EMPTY_CHAT_ANSWER: ChatAnswer = {
 
 export const MOCK_CHAT_ANSWER = "Mock answer based on retrieved context.";
 
+export interface ChatStreamToken {
+	index: number;
+	text: string;
+}
+
+export interface ChatStreamCallbacks {
+	onToken(token: ChatStreamToken): void;
+	onDone(): void;
+	onError(error: Error): void;
+}
+
+export interface ChatStreamTokenApiDto {
+	index: number;
+	text: string;
+}
+
+export const MOCK_STREAM_BASE_TOKENS = [
+	"Mock ",
+	"answer ",
+	"based ",
+	"on ",
+	"retrieved ",
+	"context",
+] as const;
+
 function normalizeScore(score: unknown): number | undefined {
 	if (typeof score !== "number" || !Number.isFinite(score)) {
 		return undefined;
@@ -166,4 +191,74 @@ export function buildMockAnswerWithCitationMarkers(
 	}).join("");
 
 	return `${MOCK_CHAT_ANSWER.replace(/\.$/, "")} ${markers}.`;
+}
+
+export function mapChatStreamTokenFromApi(
+	dto: ChatStreamTokenApiDto,
+): ChatStreamToken | null {
+	if (
+		typeof dto.index !== "number" ||
+		!Number.isInteger(dto.index) ||
+		dto.index < 0
+	) {
+		return null;
+	}
+
+	if (typeof dto.text !== "string" || dto.text === "") {
+		return null;
+	}
+
+	return {
+		index: dto.index,
+		text: dto.text,
+	};
+}
+
+export function parseSseEvents(
+	content: string,
+): Array<{ event: string; data: string }> {
+	const events: Array<{ event: string; data: string }> = [];
+
+	for (const block of content.trim().split(/\r?\n\r?\n/)) {
+		if (block === "") {
+			continue;
+		}
+
+		let eventName = "";
+		let data = "";
+
+		for (const line of block.split(/\r?\n/)) {
+			if (line.startsWith("event: ")) {
+				eventName = line.slice(7);
+			}
+
+			if (line.startsWith("data: ")) {
+				data = line.slice(6);
+			}
+		}
+
+		if (eventName !== "") {
+			events.push({ event: eventName, data });
+		}
+	}
+
+	return events;
+}
+
+export function buildMockStreamTokens(sourceCount: number): string[] {
+	const tokens: string[] = [...MOCK_STREAM_BASE_TOKENS];
+
+	if (sourceCount === 0) {
+		tokens.push(".");
+		return tokens;
+	}
+
+	const markers = Array.from(
+		{ length: sourceCount },
+		(_, index) => `[${index + 1}]`,
+	);
+	const trailingMarkers = markers.slice(0, -1);
+	tokens.push(...trailingMarkers, `${markers[markers.length - 1]}.`);
+
+	return tokens;
 }

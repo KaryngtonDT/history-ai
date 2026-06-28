@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+	buildMockStreamTokens,
 	mapChatAnswerFromApi,
 	mapChatCitationFromApi,
 	mapChatSourceFromApi,
+	mapChatStreamTokenFromApi,
+	parseSseEvents,
 } from "./types";
 
 describe("chat types", () => {
@@ -163,5 +166,40 @@ describe("chat types", () => {
 		});
 
 		expect(result.citations.map((citation) => citation.number)).toEqual([1, 2]);
+	});
+
+	it("maps stream token from API dto", () => {
+		expect(mapChatStreamTokenFromApi({ index: 0, text: "Mock " })).toEqual({
+			index: 0,
+			text: "Mock ",
+		});
+	});
+
+	it("rejects invalid stream token dto values", () => {
+		expect(mapChatStreamTokenFromApi({ index: -1, text: "Mock " })).toBeNull();
+		expect(mapChatStreamTokenFromApi({ index: 0, text: "" })).toBeNull();
+	});
+
+	it("parses SSE events from response body", () => {
+		expect(
+			parseSseEvents(
+				'event: token\ndata: {"index":0,"text":"Mock "}\n\nevent: done\ndata: {}\n\n',
+			),
+		).toEqual([
+			{ event: "token", data: '{"index":0,"text":"Mock "}' },
+			{ event: "done", data: "{}" },
+		]);
+	});
+
+	it("builds deterministic mock stream tokens", () => {
+		expect(buildMockStreamTokens(1)).toEqual([
+			"Mock ",
+			"answer ",
+			"based ",
+			"on ",
+			"retrieved ",
+			"context",
+			"[1].",
+		]);
 	});
 });

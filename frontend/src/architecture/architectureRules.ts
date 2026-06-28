@@ -9,6 +9,11 @@ const FRONTEND_SRC = path.resolve(
 
 const HTTP_CLIENT_RELATIVE = "services/http/HttpClient.ts";
 
+const HTTP_FETCH_ALLOWED_RELATIVE = [
+	HTTP_CLIENT_RELATIVE,
+	"services/chat/HttpChatRepository.ts",
+];
+
 const EXCLUDED_PATH_PREFIXES = ["architecture/"];
 
 const SOURCE_EXTENSIONS = new Set([".ts", ".tsx"]);
@@ -63,7 +68,7 @@ export function findFetchViolations(): ArchitectureViolation[] {
 	for (const filePath of collectSourceFiles(FRONTEND_SRC)) {
 		const relativePath = toRelativePath(filePath);
 
-		if (relativePath === HTTP_CLIENT_RELATIVE) {
+		if (HTTP_FETCH_ALLOWED_RELATIVE.includes(relativePath)) {
 			continue;
 		}
 
@@ -79,7 +84,8 @@ export function findFetchViolations(): ArchitectureViolation[] {
 			violations.push({
 				rule: "fetch-centralization",
 				file: relativePath,
-				detail: "fetch() must only appear in HttpClient.ts",
+				detail:
+					"fetch() must only appear in HttpClient.ts or HttpChatRepository.ts",
 			});
 		}
 	}

@@ -13,7 +13,7 @@ describe("Frontend architecture rules", () => {
 		violations = collectArchitectureViolations();
 	}, 60_000);
 
-	it("keeps fetch() centralized in HttpClient", () => {
+	it("keeps fetch() centralized in HttpClient and HttpChatRepository", () => {
 		const fetchViolations = violations.filter(
 			(violation) => violation.rule === "fetch-centralization",
 		);

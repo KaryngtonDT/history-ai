@@ -47,6 +47,10 @@ export function contentChatPath(contentId: string): string {
 	return `${CONTENTS_PATH}/${contentId}/chat`;
 }
 
+export function contentChatStreamPath(contentId: string): string {
+	return `${CONTENTS_PATH}/${contentId}/chat/stream`;
+}
+
 export function collectionItemsPath(collectionId: string): string {
 	return `${COLLECTIONS_PATH}/${collectionId}/items`;
 }
