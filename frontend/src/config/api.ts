@@ -39,6 +39,10 @@ export function contentArtifactRecommendationsPath(
 	return `${CONTENTS_PATH}/${contentId}/artifacts/${artifactId}/recommendations`;
 }
 
+export function contentSemanticSearchPath(contentId: string): string {
+	return `${CONTENTS_PATH}/${contentId}/semantic-search`;
+}
+
 export function collectionItemsPath(collectionId: string): string {
 	return `${COLLECTIONS_PATH}/${collectionId}/items`;
 }
