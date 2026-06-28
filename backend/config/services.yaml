@@ -50,6 +50,9 @@ services:
     App\Domain\Semantic\EmbeddingGeneratorInterface:
         alias: App\Infrastructure\Semantic\DeterministicEmbeddingGenerator
 
+    App\Domain\Semantic\VectorStoreInterface:
+        alias: App\Infrastructure\Semantic\InMemoryVectorStore
+
     App\Infrastructure\Processing\HttpWorkerDispatcher:
         arguments:
             $workerBaseUrl: '%worker.base_url%'

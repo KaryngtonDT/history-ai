@@ -32,3 +32,7 @@ when@test:
         App\Domain\Semantic\EmbeddingGeneratorInterface:
             alias: App\Infrastructure\Semantic\DeterministicEmbeddingGenerator
             public: true
+
+        App\Domain\Semantic\VectorStoreInterface:
+            alias: App\Infrastructure\Semantic\InMemoryVectorStore
+            public: true
