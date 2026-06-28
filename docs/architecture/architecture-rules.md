@@ -442,10 +442,13 @@ AskContentChatHandler
 ChatRequest (prompt + sources + options)
         │
         ▼
-ChatProviderInterface
+CHAT_PROVIDER=mock|gemini
+        │
+        ▼
+ChatProviderFactory.create()
         │
         ├── MockChatProvider              (default)
-        └── GeminiChatProvider            (optional; not default)
+        └── GeminiChatProvider            (requires GEMINI_API_KEY)
                 │
                 ▼
         GeminiChatTransportInterface
@@ -458,10 +461,19 @@ ChatProviderInterface
 | `ChatProviderInterface` | Domain port: `answer(ChatRequest): ChatResponse` |
 | `MockChatProvider` | Deterministic local answer; default for local dev and CI |
 | `GeminiChatProvider` | Gemini `generateContent` REST API; requires `GEMINI_API_KEY` |
+| `ChatProviderFactory` | Selects provider from `CHAT_PROVIDER` env var |
 | `GeminiChatTransportInterface` | HTTP transport abstraction; mocked in tests |
 | `CurlGeminiChatTransport` | cURL implementation; not used in CI tests |
 
-Gemini chat env vars: `GEMINI_API_KEY`, `GEMINI_CHAT_MODEL` (default `gemini-2.5-flash`). Provider selection for chat is **not** switched at runtime yet — `MockChatProvider` remains the default alias. Activation of `GeminiChatProvider` as the runtime provider is deferred to a future slice.
+Provider selection:
+
+| `CHAT_PROVIDER` | Result |
+| --------------- | ------ |
+| `mock` (default) | `MockChatProvider` — used in local dev and CI |
+| `gemini` | `GeminiChatProvider` via Gemini `generateContent` REST API; requires `GEMINI_API_KEY` |
+| unknown value | `InvalidChatProviderConfigurationException` at container build / first resolution |
+
+Gemini chat env vars: `GEMINI_API_KEY`, `GEMINI_CHAT_MODEL` (default `gemini-2.5-flash`). Factory validates API key when `gemini` is selected; no network call during selection. Tests use mocked transport; no live API calls in CI.
 
 ## Enforcement
 

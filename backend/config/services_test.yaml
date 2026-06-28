@@ -42,5 +42,5 @@ when@test:
             public: true
 
         App\Domain\Chat\ChatProviderInterface:
-            alias: App\Infrastructure\Chat\MockChatProvider
+            factory: ['@App\Infrastructure\Chat\ChatProviderFactory', 'create']
             public: true

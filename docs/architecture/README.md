@@ -230,11 +230,11 @@ UX-01 delivers a read-only chat API over the semantic retrieval pipeline. Slice 
 | Layer | Addition |
 | ----- | -------- |
 | Domain | `ChatProviderInterface` with `ChatRequest` / `ChatResponse`; `ChatProviderOptions` (temperature, maxTokens, model) |
-| Infrastructure | `MockChatProvider` (default); `GeminiChatProvider`; `GeminiChatTransportInterface`; `CurlGeminiChatTransport` |
+| Infrastructure | `MockChatProvider` (default); `GeminiChatProvider`; `ChatProviderFactory`; `GeminiChatTransportInterface`; `CurlGeminiChatTransport` |
 | Application | `AskContentChatHandler` builds `ChatRequest`, maps `ChatResponse` to DTO |
 | API / Frontend / Worker | Unchanged — `POST /api/contents/{contentId}/chat` contract preserved |
 
-Chat provider wiring: `MockChatProvider` remains default. `GeminiChatProvider` is registered but activation is deferred. Gemini env vars: `GEMINI_API_KEY`, `GEMINI_CHAT_MODEL` (default `gemini-2.5-flash`). Tests use mocked transport; no live API calls in CI.
+Chat provider selection via `CHAT_PROVIDER` env var (`mock` default, `gemini` requires `GEMINI_API_KEY`). Test/CI env keeps `CHAT_PROVIDER=mock`. Gemini env vars: `GEMINI_API_KEY`, `GEMINI_CHAT_MODEL` (default `gemini-2.5-flash`). Tests use mocked transport; no live API calls in CI.
 
 ---
 

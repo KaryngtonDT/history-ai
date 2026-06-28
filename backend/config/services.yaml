@@ -6,6 +6,7 @@ parameters:
     gemini.embedding_model_default: 'text-embedding-004'
     gemini.chat_model_default: 'gemini-2.5-flash'
     embedding.provider_default: 'deterministic'
+    chat.provider_default: 'mock'
     gemini.api_key_default: ''
 
 services:
@@ -23,6 +24,7 @@ services:
         resource: '../src/Infrastructure/'
         exclude:
             - '../src/Infrastructure/Semantic/EmbeddingProviderFactory.php'
+            - '../src/Infrastructure/Chat/ChatProviderFactory.php'
 
     App\Domain\Recommendation\RecommendationEngine: ~
     App\Domain\Recommendation\RecommendationScoringEngine: ~
@@ -31,7 +33,15 @@ services:
     App\Domain\Chat\ChatOrchestrator: ~
 
     App\Domain\Chat\ChatProviderInterface:
-        alias: App\Infrastructure\Chat\MockChatProvider
+        factory: ['@App\Infrastructure\Chat\ChatProviderFactory', 'create']
+
+    App\Infrastructure\Chat\ChatProviderFactory:
+        arguments:
+            $providerName: '%env(default:chat.provider_default:CHAT_PROVIDER)%'
+            $geminiApiKey: '%env(default:gemini.api_key_default:GEMINI_API_KEY)%'
+            $mockProvider: '@App\Infrastructure\Chat\MockChatProvider'
+            $geminiTransport: '@App\Infrastructure\Chat\CurlGeminiChatTransport'
+            $geminiModel: '%env(default:gemini.chat_model_default:GEMINI_CHAT_MODEL)%'
 
     App\Infrastructure\Chat\CurlGeminiChatTransport:
         arguments:
