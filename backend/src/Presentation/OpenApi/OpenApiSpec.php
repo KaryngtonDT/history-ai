@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Presentation\OpenApi;
 
+use App\Presentation\OpenApi\Schema\Coordinates;
+use App\Presentation\OpenApi\Schema\HistoricalPlace;
+use App\Presentation\OpenApi\Schema\Map;
 use OpenApi\Attributes as OA;
 
 #[OA\OpenApi(openapi: '3.1.0')]
@@ -19,6 +22,7 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'Collections', description: 'Themed groups of library items')]
 #[OA\Tag(name: 'Search', description: 'Library search')]
 #[OA\Tag(name: 'Timeline', description: 'Structured timeline projections for timeline artifacts')]
+#[OA\Tag(name: 'Map', description: 'Historical place map projections for timeline artifacts')]
 final class OpenApiSpec
 {
 }

@@ -72,7 +72,7 @@ See [architecture-rules.md](./architecture-rules.md) for automated dependency en
 
 See [ci.md](./ci.md) for the GitHub Actions pipeline.
 
-See [openapi.md](./openapi.md) for OpenAPI / Swagger UI documentation (includes `GET /api/timeline/{artifactId}` since Sprint 14).
+See [openapi.md](./openapi.md) for OpenAPI / Swagger UI documentation (includes `GET /api/timeline/{artifactId}` since Sprint 14 and `GET /api/maps/timeline/{artifactId}` since Sprint 15).
 
 ---
 
@@ -89,6 +89,22 @@ Sprint 14 extended the Sprint 13 timeline artifact with:
 | Architecture | Timeline layer rules (backend + frontend transport guards) |
 
 Verification: [Sprint14-Verification.md](../reports/Sprint14-Verification.md)
+
+---
+
+# Sprint 15 — Interactive Historical Map (2026-06)
+
+Sprint 15 extended the Sprint 14 timeline with geographic place resolution:
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `HistoricalPlace`, `Coordinates`, `HistoricalPlaceCollection`, `TimelinePlaceResolver` |
+| Backend API | `GET /api/maps/timeline/{artifactId}` → map JSON projection |
+| Frontend | `MapService`, `TimelineMapPanel`, `InteractiveMap` (CSS-only map layout) |
+| OpenAPI | `Map`, `HistoricalPlace`, `Coordinates` schemas |
+| Architecture | Map layer rules (backend + frontend transport guards) |
+
+Verification: [Sprint15-Verification.md](../reports/Sprint15-Verification.md)
 
 ---
 

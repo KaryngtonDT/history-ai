@@ -155,8 +155,11 @@ HttpClient + Repository (Http / Mock)
 | Feature modules must not import `HttpClient` | Same as above |
 | Feature modules must not import Search transport (`HttpSearchRepository`, `SearchRepositoryFactory`, `SearchRepository`) | Library search UI uses `SearchService` only |
 | Feature modules must not import Timeline transport (`HttpTimelineRepository`, `TimelineRepositoryFactory`, `TimelineRepository`) | Timeline UI uses `TimelineService` only |
+| Feature modules must not import Map transport (`HttpMapRepository`, `MapRepositoryFactory`, `MapRepository`) | Map UI uses `MapService` only |
 | `InteractiveTimeline` must not import services or repositories | Structured timeline rendering is props-only |
+| `InteractiveMap` must not import services or repositories | Map rendering is props-only |
 | Timeline artifact renderers may import `TimelineService` | Service layer owns HTTP/mock wiring |
+| Map panels may import `MapService` | Service layer owns HTTP/mock wiring |
 
 Repository factories and Http repositories live under `services/` and are consumed by service classes only.
 
@@ -191,6 +194,33 @@ HttpClient (HTTP mode only)
       │
       ▼
 InteractiveTimeline (props-only, no services)
+```
+
+### Map service layer
+
+```text
+features/map/TimelineMapPanel
+      │
+      ▼
+MapService.getTimelineMap()
+      │
+      ▼
+MapRepositoryFactory → HttpMapRepository | MockMapRepository
+      │
+      ▼
+HttpClient (HTTP mode only)
+      │
+      ▼
+InteractiveMap (props-only, no services)
+```
+
+Timeline artifact integration:
+
+```text
+TimelineArtifactRenderer
+        │
+        ├── InteractiveTimeline (structured timeline)
+        └── TimelineMapPanel (when structured timeline is available)
 ```
 
 ## Enforcement
@@ -235,6 +265,20 @@ import { timelineService } from "@/services/timeline/TimelineService"; // ❌ fo
 ```
 
 **Fix:** receive `Timeline` data via props from the parent renderer.
+
+```tsx
+// frontend/src/features/map/TimelineMapPanel/TimelineMapPanel.tsx
+import { HttpMapRepository } from "@/services/map/HttpMapRepository"; // ❌ forbidden
+```
+
+**Fix:** import `mapService` from `@/services/map/MapService`.
+
+```tsx
+// frontend/src/features/map/InteractiveMap/InteractiveMap.tsx
+import { mapService } from "@/services/map/MapService"; // ❌ forbidden
+```
+
+**Fix:** receive place data via props from `TimelineMapPanel`.
 
 ---
 

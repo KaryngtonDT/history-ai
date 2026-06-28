@@ -53,6 +53,7 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Collections | POST | `/api/collections/{collectionId}/items` |
 | Search | GET | `/api/search/library` |
 | Timeline | GET | `/api/timeline/{artifactId}` |
+| Map | GET | `/api/maps/timeline/{artifactId}` |
 
 ---
 
@@ -140,8 +141,13 @@ Shared OpenAPI schemas:
 | `Timeline` | `Presentation/OpenApi/Schema/Timeline.php` |
 | `TimelineSection` | `Presentation/OpenApi/Schema/TimelineSection.php` |
 | `TimelineEvent` | `Presentation/OpenApi/Schema/TimelineEvent.php` |
+| `Map` | `Presentation/OpenApi/Schema/Map.php` |
+| `HistoricalPlace` | `Presentation/OpenApi/Schema/HistoricalPlace.php` |
+| `Coordinates` | `Presentation/OpenApi/Schema/Coordinates.php` |
 
 `GET /api/timeline/{artifactId}` returns a `Timeline` with nested `sections[].events[].text`.
+
+`GET /api/maps/timeline/{artifactId}` returns a `Map` with nested `places[].name`, `places[].coordinates`, and optional `places[].description`.
 
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 

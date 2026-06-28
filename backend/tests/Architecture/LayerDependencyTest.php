@@ -175,6 +175,9 @@ final class LayerDependencyTest extends TestCase
         $mapPresentationPaths = [
             $this->srcRoot . '/Presentation/Http/Controller/Map',
             $this->srcRoot . '/Presentation/Http/Response/Map',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/Map.php',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/HistoricalPlace.php',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/Coordinates.php',
         ];
 
         $violations = [];

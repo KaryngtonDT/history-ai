@@ -19,6 +19,9 @@ nelmio_api_doc:
             - { alias: Timeline, type: App\Presentation\OpenApi\Schema\Timeline }
             - { alias: TimelineSection, type: App\Presentation\OpenApi\Schema\TimelineSection }
             - { alias: TimelineEvent, type: App\Presentation\OpenApi\Schema\TimelineEvent }
+            - { alias: 'Map', type: App\Presentation\OpenApi\Schema\Map }
+            - { alias: HistoricalPlace, type: App\Presentation\OpenApi\Schema\HistoricalPlace }
+            - { alias: Coordinates, type: App\Presentation\OpenApi\Schema\Coordinates }
     areas:
         default:
             path_patterns:

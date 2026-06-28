@@ -16,6 +16,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/collections/{collectionId}/items',
         '/api/search/library',
         '/api/timeline/{artifactId}',
+        '/api/maps/timeline/{artifactId}',
     ];
 
     public function testSwaggerUiIsAvailable(): void
@@ -54,6 +55,7 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('post', $spec['paths']['/api/collections/{collectionId}/items']);
         self::assertArrayHasKey('get', $spec['paths']['/api/search/library']);
         self::assertArrayHasKey('get', $spec['paths']['/api/timeline/{artifactId}']);
+        self::assertArrayHasKey('get', $spec['paths']['/api/maps/timeline/{artifactId}']);
     }
 
     public function testOpenApiSpecDocumentsSearchLibraryQueryParameter(): void
@@ -216,6 +218,100 @@ final class ApiDocumentationTest extends WebTestCase
 
         self::assertContains('text', $eventSchema['required']);
         self::assertSame('string', $eventSchema['properties']['text']['type']);
+    }
+
+    public function testOpenApiSpecDocumentsGetTimelineMapPathParameter(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/maps/timeline/{artifactId}']['get'];
+
+        self::assertSame('getTimelineMap', $operation['operationId']);
+
+        $pathParameter = null;
+
+        foreach ($operation['parameters'] as $parameter) {
+            if (($parameter['name'] ?? null) === 'artifactId') {
+                $pathParameter = $parameter;
+                break;
+            }
+        }
+
+        self::assertNotNull($pathParameter, 'Missing path parameter: artifactId');
+        self::assertSame('path', $pathParameter['in']);
+        self::assertTrue($pathParameter['required']);
+        self::assertSame('string', $pathParameter['schema']['type']);
+        self::assertSame('uuid', $pathParameter['schema']['format']);
+        self::assertSame('550e8400-e29b-41d4-a716-446655440000', $pathParameter['example']);
+    }
+
+    public function testOpenApiSpecDocumentsGetTimelineMapResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/maps/timeline/{artifactId}']['get']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Historical map projection', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/Map',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('404', $responses);
+        self::assertSame('Timeline artifact not found', $responses['404']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['404']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsMapSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('Map', $spec['components']['schemas']);
+        self::assertArrayHasKey('HistoricalPlace', $spec['components']['schemas']);
+        self::assertArrayHasKey('Coordinates', $spec['components']['schemas']);
+
+        $mapSchema = $spec['components']['schemas']['Map'];
+        $placeSchema = $spec['components']['schemas']['HistoricalPlace'];
+        $coordinatesSchema = $spec['components']['schemas']['Coordinates'];
+
+        self::assertArrayHasKey('places', $mapSchema['properties']);
+        self::assertSame('array', $mapSchema['properties']['places']['type']);
+        self::assertSame(
+            '#/components/schemas/HistoricalPlace',
+            $mapSchema['properties']['places']['items']['$ref'],
+        );
+        if (isset($mapSchema['required'])) {
+            self::assertContains('places', $mapSchema['required']);
+        }
+
+        self::assertArrayHasKey('name', $placeSchema['properties']);
+        self::assertArrayHasKey('coordinates', $placeSchema['properties']);
+        self::assertSame(
+            '#/components/schemas/Coordinates',
+            $placeSchema['properties']['coordinates']['$ref'],
+        );
+        if (isset($placeSchema['required'])) {
+            self::assertContains('name', $placeSchema['required']);
+            self::assertContains('coordinates', $placeSchema['required']);
+        }
+
+        self::assertArrayHasKey('latitude', $coordinatesSchema['properties']);
+        self::assertArrayHasKey('longitude', $coordinatesSchema['properties']);
+        self::assertSame('number', $coordinatesSchema['properties']['latitude']['type']);
+        self::assertSame('number', $coordinatesSchema['properties']['longitude']['type']);
+        if (isset($coordinatesSchema['required'])) {
+            self::assertContains('latitude', $coordinatesSchema['required']);
+            self::assertContains('longitude', $coordinatesSchema['required']);
+        }
     }
 
     /**
