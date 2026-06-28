@@ -17,6 +17,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/search/library',
         '/api/timeline/{artifactId}',
         '/api/maps/timeline/{artifactId}',
+        '/api/contents/{contentId}/relations',
     ];
 
     public function testSwaggerUiIsAvailable(): void
@@ -56,6 +57,7 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('get', $spec['paths']['/api/search/library']);
         self::assertArrayHasKey('get', $spec['paths']['/api/timeline/{artifactId}']);
         self::assertArrayHasKey('get', $spec['paths']['/api/maps/timeline/{artifactId}']);
+        self::assertArrayHasKey('get', $spec['paths']['/api/contents/{contentId}/relations']);
     }
 
     public function testOpenApiSpecDocumentsSearchLibraryQueryParameter(): void
@@ -312,6 +314,93 @@ final class ApiDocumentationTest extends WebTestCase
             self::assertContains('latitude', $coordinatesSchema['required']);
             self::assertContains('longitude', $coordinatesSchema['required']);
         }
+    }
+
+    public function testOpenApiSpecDocumentsGetArtifactRelationsPathParameter(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/contents/{contentId}/relations']['get'];
+
+        self::assertSame('getArtifactRelations', $operation['operationId']);
+
+        $pathParameter = null;
+
+        foreach ($operation['parameters'] as $parameter) {
+            if (($parameter['name'] ?? null) === 'contentId') {
+                $pathParameter = $parameter;
+                break;
+            }
+        }
+
+        self::assertNotNull($pathParameter, 'Missing path parameter: contentId');
+        self::assertSame('path', $pathParameter['in']);
+        self::assertTrue($pathParameter['required']);
+        self::assertSame('string', $pathParameter['schema']['type']);
+        self::assertSame('uuid', $pathParameter['schema']['format']);
+        self::assertSame('550e8400-e29b-41d4-a716-446655440000', $pathParameter['example']);
+    }
+
+    public function testOpenApiSpecDocumentsGetArtifactRelationsResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/contents/{contentId}/relations']['get']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Artifact relations projection', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/ArtifactRelations',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsArtifactRelationSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('ArtifactRelation', $spec['components']['schemas']);
+        self::assertArrayHasKey('ArtifactRelations', $spec['components']['schemas']);
+        self::assertArrayHasKey('ArtifactRelationType', $spec['components']['schemas']);
+
+        $relationSchema = $spec['components']['schemas']['ArtifactRelation'];
+        $relationsSchema = $spec['components']['schemas']['ArtifactRelations'];
+        $relationTypeSchema = $spec['components']['schemas']['ArtifactRelationType'];
+
+        self::assertArrayHasKey('sourceArtifactId', $relationSchema['properties']);
+        self::assertArrayHasKey('targetArtifactId', $relationSchema['properties']);
+        self::assertArrayHasKey('type', $relationSchema['properties']);
+        self::assertSame(
+            '#/components/schemas/ArtifactRelationType',
+            $relationSchema['properties']['type']['$ref'],
+        );
+        if (isset($relationSchema['required'])) {
+            self::assertContains('sourceArtifactId', $relationSchema['required']);
+            self::assertContains('targetArtifactId', $relationSchema['required']);
+            self::assertContains('type', $relationSchema['required']);
+        }
+
+        self::assertArrayHasKey('relations', $relationsSchema['properties']);
+        self::assertSame('array', $relationsSchema['properties']['relations']['type']);
+        self::assertSame(
+            '#/components/schemas/ArtifactRelation',
+            $relationsSchema['properties']['relations']['items']['$ref'],
+        );
+        if (isset($relationsSchema['required'])) {
+            self::assertContains('relations', $relationsSchema['required']);
+        }
+
+        self::assertSame('string', $relationTypeSchema['type']);
+        self::assertSame(
+            ['related', 'derived_from', 'references', 'next', 'previous'],
+            $relationTypeSchema['enum'],
+        );
+        self::assertSame('derived_from', $relationTypeSchema['example']);
     }
 
     /**

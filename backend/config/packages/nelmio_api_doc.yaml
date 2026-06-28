@@ -22,6 +22,9 @@ nelmio_api_doc:
             - { alias: 'Map', type: App\Presentation\OpenApi\Schema\Map }
             - { alias: HistoricalPlace, type: App\Presentation\OpenApi\Schema\HistoricalPlace }
             - { alias: Coordinates, type: App\Presentation\OpenApi\Schema\Coordinates }
+            - { alias: ArtifactRelation, type: App\Presentation\OpenApi\Schema\ArtifactRelation }
+            - { alias: ArtifactRelations, type: App\Presentation\OpenApi\Schema\ArtifactRelations }
+            - { alias: ArtifactRelationType, type: App\Presentation\OpenApi\Schema\ArtifactRelationTypeSchema }
     areas:
         default:
             path_patterns:

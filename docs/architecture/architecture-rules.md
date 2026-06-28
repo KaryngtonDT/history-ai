@@ -62,6 +62,9 @@ Presentation may reference Domain value objects and exceptions when parsing HTTP
 9. **Timeline domain** — `Domain/Timeline` follows the same purity rules as other domains (no Symfony, Doctrine, Infrastructure, or Presentation).
 10. **Timeline application** — `Application/Timeline` depends on Domain only (via handlers and DTOs); must not import Infrastructure or Presentation.
 11. **Timeline presentation** — controllers, responses, and OpenAPI schemas under `Presentation/Http/.../Timeline` and `Presentation/OpenApi/Schema/Timeline*` may depend on `Application/Timeline` and Domain value objects; must not import Infrastructure.
+12. **Relation domain** — `Domain/Relation` follows the same purity rules as other domains (no Symfony, Doctrine, Infrastructure, or Presentation).
+13. **Relation application** — `Application/Relation` depends on `Domain/Relation`, `Domain/Artifact`, and `Domain/Content` only; must not import Infrastructure or Presentation.
+14. **Relation presentation** — controllers, responses, and OpenAPI schemas under `Presentation/Http/.../Relation` and `Presentation/OpenApi/Schema/ArtifactRelation*` may depend on `Application/Relation` and Domain value objects; must not import Infrastructure.
 
 ### Search example (passes CI)
 
@@ -156,10 +159,12 @@ HttpClient + Repository (Http / Mock)
 | Feature modules must not import Search transport (`HttpSearchRepository`, `SearchRepositoryFactory`, `SearchRepository`) | Library search UI uses `SearchService` only |
 | Feature modules must not import Timeline transport (`HttpTimelineRepository`, `TimelineRepositoryFactory`, `TimelineRepository`) | Timeline UI uses `TimelineService` only |
 | Feature modules must not import Map transport (`HttpMapRepository`, `MapRepositoryFactory`, `MapRepository`) | Map UI uses `MapService` only |
+| Feature modules must not import Relation transport (`HttpRelationRepository`, `RelationRepositoryFactory`, `RelationRepository`) | Relations UI uses `RelationService` only |
 | `InteractiveTimeline` must not import services or repositories | Structured timeline rendering is props-only |
 | `InteractiveMap` must not import services or repositories | Map rendering is props-only |
 | Timeline artifact renderers may import `TimelineService` | Service layer owns HTTP/mock wiring |
 | Map panels may import `MapService` | Service layer owns HTTP/mock wiring |
+| Relation panels may import `RelationService` | Service layer owns HTTP/mock wiring |
 
 Repository factories and Http repositories live under `services/` and are consumed by service classes only.
 
@@ -223,6 +228,30 @@ TimelineArtifactRenderer
         └── TimelineMapPanel (when structured timeline is available)
 ```
 
+### Relation service layer
+
+```text
+features/processing/ArtifactRelationsPanel
+      │
+      ▼
+RelationService.getArtifactRelations()
+      │
+      ▼
+RelationRepositoryFactory → HttpRelationRepository | MockRelationRepository
+      │
+      ▼
+HttpClient (HTTP mode only)
+```
+
+Processing page integration:
+
+```text
+ProcessingArtifacts
+        │
+        ├── artifact cards (id="artifact-{type}" anchors)
+        └── ArtifactRelationsPanel (contentId + artifacts)
+```
+
 ## Enforcement
 
 | Tool | Location | Command |
@@ -279,6 +308,13 @@ import { mapService } from "@/services/map/MapService"; // ❌ forbidden
 ```
 
 **Fix:** receive place data via props from `TimelineMapPanel`.
+
+```tsx
+// frontend/src/features/processing/ArtifactRelationsPanel/ArtifactRelationsPanel.tsx
+import { HttpRelationRepository } from "@/services/relation/HttpRelationRepository"; // ❌ forbidden
+```
+
+**Fix:** import `relationService` from `@/services/relation/RelationService`.
 
 ---
 

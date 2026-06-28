@@ -72,7 +72,7 @@ See [architecture-rules.md](./architecture-rules.md) for automated dependency en
 
 See [ci.md](./ci.md) for the GitHub Actions pipeline.
 
-See [openapi.md](./openapi.md) for OpenAPI / Swagger UI documentation (includes `GET /api/timeline/{artifactId}` since Sprint 14 and `GET /api/maps/timeline/{artifactId}` since Sprint 15).
+See [openapi.md](./openapi.md) for OpenAPI / Swagger UI documentation (includes `GET /api/timeline/{artifactId}` since Sprint 14, `GET /api/maps/timeline/{artifactId}` since Sprint 15, and `GET /api/contents/{contentId}/relations` since Sprint 16).
 
 ---
 
@@ -105,6 +105,22 @@ Sprint 15 extended the Sprint 14 timeline with geographic place resolution:
 | Architecture | Map layer rules (backend + frontend transport guards) |
 
 Verification: [Sprint15-Verification.md](../reports/Sprint15-Verification.md)
+
+---
+
+# Sprint 16 — Artifact Relations (2026-06)
+
+Sprint 16 connected learning artifacts within a content into a deterministic relation graph:
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `ArtifactRelation`, `ArtifactRelationCollection`, `ArtifactRelationType`, `ArtifactRelationResolver` |
+| Backend API | `GET /api/contents/{contentId}/relations` → relations JSON projection |
+| Frontend | `RelationService`, `ArtifactRelationsPanel` on Processing page |
+| OpenAPI | `ArtifactRelation`, `ArtifactRelations`, `ArtifactRelationType` schemas |
+| Architecture | Relation layer rules (backend + frontend transport guards) |
+
+Verification: [Sprint16-Verification.md](../reports/Sprint16-Verification.md)
 
 ---
 

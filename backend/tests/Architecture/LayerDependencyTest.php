@@ -219,6 +219,9 @@ final class LayerDependencyTest extends TestCase
         $relationPresentationPaths = [
             $this->srcRoot . '/Presentation/Http/Controller/Relation',
             $this->srcRoot . '/Presentation/Http/Response/Relation',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/ArtifactRelation.php',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/ArtifactRelations.php',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/ArtifactRelationTypeSchema.php',
         ];
 
         $violations = [];

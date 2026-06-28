@@ -54,6 +54,7 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Search | GET | `/api/search/library` |
 | Timeline | GET | `/api/timeline/{artifactId}` |
 | Map | GET | `/api/maps/timeline/{artifactId}` |
+| Relations | GET | `/api/contents/{contentId}/relations` |
 
 ---
 
@@ -144,10 +145,15 @@ Shared OpenAPI schemas:
 | `Map` | `Presentation/OpenApi/Schema/Map.php` |
 | `HistoricalPlace` | `Presentation/OpenApi/Schema/HistoricalPlace.php` |
 | `Coordinates` | `Presentation/OpenApi/Schema/Coordinates.php` |
+| `ArtifactRelation` | `Presentation/OpenApi/Schema/ArtifactRelation.php` |
+| `ArtifactRelations` | `Presentation/OpenApi/Schema/ArtifactRelations.php` |
+| `ArtifactRelationType` | `Presentation/OpenApi/Schema/ArtifactRelationTypeSchema.php` |
 
 `GET /api/timeline/{artifactId}` returns a `Timeline` with nested `sections[].events[].text`.
 
 `GET /api/maps/timeline/{artifactId}` returns a `Map` with nested `places[].name`, `places[].coordinates`, and optional `places[].description`.
+
+`GET /api/contents/{contentId}/relations` returns an `ArtifactRelations` envelope with `relations[]` entries (`sourceArtifactId`, `targetArtifactId`, `type`). The `type` field uses the `ArtifactRelationType` enum: `related`, `derived_from`, `references`, `next`, `previous`.
 
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 
