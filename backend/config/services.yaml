@@ -27,6 +27,10 @@ services:
     App\Domain\Recommendation\RecommendationScoringEngine: ~
     App\Domain\Semantic\Chunker: ~
     App\Domain\Semantic\SemanticRetriever: ~
+    App\Domain\Chat\ChatOrchestrator: ~
+
+    App\Domain\Chat\ChatProviderInterface:
+        alias: App\Infrastructure\Chat\MockChatProvider
 
     App\Domain\Content\ContentRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Content\DoctrineContentRepository

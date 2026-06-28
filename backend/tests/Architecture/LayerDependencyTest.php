@@ -244,6 +244,19 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testChatApplicationMayDependOnChatSemanticArtifactAndContentDomainOnly(): void
+    {
+        self::assertFileExists($this->srcRoot . '/Application/Chat/Handlers/AskContentChatHandler.php');
+
+        $this->assertNoViolations(
+            'Chat application',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Application/Chat',
+                self::APPLICATION_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testPresentationDoesNotDependOnInfrastructure(): void
     {
         $presentationPaths = [
@@ -412,6 +425,26 @@ final class LayerDependencyTest extends TestCase
         $this->assertNoViolations('Semantic presentation', $violations);
     }
 
+    public function testChatPresentationMayDependOnChatApplicationOnly(): void
+    {
+        $chatPresentationPaths = [
+            $this->srcRoot . '/Presentation/Http/Controller/Chat',
+            $this->srcRoot . '/Presentation/Http/Request/Chat',
+            $this->srcRoot . '/Presentation/Http/Response/Chat',
+        ];
+
+        $violations = [];
+
+        foreach ($chatPresentationPaths as $path) {
+            $violations = array_merge(
+                $violations,
+                LayerDependencyRules::findViolations($path, ['App\\Infrastructure\\']),
+            );
+        }
+
+        $this->assertNoViolations('Chat presentation', $violations);
+    }
+
     public function testConsolePresentationMayDependOnInfrastructure(): void
     {
         self::assertFileExists($this->srcRoot . '/Presentation/Console/Command/Semantic/GeminiEmbeddingSmokeTestCommand.php');
@@ -444,6 +477,19 @@ final class LayerDependencyTest extends TestCase
             'Semantic infrastructure',
             LayerDependencyRules::findViolations(
                 $this->srcRoot . '/Infrastructure/Semantic',
+                ['App\\Presentation\\', 'App\\Application\\'],
+            ),
+        );
+    }
+
+    public function testChatInfrastructureMayDependOnChatDomainOnly(): void
+    {
+        self::assertFileExists($this->srcRoot . '/Infrastructure/Chat/MockChatProvider.php');
+
+        $this->assertNoViolations(
+            'Chat infrastructure',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Infrastructure/Chat',
                 ['App\\Presentation\\', 'App\\Application\\'],
             ),
         );

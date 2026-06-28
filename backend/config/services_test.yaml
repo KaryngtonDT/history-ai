@@ -40,3 +40,7 @@ when@test:
         App\Domain\Semantic\VectorStoreInterface:
             alias: App\Infrastructure\Semantic\InMemoryVectorStore
             public: true
+
+        App\Domain\Chat\ChatProviderInterface:
+            alias: App\Infrastructure\Chat\MockChatProvider
+            public: true
