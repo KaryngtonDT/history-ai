@@ -16,6 +16,8 @@ use App\Presentation\OpenApi\Schema\KnowledgeGraph;
 use App\Presentation\OpenApi\Schema\Map;
 use App\Presentation\OpenApi\Schema\RecommendationReasonSchema;
 use App\Presentation\OpenApi\Schema\RecommendedArtifact;
+use App\Presentation\OpenApi\Schema\RetrievedChunk;
+use App\Presentation\OpenApi\Schema\SemanticSearchResult;
 use OpenApi\Attributes as OA;
 
 #[OA\OpenApi(openapi: '3.1.0')]
@@ -35,6 +37,7 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'Relations', description: 'Deterministic artifact relation projections for content resources')]
 #[OA\Tag(name: 'Graph', description: 'Knowledge graph projections for content resources')]
 #[OA\Tag(name: 'Recommendations', description: 'Contextual artifact recommendation projections for content resources')]
+#[OA\Tag(name: 'Semantic', description: 'Semantic chunk retrieval projections for content resources')]
 final class OpenApiSpec
 {
 }

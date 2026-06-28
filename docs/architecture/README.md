@@ -172,6 +172,23 @@ Verification: [Sprint19-Verification.md](../reports/Sprint19-Verification.md)
 
 ---
 
+# Sprint 20 — Semantic Search (2026-06)
+
+Sprint 20 delivered semantic chunk retrieval end-to-end: chunking domain, embedding abstraction, deterministic embeddings, in-memory retriever, semantic search API, frontend service, and UI panel. Slice 8 changed **documentation and OpenAPI only** — no business logic in backend, frontend, or worker.
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `Chunker`, `Chunk`, `EmbeddingVector`, `EmbeddedChunk`, `EmbeddingGeneratorInterface`, `SemanticRetriever`, `SemanticQuery`, `SimilarityScore`, `RetrievedChunk` |
+| Infrastructure | `DeterministicEmbeddingGenerator` (hash-based, dim 8) |
+| Backend API | `GET /api/contents/{contentId}/semantic-search?q=…` → semantic search JSON projection |
+| Frontend | `SemanticSearchService`, `SemanticSearchPanel`, `SemanticSearchResults` |
+| OpenAPI | `RetrievedChunk`, `SemanticSearchResult` schemas |
+| Architecture | Semantic layer rules (backend + frontend transport guards) |
+
+Verification: [Sprint20-Verification.md](../reports/Sprint20-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

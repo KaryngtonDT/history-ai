@@ -315,6 +315,34 @@ ProcessingArtifacts
         └── KnowledgeGraphPanel
 ```
 
+### Semantic search service layer
+
+```text
+features/semantic/SemanticSearchPanel
+      │
+      ▼
+SemanticSearchService.searchSemanticChunks(contentId, query)
+      │
+      ▼
+SemanticSearchRepositoryFactory → HttpSemanticSearchRepository | MockSemanticSearchRepository
+      │
+      ▼
+HttpClient (HTTP mode only)
+```
+
+Processing page semantic search integration:
+
+```text
+ProcessingArtifacts
+        │
+        ├── artifact cards (id="artifact-{type}" anchors)
+        ├── ArtifactRelationsPanel
+        ├── KnowledgeGraphPanel
+        └── SemanticSearchPanel → SemanticSearchResults (props-only)
+```
+
+`SemanticSearchResults` is props-only and must not import services or repositories.
+
 ## Enforcement
 
 | Tool | Location | Command |
@@ -399,6 +427,13 @@ import { HttpRecommendationRepository } from "@/services/recommendation/HttpReco
 ```
 
 **Fix:** import `recommendationService` from `@/services/recommendation/RecommendationService`.
+
+```tsx
+// frontend/src/features/semantic/SemanticSearchPanel/SemanticSearchPanel.tsx
+import { HttpSemanticSearchRepository } from "@/services/semantic/HttpSemanticSearchRepository"; // ❌ forbidden
+```
+
+**Fix:** import `semanticSearchService` from `@/services/semantic/SemanticSearchService`.
 
 ---
 

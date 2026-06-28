@@ -57,6 +57,7 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Relations | GET | `/api/contents/{contentId}/relations` |
 | Graph | GET | `/api/contents/{contentId}/graph` |
 | Recommendations | GET | `/api/contents/{contentId}/artifacts/{artifactId}/recommendations` |
+| Semantic | GET | `/api/contents/{contentId}/semantic-search` |
 
 ---
 
@@ -156,6 +157,8 @@ Shared OpenAPI schemas:
 | `RecommendedArtifact` | `Presentation/OpenApi/Schema/RecommendedArtifact.php` |
 | `ArtifactRecommendations` | `Presentation/OpenApi/Schema/ArtifactRecommendations.php` |
 | `RecommendationReason` | `Presentation/OpenApi/Schema/RecommendationReasonSchema.php` |
+| `RetrievedChunk` | `Presentation/OpenApi/Schema/RetrievedChunk.php` |
+| `SemanticSearchResult` | `Presentation/OpenApi/Schema/SemanticSearchResult.php` |
 
 `GET /api/timeline/{artifactId}` returns a `Timeline` with nested `sections[].events[].text`.
 
@@ -166,6 +169,8 @@ Shared OpenAPI schemas:
 `GET /api/contents/{contentId}/graph` returns a `KnowledgeGraph` with `nodes[]` (`artifactId`, `type`, `title`) and `edges[]` (`sourceArtifactId`, `targetArtifactId`, `type`). Node `type` uses `ArtifactType`; edge `type` reuses `ArtifactRelationType`.
 
 `GET /api/contents/{contentId}/artifacts/{artifactId}/recommendations` returns an `ArtifactRecommendations` envelope with `recommendations[]` entries (`artifactId`, `type`, `title`, `reason`, `score`). The `type` field uses `ArtifactType`; `reason` uses the `RecommendationReason` enum: `related`, `derived_from`, `references`, `next`, `previous`. The `score` field is an integer from 0 to 100 (relevance weight derived from `reason`; higher scores appear first in the API response).
+
+`GET /api/contents/{contentId}/semantic-search?q=…` returns a `SemanticSearchResult` envelope with `results[]` entries (`artifactId`, `chunkId`, `position`, `text`, `score`). The `score` field is a float from 0.0 to 1.0 (cosine similarity; higher scores appear first in the API response). The required query parameter `q` accepts 1–500 characters.
 
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 

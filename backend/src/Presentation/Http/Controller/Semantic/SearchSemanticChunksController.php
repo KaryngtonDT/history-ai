@@ -11,6 +11,9 @@ use App\Domain\Content\Exception\InvalidContentIdException;
 use App\Domain\Semantic\Exception\InvalidSemanticQueryException;
 use App\Domain\Semantic\SemanticQuery;
 use App\Presentation\Http\Response\Semantic\SemanticSearchResponse;
+use App\Presentation\OpenApi\Schema\RetrievedChunk;
+use App\Presentation\OpenApi\Schema\SemanticSearchResult;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +22,39 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class SearchSemanticChunksController extends AbstractController
 {
+    #[OA\Get(
+        operationId: 'searchSemanticChunks',
+        summary: 'Search semantic chunks for content',
+        description: 'Returns artifact chunks ranked by semantic similarity to the query text for a content resource.',
+        tags: ['Semantic'],
+        parameters: [
+            new OA\Parameter(
+                name: 'contentId',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid'),
+                example: '550e8400-e29b-41d4-a716-446655440000',
+            ),
+            new OA\Parameter(
+                name: 'q',
+                in: 'query',
+                required: true,
+                schema: new OA\Schema(type: 'string', minLength: 1, maxLength: 500, example: 'rome'),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Semantic search results',
+                content: new OA\JsonContent(ref: '#/components/schemas/SemanticSearchResult'),
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid request',
+                content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse'),
+            ),
+        ],
+    )]
     #[Route(
         '/api/contents/{contentId}/semantic-search',
         name: 'api_contents_semantic_search',

@@ -687,18 +687,17 @@ describe("ProcessingArtifacts", () => {
 		);
 
 		await waitFor(() => {
-			expect(screen.getAllByText("See also")).toHaveLength(2);
+			expect(getArtifactRecommendations).toHaveBeenCalledWith(
+				"550e8400-e29b-41d4-a716-446655440000",
+				"550e8400-e29b-41d4-a716-446655440002",
+			);
+			expect(getArtifactRecommendations).toHaveBeenCalledWith(
+				"550e8400-e29b-41d4-a716-446655440000",
+				"550e8400-e29b-41d4-a716-446655440003",
+			);
 		});
 
 		expect(listByContentId).toHaveBeenCalledTimes(1);
-		expect(getArtifactRecommendations).toHaveBeenCalledWith(
-			"550e8400-e29b-41d4-a716-446655440000",
-			"550e8400-e29b-41d4-a716-446655440002",
-		);
-		expect(getArtifactRecommendations).toHaveBeenCalledWith(
-			"550e8400-e29b-41d4-a716-446655440000",
-			"550e8400-e29b-41d4-a716-446655440003",
-		);
 	});
 
 	it("does not show recommendations for missing artifact placeholders", async () => {
@@ -724,7 +723,10 @@ describe("ProcessingArtifacts", () => {
 		});
 
 		expect(screen.getAllByText("See also")).toHaveLength(1);
-		expect(getArtifactRecommendations).toHaveBeenCalledTimes(1);
+
+		await waitFor(() => {
+			expect(getArtifactRecommendations).toHaveBeenCalledTimes(1);
+		});
 		expect(getArtifactRecommendations).toHaveBeenCalledWith(
 			"550e8400-e29b-41d4-a716-446655440000",
 			"550e8400-e29b-41d4-a716-446655440002",

@@ -20,6 +20,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/contents/{contentId}/relations',
         '/api/contents/{contentId}/graph',
         '/api/contents/{contentId}/artifacts/{artifactId}/recommendations',
+        '/api/contents/{contentId}/semantic-search',
     ];
 
     public function testSwaggerUiIsAvailable(): void
@@ -65,6 +66,7 @@ final class ApiDocumentationTest extends WebTestCase
             'get',
             $spec['paths']['/api/contents/{contentId}/artifacts/{artifactId}/recommendations'],
         );
+        self::assertArrayHasKey('get', $spec['paths']['/api/contents/{contentId}/semantic-search']);
     }
 
     public function testOpenApiSpecDocumentsSearchLibraryQueryParameter(): void
@@ -618,6 +620,110 @@ final class ApiDocumentationTest extends WebTestCase
             $reasonSchema['enum'],
         );
         self::assertSame('derived_from', $reasonSchema['example']);
+    }
+
+    public function testOpenApiSpecDocumentsSearchSemanticChunksPathParameters(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/contents/{contentId}/semantic-search']['get'];
+
+        self::assertSame('searchSemanticChunks', $operation['operationId']);
+
+        $contentIdParameter = null;
+
+        foreach ($operation['parameters'] as $parameter) {
+            if (($parameter['name'] ?? null) === 'contentId') {
+                $contentIdParameter = $parameter;
+            }
+        }
+
+        self::assertNotNull($contentIdParameter, 'Missing path parameter: contentId');
+        self::assertSame('path', $contentIdParameter['in']);
+        self::assertTrue($contentIdParameter['required']);
+        self::assertSame('string', $contentIdParameter['schema']['type']);
+        self::assertSame('uuid', $contentIdParameter['schema']['format']);
+        self::assertSame('550e8400-e29b-41d4-a716-446655440000', $contentIdParameter['example']);
+    }
+
+    public function testOpenApiSpecDocumentsSearchSemanticChunksQueryParameter(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/contents/{contentId}/semantic-search']['get'];
+
+        $queryParameter = null;
+
+        foreach ($operation['parameters'] as $parameter) {
+            if (($parameter['name'] ?? null) === 'q') {
+                $queryParameter = $parameter;
+                break;
+            }
+        }
+
+        self::assertNotNull($queryParameter, 'Missing query parameter: q');
+        self::assertSame('query', $queryParameter['in']);
+        self::assertTrue($queryParameter['required']);
+        self::assertSame('string', $queryParameter['schema']['type']);
+        self::assertSame(1, $queryParameter['schema']['minLength']);
+        self::assertSame(500, $queryParameter['schema']['maxLength']);
+        self::assertSame('rome', $queryParameter['schema']['example']);
+    }
+
+    public function testOpenApiSpecDocumentsSearchSemanticChunksResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/contents/{contentId}/semantic-search']['get']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Semantic search results', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/SemanticSearchResult',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsSemanticSearchSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('RetrievedChunk', $spec['components']['schemas']);
+        self::assertArrayHasKey('SemanticSearchResult', $spec['components']['schemas']);
+
+        $chunkSchema = $spec['components']['schemas']['RetrievedChunk'];
+        $resultSchema = $spec['components']['schemas']['SemanticSearchResult'];
+
+        self::assertArrayHasKey('artifactId', $chunkSchema['properties']);
+        self::assertArrayHasKey('chunkId', $chunkSchema['properties']);
+        self::assertArrayHasKey('position', $chunkSchema['properties']);
+        self::assertArrayHasKey('text', $chunkSchema['properties']);
+        self::assertArrayHasKey('score', $chunkSchema['properties']);
+        self::assertSame('number', $chunkSchema['properties']['score']['type']);
+        self::assertSame(0, $chunkSchema['properties']['score']['minimum']);
+        self::assertSame(1, $chunkSchema['properties']['score']['maximum']);
+        self::assertSame(0.87, $chunkSchema['properties']['score']['example']);
+        if (isset($chunkSchema['required'])) {
+            self::assertContains('artifactId', $chunkSchema['required']);
+            self::assertContains('chunkId', $chunkSchema['required']);
+            self::assertContains('position', $chunkSchema['required']);
+            self::assertContains('text', $chunkSchema['required']);
+            self::assertContains('score', $chunkSchema['required']);
+        }
+
+        self::assertArrayHasKey('results', $resultSchema['properties']);
+        self::assertSame('array', $resultSchema['properties']['results']['type']);
+        self::assertSame(
+            '#/components/schemas/RetrievedChunk',
+            $resultSchema['properties']['results']['items']['$ref'],
+        );
+        if (isset($resultSchema['required'])) {
+            self::assertContains('results', $resultSchema['required']);
+        }
     }
 
     /**
