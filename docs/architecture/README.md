@@ -205,25 +205,21 @@ Verification: [Sprint21-Verification.md](../reports/Sprint21-Verification.md)
 
 ---
 
-# Sprint 22 — Real Embedding Provider (in progress)
+# Sprint 22 — Real Embedding Provider (2026-06)
+
+Sprint 22 introduced a **multi-provider embedding architecture** with config-driven selection and an optional Gemini adapter. Slice 5 changed **documentation and verification only** — no business logic in backend, frontend, or worker.
 
 | Layer | Addition |
 | ----- | -------- |
 | Domain | `EmbeddingProviderInterface` — port for single-text embedding generation |
-| Infrastructure | `DeterministicEmbeddingProvider` (SHA-256); `GeminiEmbeddingProvider` (Gemini `embedContent`); `EmbeddingProviderFactory` (config-driven selection) |
+| Infrastructure | `DeterministicEmbeddingProvider` (SHA-256); `GeminiEmbeddingProvider` (Gemini `embedContent`); `EmbeddingProviderFactory`; `GeminiEmbeddingTransportInterface` |
 | Refactor | `DeterministicEmbeddingGenerator` delegates to `EmbeddingProviderInterface` |
+| Console | `semantic:embedding:smoke-test` — manual Gemini verification (not CI) |
+| API / Frontend / Worker | Unchanged — semantic-search contract preserved |
 
 Provider selection via `EMBEDDING_PROVIDER` env var (`deterministic` default, `gemini` requires `GEMINI_API_KEY`). Test/CI env keeps `EMBEDDING_PROVIDER=deterministic`.
 
-### Manual Gemini smoke test (not CI)
-
-Verify real Gemini embeddings locally without changing runtime provider wiring:
-
-```bash
-docker compose exec backend php bin/console semantic:embedding:smoke-test "Roman Empire"
-```
-
-Requires `GEMINI_API_KEY` in the backend environment. The command uses `GeminiEmbeddingProvider` directly (not `EmbeddingProviderInterface` / factory). It does not call `SemanticRetriever`, `VectorStore`, or persist data. Not used by CI or the default deterministic runtime.
+Verification: [Sprint22-Verification.md](../reports/Sprint22-Verification.md)
 
 ---
 

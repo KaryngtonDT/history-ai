@@ -362,10 +362,11 @@ RetrievedChunkCollection → Semantic Search API JSON
 
 | Layer | Rule |
 | ----- | ---- |
-| `Domain/Semantic` | Pure domain: `VectorStoreInterface`, `VectorDocument`, `VectorSearchResult`, `SemanticRetriever` — no Symfony, HTTP, or persistence |
-| `Infrastructure/Semantic` | `InMemoryVectorStore` implements `VectorStoreInterface`; `EmbeddingProviderFactory` selects `DeterministicEmbeddingProvider` (default) or `GeminiEmbeddingProvider`; cosine similarity and top-K sorting live here |
+| `Domain/Semantic` | Pure domain: `EmbeddingProviderInterface`, `VectorStoreInterface`, `VectorDocument`, `VectorSearchResult`, `SemanticRetriever` — no Symfony, HTTP, or persistence |
+| `Infrastructure/Semantic` | `DeterministicEmbeddingProvider`, `GeminiEmbeddingProvider`, `EmbeddingProviderFactory`, `InMemoryVectorStore`; transport abstractions (`GeminiEmbeddingTransportInterface`); cosine similarity and top-K sorting |
 | `Application/Semantic` | Handler indexes vector documents before calling `SemanticRetriever`; no vector persistence |
-| `Presentation/Semantic` | Thin HTTP adapter only; unchanged semantic-search contract |
+| `Presentation/Http/Semantic` | Thin HTTP adapter only; unchanged semantic-search contract |
+| `Presentation/Console/Semantic` | Operational CLI only (e.g. Gemini smoke test); may depend on Infrastructure; not used by CI or default runtime |
 
 Wiring (`services.yaml`):
 
@@ -394,6 +395,43 @@ Provider selection:
 Gemini env vars: `GEMINI_API_KEY`, `GEMINI_EMBEDDING_MODEL` (default `text-embedding-004`). Factory validates API key when `gemini` is selected; no network call during selection. Tests use mocked transport; no live API calls in CI.
 
 Per-request flow: handler calls `index()` (replaces in-memory corpus), then retriever calls `search()`. No worker or frontend involvement in vector indexing.
+
+### Embedding provider layer (backend)
+
+```text
+Chunk
+    │
+    ▼
+EmbeddingGeneratorInterface
+    │
+    ▼
+DeterministicEmbeddingGenerator
+    │
+    ▼
+EmbeddingProviderInterface
+    │
+    ├── DeterministicEmbeddingProvider (default)
+    └── GeminiEmbeddingProvider (optional)
+            │
+            ▼
+EmbeddingVector
+```
+
+| Component | Role |
+| --------- | ---- |
+| `EmbeddingProviderInterface` | Domain port: `generateEmbedding(ChunkText): EmbeddingVector` |
+| `DeterministicEmbeddingProvider` | SHA-256 deterministic vectors (8-dim); default for local dev and CI |
+| `GeminiEmbeddingProvider` | Gemini `embedContent` REST API; requires `GEMINI_API_KEY` |
+| `EmbeddingProviderFactory` | Selects provider from `EMBEDDING_PROVIDER` env var |
+| `GeminiEmbeddingTransportInterface` | HTTP transport abstraction; mocked in tests |
+
+Manual verification (not CI):
+
+```bash
+php bin/console semantic:embedding:smoke-test "Roman Empire"
+```
+
+Uses `GeminiEmbeddingProvider` directly; does not change runtime provider wiring.
 
 ## Enforcement
 

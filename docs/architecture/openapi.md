@@ -172,6 +172,8 @@ Shared OpenAPI schemas:
 
 `GET /api/contents/{contentId}/semantic-search?q=…` returns a `SemanticSearchResult` envelope with `results[]` entries (`artifactId`, `chunkId`, `position`, `text`, `score`). The `score` field is a float from 0.0 to 1.0 (cosine similarity; higher scores appear first in the API response). The required query parameter `q` accepts 1–500 characters.
 
+**Sprint 22 note:** Embedding provider selection (`EMBEDDING_PROVIDER`, Gemini adapter) is internal to the backend. The semantic-search HTTP contract, OpenAPI schemas, and response shape are unchanged from Sprint 20.
+
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 
 ---

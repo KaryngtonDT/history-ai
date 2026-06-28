@@ -117,6 +117,19 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testChatDomainDoesNotDependOnOuterLayersOrFrameworks(): void
+    {
+        self::assertFileExists($this->srcRoot . '/Domain/Chat/ChatOrchestrator.php');
+
+        $this->assertNoViolations(
+            'Chat domain',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Domain/Chat',
+                self::DOMAIN_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testSemanticVectorDomainDoesNotDependOnOuterLayersOrFrameworks(): void
     {
         self::assertFileExists($this->srcRoot . '/Domain/Semantic/VectorStoreInterface.php');
@@ -397,6 +410,19 @@ final class LayerDependencyTest extends TestCase
         }
 
         $this->assertNoViolations('Semantic presentation', $violations);
+    }
+
+    public function testConsolePresentationMayDependOnInfrastructure(): void
+    {
+        self::assertFileExists($this->srcRoot . '/Presentation/Console/Command/Semantic/GeminiEmbeddingSmokeTestCommand.php');
+
+        $this->assertNoViolations(
+            'Console presentation',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Presentation/Console',
+                ['App\\Application\\'],
+            ),
+        );
     }
 
     public function testInfrastructureDoesNotDependOnPresentation(): void
