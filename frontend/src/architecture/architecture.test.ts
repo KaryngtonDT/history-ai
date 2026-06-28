@@ -84,4 +84,20 @@ describe("Frontend architecture rules", () => {
 
 		expect(relationViolations).toEqual([]);
 	});
+
+	it("prevents feature modules from importing Graph transport directly", () => {
+		const graphViolations = violations.filter(
+			(violation) => violation.rule === "feature-graph-transport",
+		);
+
+		expect(graphViolations).toEqual([]);
+	});
+
+	it("keeps InteractiveGraph props-only without service imports", () => {
+		const interactiveGraphViolations = violations.filter(
+			(violation) => violation.rule === "interactive-graph-props-only",
+		);
+
+		expect(interactiveGraphViolations).toEqual([]);
+	});
 });

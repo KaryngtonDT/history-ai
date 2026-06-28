@@ -354,6 +354,90 @@ export function findInteractiveMapServiceViolations(): ArchitectureViolation[] {
 	return violations;
 }
 
+export function findFeatureGraphTransportViolations(): ArchitectureViolation[] {
+	const violations: ArchitectureViolation[] = [];
+	const featuresRoot = path.join(FRONTEND_SRC, "features");
+
+	if (!directoryExists(featuresRoot)) {
+		return violations;
+	}
+
+	const forbiddenPatterns: Array<{ pattern: RegExp; detail: string }> = [
+		{
+			pattern: /from\s+["']@\/services\/graph\/HttpGraphRepository["']/,
+			detail:
+				"Feature components must use GraphService, not HttpGraphRepository",
+		},
+		{
+			pattern: /from\s+["']@\/services\/graph\/GraphRepositoryFactory["']/,
+			detail: "Feature components must not wire GraphRepositoryFactory",
+		},
+		{
+			pattern: /from\s+["']@\/services\/graph\/GraphRepository["']/,
+			detail: "Feature components must use GraphService, not GraphRepository",
+		},
+	];
+
+	for (const filePath of collectSourceFiles(featuresRoot)) {
+		const content = readFileSync(filePath, "utf8");
+
+		for (const { pattern, detail } of forbiddenPatterns) {
+			if (!pattern.test(content)) {
+				continue;
+			}
+
+			violations.push({
+				rule: "feature-graph-transport",
+				file: toRelativePath(filePath),
+				detail,
+			});
+		}
+	}
+
+	return violations;
+}
+
+export function findInteractiveGraphServiceViolations(): ArchitectureViolation[] {
+	const violations: ArchitectureViolation[] = [];
+	const interactiveGraphRoot = path.join(
+		FRONTEND_SRC,
+		"features/graph/InteractiveGraph",
+	);
+
+	if (!directoryExists(interactiveGraphRoot)) {
+		return violations;
+	}
+
+	const forbiddenPatterns: Array<{ pattern: RegExp; detail: string }> = [
+		{
+			pattern: /from\s+["']@\/services\//,
+			detail: "InteractiveGraph must not import services",
+		},
+		{
+			pattern: /Repository["']/,
+			detail: "InteractiveGraph must not import repositories",
+		},
+	];
+
+	for (const filePath of collectSourceFiles(interactiveGraphRoot)) {
+		const content = readFileSync(filePath, "utf8");
+
+		for (const { pattern, detail } of forbiddenPatterns) {
+			if (!pattern.test(content)) {
+				continue;
+			}
+
+			violations.push({
+				rule: "interactive-graph-props-only",
+				file: toRelativePath(filePath),
+				detail,
+			});
+		}
+	}
+
+	return violations;
+}
+
 export function findFeatureRelationTransportViolations(): ArchitectureViolation[] {
 	const violations: ArchitectureViolation[] = [];
 	const featuresRoot = path.join(FRONTEND_SRC, "features");
@@ -408,7 +492,9 @@ export function collectArchitectureViolations(): ArchitectureViolation[] {
 		...findFeatureTimelineTransportViolations(),
 		...findFeatureMapTransportViolations(),
 		...findFeatureRelationTransportViolations(),
+		...findFeatureGraphTransportViolations(),
 		...findInteractiveTimelineServiceViolations(),
 		...findInteractiveMapServiceViolations(),
+		...findInteractiveGraphServiceViolations(),
 	];
 }

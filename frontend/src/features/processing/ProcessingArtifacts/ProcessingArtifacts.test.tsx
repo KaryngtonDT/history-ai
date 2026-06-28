@@ -3,12 +3,19 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ProcessingArtifacts } from "@/features/processing/ProcessingArtifacts";
 import { artifactService } from "@/services/artifact/ArtifactService";
+import { graphService } from "@/services/graph/GraphService";
 import { libraryService } from "@/services/library/LibraryService";
 import { relationService } from "@/services/relation/RelationService";
 
 vi.mock("@/services/relation/RelationService", () => ({
 	relationService: {
 		getArtifactRelations: vi.fn().mockResolvedValue([]),
+	},
+}));
+
+vi.mock("@/services/graph/GraphService", () => ({
+	graphService: {
+		getKnowledgeGraph: vi.fn().mockResolvedValue({ nodes: [], edges: [] }),
 	},
 }));
 
@@ -558,6 +565,46 @@ describe("ProcessingArtifacts", () => {
 		expect(screen.getByRole("link", { name: "Transcript" })).toHaveAttribute(
 			"href",
 			"#artifact-transcript",
+		);
+	});
+
+	it("renders KnowledgeGraphPanel and still fetches artifacts once", async () => {
+		const listByContentId = vi
+			.spyOn(artifactService, "listByContentId")
+			.mockResolvedValue([
+				{
+					id: "550e8400-e29b-41d4-a716-446655440002",
+					contentId: "550e8400-e29b-41d4-a716-446655440000",
+					processingJobId: "job-1",
+					type: "summary",
+					content: "Generated summary text",
+					createdAt: "2026-06-26T12:00:00+00:00",
+				},
+			]);
+		const getKnowledgeGraph = vi
+			.spyOn(graphService, "getKnowledgeGraph")
+			.mockResolvedValue({
+				nodes: [
+					{
+						artifactId: "550e8400-e29b-41d4-a716-446655440002",
+						type: "summary",
+						title: "Summary",
+					},
+				],
+				edges: [],
+			});
+
+		render(
+			<ProcessingArtifacts contentId="550e8400-e29b-41d4-a716-446655440000" />,
+		);
+
+		expect(await screen.findByText("Knowledge Graph")).toBeInTheDocument();
+		expect(
+			await screen.findByRole("region", { name: "Knowledge graph" }),
+		).toBeInTheDocument();
+		expect(listByContentId).toHaveBeenCalledTimes(1);
+		expect(getKnowledgeGraph).toHaveBeenCalledWith(
+			"550e8400-e29b-41d4-a716-446655440000",
 		);
 	});
 });

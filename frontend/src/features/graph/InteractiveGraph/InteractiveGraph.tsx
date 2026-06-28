@@ -1,4 +1,3 @@
-import type { GraphEdge, GraphNode } from "@/services/graph/types";
 import {
 	ARTIFACT_TYPE_LABELS,
 	EDGE_TYPE_LABELS,
@@ -6,16 +5,30 @@ import {
 } from "../graphLabels";
 import styles from "./InteractiveGraph.module.css";
 
+export interface InteractiveGraphNode {
+	artifactId: string;
+	type: keyof typeof ARTIFACT_TYPE_LABELS;
+	title: string;
+}
+
+export interface InteractiveGraphEdge {
+	sourceArtifactId: string;
+	targetArtifactId: string;
+	type: keyof typeof EDGE_TYPE_LABELS;
+}
+
 export interface InteractiveGraphData {
-	nodes: GraphNode[];
-	edges: GraphEdge[];
+	nodes: InteractiveGraphNode[];
+	edges: InteractiveGraphEdge[];
 }
 
 interface InteractiveGraphProps {
 	graph: InteractiveGraphData;
 }
 
-function buildNodeLookup(nodes: GraphNode[]): Map<string, GraphNode> {
+function buildNodeLookup(
+	nodes: InteractiveGraphNode[],
+): Map<string, InteractiveGraphNode> {
 	return new Map(nodes.map((node) => [node.artifactId, node]));
 }
 
@@ -37,7 +50,10 @@ export function InteractiveGraph({ graph }: InteractiveGraphProps) {
 			</div>
 			<div className={styles.sections}>
 				<section aria-labelledby="knowledge-graph-nodes-heading">
-					<h3 id="knowledge-graph-nodes-heading" className={styles.sectionHeading}>
+					<h3
+						id="knowledge-graph-nodes-heading"
+						className={styles.sectionHeading}
+					>
 						Nodes
 					</h3>
 					<ol className={styles.nodeList}>
@@ -61,7 +77,10 @@ export function InteractiveGraph({ graph }: InteractiveGraphProps) {
 					</ol>
 				</section>
 				<section aria-labelledby="knowledge-graph-edges-heading">
-					<h3 id="knowledge-graph-edges-heading" className={styles.sectionHeading}>
+					<h3
+						id="knowledge-graph-edges-heading"
+						className={styles.sectionHeading}
+					>
 						Edges
 					</h3>
 					<ol className={styles.edgeList}>

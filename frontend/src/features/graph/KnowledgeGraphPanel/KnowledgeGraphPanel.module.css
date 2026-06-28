@@ -1,0 +1,23 @@
+.knowledgeGraphPanel {
+	padding: var(--space-5);
+	margin-top: var(--space-4);
+}
+
+.label {
+	margin: 0;
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.loadingState {
+	display: flex;
+	justify-content: center;
+	margin: var(--space-4) 0 var(--space-2);
+}
+
+.emptyState {
+	margin-top: var(--space-3);
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { KnowledgeGraphPanel } from "@/features/graph/KnowledgeGraphPanel";
 import { ArtifactRelationsPanel } from "@/features/processing/ArtifactRelationsPanel";
 import {
 	ARTIFACT_DISPLAY_ORDER,
@@ -123,6 +124,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 				/>
 			))}
 			<ArtifactRelationsPanel contentId={contentId} artifacts={artifacts} />
+			<KnowledgeGraphPanel contentId={contentId} />
 		</div>
 	);
 }

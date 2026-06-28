@@ -1,0 +1,112 @@
+.root {
+	margin-top: var(--space-3);
+	display: grid;
+	gap: var(--space-4);
+}
+
+.graphCanvas {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2);
+	min-height: 6rem;
+	padding: var(--space-4);
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-md);
+	background:
+		radial-gradient(circle at top left, rgb(191 219 254 / 35%), transparent 55%),
+		linear-gradient(
+			180deg,
+			rgb(248 250 252 / 90%) 0%,
+			rgb(241 245 249 / 70%) 100%
+		);
+}
+
+.nodeChip {
+	display: inline-flex;
+	align-items: center;
+	padding: var(--space-2) var(--space-3);
+	border: 1px solid var(--shell-border);
+	border-radius: 999px;
+	background: var(--shell-surface);
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.sections {
+	display: grid;
+	gap: var(--space-4);
+}
+
+.sectionHeading {
+	margin: 0 0 var(--space-3);
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.nodeList,
+.edgeList {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: var(--space-3);
+}
+
+.nodeCard,
+.edgeItem {
+	padding: var(--space-3) var(--space-4);
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-md);
+	background: var(--shell-surface-muted);
+}
+
+.nodeTitle {
+	margin: 0 0 var(--space-2);
+	font-size: var(--font-md);
+}
+
+.nodeLink {
+	color: var(--shell-accent);
+	font-weight: var(--font-weight-semibold);
+	text-decoration: none;
+}
+
+.nodeLink:hover,
+.nodeLink:focus-visible {
+	text-decoration: underline;
+}
+
+.nodeType {
+	margin: 0;
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
+.edgeRow {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-2);
+	margin: 0;
+}
+
+.edgeEndpoint {
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.edgeType {
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
+@media (min-width: 48rem) {
+	.sections {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		align-items: start;
+	}
+}
