@@ -37,12 +37,20 @@ describe("ChatMessageList", () => {
 					{
 						id: "2",
 						role: "assistant",
-						content: "Mock answer based on retrieved context.",
+						content: "Mock answer based on retrieved context [1].",
 						sources: [
 							{
 								artifactId: "550e8400-e29b-41d4-a716-446655440002",
 								chunkId: "550e8400-e29b-41d4-a716-446655440010",
 								text: "## Ancient Rome",
+								score: 0.97,
+							},
+						],
+						citations: [
+							{
+								number: 1,
+								artifactId: "550e8400-e29b-41d4-a716-446655440002",
+								chunkId: "550e8400-e29b-41d4-a716-446655440010",
 								score: 0.97,
 							},
 						],
@@ -56,7 +64,7 @@ describe("ChatMessageList", () => {
 
 		expect(screen.getByText("Sources")).toBeInTheDocument();
 		expect(
-			screen.getByRole("link", { name: "Summary (0.97)" }),
+			screen.getByRole("link", { name: "[1] Summary (0.97)" }),
 		).toHaveAttribute("href", "#artifact-summary");
 	});
 

@@ -1,9 +1,10 @@
 import { artifactMocksByContentId } from "@/mock/artifact";
 import type { ChatRepository } from "./ChatRepository";
 import {
+	buildMockAnswerWithCitationMarkers,
+	buildMockChatCitationsFromSources,
 	buildMockChatSourcesFromArtifacts,
 	type ChatAnswer,
-	MOCK_CHAT_ANSWER,
 } from "./types";
 
 export class MockChatRepository implements ChatRepository {
@@ -12,14 +13,18 @@ export class MockChatRepository implements ChatRepository {
 
 		if (artifacts === undefined || artifacts.length === 0) {
 			return {
-				answer: MOCK_CHAT_ANSWER,
+				answer: buildMockAnswerWithCitationMarkers(0),
 				sources: [],
+				citations: [],
 			};
 		}
 
+		const sources = buildMockChatSourcesFromArtifacts(artifacts, question);
+
 		return {
-			answer: MOCK_CHAT_ANSWER,
-			sources: buildMockChatSourcesFromArtifacts(artifacts, question),
+			answer: buildMockAnswerWithCitationMarkers(sources.length),
+			sources,
+			citations: buildMockChatCitationsFromSources(sources),
 		};
 	}
 }

@@ -70,6 +70,7 @@ export function ChatPanel({ contentId, artifacts }: ChatPanelProps) {
 					role: "assistant",
 					content: result.answer,
 					sources: result.sources,
+					citations: result.citations,
 				},
 			]);
 		} catch {

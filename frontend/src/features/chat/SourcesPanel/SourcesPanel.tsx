@@ -3,22 +3,42 @@ import {
 	getArtifactAnchor,
 } from "@/features/processing/ArtifactRelationsPanel/relationLabels";
 import type { ArtifactType } from "@/services/artifact/types";
-import type { ChatSource } from "@/services/chat/types";
+import type { ChatCitation, ChatSource } from "@/services/chat/types";
 import { CHAT_SOURCES_TITLE, formatChatScore } from "../chatLabels";
 import styles from "./SourcesPanel.module.css";
 
 export interface SourcesPanelProps {
 	sources: ChatSource[];
+	citations?: ChatCitation[];
 	artifactTypesById: Record<string, ArtifactType>;
+}
+
+function buildCitationNumberByChunkId(
+	citations: ChatCitation[] | undefined,
+): Map<string, number> {
+	const citationNumbersByChunkId = new Map<string, number>();
+
+	if (citations === undefined) {
+		return citationNumbersByChunkId;
+	}
+
+	for (const citation of citations) {
+		citationNumbersByChunkId.set(citation.chunkId, citation.number);
+	}
+
+	return citationNumbersByChunkId;
 }
 
 export function SourcesPanel({
 	sources,
+	citations,
 	artifactTypesById,
 }: SourcesPanelProps) {
 	if (sources.length === 0) {
 		return null;
 	}
+
+	const citationNumbersByChunkId = buildCitationNumberByChunkId(citations);
 
 	return (
 		<section className={styles.sourcesPanel} aria-label={CHAT_SOURCES_TITLE}>
@@ -34,7 +54,10 @@ export function SourcesPanel({
 						artifactType !== undefined
 							? getArtifactAnchor(artifactType)
 							: undefined;
-					const label = `${typeLabel} (${formatChatScore(source.score)})`;
+					const citationNumber = citationNumbersByChunkId.get(source.chunkId);
+					const citationPrefix =
+						citationNumber !== undefined ? `[${citationNumber}] ` : "";
+					const label = `${citationPrefix}${typeLabel} (${formatChatScore(source.score)})`;
 
 					return (
 						<li key={source.chunkId} className={styles.sourceItem}>

@@ -1,5 +1,5 @@
 import type { ArtifactType } from "@/services/artifact/types";
-import type { ChatSource } from "@/services/chat/types";
+import type { ChatCitation, ChatSource } from "@/services/chat/types";
 import { ChatMessage } from "../ChatMessage";
 import { SourcesPanel } from "../SourcesPanel";
 import styles from "./ChatMessageList.module.css";
@@ -9,6 +9,7 @@ export interface ChatMessageItem {
 	role: "user" | "assistant";
 	content: string;
 	sources?: ChatSource[];
+	citations?: ChatCitation[];
 }
 
 export interface ChatMessageListProps {
@@ -34,6 +35,7 @@ export function ChatMessageList({
 					message.sources.length > 0 ? (
 						<SourcesPanel
 							sources={message.sources}
+							citations={message.citations}
 							artifactTypesById={artifactTypesById}
 						/>
 					) : null}

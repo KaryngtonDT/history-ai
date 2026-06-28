@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { mapChatAnswerFromApi, mapChatSourceFromApi } from "./types";
+import {
+	mapChatAnswerFromApi,
+	mapChatCitationFromApi,
+	mapChatSourceFromApi,
+} from "./types";
 
 describe("chat types", () => {
 	it("maps score from API response", () => {
@@ -29,9 +33,55 @@ describe("chat types", () => {
 		expect(result).toBeNull();
 	});
 
-	it("maps chat answer and filters invalid sources", () => {
+	it("maps citation fields from API response", () => {
+		const result = mapChatCitationFromApi({
+			number: 1,
+			artifactId: "550e8400-e29b-41d4-a716-446655440002",
+			chunkId: "550e8400-e29b-41d4-a716-446655440010",
+			score: 0.91,
+		});
+
+		expect(result).toEqual({
+			number: 1,
+			artifactId: "550e8400-e29b-41d4-a716-446655440002",
+			chunkId: "550e8400-e29b-41d4-a716-446655440010",
+			score: 0.91,
+		});
+	});
+
+	it("omits invalid citation numbers from API response", () => {
+		expect(
+			mapChatCitationFromApi({
+				number: 0,
+				artifactId: "550e8400-e29b-41d4-a716-446655440002",
+				chunkId: "550e8400-e29b-41d4-a716-446655440010",
+				score: 0.91,
+			}),
+		).toBeNull();
+		expect(
+			mapChatCitationFromApi({
+				number: 1.5,
+				artifactId: "550e8400-e29b-41d4-a716-446655440002",
+				chunkId: "550e8400-e29b-41d4-a716-446655440010",
+				score: 0.91,
+			}),
+		).toBeNull();
+	});
+
+	it("omits invalid citation scores from API response", () => {
+		const result = mapChatCitationFromApi({
+			number: 1,
+			artifactId: "550e8400-e29b-41d4-a716-446655440002",
+			chunkId: "550e8400-e29b-41d4-a716-446655440010",
+			score: 2,
+		});
+
+		expect(result).toBeNull();
+	});
+
+	it("maps chat answer and filters invalid sources and citations", () => {
 		const result = mapChatAnswerFromApi({
-			answer: "Mock answer based on retrieved context.",
+			answer: "Mock answer based on retrieved context [1].",
 			sources: [
 				{
 					artifactId: "550e8400-e29b-41d4-a716-446655440002",
@@ -46,10 +96,24 @@ describe("chat types", () => {
 					score: 2,
 				},
 			],
+			citations: [
+				{
+					number: 1,
+					artifactId: "550e8400-e29b-41d4-a716-446655440002",
+					chunkId: "550e8400-e29b-41d4-a716-446655440010",
+					score: 0.87,
+				},
+				{
+					number: 0,
+					artifactId: "550e8400-e29b-41d4-a716-446655440004",
+					chunkId: "550e8400-e29b-41d4-a716-446655440011",
+					score: 0.5,
+				},
+			],
 		});
 
 		expect(result).toEqual({
-			answer: "Mock answer based on retrieved context.",
+			answer: "Mock answer based on retrieved context [1].",
 			sources: [
 				{
 					artifactId: "550e8400-e29b-41d4-a716-446655440002",
@@ -58,6 +122,46 @@ describe("chat types", () => {
 					score: 0.87,
 				},
 			],
+			citations: [
+				{
+					number: 1,
+					artifactId: "550e8400-e29b-41d4-a716-446655440002",
+					chunkId: "550e8400-e29b-41d4-a716-446655440010",
+					score: 0.87,
+				},
+			],
 		});
+	});
+
+	it("defaults missing citations to an empty array", () => {
+		const result = mapChatAnswerFromApi({
+			answer: "Mock answer based on retrieved context.",
+			sources: [],
+		});
+
+		expect(result.citations).toEqual([]);
+	});
+
+	it("preserves citation order from API response", () => {
+		const result = mapChatAnswerFromApi({
+			answer: "Mock answer based on retrieved context [1][2].",
+			sources: [],
+			citations: [
+				{
+					number: 1,
+					artifactId: "550e8400-e29b-41d4-a716-446655440002",
+					chunkId: "550e8400-e29b-41d4-a716-446655440010",
+					score: 0.91,
+				},
+				{
+					number: 2,
+					artifactId: "550e8400-e29b-41d4-a716-446655440003",
+					chunkId: "550e8400-e29b-41d4-a716-446655440011",
+					score: 0.89,
+				},
+			],
+		});
+
+		expect(result.citations.map((citation) => citation.number)).toEqual([1, 2]);
 	});
 });

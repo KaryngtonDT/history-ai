@@ -8,6 +8,7 @@ describe("HttpChatRepository", () => {
 		const post = vi.fn().mockResolvedValue({
 			answer: "Mock answer based on retrieved context.",
 			sources: [],
+			citations: [],
 		});
 		const httpClient = { get: vi.fn(), post } as unknown as HttpClient;
 		const repository = new HttpChatRepository(httpClient);
@@ -23,14 +24,22 @@ describe("HttpChatRepository", () => {
 		);
 	});
 
-	it("maps API DTO to chat answer", async () => {
+	it("maps API DTO to chat answer with citations", async () => {
 		const post = vi.fn().mockResolvedValue({
-			answer: "Mock answer based on retrieved context.",
+			answer: "Mock answer based on retrieved context [1].",
 			sources: [
 				{
 					artifactId: "550e8400-e29b-41d4-a716-446655440002",
 					chunkId: "550e8400-e29b-41d4-a716-446655440010",
 					text: "## Ancient Rome",
+					score: 0.87,
+				},
+			],
+			citations: [
+				{
+					number: 1,
+					artifactId: "550e8400-e29b-41d4-a716-446655440002",
+					chunkId: "550e8400-e29b-41d4-a716-446655440010",
 					score: 0.87,
 				},
 			],
@@ -44,12 +53,20 @@ describe("HttpChatRepository", () => {
 		);
 
 		expect(result).toEqual({
-			answer: "Mock answer based on retrieved context.",
+			answer: "Mock answer based on retrieved context [1].",
 			sources: [
 				{
 					artifactId: "550e8400-e29b-41d4-a716-446655440002",
 					chunkId: "550e8400-e29b-41d4-a716-446655440010",
 					text: "## Ancient Rome",
+					score: 0.87,
+				},
+			],
+			citations: [
+				{
+					number: 1,
+					artifactId: "550e8400-e29b-41d4-a716-446655440002",
+					chunkId: "550e8400-e29b-41d4-a716-446655440010",
 					score: 0.87,
 				},
 			],
@@ -66,7 +83,7 @@ describe("HttpChatRepository", () => {
 			"",
 		);
 
-		expect(result).toEqual({ answer: "", sources: [] });
+		expect(result).toEqual({ answer: "", sources: [], citations: [] });
 	});
 
 	it("propagates non-400 HTTP errors", async () => {
