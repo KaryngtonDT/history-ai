@@ -60,4 +60,20 @@ describe("Frontend architecture rules", () => {
 
 		expect(interactiveTimelineViolations).toEqual([]);
 	});
+
+	it("prevents feature modules from importing Map transport directly", () => {
+		const mapViolations = violations.filter(
+			(violation) => violation.rule === "feature-map-transport",
+		);
+
+		expect(mapViolations).toEqual([]);
+	});
+
+	it("keeps InteractiveMap props-only without service imports", () => {
+		const interactiveMapViolations = violations.filter(
+			(violation) => violation.rule === "interactive-map-props-only",
+		);
+
+		expect(interactiveMapViolations).toEqual([]);
+	});
 });

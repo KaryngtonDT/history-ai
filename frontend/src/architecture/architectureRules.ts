@@ -271,6 +271,89 @@ export function findInteractiveTimelineServiceViolations(): ArchitectureViolatio
 	return violations;
 }
 
+export function findFeatureMapTransportViolations(): ArchitectureViolation[] {
+	const violations: ArchitectureViolation[] = [];
+	const featuresRoot = path.join(FRONTEND_SRC, "features");
+
+	if (!directoryExists(featuresRoot)) {
+		return violations;
+	}
+
+	const forbiddenPatterns: Array<{ pattern: RegExp; detail: string }> = [
+		{
+			pattern: /from\s+["']@\/services\/map\/HttpMapRepository["']/,
+			detail: "Feature components must use MapService, not HttpMapRepository",
+		},
+		{
+			pattern: /from\s+["']@\/services\/map\/MapRepositoryFactory["']/,
+			detail: "Feature components must not wire MapRepositoryFactory",
+		},
+		{
+			pattern: /from\s+["']@\/services\/map\/MapRepository["']/,
+			detail: "Feature components must use MapService, not MapRepository",
+		},
+	];
+
+	for (const filePath of collectSourceFiles(featuresRoot)) {
+		const content = readFileSync(filePath, "utf8");
+
+		for (const { pattern, detail } of forbiddenPatterns) {
+			if (!pattern.test(content)) {
+				continue;
+			}
+
+			violations.push({
+				rule: "feature-map-transport",
+				file: toRelativePath(filePath),
+				detail,
+			});
+		}
+	}
+
+	return violations;
+}
+
+export function findInteractiveMapServiceViolations(): ArchitectureViolation[] {
+	const violations: ArchitectureViolation[] = [];
+	const interactiveMapRoot = path.join(
+		FRONTEND_SRC,
+		"features/map/InteractiveMap",
+	);
+
+	if (!directoryExists(interactiveMapRoot)) {
+		return violations;
+	}
+
+	const forbiddenPatterns: Array<{ pattern: RegExp; detail: string }> = [
+		{
+			pattern: /from\s+["']@\/services\//,
+			detail: "InteractiveMap must not import services",
+		},
+		{
+			pattern: /Repository["']/,
+			detail: "InteractiveMap must not import repositories",
+		},
+	];
+
+	for (const filePath of collectSourceFiles(interactiveMapRoot)) {
+		const content = readFileSync(filePath, "utf8");
+
+		for (const { pattern, detail } of forbiddenPatterns) {
+			if (!pattern.test(content)) {
+				continue;
+			}
+
+			violations.push({
+				rule: "interactive-map-props-only",
+				file: toRelativePath(filePath),
+				detail,
+			});
+		}
+	}
+
+	return violations;
+}
+
 export function collectArchitectureViolations(): ArchitectureViolation[] {
 	return [
 		...findFetchViolations(),
@@ -278,6 +361,8 @@ export function collectArchitectureViolations(): ArchitectureViolation[] {
 		...findFeatureHttpClientViolations(),
 		...findFeatureSearchTransportViolations(),
 		...findFeatureTimelineTransportViolations(),
+		...findFeatureMapTransportViolations(),
 		...findInteractiveTimelineServiceViolations(),
+		...findInteractiveMapServiceViolations(),
 	];
 }

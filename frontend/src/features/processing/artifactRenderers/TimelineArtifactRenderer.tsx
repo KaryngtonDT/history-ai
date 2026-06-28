@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Timeline } from "@/domain/timeline";
+import { TimelineMapPanel } from "@/features/map/TimelineMapPanel";
 import { ProcessingTimelineArtifact } from "@/features/processing/ProcessingTimelineArtifact";
 import { timelineService } from "@/services/timeline/TimelineService";
 import type { ArtifactRendererProps } from "./ArtifactRenderer";
@@ -57,11 +58,16 @@ export function TimelineArtifactRenderer({
 		viewState.status === "structured" ? viewState.timeline : undefined;
 
 	return (
-		<ProcessingTimelineArtifact
-			artifact={artifact}
-			contentId={readOnly ? undefined : contentId}
-			isLoading={isLoading}
-			structuredTimeline={structuredTimeline}
-		/>
+		<>
+			<ProcessingTimelineArtifact
+				artifact={artifact}
+				contentId={readOnly ? undefined : contentId}
+				isLoading={isLoading}
+				structuredTimeline={structuredTimeline}
+			/>
+			{artifact !== null && viewState.status === "structured" ? (
+				<TimelineMapPanel artifactId={artifact.id} />
+			) : null}
+		</>
 	);
 }

@@ -1,0 +1,117 @@
+.root {
+	margin-top: var(--space-4);
+	display: grid;
+	gap: var(--space-4);
+}
+
+.mapCanvas {
+	position: relative;
+	min-height: 12rem;
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-md);
+	background:
+		linear-gradient(
+			180deg,
+			rgb(191 219 254 / 35%) 0%,
+			rgb(219 234 254 / 20%) 45%,
+			rgb(254 243 199 / 25%) 100%
+		),
+		repeating-linear-gradient(
+			0deg,
+			transparent,
+			transparent 1.9rem,
+			rgb(148 163 184 / 12%) 2rem
+		),
+		repeating-linear-gradient(
+			90deg,
+			transparent,
+			transparent 1.9rem,
+			rgb(148 163 184 / 12%) 2rem
+		);
+	overflow: hidden;
+}
+
+.mapMarker {
+	position: absolute;
+	left: var(--marker-x);
+	top: var(--marker-y);
+	width: 0.75rem;
+	height: 0.75rem;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	background: var(--color-primary, #2563eb);
+	box-shadow: 0 0 0 2px rgb(37 99 235 / 35%);
+	transform: translate(-50%, -50%);
+}
+
+.placeList {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: var(--space-3);
+}
+
+.placeItem {
+	margin: 0;
+}
+
+.placeCard {
+	padding: var(--space-4);
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-md);
+	background: var(--shell-surface);
+}
+
+.placeName {
+	margin: 0 0 var(--space-3);
+	font-size: var(--font-md);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.coordinates {
+	margin: 0;
+	display: grid;
+	gap: var(--space-2);
+}
+
+.coordinateRow {
+	display: grid;
+	grid-template-columns: 6rem 1fr;
+	gap: var(--space-2);
+}
+
+.coordinates dt {
+	margin: 0;
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.coordinates dd {
+	margin: 0;
+	font-size: var(--font-md);
+	color: var(--shell-text);
+	font-variant-numeric: tabular-nums;
+}
+
+.description {
+	margin: var(--space-3) 0 0;
+	color: var(--shell-text);
+	font-size: var(--font-md);
+	line-height: 1.6;
+}
+
+@media (min-width: 48rem) {
+	.root {
+		grid-template-columns: minmax(12rem, 1fr) minmax(16rem, 1.2fr);
+		align-items: start;
+	}
+
+	.mapCanvas {
+		min-height: 16rem;
+	}
+}

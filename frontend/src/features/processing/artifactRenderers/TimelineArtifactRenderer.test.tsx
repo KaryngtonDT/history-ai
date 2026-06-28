@@ -10,9 +10,19 @@ const { mockGetTimeline } = vi.hoisted(() => ({
 	mockGetTimeline: vi.fn(),
 }));
 
+const { mockGetTimelineMap } = vi.hoisted(() => ({
+	mockGetTimelineMap: vi.fn(),
+}));
+
 vi.mock("@/services/timeline/TimelineService", () => ({
 	timelineService: {
 		getTimeline: mockGetTimeline,
+	},
+}));
+
+vi.mock("@/services/map/MapService", () => ({
+	mapService: {
+		getTimelineMap: mockGetTimelineMap,
 	},
 }));
 
@@ -41,9 +51,19 @@ const structuredTimeline = {
 	],
 };
 
+const mapPlaces = [
+	{
+		name: "Rome",
+		coordinates: { latitude: 41.9028, longitude: 12.4964 },
+		description: "753 BC — Foundation of Rome",
+	},
+];
+
 describe("TimelineArtifactRenderer", () => {
 	beforeEach(() => {
 		mockGetTimeline.mockReset();
+		mockGetTimelineMap.mockReset();
+		mockGetTimelineMap.mockResolvedValue(mapPlaces);
 	});
 
 	it("calls TimelineService with artifact id", async () => {
@@ -90,6 +110,41 @@ describe("TimelineArtifactRenderer", () => {
 			await screen.findByRole("heading", { name: "Structured Rome" }),
 		).toBeInTheDocument();
 		expect(screen.getByText("Structured event")).toBeInTheDocument();
+	});
+
+	it("shows map panel below structured timeline", async () => {
+		mockGetTimeline.mockResolvedValue(structuredTimeline);
+
+		render(
+			<TimelineArtifactRenderer
+				artifact={timelineArtifact}
+				contentId="content-1"
+			/>,
+		);
+
+		expect(
+			await screen.findByRole("region", { name: "Historical places map" }),
+		).toBeInTheDocument();
+		expect(mockGetTimelineMap).toHaveBeenCalledWith(timelineArtifact.id);
+	});
+
+	it("does not show map panel when timeline falls back to markdown", async () => {
+		mockGetTimeline.mockResolvedValue(null);
+
+		render(
+			<TimelineArtifactRenderer
+				artifact={timelineArtifact}
+				contentId="content-1"
+			/>,
+		);
+
+		expect(
+			await screen.findByRole("heading", { name: "Ancient Rome" }),
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole("region", { name: "Historical places map" }),
+		).not.toBeInTheDocument();
+		expect(mockGetTimelineMap).not.toHaveBeenCalled();
 	});
 
 	it("falls back to markdown when TimelineService returns null", async () => {
@@ -150,6 +205,7 @@ describe("TimelineArtifactRenderer", () => {
 		const source = readFileSync(componentPath, "utf8");
 
 		expect(source).not.toMatch(/HttpTimelineRepository/);
+		expect(source).not.toMatch(/HttpMapRepository/);
 		expect(source).not.toMatch(/\bfetch\s*\(/);
 	});
 });
