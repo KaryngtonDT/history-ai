@@ -73,6 +73,17 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testRelationDomainDoesNotDependOnOuterLayersOrFrameworks(): void
+    {
+        $this->assertNoViolations(
+            'Relation domain',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Domain/Relation',
+                self::DOMAIN_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testApplicationDoesNotDependOnInfrastructureOrPresentation(): void
     {
         $this->assertNoViolations(
