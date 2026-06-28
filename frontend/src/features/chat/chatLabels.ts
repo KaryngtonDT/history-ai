@@ -17,6 +17,14 @@ export const CHAT_LOADING_LABEL = "Generating answer";
 export const CHAT_ERROR_MESSAGE =
 	"Something went wrong while asking this content. Please try again.";
 
+export const CHAT_UNAVAILABLE_TITLE = "Chat unavailable";
+
+export const CHAT_UNAVAILABLE_DESCRIPTION =
+	"A valid content identifier is required before you can ask questions about this document.";
+
+export const CHAT_EMPTY_ANSWER_MESSAGE =
+	"No answer was returned for this question. Check that the content identifier is valid.";
+
 export function formatChatScore(score: number): string {
 	return score.toFixed(2);
 }

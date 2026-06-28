@@ -4,12 +4,13 @@ import {
 	MOCK_SUMMARY,
 	MOCK_TIMELINE,
 	MOCK_TRANSCRIPT,
+	ROMAN_EMPIRE_CONTENT_ID,
 } from "./artifact";
 import { generateSummaryFromTranscript } from "./summaryGenerator";
 
 describe("artifact mocks", () => {
 	it("includes transcript artifact for mock content", () => {
-		const transcript = artifactMocksByContentId["1"].find(
+		const transcript = artifactMocksByContentId[ROMAN_EMPIRE_CONTENT_ID].find(
 			(artifact) => artifact.type === "transcript",
 		);
 
@@ -17,7 +18,7 @@ describe("artifact mocks", () => {
 	});
 
 	it("derives summary from transcript content", () => {
-		const summary = artifactMocksByContentId["1"].find(
+		const summary = artifactMocksByContentId[ROMAN_EMPIRE_CONTENT_ID].find(
 			(artifact) => artifact.type === "summary",
 		);
 
@@ -28,7 +29,7 @@ describe("artifact mocks", () => {
 	});
 
 	it("does not use placeholder summary text", () => {
-		const summary = artifactMocksByContentId["1"].find(
+		const summary = artifactMocksByContentId[ROMAN_EMPIRE_CONTENT_ID].find(
 			(artifact) => artifact.type === "summary",
 		);
 

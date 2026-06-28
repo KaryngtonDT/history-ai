@@ -1,6 +1,8 @@
 import type { Artifact } from "@/services/artifact/types";
 import { generateSummaryFromTranscript } from "./summaryGenerator";
 
+export const ROMAN_EMPIRE_CONTENT_ID = "550e8400-e29b-41d4-a716-446655440001";
+
 export const MOCK_TRANSCRIPT =
 	"The Roman Empire was vast. It lasted many centuries. Its legacy shaped Europe. Modern law still reflects Roman ideas. Archaeology continues to reveal new sites.";
 
@@ -45,7 +47,10 @@ function buildMockArtifactsForContent(
 }
 
 export const artifactMocksByContentId: Record<string, Artifact[]> = {
-	"1": buildMockArtifactsForContent("1", "1"),
+	[ROMAN_EMPIRE_CONTENT_ID]: buildMockArtifactsForContent(
+		ROMAN_EMPIRE_CONTENT_ID,
+		"1",
+	),
 	"content-1": [
 		{
 			id: "artifact-1",

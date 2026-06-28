@@ -1,28 +1,32 @@
 import { describe, expect, it } from "vitest";
+import { ROMAN_EMPIRE_CONTENT_ID } from "@/mock/artifact";
 import { MockGraphRepository } from "./MockGraphRepository";
 import { EMPTY_KNOWLEDGE_GRAPH } from "./types";
+
+const transcriptArtifactId = `artifact-transcript-${ROMAN_EMPIRE_CONTENT_ID}`;
+const summaryArtifactId = `artifact-summary-${ROMAN_EMPIRE_CONTENT_ID}`;
 
 describe("MockGraphRepository", () => {
 	it("returns graph nodes and derived_from edge for mock transcript and summary", async () => {
 		const repository = new MockGraphRepository();
 
-		const graph = await repository.getKnowledgeGraph("1");
+		const graph = await repository.getKnowledgeGraph(ROMAN_EMPIRE_CONTENT_ID);
 
 		expect(graph.nodes).toEqual([
 			{
-				artifactId: "artifact-transcript-1",
+				artifactId: transcriptArtifactId,
 				type: "transcript",
 				title: "Transcript",
 			},
 			{
-				artifactId: "artifact-summary-1",
+				artifactId: summaryArtifactId,
 				type: "summary",
 				title: "Summary",
 			},
 		]);
 		expect(graph.edges).toContainEqual({
-			sourceArtifactId: "artifact-summary-1",
-			targetArtifactId: "artifact-transcript-1",
+			sourceArtifactId: summaryArtifactId,
+			targetArtifactId: transcriptArtifactId,
 			type: "derived_from",
 		});
 	});

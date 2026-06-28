@@ -1,7 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import { ChatPanel } from "@/features/chat/ChatPanel";
+import {
+	CHAT_UNAVAILABLE_DESCRIPTION,
+	CHAT_UNAVAILABLE_TITLE,
+} from "@/features/chat/chatLabels";
 import { KnowledgeGraphPanel } from "@/features/graph/KnowledgeGraphPanel";
 import { ArtifactRelationsPanel } from "@/features/processing/ArtifactRelationsPanel";
 import {
@@ -14,6 +18,7 @@ import { SeeAlsoRecommendationsPanel } from "@/features/recommendation/SeeAlsoRe
 import { SemanticSearchPanel } from "@/features/semantic/SemanticSearchPanel";
 import { artifactService } from "@/services/artifact/ArtifactService";
 import type { Artifact } from "@/services/artifact/types";
+import { resolveChatContentId } from "@/shared/contentId";
 import styles from "./ProcessingArtifacts.module.css";
 
 interface ProcessingArtifactsProps {
@@ -77,26 +82,50 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 		};
 	}, [contentId]);
 
+	const chatContentId = useMemo(
+		() => resolveChatContentId(contentId, artifacts),
+		[contentId, artifacts],
+	);
+
+	const chatSection =
+		chatContentId !== null ? (
+			<ChatPanel contentId={chatContentId} artifacts={artifacts} />
+		) : (
+			<EmptyState
+				title={CHAT_UNAVAILABLE_TITLE}
+				description={CHAT_UNAVAILABLE_DESCRIPTION}
+			/>
+		);
+
 	if (loading) {
 		return (
-			<div className={styles.loading}>
-				<Spinner label="Loading artifacts" />
+			<div className={styles.list}>
+				<div className={styles.loading}>
+					<Spinner label="Loading artifacts" />
+				</div>
+				{chatSection}
 			</div>
 		);
 	}
 
 	if (loadError !== null) {
 		return (
-			<EmptyState title="Unable to load artifacts" description={loadError} />
+			<div className={styles.list}>
+				<EmptyState title="Unable to load artifacts" description={loadError} />
+				{chatSection}
+			</div>
 		);
 	}
 
 	if (isEmpty) {
 		return (
-			<EmptyState
-				title="No artifacts yet"
-				description="Generated learning artifacts will appear here once processing output is available."
-			/>
+			<div className={styles.list}>
+				<EmptyState
+					title="No artifacts yet"
+					description="Generated learning artifacts will appear here once processing output is available."
+				/>
+				{chatSection}
+			</div>
 		);
 	}
 
@@ -140,7 +169,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 			<ArtifactRelationsPanel contentId={contentId} artifacts={artifacts} />
 			<KnowledgeGraphPanel contentId={contentId} />
 			<SemanticSearchPanel contentId={contentId} artifacts={artifacts} />
-			<ChatPanel contentId={contentId} artifacts={artifacts} />
+			{chatSection}
 		</div>
 	);
 }

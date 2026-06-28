@@ -1,18 +1,22 @@
 import { describe, expect, it } from "vitest";
+import { ROMAN_EMPIRE_CONTENT_ID } from "@/mock/artifact";
 import { MockRecommendationRepository } from "./MockRecommendationRepository";
+
+const transcriptArtifactId = `artifact-transcript-${ROMAN_EMPIRE_CONTENT_ID}`;
+const summaryArtifactId = `artifact-summary-${ROMAN_EMPIRE_CONTENT_ID}`;
 
 describe("MockRecommendationRepository", () => {
 	it("returns transcript recommendation for mock summary artifact", async () => {
 		const repository = new MockRecommendationRepository();
 
 		const recommendations = await repository.getArtifactRecommendations(
-			"1",
-			"artifact-summary-1",
+			ROMAN_EMPIRE_CONTENT_ID,
+			summaryArtifactId,
 		);
 
 		expect(recommendations).toEqual([
 			{
-				artifactId: "artifact-transcript-1",
+				artifactId: transcriptArtifactId,
 				type: "transcript",
 				title: "Transcript",
 				reason: "derived_from",
@@ -36,7 +40,7 @@ describe("MockRecommendationRepository", () => {
 		const repository = new MockRecommendationRepository();
 
 		const recommendations = await repository.getArtifactRecommendations(
-			"1",
+			ROMAN_EMPIRE_CONTENT_ID,
 			"artifact-unknown-1",
 		);
 

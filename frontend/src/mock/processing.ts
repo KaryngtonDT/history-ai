@@ -1,9 +1,10 @@
+import { ROMAN_EMPIRE_CONTENT_ID } from "@/mock/artifact";
 import type { ProcessingData } from "@/services/processing/types";
 
 export const processingMocks: Record<string, ProcessingData> = {
 	"1": {
 		id: "1",
-		contentId: "1",
+		contentId: ROMAN_EMPIRE_CONTENT_ID,
 		title: "The Roman Empire",
 		progress: 0,
 		status: "pending",

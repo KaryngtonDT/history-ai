@@ -7,12 +7,18 @@ import { graphService } from "@/services/graph/GraphService";
 import { libraryService } from "@/services/library/LibraryService";
 import { relationService } from "@/services/relation/RelationService";
 
-const { mockGetArtifactRelations, mockGetArtifactRecommendations } = vi.hoisted(
-	() => ({
-		mockGetArtifactRelations: vi.fn(),
-		mockGetArtifactRecommendations: vi.fn().mockResolvedValue([]),
+const {
+	mockAskQuestion,
+	mockGetArtifactRelations,
+	mockGetArtifactRecommendations,
+} = vi.hoisted(() => ({
+	mockAskQuestion: vi.fn().mockResolvedValue({
+		answer: "Mock answer based on retrieved context.",
+		sources: [],
 	}),
-);
+	mockGetArtifactRelations: vi.fn(),
+	mockGetArtifactRecommendations: vi.fn().mockResolvedValue([]),
+}));
 
 vi.mock("@/services/relation/RelationService", () => ({
 	relationService: {
@@ -40,15 +46,17 @@ vi.mock("@/services/semantic/SemanticSearchService", () => ({
 
 vi.mock("@/services/chat/ChatService", () => ({
 	chatService: {
-		askQuestion: vi.fn().mockResolvedValue({
-			answer: "Mock answer based on retrieved context.",
-			sources: [],
-		}),
+		askQuestion: mockAskQuestion,
 	},
 }));
 
 describe("ProcessingArtifacts", () => {
 	beforeEach(() => {
+		mockAskQuestion.mockReset();
+		mockAskQuestion.mockResolvedValue({
+			answer: "Mock answer based on retrieved context.",
+			sources: [],
+		});
 		mockGetArtifactRelations.mockReset();
 		mockGetArtifactRelations.mockResolvedValue([]);
 		mockGetArtifactRecommendations.mockReset();
@@ -361,6 +369,28 @@ describe("ProcessingArtifacts", () => {
 		await waitFor(() => {
 			expect(screen.getByText("No artifacts yet")).toBeInTheDocument();
 		});
+		expect(screen.getByText("Chat unavailable")).toBeInTheDocument();
+		expect(
+			screen.queryByRole("textbox", { name: "Ask a question" }),
+		).not.toBeInTheDocument();
+	});
+
+	it("shows chat unavailable while artifacts load for non-uuid content id", () => {
+		vi.spyOn(artifactService, "listByContentId").mockReturnValue(
+			new Promise(() => {}),
+		);
+
+		render(<ProcessingArtifacts contentId="content-1" />);
+
+		expect(screen.getByText("Chat unavailable")).toBeInTheDocument();
+		expect(
+			screen.queryByRole("textbox", { name: "Ask a question" }),
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole("status", { name: "Loading artifacts" }),
+		).toBeInTheDocument();
+		expect(artifactService.listByContentId).toHaveBeenCalledTimes(1);
+		expect(mockAskQuestion).not.toHaveBeenCalled();
 	});
 
 	it("renders unsupported artifact types with fallback card", async () => {
@@ -687,12 +717,72 @@ describe("ProcessingArtifacts", () => {
 		);
 
 		expect(
-			await screen.findByText("Chat with this document"),
+			await screen.findByText("Generated summary text"),
 		).toBeInTheDocument();
+		expect(screen.getByText("Chat with this document")).toBeInTheDocument();
 		expect(
 			screen.getByRole("textbox", { name: "Ask a question" }),
 		).toBeInTheDocument();
 		expect(listByContentId).toHaveBeenCalledTimes(1);
+	});
+
+	it("derives chat content id from artifact uuid when prop is not a uuid", async () => {
+		const user = userEvent.setup();
+		const chatContentId = "550e8400-e29b-41d4-a716-446655440001";
+
+		vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
+			{
+				id: "550e8400-e29b-41d4-a716-446655440002",
+				contentId: chatContentId,
+				processingJobId: "job-1",
+				type: "summary",
+				content: "Generated summary text",
+				createdAt: "2026-06-26T12:00:00+00:00",
+			},
+		]);
+
+		render(<ProcessingArtifacts contentId="1" />);
+
+		expect(
+			await screen.findByText("Generated summary text"),
+		).toBeInTheDocument();
+		expect(screen.getByText("Chat with this document")).toBeInTheDocument();
+
+		await user.type(
+			screen.getByRole("textbox", { name: "Ask a question" }),
+			"what is the purpose?{enter}",
+		);
+
+		await waitFor(() => {
+			expect(mockAskQuestion).toHaveBeenCalledWith(
+				chatContentId,
+				"what is the purpose?",
+			);
+		});
+	});
+
+	it("shows chat unavailable for non-uuid content id without calling ChatService", async () => {
+		vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
+			{
+				id: "artifact-1",
+				contentId: "content-1",
+				processingJobId: "job-1",
+				type: "summary",
+				content: "Generated summary text",
+				createdAt: "2026-06-26T12:00:00+00:00",
+			},
+		]);
+
+		render(<ProcessingArtifacts contentId="content-1" />);
+
+		expect(
+			await screen.findByText("Generated summary text"),
+		).toBeInTheDocument();
+		expect(screen.getByText("Chat unavailable")).toBeInTheDocument();
+		expect(
+			screen.queryByRole("textbox", { name: "Ask a question" }),
+		).not.toBeInTheDocument();
+		expect(mockAskQuestion).not.toHaveBeenCalled();
 	});
 
 	it("loads artifacts exactly once when recommendations panels are shown", async () => {

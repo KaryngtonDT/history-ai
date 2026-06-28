@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { ROMAN_EMPIRE_CONTENT_ID } from "@/mock/artifact";
 import { MockChatRepository } from "./MockChatRepository";
 import { MOCK_CHAT_ANSWER } from "./types";
 
@@ -6,7 +7,10 @@ describe("MockChatRepository", () => {
 	it("returns deterministic mock answer with sources for mock content", async () => {
 		const repository = new MockChatRepository();
 
-		const result = await repository.askQuestion("1", "Roman");
+		const result = await repository.askQuestion(
+			ROMAN_EMPIRE_CONTENT_ID,
+			"Roman",
+		);
 
 		expect(result.answer).toBe(MOCK_CHAT_ANSWER);
 		expect(result.sources.length).toBeGreaterThan(0);
@@ -35,7 +39,10 @@ describe("MockChatRepository", () => {
 	it("returns mock answer with empty sources when query does not match mock content", async () => {
 		const repository = new MockChatRepository();
 
-		const result = await repository.askQuestion("1", "byzantine");
+		const result = await repository.askQuestion(
+			ROMAN_EMPIRE_CONTENT_ID,
+			"byzantine",
+		);
 
 		expect(result).toEqual({
 			answer: MOCK_CHAT_ANSWER,

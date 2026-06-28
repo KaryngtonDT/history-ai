@@ -7,6 +7,7 @@ import { chatService } from "@/services/chat/ChatService";
 import { ChatInput } from "../ChatInput";
 import { type ChatMessageItem, ChatMessageList } from "../ChatMessageList";
 import {
+	CHAT_EMPTY_ANSWER_MESSAGE,
 	CHAT_ERROR_MESSAGE,
 	CHAT_LOADING_LABEL,
 	CHAT_PANEL_TITLE,
@@ -56,6 +57,11 @@ export function ChatPanel({ contentId, artifacts }: ChatPanelProps) {
 
 		try {
 			const result = await chatService.askQuestion(contentId, trimmedQuestion);
+
+			if (result.answer.trim() === "") {
+				setError(CHAT_EMPTY_ANSWER_MESSAGE);
+				return;
+			}
 
 			setMessages((currentMessages) => [
 				...currentMessages,

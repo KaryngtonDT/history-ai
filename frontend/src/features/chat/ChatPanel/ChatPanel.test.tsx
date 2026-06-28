@@ -141,6 +141,32 @@ describe("ChatPanel", () => {
 		).toBeInTheDocument();
 	});
 
+	it("does not render an empty assistant bubble when ChatService returns empty answer", async () => {
+		const user = userEvent.setup();
+		mockAskQuestion.mockResolvedValue({
+			answer: "",
+			sources: [],
+		});
+
+		render(<ChatPanel contentId={contentId} artifacts={artifacts} />);
+
+		await user.type(
+			screen.getByRole("textbox", { name: "Ask a question" }),
+			"Why did Rome collapse?",
+		);
+		await user.click(screen.getByRole("button", { name: "Send" }));
+
+		expect(
+			await screen.findByText("Unable to get an answer"),
+		).toBeInTheDocument();
+		expect(
+			screen.getByText(
+				"No answer was returned for this question. Check that the content identifier is valid.",
+			),
+		).toBeInTheDocument();
+		expect(screen.queryByLabelText("Assistant")).not.toBeInTheDocument();
+	});
+
 	it("does not use direct fetch or HTTP repository imports", () => {
 		const source = readFileSync(join(__dirname, "ChatPanel.tsx"), "utf8");
 		const fetchPattern = ["fetch", "("].join("");
