@@ -343,6 +343,39 @@ ProcessingArtifacts
 
 `SemanticSearchResults` is props-only and must not import services or repositories.
 
+### Vector store layer (backend)
+
+```text
+SearchSemanticChunksHandler
+        │
+        ├── Chunker → ChunkCollection
+        ├── EmbeddingGeneratorInterface → EmbeddedChunkCollection
+        ├── VectorDocumentCollection
+        ├── VectorStoreInterface.index()
+        └── SemanticRetriever.retrieve()
+                ├── EmbeddingGeneratorInterface (query embedding)
+                └── VectorStoreInterface.search()
+        │
+        ▼
+RetrievedChunkCollection → Semantic Search API JSON
+```
+
+| Layer | Rule |
+| ----- | ---- |
+| `Domain/Semantic` | Pure domain: `VectorStoreInterface`, `VectorDocument`, `VectorSearchResult`, `SemanticRetriever` — no Symfony, HTTP, or persistence |
+| `Infrastructure/Semantic` | `InMemoryVectorStore` implements `VectorStoreInterface`; cosine similarity and top-K sorting live here |
+| `Application/Semantic` | Handler indexes vector documents before calling `SemanticRetriever`; no vector persistence |
+| `Presentation/Semantic` | Thin HTTP adapter only; unchanged semantic-search contract |
+
+Wiring (`services.yaml`):
+
+```text
+VectorStoreInterface → InMemoryVectorStore
+SemanticRetriever    → autowired with VectorStoreInterface
+```
+
+Per-request flow: handler calls `index()` (replaces in-memory corpus), then retriever calls `search()`. No worker or frontend involvement in vector indexing.
+
 ## Enforcement
 
 | Tool | Location | Command |

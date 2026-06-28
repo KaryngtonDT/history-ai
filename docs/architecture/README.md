@@ -189,6 +189,22 @@ Verification: [Sprint20-Verification.md](../reports/Sprint20-Verification.md)
 
 ---
 
+# Sprint 21 — Vector Store (2026-06)
+
+Sprint 21 introduced a **Vector Store abstraction** and refactored semantic retrieval to route through it. Slice 4 changed **documentation and verification only** — no business logic in backend, frontend, or worker.
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `VectorDocument`, `VectorDocumentCollection`, `VectorSearchResult`, `VectorSearchResultCollection`, `VectorStoreInterface` |
+| Infrastructure | `InMemoryVectorStore` (cosine similarity, top-K, replace-on-index) |
+| Application | `SearchSemanticChunksHandler` indexes `VectorDocumentCollection` before retrieval |
+| Domain (refactor) | `SemanticRetriever` delegates search to `VectorStoreInterface`; cosine logic removed from retriever |
+| API / Frontend / Worker | Unchanged — semantic-search contract and UI preserved |
+
+Verification: [Sprint21-Verification.md](../reports/Sprint21-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

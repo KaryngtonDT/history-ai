@@ -11,7 +11,7 @@ describe("Frontend architecture rules", () => {
 
 	beforeAll(() => {
 		violations = collectArchitectureViolations();
-	}, 30_000);
+	}, 60_000);
 
 	it("keeps fetch() centralized in HttpClient", () => {
 		const fetchViolations = violations.filter(

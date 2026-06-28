@@ -402,6 +402,19 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testSemanticInfrastructureMayDependOnSemanticDomainOnly(): void
+    {
+        self::assertFileExists($this->srcRoot . '/Infrastructure/Semantic/InMemoryVectorStore.php');
+
+        $this->assertNoViolations(
+            'Semantic infrastructure',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Infrastructure/Semantic',
+                ['App\\Presentation\\', 'App\\Application\\'],
+            ),
+        );
+    }
+
     public function testSearchInfrastructureMayDependOnSearchAndLibraryDomain(): void
     {
         $this->assertNoViolations(
