@@ -363,16 +363,21 @@ RetrievedChunkCollection → Semantic Search API JSON
 | Layer | Rule |
 | ----- | ---- |
 | `Domain/Semantic` | Pure domain: `VectorStoreInterface`, `VectorDocument`, `VectorSearchResult`, `SemanticRetriever` — no Symfony, HTTP, or persistence |
-| `Infrastructure/Semantic` | `InMemoryVectorStore` implements `VectorStoreInterface`; cosine similarity and top-K sorting live here |
+| `Infrastructure/Semantic` | `InMemoryVectorStore` implements `VectorStoreInterface`; `DeterministicEmbeddingProvider` (default) and optional `GeminiEmbeddingProvider` implement `EmbeddingProviderInterface`; cosine similarity and top-K sorting live here |
 | `Application/Semantic` | Handler indexes vector documents before calling `SemanticRetriever`; no vector persistence |
 | `Presentation/Semantic` | Thin HTTP adapter only; unchanged semantic-search contract |
 
 Wiring (`services.yaml`):
 
 ```text
+EmbeddingProviderInterface → DeterministicEmbeddingProvider   (default)
+EmbeddingGeneratorInterface → DeterministicEmbeddingGenerator
 VectorStoreInterface → InMemoryVectorStore
 SemanticRetriever    → autowired with VectorStoreInterface
+GeminiEmbeddingProvider → registered, not aliased as default
 ```
+
+Optional real embeddings: `GeminiEmbeddingProvider` implements `EmbeddingProviderInterface` via the Gemini `embedContent` REST API (`GEMINI_API_KEY`, `GEMINI_EMBEDDING_MODEL`, default `text-embedding-004`). Activation by swapping the `EmbeddingProviderInterface` alias is deferred to a later slice — tests use a mocked transport; no live API calls in CI.
 
 Per-request flow: handler calls `index()` (replaces in-memory corpus), then retriever calls `search()`. No worker or frontend involvement in vector indexing.
 

@@ -205,6 +205,18 @@ Verification: [Sprint21-Verification.md](../reports/Sprint21-Verification.md)
 
 ---
 
+# Sprint 22 — Real Embedding Provider (in progress)
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `EmbeddingProviderInterface` — port for single-text embedding generation |
+| Infrastructure | `DeterministicEmbeddingProvider` (SHA-256, default); `GeminiEmbeddingProvider` (Gemini `embedContent`, optional, not default) |
+| Refactor | `DeterministicEmbeddingGenerator` delegates to `EmbeddingProviderInterface` |
+
+Default wiring unchanged: `EmbeddingProviderInterface` → `DeterministicEmbeddingProvider`. Real Gemini activation deferred to a later slice.
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

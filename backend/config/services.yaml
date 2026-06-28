@@ -3,6 +3,7 @@
 
 parameters:
     worker.base_url: '%env(WORKER_BASE_URL)%'
+    gemini.embedding_model_default: 'text-embedding-004'
 
 services:
     _defaults:
@@ -55,6 +56,11 @@ services:
 
     App\Domain\Semantic\VectorStoreInterface:
         alias: App\Infrastructure\Semantic\InMemoryVectorStore
+
+    App\Infrastructure\Semantic\GeminiEmbeddingProvider:
+        arguments:
+            $apiKey: '%env(default::GEMINI_API_KEY)%'
+            $model: '%env(default:gemini.embedding_model_default:GEMINI_EMBEDDING_MODEL)%'
 
     App\Infrastructure\Processing\HttpWorkerDispatcher:
         arguments:
