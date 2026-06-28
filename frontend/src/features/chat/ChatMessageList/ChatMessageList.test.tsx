@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import { ChatMessageList } from "./ChatMessageList";
 
 describe("ChatMessageList", () => {
@@ -59,13 +60,58 @@ describe("ChatMessageList", () => {
 				artifactTypesById={{
 					"550e8400-e29b-41d4-a716-446655440002": "summary",
 				}}
+				onCitationClick={vi.fn()}
 			/>,
 		);
 
 		expect(screen.getByText("Sources")).toBeInTheDocument();
 		expect(
-			screen.getByRole("link", { name: "[1] Summary (0.97)" }),
-		).toHaveAttribute("href", "#artifact-summary");
+			screen.getByRole("button", { name: "[1] Summary (0.97)" }),
+		).toBeInTheDocument();
+	});
+
+	it("forwards citation clicks from answer markers", async () => {
+		const user = userEvent.setup();
+		const onCitationClick = vi.fn();
+
+		render(
+			<ChatMessageList
+				messages={[
+					{
+						id: "2",
+						role: "assistant",
+						content: "Rome collapsed because of military pressure [1].",
+						sources: [
+							{
+								artifactId: "550e8400-e29b-41d4-a716-446655440002",
+								chunkId: "550e8400-e29b-41d4-a716-446655440010",
+								text: "## Ancient Rome",
+								score: 0.97,
+							},
+						],
+						citations: [
+							{
+								number: 1,
+								artifactId: "550e8400-e29b-41d4-a716-446655440002",
+								chunkId: "550e8400-e29b-41d4-a716-446655440010",
+								score: 0.97,
+							},
+						],
+					},
+				]}
+				artifactTypesById={{
+					"550e8400-e29b-41d4-a716-446655440002": "summary",
+				}}
+				onCitationClick={onCitationClick}
+			/>,
+		);
+
+		await user.click(screen.getByRole("button", { name: "Citation 1" }));
+
+		expect(onCitationClick).toHaveBeenCalledWith({
+			artifactId: "550e8400-e29b-41d4-a716-446655440002",
+			chunkId: "550e8400-e29b-41d4-a716-446655440010",
+		});
 	});
 
 	it("does not import services directly", () => {

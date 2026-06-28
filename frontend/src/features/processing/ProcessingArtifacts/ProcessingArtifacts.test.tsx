@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { CITATION_HIGHLIGHT_CLASS } from "@/features/chat/citationNavigation";
 import { ProcessingArtifacts } from "@/features/processing/ProcessingArtifacts";
 import { artifactService } from "@/services/artifact/ArtifactService";
 import { graphService } from "@/services/graph/GraphService";
@@ -15,6 +16,7 @@ const {
 	mockAskQuestion: vi.fn().mockResolvedValue({
 		answer: "Mock answer based on retrieved context.",
 		sources: [],
+		citations: [],
 	}),
 	mockGetArtifactRelations: vi.fn(),
 	mockGetArtifactRecommendations: vi.fn().mockResolvedValue([]),
@@ -56,6 +58,7 @@ describe("ProcessingArtifacts", () => {
 		mockAskQuestion.mockResolvedValue({
 			answer: "Mock answer based on retrieved context.",
 			sources: [],
+			citations: [],
 		});
 		mockGetArtifactRelations.mockReset();
 		mockGetArtifactRelations.mockResolvedValue([]);
@@ -905,5 +908,85 @@ describe("ProcessingArtifacts", () => {
 			"#artifact-quiz",
 		);
 		expect(screen.getByText("Next")).toBeInTheDocument();
+	});
+
+	it("scrolls and highlights artifact when a citation marker is clicked", async () => {
+		vi.useFakeTimers({ shouldAdvanceTime: true });
+
+		try {
+			const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+			const summaryId = "550e8400-e29b-41d4-a716-446655440002";
+			const chunkId = "550e8400-e29b-41d4-a716-446655440010";
+
+			vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
+				{
+					id: summaryId,
+					contentId: "550e8400-e29b-41d4-a716-446655440000",
+					processingJobId: "job-1",
+					type: "summary",
+					content: "Generated summary text",
+					createdAt: "2026-06-26T12:00:00+00:00",
+				},
+			]);
+			mockAskQuestion.mockResolvedValue({
+				answer: "Rome collapsed because of military pressure [1].",
+				sources: [
+					{
+						artifactId: summaryId,
+						chunkId,
+						text: "Generated summary text",
+						score: 0.91,
+					},
+				],
+				citations: [
+					{
+						number: 1,
+						artifactId: summaryId,
+						chunkId,
+						score: 0.91,
+					},
+				],
+			});
+
+			render(
+				<ProcessingArtifacts contentId="550e8400-e29b-41d4-a716-446655440000" />,
+			);
+
+			expect(
+				await screen.findByText("Generated summary text"),
+			).toBeInTheDocument();
+
+			const artifactTarget = document.getElementById("artifact-summary");
+			expect(artifactTarget).not.toBeNull();
+			const scrollIntoView = vi.fn();
+			if (artifactTarget !== null) {
+				artifactTarget.scrollIntoView = scrollIntoView;
+			}
+
+			await user.type(
+				screen.getByRole("textbox", { name: "Ask a question" }),
+				"Why Rome?{enter}",
+			);
+
+			await user.click(
+				await screen.findByRole("button", { name: "Citation 1" }),
+			);
+
+			expect(scrollIntoView).toHaveBeenCalledWith({
+				behavior: "smooth",
+				block: "start",
+			});
+			expect(artifactTarget?.classList.contains(CITATION_HIGHLIGHT_CLASS)).toBe(
+				true,
+			);
+
+			vi.advanceTimersByTime(3000);
+
+			expect(artifactTarget?.classList.contains(CITATION_HIGHLIGHT_CLASS)).toBe(
+				false,
+			);
+		} finally {
+			vi.useRealTimers();
+		}
 	});
 });

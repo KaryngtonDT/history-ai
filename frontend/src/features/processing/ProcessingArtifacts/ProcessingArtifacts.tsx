@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import { ChatPanel } from "@/features/chat/ChatPanel";
@@ -6,6 +6,8 @@ import {
 	CHAT_UNAVAILABLE_DESCRIPTION,
 	CHAT_UNAVAILABLE_TITLE,
 } from "@/features/chat/chatLabels";
+import type { CitationClickDetails } from "@/features/chat/citationNavigation";
+import { navigateToCitationTarget } from "@/features/chat/citationNavigation";
 import { KnowledgeGraphPanel } from "@/features/graph/KnowledgeGraphPanel";
 import { ArtifactRelationsPanel } from "@/features/processing/ArtifactRelationsPanel";
 import {
@@ -37,6 +39,22 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 	const [loading, setLoading] = useState(true);
 	const [loadError, setLoadError] = useState<string | null>(null);
 	const [isEmpty, setIsEmpty] = useState(false);
+	const clearHighlightRef = useRef<(() => void) | null>(null);
+
+	const handleCitationClick = useCallback(
+		(details: CitationClickDetails) => {
+			clearHighlightRef.current?.();
+			clearHighlightRef.current =
+				navigateToCitationTarget(details.artifactId, artifacts) ?? null;
+		},
+		[artifacts],
+	);
+
+	useEffect(() => {
+		return () => {
+			clearHighlightRef.current?.();
+		};
+	}, []);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -89,7 +107,11 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 
 	const chatSection =
 		chatContentId !== null ? (
-			<ChatPanel contentId={chatContentId} artifacts={artifacts} />
+			<ChatPanel
+				contentId={chatContentId}
+				artifacts={artifacts}
+				onCitationClick={handleCitationClick}
+			/>
 		) : (
 			<EmptyState
 				title={CHAT_UNAVAILABLE_TITLE}

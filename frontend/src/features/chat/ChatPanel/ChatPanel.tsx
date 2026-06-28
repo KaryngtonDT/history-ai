@@ -12,18 +12,24 @@ import {
 	CHAT_LOADING_LABEL,
 	CHAT_PANEL_TITLE,
 } from "../chatLabels";
+import type { CitationClickDetails } from "../citationNavigation";
 import styles from "./ChatPanel.module.css";
 
 interface ChatPanelProps {
 	contentId: string;
 	artifacts: Artifact[];
+	onCitationClick?: (details: CitationClickDetails) => void;
 }
 
 function createMessageId(): string {
 	return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-export function ChatPanel({ contentId, artifacts }: ChatPanelProps) {
+export function ChatPanel({
+	contentId,
+	artifacts,
+	onCitationClick,
+}: ChatPanelProps) {
 	const [messages, setMessages] = useState<ChatMessageItem[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -86,6 +92,7 @@ export function ChatPanel({ contentId, artifacts }: ChatPanelProps) {
 			<ChatMessageList
 				messages={messages}
 				artifactTypesById={artifactTypesById}
+				onCitationClick={onCitationClick}
 			/>
 			{loading ? (
 				<div className={styles.loadingState}>

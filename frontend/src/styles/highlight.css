@@ -1,0 +1,31 @@
+.history-ai-highlight {
+	border-radius: var(--radius-md, 8px);
+	animation: history-ai-highlight-fade 3s ease-out forwards;
+}
+
+@keyframes history-ai-highlight-fade {
+	0% {
+		background-color: color-mix(
+			in srgb,
+			var(--shell-accent, #3b82f6) 28%,
+			transparent
+		);
+		box-shadow: 0 0 0 2px
+			color-mix(in srgb, var(--shell-accent, #3b82f6) 40%, transparent);
+	}
+
+	70% {
+		background-color: color-mix(
+			in srgb,
+			var(--shell-accent, #3b82f6) 12%,
+			transparent
+		);
+		box-shadow: 0 0 0 1px
+			color-mix(in srgb, var(--shell-accent, #3b82f6) 20%, transparent);
+	}
+
+	100% {
+		background-color: transparent;
+		box-shadow: none;
+	}
+}

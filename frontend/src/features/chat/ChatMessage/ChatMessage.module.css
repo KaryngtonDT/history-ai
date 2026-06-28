@@ -28,3 +28,24 @@
 	word-break: break-word;
 	color: var(--shell-text);
 }
+
+.citationMarker {
+	display: inline;
+	margin: 0;
+	padding: 0 0.1em;
+	border: none;
+	background: transparent;
+	color: var(--shell-accent, #3b82f6);
+	font: inherit;
+	line-height: inherit;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.citationMarker:hover {
+	color: color-mix(
+		in srgb,
+		var(--shell-accent, #3b82f6) 80%,
+		var(--shell-text)
+	);
+}

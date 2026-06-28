@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import { ChatMessage } from "./ChatMessage";
 
 describe("ChatMessage", () => {
@@ -24,6 +25,33 @@ describe("ChatMessage", () => {
 			screen.getByText("Mock answer based on retrieved context."),
 		).toBeInTheDocument();
 		expect(screen.getByLabelText("Assistant")).toBeInTheDocument();
+	});
+
+	it("renders citation markers as buttons and emits chunkId on click", async () => {
+		const user = userEvent.setup();
+		const onCitationClick = vi.fn();
+
+		render(
+			<ChatMessage
+				speaker="assistant"
+				content="Rome collapsed because of military pressure [1]."
+				citations={[
+					{
+						number: 1,
+						artifactId: "550e8400-e29b-41d4-a716-446655440002",
+						chunkId: "550e8400-e29b-41d4-a716-446655440010",
+					},
+				]}
+				onCitationClick={onCitationClick}
+			/>,
+		);
+
+		await user.click(screen.getByRole("button", { name: "Citation 1" }));
+
+		expect(onCitationClick).toHaveBeenCalledWith({
+			artifactId: "550e8400-e29b-41d4-a716-446655440002",
+			chunkId: "550e8400-e29b-41d4-a716-446655440010",
+		});
 	});
 
 	it("does not import services directly", () => {

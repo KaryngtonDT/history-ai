@@ -5,12 +5,14 @@ import {
 import type { ArtifactType } from "@/services/artifact/types";
 import type { ChatCitation, ChatSource } from "@/services/chat/types";
 import { CHAT_SOURCES_TITLE, formatChatScore } from "../chatLabels";
+import type { CitationClickDetails } from "../citationNavigation";
 import styles from "./SourcesPanel.module.css";
 
 export interface SourcesPanelProps {
 	sources: ChatSource[];
 	citations?: ChatCitation[];
 	artifactTypesById: Record<string, ArtifactType>;
+	onCitationClick?: (details: CitationClickDetails) => void;
 }
 
 function buildCitationNumberByChunkId(
@@ -33,6 +35,7 @@ export function SourcesPanel({
 	sources,
 	citations,
 	artifactTypesById,
+	onCitationClick,
 }: SourcesPanelProps) {
 	if (sources.length === 0) {
 		return null;
@@ -58,10 +61,24 @@ export function SourcesPanel({
 					const citationPrefix =
 						citationNumber !== undefined ? `[${citationNumber}] ` : "";
 					const label = `${citationPrefix}${typeLabel} (${formatChatScore(source.score)})`;
+					const citationDetails: CitationClickDetails = {
+						chunkId: source.chunkId,
+						artifactId: source.artifactId,
+					};
 
 					return (
 						<li key={source.chunkId} className={styles.sourceItem}>
-							{anchor !== undefined ? (
+							{onCitationClick !== undefined ? (
+								<button
+									type="button"
+									className={styles.sourceButton}
+									onClick={() => {
+										onCitationClick(citationDetails);
+									}}
+								>
+									{label}
+								</button>
+							) : anchor !== undefined ? (
 								<a className={styles.sourceLink} href={anchor}>
 									{label}
 								</a>

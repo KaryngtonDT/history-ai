@@ -23,9 +23,23 @@
 }
 
 .sourceLink,
-.sourceLabel {
+.sourceLabel,
+.sourceButton {
 	font-size: var(--font-sm);
 	color: var(--shell-text);
+}
+
+.sourceButton {
+	padding: 0;
+	border: none;
+	background: transparent;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.sourceButton:hover {
+	text-decoration: underline;
 }
 
 .sourceLink {
