@@ -11,6 +11,8 @@ use App\Domain\Chat\ChatProviderOptions;
 use App\Domain\Chat\ChatRequest;
 use App\Domain\Chat\ChatSource;
 use App\Domain\Chat\ChatSourceCollection;
+use App\Domain\Chat\ChatStreamEvent;
+use App\Domain\Chat\StreamingChatProviderInterface;
 use App\Domain\Semantic\Chunk;
 use App\Domain\Semantic\ChunkId;
 use App\Domain\Semantic\ChunkPosition;
@@ -25,6 +27,11 @@ final class MockChatProviderTest extends TestCase
     public function testImplementsChatProviderInterface(): void
     {
         self::assertInstanceOf(ChatProviderInterface::class, new MockChatProvider());
+    }
+
+    public function testImplementsStreamingChatProviderInterface(): void
+    {
+        self::assertInstanceOf(StreamingChatProviderInterface::class, new MockChatProvider());
     }
 
     public function testReturnsDeterministicMockAnswerWithoutSources(): void
@@ -69,6 +76,87 @@ final class MockChatProviderTest extends TestCase
         $response = $provider->answer($request);
 
         self::assertSame(MockChatProvider::MOCK_ANSWER, $response->answer());
+    }
+
+    public function testStreamReturnsOrderedTokensWithoutSources(): void
+    {
+        $provider = new MockChatProvider();
+        $request = ChatRequest::create(
+            new ChatPrompt('Answer the question using only the document excerpts below.'),
+            ChatSourceCollection::empty(),
+        );
+
+        $stream = $provider->stream($request);
+
+        self::assertSame(
+            [
+                'Mock ',
+                'answer ',
+                'based ',
+                'on ',
+                'retrieved ',
+                'context ',
+                '.',
+            ],
+            array_map(
+                static fn (ChatStreamEvent $event): string => $event->token()->text(),
+                $stream->events()->events(),
+            ),
+        );
+        self::assertSame(
+            [0, 1, 2, 3, 4, 5, 6],
+            array_map(
+                static fn (ChatStreamEvent $event): int => $event->index(),
+                $stream->events()->events(),
+            ),
+        );
+    }
+
+    public function testStreamReturnsOrderedTokensWithSources(): void
+    {
+        $provider = new MockChatProvider();
+        $artifactId = new ArtifactId('550e8400-e29b-41d4-a716-446655440001');
+        $source = $this->createSource($artifactId, 0, 'Summary excerpt', 0.9);
+        $request = ChatRequest::create(
+            new ChatPrompt('Prompt with context'),
+            new ChatSourceCollection([$source]),
+        );
+
+        $stream = $provider->stream($request);
+
+        self::assertSame(
+            [
+                'Mock ',
+                'answer ',
+                'based ',
+                'on ',
+                'retrieved ',
+                'context ',
+                '[1].',
+            ],
+            array_map(
+                static fn (ChatStreamEvent $event): string => $event->token()->text(),
+                $stream->events()->events(),
+            ),
+        );
+    }
+
+    public function testStreamToAnswerMatchesNonStreamingAnswerText(): void
+    {
+        $provider = new MockChatProvider();
+        $artifactId = new ArtifactId('550e8400-e29b-41d4-a716-446655440001');
+        $firstSource = $this->createSource($artifactId, 0, 'Summary excerpt', 0.9);
+        $secondSource = $this->createSource($artifactId, 1, 'Timeline excerpt', 0.8);
+        $sources = new ChatSourceCollection([$firstSource, $secondSource]);
+        $request = ChatRequest::create(
+            new ChatPrompt('Prompt with context'),
+            $sources,
+        );
+
+        self::assertSame(
+            $provider->answer($request)->answer(),
+            $provider->stream($request)->toAnswer()->answer(),
+        );
     }
 
     public function testGeneratesDeterministicCitationsFromSources(): void
