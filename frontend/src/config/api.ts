@@ -28,6 +28,10 @@ export function contentRelationsPath(contentId: string): string {
 	return `${CONTENTS_PATH}/${contentId}/relations`;
 }
 
+export function contentGraphPath(contentId: string): string {
+	return `${CONTENTS_PATH}/${contentId}/graph`;
+}
+
 export function collectionItemsPath(collectionId: string): string {
 	return `${COLLECTIONS_PATH}/${collectionId}/items`;
 }
