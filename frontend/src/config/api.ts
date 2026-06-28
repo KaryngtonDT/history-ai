@@ -43,6 +43,10 @@ export function contentSemanticSearchPath(contentId: string): string {
 	return `${CONTENTS_PATH}/${contentId}/semantic-search`;
 }
 
+export function contentChatPath(contentId: string): string {
+	return `${CONTENTS_PATH}/${contentId}/chat`;
+}
+
 export function collectionItemsPath(collectionId: string): string {
 	return `${COLLECTIONS_PATH}/${collectionId}/items`;
 }
