@@ -45,6 +45,9 @@ services:
     App\Application\Processing\Ports\ProcessingOrchestratorInterface:
         alias: App\Infrastructure\Processing\HttpWorkerDispatcher
 
+    App\Domain\Semantic\EmbeddingGeneratorInterface:
+        alias: App\Infrastructure\Semantic\DeterministicEmbeddingGenerator
+
     App\Infrastructure\Processing\HttpWorkerDispatcher:
         arguments:
             $workerBaseUrl: '%worker.base_url%'

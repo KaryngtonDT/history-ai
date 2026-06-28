@@ -28,3 +28,7 @@ when@test:
         App\Domain\CollectionItem\CollectionItemRepositoryInterface:
             alias: App\Infrastructure\Persistence\Doctrine\CollectionItem\DoctrineCollectionItemRepository
             public: true
+
+        App\Domain\Semantic\EmbeddingGeneratorInterface:
+            alias: App\Infrastructure\Semantic\DeterministicEmbeddingGenerator
+            public: true
