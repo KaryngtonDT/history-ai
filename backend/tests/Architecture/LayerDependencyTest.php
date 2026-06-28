@@ -207,6 +207,17 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testSemanticApplicationMayDependOnSemanticArtifactAndContentDomainOnly(): void
+    {
+        $this->assertNoViolations(
+            'Semantic application',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Application/Semantic',
+                self::APPLICATION_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testPresentationDoesNotDependOnInfrastructure(): void
     {
         $this->assertNoViolations(
@@ -346,6 +357,25 @@ final class LayerDependencyTest extends TestCase
         }
 
         $this->assertNoViolations('Recommendation presentation', $violations);
+    }
+
+    public function testSemanticPresentationMayDependOnSemanticApplicationOnly(): void
+    {
+        $semanticPresentationPaths = [
+            $this->srcRoot . '/Presentation/Http/Controller/Semantic',
+            $this->srcRoot . '/Presentation/Http/Response/Semantic',
+        ];
+
+        $violations = [];
+
+        foreach ($semanticPresentationPaths as $path) {
+            $violations = array_merge(
+                $violations,
+                LayerDependencyRules::findViolations($path, ['App\\Infrastructure\\']),
+            );
+        }
+
+        $this->assertNoViolations('Semantic presentation', $violations);
     }
 
     public function testInfrastructureDoesNotDependOnPresentation(): void

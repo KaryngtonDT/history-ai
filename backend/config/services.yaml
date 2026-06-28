@@ -20,6 +20,8 @@ services:
 
     App\Domain\Recommendation\RecommendationEngine: ~
     App\Domain\Recommendation\RecommendationScoringEngine: ~
+    App\Domain\Semantic\Chunker: ~
+    App\Domain\Semantic\SemanticRetriever: ~
 
     App\Domain\Content\ContentRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Content\DoctrineContentRepository
