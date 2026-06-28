@@ -581,6 +581,7 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('type', $recommendedSchema['properties']);
         self::assertArrayHasKey('title', $recommendedSchema['properties']);
         self::assertArrayHasKey('reason', $recommendedSchema['properties']);
+        self::assertArrayHasKey('score', $recommendedSchema['properties']);
         self::assertSame(
             '#/components/schemas/ArtifactType',
             $recommendedSchema['properties']['type']['$ref'],
@@ -589,11 +590,16 @@ final class ApiDocumentationTest extends WebTestCase
             '#/components/schemas/RecommendationReason',
             $recommendedSchema['properties']['reason']['$ref'],
         );
+        self::assertSame('integer', $recommendedSchema['properties']['score']['type']);
+        self::assertSame(0, $recommendedSchema['properties']['score']['minimum']);
+        self::assertSame(100, $recommendedSchema['properties']['score']['maximum']);
+        self::assertSame(80, $recommendedSchema['properties']['score']['example']);
         if (isset($recommendedSchema['required'])) {
             self::assertContains('artifactId', $recommendedSchema['required']);
             self::assertContains('type', $recommendedSchema['required']);
             self::assertContains('title', $recommendedSchema['required']);
             self::assertContains('reason', $recommendedSchema['required']);
+            self::assertContains('score', $recommendedSchema['required']);
         }
 
         self::assertArrayHasKey('recommendations', $recommendationsSchema['properties']);

@@ -156,6 +156,22 @@ Verification: [Sprint18-Verification.md](../reports/Sprint18-Verification.md)
 
 ---
 
+# Sprint 19 — Recommendation Scoring (2026-06)
+
+Sprint 19 enriched contextual recommendations with relevance scoring end-to-end:
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `RecommendationScoringEngine`, `RecommendationScore`, `RecommendationWeight`, `ScoredRecommendation`, `ScoredRecommendationCollection` |
+| Backend API | `score` field on each recommendation in `GET /api/contents/{contentId}/artifacts/{artifactId}/recommendations` (sorted by score descending) |
+| Frontend | Score mapping in `RecommendationService` layer; relevance badge in `SeeAlsoRecommendationsPanel` (`"80% relevant"`) |
+| OpenAPI | `score` on `RecommendedArtifact` schema (integer 0–100) |
+| Architecture | Existing recommendation layer rules unchanged |
+
+Verification: [Sprint19-Verification.md](../reports/Sprint19-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

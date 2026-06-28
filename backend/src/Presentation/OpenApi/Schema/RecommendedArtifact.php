@@ -8,7 +8,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Schema(
     schema: 'RecommendedArtifact',
-    required: ['artifactId', 'type', 'title', 'reason'],
+    required: ['artifactId', 'type', 'title', 'reason', 'score'],
     properties: [
         new OA\Property(
             property: 'artifactId',
@@ -28,6 +28,13 @@ use OpenApi\Attributes as OA;
         new OA\Property(
             property: 'reason',
             ref: '#/components/schemas/RecommendationReason',
+        ),
+        new OA\Property(
+            property: 'score',
+            type: 'integer',
+            minimum: 0,
+            maximum: 100,
+            example: 80,
         ),
     ],
 )]

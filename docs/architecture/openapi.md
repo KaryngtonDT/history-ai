@@ -165,7 +165,7 @@ Shared OpenAPI schemas:
 
 `GET /api/contents/{contentId}/graph` returns a `KnowledgeGraph` with `nodes[]` (`artifactId`, `type`, `title`) and `edges[]` (`sourceArtifactId`, `targetArtifactId`, `type`). Node `type` uses `ArtifactType`; edge `type` reuses `ArtifactRelationType`.
 
-`GET /api/contents/{contentId}/artifacts/{artifactId}/recommendations` returns an `ArtifactRecommendations` envelope with `recommendations[]` entries (`artifactId`, `type`, `title`, `reason`). The `type` field uses `ArtifactType`; `reason` uses the `RecommendationReason` enum: `related`, `derived_from`, `references`, `next`, `previous`.
+`GET /api/contents/{contentId}/artifacts/{artifactId}/recommendations` returns an `ArtifactRecommendations` envelope with `recommendations[]` entries (`artifactId`, `type`, `title`, `reason`, `score`). The `type` field uses `ArtifactType`; `reason` uses the `RecommendationReason` enum: `related`, `derived_from`, `references`, `next`, `previous`. The `score` field is an integer from 0 to 100 (relevance weight derived from `reason`; higher scores appear first in the API response).
 
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 
