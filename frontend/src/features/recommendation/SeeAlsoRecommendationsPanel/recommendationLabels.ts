@@ -7,3 +7,13 @@ export const REASON_LABELS: Record<RecommendationReason, string> = {
 	next: "Next",
 	previous: "Previous",
 };
+
+export function formatRecommendationScoreLabel(
+	score: number | undefined,
+): string | null {
+	if (score === undefined) {
+		return null;
+	}
+
+	return `${score}% relevant`;
+}

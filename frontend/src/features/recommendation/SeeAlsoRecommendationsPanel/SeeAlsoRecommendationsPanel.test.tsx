@@ -94,12 +94,14 @@ describe("SeeAlsoRecommendationsPanel", () => {
 				type: "quiz",
 				title: "Roman Empire Quiz",
 				reason: "derived_from",
+				score: 100,
 			},
 			{
 				artifactId: "550e8400-e29b-41d4-a716-446655440004",
 				type: "timeline",
 				title: "Roman Timeline",
 				reason: "references",
+				score: 80,
 			},
 		]);
 
@@ -116,6 +118,89 @@ describe("SeeAlsoRecommendationsPanel", () => {
 		expect(screen.getByText("References")).toBeInTheDocument();
 		expect(screen.getAllByText("Quiz")).toHaveLength(1);
 		expect(screen.getByText("Timeline")).toBeInTheDocument();
+		expect(screen.getByText("100% relevant")).toBeInTheDocument();
+		expect(screen.getByText("80% relevant")).toBeInTheDocument();
+	});
+
+	it("displays score relevance badges", async () => {
+		mockGetArtifactRecommendations.mockResolvedValue([
+			{
+				artifactId: "550e8400-e29b-41d4-a716-446655440003",
+				type: "quiz",
+				title: "Practice Quiz",
+				reason: "derived_from",
+				score: 100,
+			},
+			{
+				artifactId: "550e8400-e29b-41d4-a716-446655440004",
+				type: "timeline",
+				title: "Event Timeline",
+				reason: "references",
+				score: 80,
+			},
+		]);
+
+		render(
+			<SeeAlsoRecommendationsPanel
+				contentId={contentId}
+				artifactId={artifactId}
+			/>,
+		);
+
+		expect(await screen.findByText("100% relevant")).toBeInTheDocument();
+		expect(screen.getByText("80% relevant")).toBeInTheDocument();
+	});
+
+	it("hides score badge when score is missing", async () => {
+		mockGetArtifactRecommendations.mockResolvedValue([
+			{
+				artifactId: "550e8400-e29b-41d4-a716-446655440003",
+				type: "quiz",
+				title: "Legacy Quiz",
+				reason: "related",
+			},
+		]);
+
+		render(
+			<SeeAlsoRecommendationsPanel
+				contentId={contentId}
+				artifactId={artifactId}
+			/>,
+		);
+
+		expect(await screen.findByText("Legacy Quiz")).toBeInTheDocument();
+		expect(screen.queryByText(/% relevant/)).not.toBeInTheDocument();
+	});
+
+	it("preserves backend recommendation order", async () => {
+		mockGetArtifactRecommendations.mockResolvedValue([
+			{
+				artifactId: "550e8400-e29b-41d4-a716-446655440003",
+				type: "quiz",
+				title: "Higher score",
+				reason: "derived_from",
+				score: 100,
+			},
+			{
+				artifactId: "550e8400-e29b-41d4-a716-446655440004",
+				type: "timeline",
+				title: "Lower score",
+				reason: "references",
+				score: 80,
+			},
+		]);
+
+		render(
+			<SeeAlsoRecommendationsPanel
+				contentId={contentId}
+				artifactId={artifactId}
+			/>,
+		);
+
+		expect(await screen.findByText("Higher score")).toBeInTheDocument();
+		const links = screen.getAllByRole("link");
+		expect(links[0]).toHaveAccessibleName(/Higher score/);
+		expect(links[1]).toHaveAccessibleName(/Lower score/);
 	});
 
 	it("links recommendations to artifact anchors", async () => {

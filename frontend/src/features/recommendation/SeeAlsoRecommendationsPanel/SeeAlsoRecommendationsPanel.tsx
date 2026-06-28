@@ -7,7 +7,10 @@ import {
 } from "@/features/processing/ArtifactRelationsPanel/relationLabels";
 import { recommendationService } from "@/services/recommendation/RecommendationService";
 import type { RecommendedArtifact } from "@/services/recommendation/types";
-import { REASON_LABELS } from "./recommendationLabels";
+import {
+	formatRecommendationScoreLabel,
+	REASON_LABELS,
+} from "./recommendationLabels";
 import styles from "./SeeAlsoRecommendationsPanel.module.css";
 
 interface SeeAlsoRecommendationsPanelProps {
@@ -87,13 +90,21 @@ export function SeeAlsoRecommendationsPanel({
 						const typeLabel = ARTIFACT_TYPE_LABELS[recommendation.type];
 						const anchor = getArtifactAnchor(recommendation.type);
 						const reasonLabel = REASON_LABELS[recommendation.reason];
+						const scoreLabel = formatRecommendationScoreLabel(
+							recommendation.score,
+						);
 						const recommendationKey = `${recommendation.artifactId}-${recommendation.reason}`;
 
 						return (
 							<li key={recommendationKey} className={styles.recommendationRow}>
 								<a className={styles.recommendationLink} href={anchor}>
-									<span className={styles.recommendationTitle}>
-										{recommendation.title}
+									<span className={styles.recommendationTitleRow}>
+										<span className={styles.recommendationTitle}>
+											{recommendation.title}
+										</span>
+										{scoreLabel !== null ? (
+											<span className={styles.scoreBadge}>{scoreLabel}</span>
+										) : null}
 									</span>
 									<span className={styles.recommendationMeta}>
 										<span className={styles.artifactType}>{typeLabel}</span>

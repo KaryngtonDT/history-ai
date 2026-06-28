@@ -16,6 +16,7 @@ describe("MockRecommendationRepository", () => {
 				type: "transcript",
 				title: "Transcript",
 				reason: "derived_from",
+				score: 100,
 			},
 		]);
 	});

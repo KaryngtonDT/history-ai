@@ -14,6 +14,7 @@ export interface RecommendedArtifact {
 	type: ArtifactType;
 	title: string;
 	reason: RecommendationReason;
+	score?: number;
 }
 
 export interface RecommendedArtifactApiDto {
@@ -21,6 +22,7 @@ export interface RecommendedArtifactApiDto {
 	type: string;
 	title: string;
 	reason: string;
+	score?: number;
 }
 
 export interface ArtifactRecommendationsApiDto {
@@ -60,14 +62,29 @@ function normalizeRecommendationReason(reason: string): RecommendationReason {
 	return "related";
 }
 
+function normalizeRecommendationScore(score: unknown): number | undefined {
+	if (typeof score !== "number" || !Number.isInteger(score)) {
+		return undefined;
+	}
+
+	if (score < 0 || score > 100) {
+		return undefined;
+	}
+
+	return score;
+}
+
 export function mapRecommendedArtifactFromApi(
 	dto: RecommendedArtifactApiDto,
 ): RecommendedArtifact {
+	const normalizedScore = normalizeRecommendationScore(dto.score);
+
 	return {
 		artifactId: dto.artifactId,
 		type: normalizeArtifactType(dto.type),
 		title: dto.title,
 		reason: normalizeRecommendationReason(dto.reason),
+		...(normalizedScore !== undefined ? { score: normalizedScore } : {}),
 	};
 }
 
