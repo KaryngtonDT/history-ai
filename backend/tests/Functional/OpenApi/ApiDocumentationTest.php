@@ -18,6 +18,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/timeline/{artifactId}',
         '/api/maps/timeline/{artifactId}',
         '/api/contents/{contentId}/relations',
+        '/api/contents/{contentId}/graph',
     ];
 
     public function testSwaggerUiIsAvailable(): void
@@ -58,6 +59,7 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('get', $spec['paths']['/api/timeline/{artifactId}']);
         self::assertArrayHasKey('get', $spec['paths']['/api/maps/timeline/{artifactId}']);
         self::assertArrayHasKey('get', $spec['paths']['/api/contents/{contentId}/relations']);
+        self::assertArrayHasKey('get', $spec['paths']['/api/contents/{contentId}/graph']);
     }
 
     public function testOpenApiSpecDocumentsSearchLibraryQueryParameter(): void
@@ -401,6 +403,106 @@ final class ApiDocumentationTest extends WebTestCase
             $relationTypeSchema['enum'],
         );
         self::assertSame('derived_from', $relationTypeSchema['example']);
+    }
+
+    public function testOpenApiSpecDocumentsGetKnowledgeGraphPathParameter(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/contents/{contentId}/graph']['get'];
+
+        self::assertSame('getKnowledgeGraph', $operation['operationId']);
+
+        $pathParameter = null;
+
+        foreach ($operation['parameters'] as $parameter) {
+            if (($parameter['name'] ?? null) === 'contentId') {
+                $pathParameter = $parameter;
+                break;
+            }
+        }
+
+        self::assertNotNull($pathParameter, 'Missing path parameter: contentId');
+        self::assertSame('path', $pathParameter['in']);
+        self::assertTrue($pathParameter['required']);
+        self::assertSame('string', $pathParameter['schema']['type']);
+        self::assertSame('uuid', $pathParameter['schema']['format']);
+        self::assertSame('550e8400-e29b-41d4-a716-446655440000', $pathParameter['example']);
+    }
+
+    public function testOpenApiSpecDocumentsGetKnowledgeGraphResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/contents/{contentId}/graph']['get']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Knowledge graph projection', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/KnowledgeGraph',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsKnowledgeGraphSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('KnowledgeGraph', $spec['components']['schemas']);
+        self::assertArrayHasKey('GraphNode', $spec['components']['schemas']);
+        self::assertArrayHasKey('GraphEdge', $spec['components']['schemas']);
+
+        $graphSchema = $spec['components']['schemas']['KnowledgeGraph'];
+        $nodeSchema = $spec['components']['schemas']['GraphNode'];
+        $edgeSchema = $spec['components']['schemas']['GraphEdge'];
+
+        self::assertArrayHasKey('nodes', $graphSchema['properties']);
+        self::assertArrayHasKey('edges', $graphSchema['properties']);
+        self::assertSame('array', $graphSchema['properties']['nodes']['type']);
+        self::assertSame('array', $graphSchema['properties']['edges']['type']);
+        self::assertSame(
+            '#/components/schemas/GraphNode',
+            $graphSchema['properties']['nodes']['items']['$ref'],
+        );
+        self::assertSame(
+            '#/components/schemas/GraphEdge',
+            $graphSchema['properties']['edges']['items']['$ref'],
+        );
+        if (isset($graphSchema['required'])) {
+            self::assertContains('nodes', $graphSchema['required']);
+            self::assertContains('edges', $graphSchema['required']);
+        }
+
+        self::assertArrayHasKey('artifactId', $nodeSchema['properties']);
+        self::assertArrayHasKey('type', $nodeSchema['properties']);
+        self::assertArrayHasKey('title', $nodeSchema['properties']);
+        self::assertSame(
+            '#/components/schemas/ArtifactType',
+            $nodeSchema['properties']['type']['$ref'],
+        );
+        if (isset($nodeSchema['required'])) {
+            self::assertContains('artifactId', $nodeSchema['required']);
+            self::assertContains('type', $nodeSchema['required']);
+            self::assertContains('title', $nodeSchema['required']);
+        }
+
+        self::assertArrayHasKey('sourceArtifactId', $edgeSchema['properties']);
+        self::assertArrayHasKey('targetArtifactId', $edgeSchema['properties']);
+        self::assertArrayHasKey('type', $edgeSchema['properties']);
+        self::assertSame(
+            '#/components/schemas/ArtifactRelationType',
+            $edgeSchema['properties']['type']['$ref'],
+        );
+        if (isset($edgeSchema['required'])) {
+            self::assertContains('sourceArtifactId', $edgeSchema['required']);
+            self::assertContains('targetArtifactId', $edgeSchema['required']);
+            self::assertContains('type', $edgeSchema['required']);
+        }
     }
 
     /**

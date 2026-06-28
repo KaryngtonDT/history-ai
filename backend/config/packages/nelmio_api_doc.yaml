@@ -25,6 +25,9 @@ nelmio_api_doc:
             - { alias: ArtifactRelation, type: App\Presentation\OpenApi\Schema\ArtifactRelation }
             - { alias: ArtifactRelations, type: App\Presentation\OpenApi\Schema\ArtifactRelations }
             - { alias: ArtifactRelationType, type: App\Presentation\OpenApi\Schema\ArtifactRelationTypeSchema }
+            - { alias: GraphNode, type: App\Presentation\OpenApi\Schema\GraphNode }
+            - { alias: GraphEdge, type: App\Presentation\OpenApi\Schema\GraphEdge }
+            - { alias: KnowledgeGraph, type: App\Presentation\OpenApi\Schema\KnowledgeGraph }
     areas:
         default:
             path_patterns:

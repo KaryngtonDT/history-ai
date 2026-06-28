@@ -55,6 +55,7 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Timeline | GET | `/api/timeline/{artifactId}` |
 | Map | GET | `/api/maps/timeline/{artifactId}` |
 | Relations | GET | `/api/contents/{contentId}/relations` |
+| Graph | GET | `/api/contents/{contentId}/graph` |
 
 ---
 
@@ -148,12 +149,17 @@ Shared OpenAPI schemas:
 | `ArtifactRelation` | `Presentation/OpenApi/Schema/ArtifactRelation.php` |
 | `ArtifactRelations` | `Presentation/OpenApi/Schema/ArtifactRelations.php` |
 | `ArtifactRelationType` | `Presentation/OpenApi/Schema/ArtifactRelationTypeSchema.php` |
+| `GraphNode` | `Presentation/OpenApi/Schema/GraphNode.php` |
+| `GraphEdge` | `Presentation/OpenApi/Schema/GraphEdge.php` |
+| `KnowledgeGraph` | `Presentation/OpenApi/Schema/KnowledgeGraph.php` |
 
 `GET /api/timeline/{artifactId}` returns a `Timeline` with nested `sections[].events[].text`.
 
 `GET /api/maps/timeline/{artifactId}` returns a `Map` with nested `places[].name`, `places[].coordinates`, and optional `places[].description`.
 
 `GET /api/contents/{contentId}/relations` returns an `ArtifactRelations` envelope with `relations[]` entries (`sourceArtifactId`, `targetArtifactId`, `type`). The `type` field uses the `ArtifactRelationType` enum: `related`, `derived_from`, `references`, `next`, `previous`.
+
+`GET /api/contents/{contentId}/graph` returns a `KnowledgeGraph` with `nodes[]` (`artifactId`, `type`, `title`) and `edges[]` (`sourceArtifactId`, `targetArtifactId`, `type`). Node `type` uses `ArtifactType`; edge `type` reuses `ArtifactRelationType`.
 
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 

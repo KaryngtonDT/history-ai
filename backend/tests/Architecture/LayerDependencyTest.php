@@ -263,6 +263,9 @@ final class LayerDependencyTest extends TestCase
         $graphPresentationPaths = [
             $this->srcRoot . '/Presentation/Http/Controller/Graph',
             $this->srcRoot . '/Presentation/Http/Response/Graph',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/GraphNode.php',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/GraphEdge.php',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/KnowledgeGraph.php',
         ];
 
         $violations = [];

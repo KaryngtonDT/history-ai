@@ -65,6 +65,9 @@ Presentation may reference Domain value objects and exceptions when parsing HTTP
 12. **Relation domain** — `Domain/Relation` follows the same purity rules as other domains (no Symfony, Doctrine, Infrastructure, or Presentation).
 13. **Relation application** — `Application/Relation` depends on `Domain/Relation`, `Domain/Artifact`, and `Domain/Content` only; must not import Infrastructure or Presentation.
 14. **Relation presentation** — controllers, responses, and OpenAPI schemas under `Presentation/Http/.../Relation` and `Presentation/OpenApi/Schema/ArtifactRelation*` may depend on `Application/Relation` and Domain value objects; must not import Infrastructure.
+15. **Graph domain** — `Domain/Graph` follows the same purity rules as other domains (no Symfony, Doctrine, Infrastructure, or Presentation).
+16. **Graph application** — `Application/Graph` depends on `Domain/Graph`, `Domain/Relation`, `Domain/Artifact`, and `Domain/Content` only; must not import Infrastructure or Presentation.
+17. **Graph presentation** — controllers, responses, and OpenAPI schemas under `Presentation/Http/.../Graph` and `Presentation/OpenApi/Schema/Graph*` / `KnowledgeGraph.php` may depend on `Application/Graph` and Domain value objects; must not import Infrastructure.
 
 ### Search example (passes CI)
 
@@ -160,11 +163,14 @@ HttpClient + Repository (Http / Mock)
 | Feature modules must not import Timeline transport (`HttpTimelineRepository`, `TimelineRepositoryFactory`, `TimelineRepository`) | Timeline UI uses `TimelineService` only |
 | Feature modules must not import Map transport (`HttpMapRepository`, `MapRepositoryFactory`, `MapRepository`) | Map UI uses `MapService` only |
 | Feature modules must not import Relation transport (`HttpRelationRepository`, `RelationRepositoryFactory`, `RelationRepository`) | Relations UI uses `RelationService` only |
+| Feature modules must not import Graph transport (`HttpGraphRepository`, `GraphRepositoryFactory`, `GraphRepository`) | Graph UI uses `GraphService` only |
 | `InteractiveTimeline` must not import services or repositories | Structured timeline rendering is props-only |
 | `InteractiveMap` must not import services or repositories | Map rendering is props-only |
+| `InteractiveGraph` must not import services or repositories | Graph rendering is props-only |
 | Timeline artifact renderers may import `TimelineService` | Service layer owns HTTP/mock wiring |
 | Map panels may import `MapService` | Service layer owns HTTP/mock wiring |
 | Relation panels may import `RelationService` | Service layer owns HTTP/mock wiring |
+| Graph panels may import `GraphService` | Service layer owns HTTP/mock wiring |
 
 Repository factories and Http repositories live under `services/` and are consumed by service classes only.
 
@@ -250,6 +256,32 @@ ProcessingArtifacts
         │
         ├── artifact cards (id="artifact-{type}" anchors)
         └── ArtifactRelationsPanel (contentId + artifacts)
+        └── KnowledgeGraphPanel (contentId)
+```
+
+### Graph service layer
+
+```text
+features/graph/KnowledgeGraphPanel
+      │
+      ▼
+GraphService.getKnowledgeGraph()
+      │
+      ▼
+GraphRepositoryFactory → HttpGraphRepository | MockGraphRepository
+      │
+      ▼
+HttpClient (HTTP mode only)
+```
+
+Processing page graph integration:
+
+```text
+ProcessingArtifacts
+        │
+        ├── artifact cards (id="artifact-{type}" anchors)
+        ├── ArtifactRelationsPanel
+        └── KnowledgeGraphPanel → InteractiveGraph (props-only)
 ```
 
 ## Enforcement
@@ -315,6 +347,20 @@ import { HttpRelationRepository } from "@/services/relation/HttpRelationReposito
 ```
 
 **Fix:** import `relationService` from `@/services/relation/RelationService`.
+
+```tsx
+// frontend/src/features/graph/KnowledgeGraphPanel/KnowledgeGraphPanel.tsx
+import { HttpGraphRepository } from "@/services/graph/HttpGraphRepository"; // ❌ forbidden
+```
+
+**Fix:** import `graphService` from `@/services/graph/GraphService`.
+
+```tsx
+// frontend/src/features/graph/InteractiveGraph/InteractiveGraph.tsx
+import { graphService } from "@/services/graph/GraphService"; // ❌ forbidden
+```
+
+**Fix:** receive graph data via props from `KnowledgeGraphPanel`.
 
 ---
 

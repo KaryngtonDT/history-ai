@@ -72,7 +72,7 @@ See [architecture-rules.md](./architecture-rules.md) for automated dependency en
 
 See [ci.md](./ci.md) for the GitHub Actions pipeline.
 
-See [openapi.md](./openapi.md) for OpenAPI / Swagger UI documentation (includes `GET /api/timeline/{artifactId}` since Sprint 14, `GET /api/maps/timeline/{artifactId}` since Sprint 15, and `GET /api/contents/{contentId}/relations` since Sprint 16).
+See [openapi.md](./openapi.md) for OpenAPI / Swagger UI documentation (includes `GET /api/timeline/{artifactId}` since Sprint 14, `GET /api/maps/timeline/{artifactId}` since Sprint 15, `GET /api/contents/{contentId}/relations` since Sprint 16, and `GET /api/contents/{contentId}/graph` since Sprint 17).
 
 ---
 
@@ -121,6 +121,22 @@ Sprint 16 connected learning artifacts within a content into a deterministic rel
 | Architecture | Relation layer rules (backend + frontend transport guards) |
 
 Verification: [Sprint16-Verification.md](../reports/Sprint16-Verification.md)
+
+---
+
+# Sprint 17 — Knowledge Graph (2026-06)
+
+Sprint 17 projected artifact relations into a navigable knowledge graph:
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `GraphNode`, `GraphEdge`, `KnowledgeGraph`, `KnowledgeGraphBuilder` |
+| Backend API | `GET /api/contents/{contentId}/graph` → knowledge graph JSON projection |
+| Frontend | `GraphService`, `KnowledgeGraphPanel`, `InteractiveGraph` (CSS-only layout) |
+| OpenAPI | `KnowledgeGraph`, `GraphNode`, `GraphEdge` schemas |
+| Architecture | Graph layer rules (backend + frontend transport guards) |
+
+Verification: [Sprint17-Verification.md](../reports/Sprint17-Verification.md)
 
 ---
 
