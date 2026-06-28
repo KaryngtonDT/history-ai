@@ -67,6 +67,7 @@ final class AskContentChatHandlerTest extends TestCase
 
         self::assertSame(MockChatProvider::MOCK_ANSWER, $result->answer);
         self::assertSame([], $result->sources);
+        self::assertSame([], $result->citations);
     }
 
     public function testIndexesVectorDocumentsBeforeRetrieval(): void
@@ -132,6 +133,11 @@ final class AskContentChatHandlerTest extends TestCase
         self::assertNotSame('', $result->sources[0]->chunkId);
         self::assertSame($queryText, $result->sources[0]->text);
         self::assertSame(1.0, $result->sources[0]->score);
+        self::assertCount(1, $result->citations);
+        self::assertSame(1, $result->citations[0]->number);
+        self::assertSame($summaryId, $result->citations[0]->artifactId);
+        self::assertSame($result->sources[0]->chunkId, $result->citations[0]->chunkId);
+        self::assertSame(1.0, $result->citations[0]->score);
     }
 
     public function testDelegatesAnswerGenerationToChatProvider(): void

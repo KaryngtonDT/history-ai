@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Presentation\Http\Response\Chat;
 
 use App\Application\Chat\DTO\ChatAnswerResult;
+use App\Application\Chat\DTO\ChatCitationResult;
 use App\Application\Chat\DTO\ChatSourceResult;
 
 final class ChatAnswerResponse
@@ -16,6 +17,12 @@ final class ChatAnswerResponse
      *         artifactId: string,
      *         chunkId: string,
      *         text: string,
+     *         score: float
+     *     }>,
+     *     citations: list<array{
+     *         number: int,
+     *         artifactId: string,
+     *         chunkId: string,
      *         score: float
      *     }>
      * }
@@ -32,6 +39,15 @@ final class ChatAnswerResponse
                     'score' => $source->score,
                 ],
                 $result->sources,
+            ),
+            'citations' => array_map(
+                static fn (ChatCitationResult $citation): array => [
+                    'number' => $citation->number,
+                    'artifactId' => $citation->artifactId,
+                    'chunkId' => $citation->chunkId,
+                    'score' => $citation->score,
+                ],
+                $result->citations,
             ),
         ];
     }

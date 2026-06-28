@@ -53,6 +53,12 @@ final class AskContentChatControllerTest extends WebTestCase
         self::assertArrayHasKey('chunkId', $response['sources'][0]);
         self::assertArrayHasKey('text', $response['sources'][0]);
         self::assertArrayHasKey('score', $response['sources'][0]);
+        self::assertCount(1, $response['citations']);
+        self::assertSame(1, $response['citations'][0]['number']);
+        self::assertSame($summaryId->value, $response['citations'][0]['artifactId']);
+        self::assertSame($response['sources'][0]['chunkId'], $response['citations'][0]['chunkId']);
+        self::assertSame($response['sources'][0]['score'], $response['citations'][0]['score']);
+        self::assertArrayNotHasKey('text', $response['citations'][0]);
     }
 
     public function testPostWithEmptyContentReturnsMockAnswerWithEmptySources(): void
@@ -74,6 +80,7 @@ final class AskContentChatControllerTest extends WebTestCase
             json_encode([
                 'answer' => MockChatProvider::MOCK_ANSWER,
                 'sources' => [],
+                'citations' => [],
             ], JSON_THROW_ON_ERROR),
             $client->getResponse()->getContent(),
         );
