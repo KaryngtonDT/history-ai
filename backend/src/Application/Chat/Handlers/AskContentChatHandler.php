@@ -10,7 +10,9 @@ use App\Domain\Artifact\ArtifactRepositoryInterface;
 use App\Domain\Chat\ChatContext;
 use App\Domain\Chat\ChatOrchestrator;
 use App\Domain\Chat\ChatProviderInterface;
+use App\Domain\Chat\ChatProviderOptions;
 use App\Domain\Chat\ChatQuestion;
+use App\Domain\Chat\ChatRequest;
 use App\Domain\Content\ContentId;
 use App\Domain\Semantic\ChunkCollection;
 use App\Domain\Semantic\Chunker;
@@ -52,9 +54,13 @@ final class AskContentChatHandler
 
         $context = new ChatContext($question, $retrievedChunks);
         $prompt = $this->chatOrchestrator->buildPrompt($context);
-        $answer = $this->chatProvider->answer($prompt, $context->sources());
+        $response = $this->chatProvider->answer(ChatRequest::create(
+            $prompt,
+            $context->sources(),
+            ChatProviderOptions::defaults(),
+        ));
 
-        return ChatAnswerResult::fromDomain($answer);
+        return ChatAnswerResult::fromDomain($response);
     }
 
     /**

@@ -13,6 +13,9 @@ use App\Domain\Artifact\ArtifactRepositoryInterface;
 use App\Domain\Artifact\ArtifactType;
 use App\Domain\Chat\ChatOrchestrator;
 use App\Domain\Chat\ChatProviderInterface;
+use App\Domain\Chat\ChatProviderOptions;
+use App\Domain\Chat\ChatRequest;
+use App\Domain\Chat\ChatResponse;
 use App\Domain\Content\ContentId;
 use App\Domain\Processing\ProcessingJobId;
 use App\Domain\Semantic\Chunker;
@@ -144,7 +147,20 @@ final class AskContentChatHandlerTest extends TestCase
         $chatProvider
             ->expects(self::once())
             ->method('answer')
-            ->willReturn(new \App\Domain\Chat\ChatAnswer(
+            ->with(self::callback(static function (ChatRequest $request): bool {
+                self::assertSame(
+                    ChatProviderOptions::DEFAULT_TEMPERATURE,
+                    $request->options()->temperature(),
+                );
+                self::assertSame(
+                    ChatProviderOptions::DEFAULT_MAX_TOKENS,
+                    $request->options()->maxTokens(),
+                );
+                self::assertNull($request->options()->model());
+
+                return true;
+            }))
+            ->willReturn(new ChatResponse(
                 MockChatProvider::MOCK_ANSWER,
                 \App\Domain\Chat\ChatSourceCollection::empty(),
             ));

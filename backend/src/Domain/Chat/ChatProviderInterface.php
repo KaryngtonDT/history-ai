@@ -6,5 +6,5 @@ namespace App\Domain\Chat;
 
 interface ChatProviderInterface
 {
-    public function answer(ChatPrompt $prompt, ChatSourceCollection $sources): ChatAnswer;
+    public function answer(ChatRequest $request): ChatResponse;
 }

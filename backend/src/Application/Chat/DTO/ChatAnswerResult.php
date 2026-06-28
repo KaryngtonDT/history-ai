@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Chat\DTO;
 
-use App\Domain\Chat\ChatAnswer;
+use App\Domain\Chat\ChatResponse;
 use App\Domain\Chat\ChatSource;
 
 final readonly class ChatAnswerResult
@@ -18,13 +18,13 @@ final readonly class ChatAnswerResult
     ) {
     }
 
-    public static function fromDomain(ChatAnswer $answer): self
+    public static function fromDomain(ChatResponse $response): self
     {
         return new self(
-            answer: $answer->answer(),
+            answer: $response->answer(),
             sources: array_map(
                 static fn (ChatSource $source): ChatSourceResult => ChatSourceResult::fromDomain($source),
-                $answer->sources()->sources(),
+                $response->sources()->sources(),
             ),
         );
     }
