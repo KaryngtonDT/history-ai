@@ -21,6 +21,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/contents/{contentId}/graph',
         '/api/contents/{contentId}/artifacts/{artifactId}/recommendations',
         '/api/contents/{contentId}/semantic-search',
+        '/api/contents/{contentId}/chat',
     ];
 
     public function testSwaggerUiIsAvailable(): void
@@ -67,6 +68,7 @@ final class ApiDocumentationTest extends WebTestCase
             $spec['paths']['/api/contents/{contentId}/artifacts/{artifactId}/recommendations'],
         );
         self::assertArrayHasKey('get', $spec['paths']['/api/contents/{contentId}/semantic-search']);
+        self::assertArrayHasKey('post', $spec['paths']['/api/contents/{contentId}/chat']);
     }
 
     public function testOpenApiSpecDocumentsSearchLibraryQueryParameter(): void
@@ -723,6 +725,114 @@ final class ApiDocumentationTest extends WebTestCase
         );
         if (isset($resultSchema['required'])) {
             self::assertContains('results', $resultSchema['required']);
+        }
+    }
+
+    public function testOpenApiSpecDocumentsAskContentChatPathParameter(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/contents/{contentId}/chat']['post'];
+
+        self::assertSame('askContentChat', $operation['operationId']);
+
+        $pathParameter = null;
+
+        foreach ($operation['parameters'] as $parameter) {
+            if (($parameter['name'] ?? null) === 'contentId') {
+                $pathParameter = $parameter;
+                break;
+            }
+        }
+
+        self::assertNotNull($pathParameter, 'Missing path parameter: contentId');
+        self::assertSame('path', $pathParameter['in']);
+        self::assertTrue($pathParameter['required']);
+        self::assertSame('string', $pathParameter['schema']['type']);
+        self::assertSame('uuid', $pathParameter['schema']['format']);
+        self::assertSame('550e8400-e29b-41d4-a716-446655440000', $pathParameter['example']);
+    }
+
+    public function testOpenApiSpecDocumentsAskContentChatRequestBody(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $requestBody = $spec['paths']['/api/contents/{contentId}/chat']['post']['requestBody'];
+
+        self::assertTrue($requestBody['required']);
+        self::assertSame(
+            '#/components/schemas/ChatRequest',
+            $requestBody['content']['application/json']['schema']['$ref'],
+        );
+
+        $questionProperty = $spec['components']['schemas']['ChatRequest']['properties']['question'];
+
+        self::assertSame('string', $questionProperty['type']);
+        self::assertSame(1, $questionProperty['minLength']);
+        self::assertSame(2000, $questionProperty['maxLength']);
+        self::assertSame('Why did Rome collapse?', $questionProperty['example']);
+    }
+
+    public function testOpenApiSpecDocumentsAskContentChatResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/contents/{contentId}/chat']['post']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Chat answer with sources', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/ChatAnswer',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsChatSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('ChatRequest', $spec['components']['schemas']);
+        self::assertArrayHasKey('ChatAnswer', $spec['components']['schemas']);
+        self::assertArrayHasKey('ChatSource', $spec['components']['schemas']);
+
+        $answerSchema = $spec['components']['schemas']['ChatAnswer'];
+        $sourceSchema = $spec['components']['schemas']['ChatSource'];
+
+        self::assertArrayHasKey('answer', $answerSchema['properties']);
+        self::assertArrayHasKey('sources', $answerSchema['properties']);
+        self::assertSame('string', $answerSchema['properties']['answer']['type']);
+        self::assertSame(
+            'Mock answer based on retrieved context.',
+            $answerSchema['properties']['answer']['example'],
+        );
+        self::assertSame('array', $answerSchema['properties']['sources']['type']);
+        self::assertSame(
+            '#/components/schemas/ChatSource',
+            $answerSchema['properties']['sources']['items']['$ref'],
+        );
+        if (isset($answerSchema['required'])) {
+            self::assertContains('answer', $answerSchema['required']);
+            self::assertContains('sources', $answerSchema['required']);
+        }
+
+        self::assertArrayHasKey('artifactId', $sourceSchema['properties']);
+        self::assertArrayHasKey('chunkId', $sourceSchema['properties']);
+        self::assertArrayHasKey('text', $sourceSchema['properties']);
+        self::assertArrayHasKey('score', $sourceSchema['properties']);
+        self::assertArrayNotHasKey('position', $sourceSchema['properties']);
+        self::assertSame('number', $sourceSchema['properties']['score']['type']);
+        self::assertSame(0, $sourceSchema['properties']['score']['minimum']);
+        self::assertSame(1, $sourceSchema['properties']['score']['maximum']);
+        self::assertSame(0.87, $sourceSchema['properties']['score']['example']);
+        if (isset($sourceSchema['required'])) {
+            self::assertContains('artifactId', $sourceSchema['required']);
+            self::assertContains('chunkId', $sourceSchema['required']);
+            self::assertContains('text', $sourceSchema['required']);
+            self::assertContains('score', $sourceSchema['required']);
         }
     }
 

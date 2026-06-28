@@ -38,6 +38,7 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'Graph', description: 'Knowledge graph projections for content resources')]
 #[OA\Tag(name: 'Recommendations', description: 'Contextual artifact recommendation projections for content resources')]
 #[OA\Tag(name: 'Semantic', description: 'Semantic chunk retrieval projections for content resources')]
+#[OA\Tag(name: 'Chat', description: 'RAG chat answers for content resources')]
 final class OpenApiSpec
 {
 }

@@ -225,16 +225,30 @@ Verification: [Sprint22-Verification.md](../reports/Sprint22-Verification.md)
 
 # UX-01 — Chat RAG (2026-06)
 
-UX-01 delivers a read-only chat API over the semantic retrieval pipeline. Slice 4 adds an optional Gemini chat adapter without changing the HTTP contract.
+UX-01 delivers an interactive RAG chat experience: backend retrieval + provider abstraction, frontend `ChatPanel`, and OpenAPI documentation for `POST /api/contents/{contentId}/chat`.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| UX-01-SLICE-01 | Domain chat model (`ChatOrchestrator`, `ChatProviderInterface`) | ✅ |
+| UX-01-SLICE-02 | Mock RAG chat API (`POST /api/contents/{contentId}/chat`) | ✅ |
+| UX-01-SLICE-03 | Generalized `ChatRequest` / `ChatResponse` provider contract | ✅ |
+| UX-01-SLICE-04 | Optional `GeminiChatProvider` adapter | ✅ |
+| UX-01-SLICE-05 | `ChatProviderFactory`; `CHAT_PROVIDER` env selection | ✅ |
+| UX-01-SLICE-06 | Frontend `ChatService` + repository layer | ✅ |
+| UX-01-SLICE-07 | Frontend `ChatPanel` UI in `ProcessingArtifacts` | ✅ |
+| UX-01-SLICE-08 | OpenAPI schemas + UX-01 verification report | ✅ |
 
 | Layer | Addition |
 | ----- | -------- |
 | Domain | `ChatProviderInterface` with `ChatRequest` / `ChatResponse`; `ChatProviderOptions` (temperature, maxTokens, model) |
 | Infrastructure | `MockChatProvider` (default); `GeminiChatProvider`; `ChatProviderFactory`; `GeminiChatTransportInterface`; `CurlGeminiChatTransport` |
 | Application | `AskContentChatHandler` builds `ChatRequest`, maps `ChatResponse` to DTO |
-| API / Frontend / Worker | Unchanged — `POST /api/contents/{contentId}/chat` contract preserved |
+| Presentation | OpenAPI schemas `ChatRequest`, `ChatAnswer`, `ChatSource`; `#[OA\Post]` on chat controller |
+| Frontend | `ChatService`; `ChatPanel` + props-only subcomponents; architecture guard `feature-chat-transport` |
 
 Chat provider selection via `CHAT_PROVIDER` env var (`mock` default, `gemini` requires `GEMINI_API_KEY`). Test/CI env keeps `CHAT_PROVIDER=mock`. Gemini env vars: `GEMINI_API_KEY`, `GEMINI_CHAT_MODEL` (default `gemini-2.5-flash`). Tests use mocked transport; no live API calls in CI.
+
+Verification: [UX01-Verification.md](../reports/UX01-Verification.md)
 
 ---
 

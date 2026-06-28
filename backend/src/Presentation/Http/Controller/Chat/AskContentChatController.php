@@ -11,6 +11,9 @@ use App\Domain\Content\Exception\InvalidContentIdException;
 use App\Presentation\Http\Request\Chat\AskContentChatRequest;
 use App\Presentation\Http\Request\Chat\Exception\InvalidChatRequestException;
 use App\Presentation\Http\Response\Chat\ChatAnswerResponse;
+use App\Presentation\OpenApi\Schema\ChatAnswer;
+use App\Presentation\OpenApi\Schema\ChatRequest;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +22,37 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class AskContentChatController extends AbstractController
 {
+    #[OA\Post(
+        operationId: 'askContentChat',
+        summary: 'Ask a question about content',
+        description: 'Returns a chat answer with retrieved artifact sources for a content resource.',
+        tags: ['Chat'],
+        parameters: [
+            new OA\Parameter(
+                name: 'contentId',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid'),
+                example: '550e8400-e29b-41d4-a716-446655440000',
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/ChatRequest'),
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Chat answer with sources',
+                content: new OA\JsonContent(ref: '#/components/schemas/ChatAnswer'),
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid request',
+                content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse'),
+            ),
+        ],
+    )]
     #[Route(
         '/api/contents/{contentId}/chat',
         name: 'api_contents_chat',

@@ -475,6 +475,35 @@ Provider selection:
 
 Gemini chat env vars: `GEMINI_API_KEY`, `GEMINI_CHAT_MODEL` (default `gemini-2.5-flash`). Factory validates API key when `gemini` is selected; no network call during selection. Tests use mocked transport; no live API calls in CI.
 
+### Chat UI layer (frontend)
+
+```text
+ProcessingArtifacts
+        │
+        ▼
+ChatPanel (only component using ChatService)
+        │
+        ├── ChatMessageList
+        ├── ChatMessage
+        ├── ChatInput
+        └── SourcesPanel
+```
+
+| Component | Rule |
+| --------- | ---- |
+| `ChatPanel` | Calls `chatService.askQuestion()` only |
+| `ChatInput`, `ChatMessage`, `ChatMessageList`, `SourcesPanel` | Props-only; no service imports |
+| `features/chat` | Must not import `HttpChatRepository`, `ChatRepositoryFactory`, or `ChatRepository` |
+
+Enforced by `findFeatureChatTransportViolations()` in `frontend/src/architecture/architectureRules.ts`.
+
+```tsx
+// frontend/src/features/chat/ChatPanel/ChatPanel.tsx
+import { HttpChatRepository } from "@/services/chat/HttpChatRepository"; // ❌ forbidden
+```
+
+**Fix:** import `chatService` from `@/services/chat/ChatService` in `ChatPanel` only.
+
 ## Enforcement
 
 | Tool | Location | Command |

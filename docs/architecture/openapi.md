@@ -58,6 +58,7 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Graph | GET | `/api/contents/{contentId}/graph` |
 | Recommendations | GET | `/api/contents/{contentId}/artifacts/{artifactId}/recommendations` |
 | Semantic | GET | `/api/contents/{contentId}/semantic-search` |
+| Chat | POST | `/api/contents/{contentId}/chat` |
 
 ---
 
@@ -159,6 +160,9 @@ Shared OpenAPI schemas:
 | `RecommendationReason` | `Presentation/OpenApi/Schema/RecommendationReasonSchema.php` |
 | `RetrievedChunk` | `Presentation/OpenApi/Schema/RetrievedChunk.php` |
 | `SemanticSearchResult` | `Presentation/OpenApi/Schema/SemanticSearchResult.php` |
+| `ChatRequest` | `Presentation/OpenApi/Schema/ChatRequest.php` |
+| `ChatAnswer` | `Presentation/OpenApi/Schema/ChatAnswer.php` |
+| `ChatSource` | `Presentation/OpenApi/Schema/ChatSource.php` |
 
 `GET /api/timeline/{artifactId}` returns a `Timeline` with nested `sections[].events[].text`.
 
@@ -172,7 +176,11 @@ Shared OpenAPI schemas:
 
 `GET /api/contents/{contentId}/semantic-search?q=…` returns a `SemanticSearchResult` envelope with `results[]` entries (`artifactId`, `chunkId`, `position`, `text`, `score`). The `score` field is a float from 0.0 to 1.0 (cosine similarity; higher scores appear first in the API response). The required query parameter `q` accepts 1–500 characters.
 
+`POST /api/contents/{contentId}/chat` accepts a `ChatRequest` body (`question`, 1–2000 characters) and returns a `ChatAnswer` with `answer` and `sources[]` entries (`artifactId`, `chunkId`, `text`, `score`). Chat sources omit the `position` field present on semantic-search chunks. Invalid UUID, malformed JSON, or invalid question returns HTTP 400 with `ErrorResponse`.
+
 **Sprint 22 note:** Embedding provider selection (`EMBEDDING_PROVIDER`, Gemini adapter) is internal to the backend. The semantic-search HTTP contract, OpenAPI schemas, and response shape are unchanged from Sprint 20.
+
+**UX-01 note:** Chat provider selection (`CHAT_PROVIDER`, Gemini adapter) is internal to the backend. The chat HTTP contract and OpenAPI schemas document the stable request/response shape only.
 
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 
