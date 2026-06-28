@@ -19,6 +19,7 @@ use App\Domain\Semantic\VectorDocumentCollection;
 use App\Domain\Semantic\VectorSearchResultCollection;
 use App\Domain\Semantic\VectorStoreInterface;
 use App\Infrastructure\Semantic\DeterministicEmbeddingGenerator;
+use App\Infrastructure\Semantic\DeterministicEmbeddingProvider;
 use App\Infrastructure\Semantic\InMemoryVectorStore;
 use PHPUnit\Framework\TestCase;
 
@@ -33,7 +34,7 @@ final class SearchSemanticChunksHandlerTest extends TestCase
         return new SearchSemanticChunksHandler(
             $repository,
             new Chunker(),
-            new DeterministicEmbeddingGenerator(),
+            new DeterministicEmbeddingGenerator(new DeterministicEmbeddingProvider()),
             $store,
             new SemanticRetriever($store),
         );

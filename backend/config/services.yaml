@@ -47,6 +47,9 @@ services:
     App\Application\Processing\Ports\ProcessingOrchestratorInterface:
         alias: App\Infrastructure\Processing\HttpWorkerDispatcher
 
+    App\Domain\Semantic\EmbeddingProviderInterface:
+        alias: App\Infrastructure\Semantic\DeterministicEmbeddingProvider
+
     App\Domain\Semantic\EmbeddingGeneratorInterface:
         alias: App\Infrastructure\Semantic\DeterministicEmbeddingGenerator
 

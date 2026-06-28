@@ -21,6 +21,7 @@ use App\Domain\Semantic\VectorDocumentCollection;
 use App\Domain\Semantic\VectorSearchResultCollection;
 use App\Domain\Semantic\VectorStoreInterface;
 use App\Infrastructure\Semantic\DeterministicEmbeddingGenerator;
+use App\Infrastructure\Semantic\DeterministicEmbeddingProvider;
 use App\Infrastructure\Semantic\InMemoryVectorStore;
 use PHPUnit\Framework\TestCase;
 
@@ -36,7 +37,9 @@ final class SemanticRetrieverTest extends TestCase
     {
         $this->vectorStore = new InMemoryVectorStore();
         $this->retriever = new SemanticRetriever($this->vectorStore);
-        $this->embeddingGenerator = new DeterministicEmbeddingGenerator();
+        $this->embeddingGenerator = new DeterministicEmbeddingGenerator(
+            new DeterministicEmbeddingProvider(),
+        );
     }
 
     public function testEmptyVectorStoreReturnsEmptyCollection(): void
