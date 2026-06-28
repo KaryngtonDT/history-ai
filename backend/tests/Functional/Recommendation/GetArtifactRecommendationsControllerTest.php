@@ -73,12 +73,19 @@ final class GetArtifactRecommendationsControllerTest extends WebTestCase
             [$transcriptId->value, $quizId->value],
             array_column($response['recommendations'], 'artifactId'),
         );
+        self::assertSame(
+            [100, 80],
+            array_column($response['recommendations'], 'score'),
+        );
         foreach ($response['recommendations'] as $recommendation) {
             self::assertArrayHasKey('artifactId', $recommendation);
             self::assertArrayHasKey('type', $recommendation);
             self::assertArrayHasKey('title', $recommendation);
             self::assertArrayHasKey('reason', $recommendation);
-            self::assertArrayNotHasKey('score', $recommendation);
+            self::assertArrayHasKey('score', $recommendation);
+            self::assertIsInt($recommendation['score']);
+            self::assertGreaterThanOrEqual(0, $recommendation['score']);
+            self::assertLessThanOrEqual(100, $recommendation['score']);
         }
         self::assertTrue($this->containsRecommendation(
             $response['recommendations'],
@@ -86,6 +93,7 @@ final class GetArtifactRecommendationsControllerTest extends WebTestCase
             'transcript',
             'Transcript',
             'derived_from',
+            100,
         ));
         self::assertTrue($this->containsRecommendation(
             $response['recommendations'],
@@ -93,6 +101,7 @@ final class GetArtifactRecommendationsControllerTest extends WebTestCase
             'quiz',
             'Quiz',
             'references',
+            80,
         ));
         self::assertFalse($this->containsRecommendation(
             $response['recommendations'],
@@ -100,6 +109,7 @@ final class GetArtifactRecommendationsControllerTest extends WebTestCase
             'summary',
             'Summary',
             'derived_from',
+            100,
         ));
         self::assertSame(
             count($response['recommendations']),
@@ -203,7 +213,7 @@ final class GetArtifactRecommendationsControllerTest extends WebTestCase
     }
 
     /**
-     * @param list<array{artifactId: string, type: string, title: string, reason: string}> $recommendations
+     * @param list<array{artifactId: string, type: string, title: string, reason: string, score: int}> $recommendations
      */
     private function containsRecommendation(
         array $recommendations,
@@ -211,6 +221,7 @@ final class GetArtifactRecommendationsControllerTest extends WebTestCase
         string $type,
         string $title,
         string $reason,
+        int $score,
     ): bool {
         foreach ($recommendations as $recommendation) {
             if (
@@ -218,6 +229,7 @@ final class GetArtifactRecommendationsControllerTest extends WebTestCase
                 && $recommendation['type'] === $type
                 && $recommendation['title'] === $title
                 && $recommendation['reason'] === $reason
+                && $recommendation['score'] === $score
             ) {
                 return true;
             }
@@ -227,7 +239,7 @@ final class GetArtifactRecommendationsControllerTest extends WebTestCase
     }
 
     /**
-     * @param list<array{artifactId: string, type: string, title: string, reason: string}> $recommendations
+     * @param list<array{artifactId: string, type: string, title: string, reason: string, score: int}> $recommendations
      *
      * @return list<string>
      */

@@ -15,7 +15,8 @@ final class ArtifactRecommendationsResponse
      *         artifactId: string,
      *         type: string,
      *         title: string,
-     *         reason: string
+     *         reason: string,
+     *         score: int
      *     }>
      * }
      */
@@ -28,6 +29,7 @@ final class ArtifactRecommendationsResponse
                     'type' => $recommendation->type,
                     'title' => $recommendation->title,
                     'reason' => $recommendation->reason,
+                    'score' => $recommendation->score,
                 ],
                 $result->recommendations,
             ),

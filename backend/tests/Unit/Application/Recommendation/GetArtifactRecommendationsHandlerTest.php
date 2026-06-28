@@ -124,6 +124,10 @@ final class GetArtifactRecommendationsHandlerTest extends TestCase
             [$transcriptId, $quizId, $flashcardsId],
             array_map(static fn (object $item): string => $item->artifactId, $result->recommendations),
         );
+        self::assertSame(
+            [100, 80, 80],
+            array_map(static fn (object $item): int => $item->score, $result->recommendations),
+        );
     }
 
     public function testPreservesStableOrderForEqualScores(): void
@@ -162,7 +166,7 @@ final class GetArtifactRecommendationsHandlerTest extends TestCase
         );
     }
 
-    public function testDoesNotExposeScoreInResult(): void
+    public function testExposesScoreInResult(): void
     {
         $contentId = ContentId::generate();
         $transcriptId = '550e8400-e29b-41d4-a716-446655440001';
@@ -182,10 +186,39 @@ final class GetArtifactRecommendationsHandlerTest extends TestCase
 
         foreach ($result->recommendations as $recommendation) {
             self::assertSame(
-                ['artifactId', 'type', 'title', 'reason'],
+                ['artifactId', 'type', 'title', 'reason', 'score'],
                 array_keys(get_object_vars($recommendation)),
             );
+            self::assertIsInt($recommendation->score);
+            self::assertGreaterThanOrEqual(0, $recommendation->score);
+            self::assertLessThanOrEqual(100, $recommendation->score);
         }
+
+        self::assertSame(100, $result->recommendations[0]->score);
+        self::assertSame('derived_from', $result->recommendations[0]->reason);
+    }
+
+    public function testMapsRelatedReasonToScoreSixty(): void
+    {
+        $contentId = ContentId::generate();
+        $summaryId = '550e8400-e29b-41d4-a716-446655440002';
+        $podcastId = '550e8400-e29b-41d4-a716-446655440005';
+
+        $repository = $this->createMock(ArtifactRepositoryInterface::class);
+        $repository
+            ->expects(self::once())
+            ->method('findByContentId')
+            ->willReturn([
+                $this->createArtifact($summaryId, $contentId, ArtifactType::Summary),
+                $this->createArtifact($podcastId, $contentId, ArtifactType::Podcast),
+            ]);
+
+        $handler = $this->createHandler($repository);
+        $result = $handler(new GetArtifactRecommendationsQuery($contentId->value, $summaryId));
+
+        self::assertCount(1, $result->recommendations);
+        self::assertSame('related', $result->recommendations[0]->reason);
+        self::assertSame(60, $result->recommendations[0]->score);
     }
 
     public function testReturnsEmptyRecommendationsWhenCurrentArtifactIsUnknown(): void

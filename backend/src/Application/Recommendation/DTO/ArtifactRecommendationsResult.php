@@ -33,8 +33,8 @@ final readonly class ArtifactRecommendationsResult
     {
         return new self(
             recommendations: array_map(
-                static fn (ScoredRecommendation $scored): RecommendedArtifactResult => RecommendedArtifactResult::fromDomain(
-                    $scored->recommendation(),
+                static fn (ScoredRecommendation $scored): RecommendedArtifactResult => RecommendedArtifactResult::fromScoredDomain(
+                    $scored,
                 ),
                 $collection->recommendations(),
             ),
