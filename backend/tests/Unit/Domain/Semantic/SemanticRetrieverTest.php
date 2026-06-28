@@ -16,30 +16,64 @@ use App\Domain\Semantic\EmbeddingGeneratorInterface;
 use App\Domain\Semantic\EmbeddingVector;
 use App\Domain\Semantic\SemanticQuery;
 use App\Domain\Semantic\SemanticRetriever;
+use App\Domain\Semantic\VectorDocument;
+use App\Domain\Semantic\VectorDocumentCollection;
+use App\Domain\Semantic\VectorSearchResultCollection;
+use App\Domain\Semantic\VectorStoreInterface;
 use App\Infrastructure\Semantic\DeterministicEmbeddingGenerator;
+use App\Infrastructure\Semantic\InMemoryVectorStore;
 use PHPUnit\Framework\TestCase;
 
 final class SemanticRetrieverTest extends TestCase
 {
+    private InMemoryVectorStore $vectorStore;
+
     private SemanticRetriever $retriever;
 
     private DeterministicEmbeddingGenerator $embeddingGenerator;
 
     protected function setUp(): void
     {
-        $this->retriever = new SemanticRetriever();
+        $this->vectorStore = new InMemoryVectorStore();
+        $this->retriever = new SemanticRetriever($this->vectorStore);
         $this->embeddingGenerator = new DeterministicEmbeddingGenerator();
     }
 
-    public function testEmptyEmbeddedChunksReturnsEmptyCollection(): void
+    public function testEmptyVectorStoreReturnsEmptyCollection(): void
     {
         $result = $this->retriever->retrieve(
             new SemanticQuery('Roman Republic'),
-            EmbeddedChunkCollection::empty(),
             $this->embeddingGenerator,
         );
 
         self::assertTrue($result->isEmpty());
+    }
+
+    public function testCallsVectorStoreSearchWithQueryEmbedding(): void
+    {
+        $artifactId = new ArtifactId('550e8400-e29b-41d4-a716-446655440001');
+        $chunk = $this->createChunk($artifactId, 0, 'Roman Republic overview');
+        $queryVector = new EmbeddingVector([1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
+        $query = new SemanticQuery('Roman Republic overview');
+
+        $generator = $this->createMock(EmbeddingGeneratorInterface::class);
+        $generator
+            ->expects(self::once())
+            ->method('generate')
+            ->with(self::callback(static fn (ChunkCollection $collection): bool => 1 === $collection->count()))
+            ->willReturn(new EmbeddedChunkCollection([
+                new EmbeddedChunk($chunk, $queryVector),
+            ]));
+
+        $vectorStore = $this->createMock(VectorStoreInterface::class);
+        $vectorStore
+            ->expects(self::once())
+            ->method('search')
+            ->with($queryVector, 5)
+            ->willReturn(VectorSearchResultCollection::empty());
+
+        $retriever = new SemanticRetriever($vectorStore);
+        $retriever->retrieve($query, $generator);
     }
 
     public function testReturnsResultsSortedByDescendingSimilarity(): void
@@ -52,9 +86,10 @@ final class SemanticRetrieverTest extends TestCase
         ]);
         $queryText = 'Roman Republic overview';
 
+        $this->indexEmbeddedChunks($embeddedChunks);
+
         $result = $this->retriever->retrieve(
             new SemanticQuery($queryText),
-            $embeddedChunks,
             $this->embeddingGenerator,
         );
 
@@ -83,9 +118,10 @@ final class SemanticRetrieverTest extends TestCase
             $this->embedChunk($artifactId, 5, 'Chunk six'),
         ]);
 
+        $this->indexEmbeddedChunks($embeddedChunks);
+
         $result = $this->retriever->retrieve(
             new SemanticQuery('Chunk query'),
-            $embeddedChunks,
             $this->embeddingGenerator,
             3,
         );
@@ -103,9 +139,10 @@ final class SemanticRetrieverTest extends TestCase
             $embedded[] = $this->embedChunk($artifactId, $index, sprintf('Chunk %d', $index));
         }
 
+        $this->indexEmbeddedChunks(new EmbeddedChunkCollection($embedded));
+
         $result = $this->retriever->retrieve(
             new SemanticQuery('Chunk query'),
-            new EmbeddedChunkCollection($embedded),
             $this->embeddingGenerator,
         );
 
@@ -122,9 +159,10 @@ final class SemanticRetrieverTest extends TestCase
             $this->embedChunk($artifactId, 2, 'Different semantic text'),
         ]);
 
+        $this->indexEmbeddedChunks($embeddedChunks);
+
         $result = $this->retriever->retrieve(
             new SemanticQuery($sharedText),
-            $embeddedChunks,
             $this->embeddingGenerator,
         );
 
@@ -143,8 +181,11 @@ final class SemanticRetrieverTest extends TestCase
         ]);
         $query = new SemanticQuery('Alpha chunk');
 
-        $firstRun = $this->retriever->retrieve($query, $embeddedChunks, $this->embeddingGenerator);
-        $secondRun = $this->retriever->retrieve($query, $embeddedChunks, $this->embeddingGenerator);
+        $this->indexEmbeddedChunks($embeddedChunks);
+
+        $firstRun = $this->retriever->retrieve($query, $this->embeddingGenerator);
+        $this->indexEmbeddedChunks($embeddedChunks);
+        $secondRun = $this->retriever->retrieve($query, $this->embeddingGenerator);
 
         self::assertSame(
             array_map(
@@ -172,9 +213,11 @@ final class SemanticRetrieverTest extends TestCase
     {
         $artifactId = new ArtifactId('550e8400-e29b-41d4-a716-446655440006');
         $chunk = $this->createChunk($artifactId, 0, 'Interface chunk text');
-        $embeddedChunks = new EmbeddedChunkCollection([
-            new EmbeddedChunk($chunk, new EmbeddingVector([1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])),
-        ]);
+        $sharedVector = new EmbeddingVector([1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
+
+        $this->vectorStore->index(new VectorDocumentCollection([
+            new VectorDocument($chunk, $sharedVector),
+        ]));
 
         $generator = $this->createMock(EmbeddingGeneratorInterface::class);
         $generator
@@ -182,20 +225,30 @@ final class SemanticRetrieverTest extends TestCase
             ->method('generate')
             ->with(self::callback(static fn (ChunkCollection $collection): bool => 1 === $collection->count()))
             ->willReturn(new EmbeddedChunkCollection([
-                new EmbeddedChunk(
-                    $chunk,
-                    new EmbeddingVector([1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
-                ),
+                new EmbeddedChunk($chunk, $sharedVector),
             ]));
 
         $result = $this->retriever->retrieve(
             new SemanticQuery('Interface chunk text'),
-            $embeddedChunks,
             $generator,
         );
 
         self::assertSame(1, $result->count());
         self::assertSame(1.0, $result->retrievedChunks()[0]->score()->value());
+    }
+
+    private function indexEmbeddedChunks(EmbeddedChunkCollection $embeddedChunks): void
+    {
+        /** @var list<VectorDocument> $documents */
+        $documents = array_map(
+            static fn (EmbeddedChunk $embeddedChunk): VectorDocument => new VectorDocument(
+                $embeddedChunk->chunk(),
+                $embeddedChunk->vector(),
+            ),
+            $embeddedChunks->embeddedChunks(),
+        );
+
+        $this->vectorStore->index(new VectorDocumentCollection($documents));
     }
 
     private function embedChunk(ArtifactId $artifactId, int $position, string $text): EmbeddedChunk

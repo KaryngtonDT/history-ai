@@ -15,18 +15,27 @@ use App\Domain\Content\ContentId;
 use App\Domain\Processing\ProcessingJobId;
 use App\Domain\Semantic\Chunker;
 use App\Domain\Semantic\SemanticRetriever;
+use App\Domain\Semantic\VectorDocumentCollection;
+use App\Domain\Semantic\VectorSearchResultCollection;
+use App\Domain\Semantic\VectorStoreInterface;
 use App\Infrastructure\Semantic\DeterministicEmbeddingGenerator;
+use App\Infrastructure\Semantic\InMemoryVectorStore;
 use PHPUnit\Framework\TestCase;
 
 final class SearchSemanticChunksHandlerTest extends TestCase
 {
-    private function createHandler(ArtifactRepositoryInterface $repository): SearchSemanticChunksHandler
-    {
+    private function createHandler(
+        ArtifactRepositoryInterface $repository,
+        ?VectorStoreInterface $vectorStore = null,
+    ): SearchSemanticChunksHandler {
+        $store = $vectorStore ?? new InMemoryVectorStore();
+
         return new SearchSemanticChunksHandler(
             $repository,
             new Chunker(),
             new DeterministicEmbeddingGenerator(),
-            new SemanticRetriever(),
+            $store,
+            new SemanticRetriever($store),
         );
     }
 
@@ -41,10 +50,48 @@ final class SearchSemanticChunksHandlerTest extends TestCase
             ->with(self::callback(static fn (ContentId $id): bool => $id->equals($contentId)))
             ->willReturn([]);
 
-        $handler = $this->createHandler($repository);
+        $vectorStore = $this->createMock(VectorStoreInterface::class);
+        $vectorStore->expects(self::never())->method('index');
+
+        $handler = $this->createHandler($repository, $vectorStore);
         $result = $handler(new SearchSemanticChunksQuery($contentId->value, 'rome'));
 
         self::assertSame([], $result->results);
+    }
+
+    public function testIndexesVectorDocumentsBeforeRetrieval(): void
+    {
+        $contentId = ContentId::generate();
+        $summaryId = '550e8400-e29b-41d4-a716-446655440002';
+        $artifacts = [
+            $this->createArtifact(
+                $summaryId,
+                $contentId,
+                ArtifactType::Summary,
+                "## Ancient Rome\n753 BC — Foundation of Rome",
+            ),
+        ];
+
+        $repository = $this->createMock(ArtifactRepositoryInterface::class);
+        $repository
+            ->expects(self::once())
+            ->method('findByContentId')
+            ->willReturn($artifacts);
+
+        $vectorStore = $this->createMock(VectorStoreInterface::class);
+        $vectorStore
+            ->expects(self::once())
+            ->method('index')
+            ->with(self::callback(
+                static fn (VectorDocumentCollection $documents): bool => 1 === $documents->count(),
+            ));
+        $vectorStore
+            ->expects(self::once())
+            ->method('search')
+            ->willReturn(VectorSearchResultCollection::empty());
+
+        $handler = $this->createHandler($repository, $vectorStore);
+        $handler(new SearchSemanticChunksQuery($contentId->value, 'Ancient Rome'));
     }
 
     public function testReturnsSemanticResultsOrderedByDescendingScore(): void

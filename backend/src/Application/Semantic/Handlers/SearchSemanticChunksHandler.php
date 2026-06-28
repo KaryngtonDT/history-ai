@@ -10,9 +10,14 @@ use App\Domain\Artifact\ArtifactRepositoryInterface;
 use App\Domain\Content\ContentId;
 use App\Domain\Semantic\ChunkCollection;
 use App\Domain\Semantic\Chunker;
+use App\Domain\Semantic\EmbeddedChunk;
+use App\Domain\Semantic\EmbeddedChunkCollection;
 use App\Domain\Semantic\EmbeddingGeneratorInterface;
 use App\Domain\Semantic\SemanticQuery;
 use App\Domain\Semantic\SemanticRetriever;
+use App\Domain\Semantic\VectorDocument;
+use App\Domain\Semantic\VectorDocumentCollection;
+use App\Domain\Semantic\VectorStoreInterface;
 
 final class SearchSemanticChunksHandler
 {
@@ -20,6 +25,7 @@ final class SearchSemanticChunksHandler
         private readonly ArtifactRepositoryInterface $artifactRepository,
         private readonly Chunker $chunker,
         private readonly EmbeddingGeneratorInterface $embeddingGenerator,
+        private readonly VectorStoreInterface $vectorStore,
         private readonly SemanticRetriever $semanticRetriever,
     ) {
     }
@@ -53,12 +59,27 @@ final class SearchSemanticChunksHandler
             return SemanticSearchResult::empty();
         }
 
+        $this->vectorStore->index($this->toVectorDocuments($embeddedChunks));
+
         $retrievedChunks = $this->semanticRetriever->retrieve(
             new SemanticQuery($query->query),
-            $embeddedChunks,
             $this->embeddingGenerator,
         );
 
         return SemanticSearchResult::fromDomain($retrievedChunks);
+    }
+
+    private function toVectorDocuments(EmbeddedChunkCollection $embeddedChunks): VectorDocumentCollection
+    {
+        /** @var list<VectorDocument> $documents */
+        $documents = array_map(
+            static fn (EmbeddedChunk $embeddedChunk): VectorDocument => new VectorDocument(
+                $embeddedChunk->chunk(),
+                $embeddedChunk->vector(),
+            ),
+            $embeddedChunks->embeddedChunks(),
+        );
+
+        return new VectorDocumentCollection($documents);
     }
 }
