@@ -483,6 +483,54 @@ export function findFeatureRelationTransportViolations(): ArchitectureViolation[
 	return violations;
 }
 
+export function findFeatureRecommendationTransportViolations(): ArchitectureViolation[] {
+	const violations: ArchitectureViolation[] = [];
+	const featuresRoot = path.join(FRONTEND_SRC, "features");
+
+	if (!directoryExists(featuresRoot)) {
+		return violations;
+	}
+
+	const forbiddenPatterns: Array<{ pattern: RegExp; detail: string }> = [
+		{
+			pattern:
+				/from\s+["']@\/services\/recommendation\/HttpRecommendationRepository["']/,
+			detail:
+				"Feature components must use RecommendationService, not HttpRecommendationRepository",
+		},
+		{
+			pattern:
+				/from\s+["']@\/services\/recommendation\/RecommendationRepositoryFactory["']/,
+			detail:
+				"Feature components must not wire RecommendationRepositoryFactory",
+		},
+		{
+			pattern:
+				/from\s+["']@\/services\/recommendation\/RecommendationRepository["']/,
+			detail:
+				"Feature components must use RecommendationService, not RecommendationRepository",
+		},
+	];
+
+	for (const filePath of collectSourceFiles(featuresRoot)) {
+		const content = readFileSync(filePath, "utf8");
+
+		for (const { pattern, detail } of forbiddenPatterns) {
+			if (!pattern.test(content)) {
+				continue;
+			}
+
+			violations.push({
+				rule: "feature-recommendation-transport",
+				file: toRelativePath(filePath),
+				detail,
+			});
+		}
+	}
+
+	return violations;
+}
+
 export function collectArchitectureViolations(): ArchitectureViolation[] {
 	return [
 		...findFetchViolations(),
@@ -493,6 +541,7 @@ export function collectArchitectureViolations(): ArchitectureViolation[] {
 		...findFeatureMapTransportViolations(),
 		...findFeatureRelationTransportViolations(),
 		...findFeatureGraphTransportViolations(),
+		...findFeatureRecommendationTransportViolations(),
 		...findInteractiveTimelineServiceViolations(),
 		...findInteractiveMapServiceViolations(),
 		...findInteractiveGraphServiceViolations(),

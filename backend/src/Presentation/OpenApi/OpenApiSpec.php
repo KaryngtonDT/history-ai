@@ -7,12 +7,15 @@ namespace App\Presentation\OpenApi;
 use App\Presentation\OpenApi\Schema\ArtifactRelation;
 use App\Presentation\OpenApi\Schema\ArtifactRelations;
 use App\Presentation\OpenApi\Schema\ArtifactRelationTypeSchema;
+use App\Presentation\OpenApi\Schema\ArtifactRecommendations;
 use App\Presentation\OpenApi\Schema\Coordinates;
 use App\Presentation\OpenApi\Schema\GraphEdge;
 use App\Presentation\OpenApi\Schema\GraphNode;
 use App\Presentation\OpenApi\Schema\HistoricalPlace;
 use App\Presentation\OpenApi\Schema\KnowledgeGraph;
 use App\Presentation\OpenApi\Schema\Map;
+use App\Presentation\OpenApi\Schema\RecommendationReasonSchema;
+use App\Presentation\OpenApi\Schema\RecommendedArtifact;
 use OpenApi\Attributes as OA;
 
 #[OA\OpenApi(openapi: '3.1.0')]
@@ -31,6 +34,7 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'Map', description: 'Historical place map projections for timeline artifacts')]
 #[OA\Tag(name: 'Relations', description: 'Deterministic artifact relation projections for content resources')]
 #[OA\Tag(name: 'Graph', description: 'Knowledge graph projections for content resources')]
+#[OA\Tag(name: 'Recommendations', description: 'Contextual artifact recommendation projections for content resources')]
 final class OpenApiSpec
 {
 }

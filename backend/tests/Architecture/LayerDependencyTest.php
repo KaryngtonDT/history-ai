@@ -307,6 +307,9 @@ final class LayerDependencyTest extends TestCase
         $recommendationPresentationPaths = [
             $this->srcRoot . '/Presentation/Http/Controller/Recommendation',
             $this->srcRoot . '/Presentation/Http/Response/Recommendation',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/RecommendedArtifact.php',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/ArtifactRecommendations.php',
+            $this->srcRoot . '/Presentation/OpenApi/Schema/RecommendationReasonSchema.php',
         ];
 
         $violations = [];

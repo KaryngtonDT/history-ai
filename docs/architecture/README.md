@@ -140,6 +140,22 @@ Verification: [Sprint17-Verification.md](../reports/Sprint17-Verification.md)
 
 ---
 
+# Sprint 18 — Contextual Recommendations (2026-06)
+
+Sprint 18 delivered contextual “See also” recommendations powered by the knowledge graph:
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `RecommendationEngine`, `RecommendedArtifact`, `RecommendedArtifactCollection`, `RecommendationReason` |
+| Backend API | `GET /api/contents/{contentId}/artifacts/{artifactId}/recommendations` → recommendations JSON projection |
+| Frontend | `RecommendationService`, `SeeAlsoRecommendationsPanel` under each artifact card |
+| OpenAPI | `RecommendedArtifact`, `ArtifactRecommendations`, `RecommendationReason` schemas |
+| Architecture | Recommendation layer rules (backend + frontend transport guards) |
+
+Verification: [Sprint18-Verification.md](../reports/Sprint18-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

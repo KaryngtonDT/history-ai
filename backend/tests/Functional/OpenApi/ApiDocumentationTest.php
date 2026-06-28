@@ -19,6 +19,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/maps/timeline/{artifactId}',
         '/api/contents/{contentId}/relations',
         '/api/contents/{contentId}/graph',
+        '/api/contents/{contentId}/artifacts/{artifactId}/recommendations',
     ];
 
     public function testSwaggerUiIsAvailable(): void
@@ -60,6 +61,10 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('get', $spec['paths']['/api/maps/timeline/{artifactId}']);
         self::assertArrayHasKey('get', $spec['paths']['/api/contents/{contentId}/relations']);
         self::assertArrayHasKey('get', $spec['paths']['/api/contents/{contentId}/graph']);
+        self::assertArrayHasKey(
+            'get',
+            $spec['paths']['/api/contents/{contentId}/artifacts/{artifactId}/recommendations'],
+        );
     }
 
     public function testOpenApiSpecDocumentsSearchLibraryQueryParameter(): void
@@ -503,6 +508,110 @@ final class ApiDocumentationTest extends WebTestCase
             self::assertContains('targetArtifactId', $edgeSchema['required']);
             self::assertContains('type', $edgeSchema['required']);
         }
+    }
+
+    public function testOpenApiSpecDocumentsGetArtifactRecommendationsPathParameters(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/contents/{contentId}/artifacts/{artifactId}/recommendations']['get'];
+
+        self::assertSame('getArtifactRecommendations', $operation['operationId']);
+
+        $contentIdParameter = null;
+        $artifactIdParameter = null;
+
+        foreach ($operation['parameters'] as $parameter) {
+            if (($parameter['name'] ?? null) === 'contentId') {
+                $contentIdParameter = $parameter;
+            }
+
+            if (($parameter['name'] ?? null) === 'artifactId') {
+                $artifactIdParameter = $parameter;
+            }
+        }
+
+        self::assertNotNull($contentIdParameter, 'Missing path parameter: contentId');
+        self::assertSame('path', $contentIdParameter['in']);
+        self::assertTrue($contentIdParameter['required']);
+        self::assertSame('string', $contentIdParameter['schema']['type']);
+        self::assertSame('uuid', $contentIdParameter['schema']['format']);
+        self::assertSame('550e8400-e29b-41d4-a716-446655440000', $contentIdParameter['example']);
+
+        self::assertNotNull($artifactIdParameter, 'Missing path parameter: artifactId');
+        self::assertSame('path', $artifactIdParameter['in']);
+        self::assertTrue($artifactIdParameter['required']);
+        self::assertSame('string', $artifactIdParameter['schema']['type']);
+        self::assertSame('uuid', $artifactIdParameter['schema']['format']);
+        self::assertSame('550e8400-e29b-41d4-a716-446655440002', $artifactIdParameter['example']);
+    }
+
+    public function testOpenApiSpecDocumentsGetArtifactRecommendationsResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/contents/{contentId}/artifacts/{artifactId}/recommendations']['get']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Artifact recommendations projection', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/ArtifactRecommendations',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsRecommendationSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('RecommendedArtifact', $spec['components']['schemas']);
+        self::assertArrayHasKey('ArtifactRecommendations', $spec['components']['schemas']);
+        self::assertArrayHasKey('RecommendationReason', $spec['components']['schemas']);
+
+        $recommendedSchema = $spec['components']['schemas']['RecommendedArtifact'];
+        $recommendationsSchema = $spec['components']['schemas']['ArtifactRecommendations'];
+        $reasonSchema = $spec['components']['schemas']['RecommendationReason'];
+
+        self::assertArrayHasKey('artifactId', $recommendedSchema['properties']);
+        self::assertArrayHasKey('type', $recommendedSchema['properties']);
+        self::assertArrayHasKey('title', $recommendedSchema['properties']);
+        self::assertArrayHasKey('reason', $recommendedSchema['properties']);
+        self::assertSame(
+            '#/components/schemas/ArtifactType',
+            $recommendedSchema['properties']['type']['$ref'],
+        );
+        self::assertSame(
+            '#/components/schemas/RecommendationReason',
+            $recommendedSchema['properties']['reason']['$ref'],
+        );
+        if (isset($recommendedSchema['required'])) {
+            self::assertContains('artifactId', $recommendedSchema['required']);
+            self::assertContains('type', $recommendedSchema['required']);
+            self::assertContains('title', $recommendedSchema['required']);
+            self::assertContains('reason', $recommendedSchema['required']);
+        }
+
+        self::assertArrayHasKey('recommendations', $recommendationsSchema['properties']);
+        self::assertSame('array', $recommendationsSchema['properties']['recommendations']['type']);
+        self::assertSame(
+            '#/components/schemas/RecommendedArtifact',
+            $recommendationsSchema['properties']['recommendations']['items']['$ref'],
+        );
+        if (isset($recommendationsSchema['required'])) {
+            self::assertContains('recommendations', $recommendationsSchema['required']);
+        }
+
+        self::assertSame('string', $reasonSchema['type']);
+        self::assertSame(
+            ['related', 'derived_from', 'references', 'next', 'previous'],
+            $reasonSchema['enum'],
+        );
+        self::assertSame('derived_from', $reasonSchema['example']);
     }
 
     /**

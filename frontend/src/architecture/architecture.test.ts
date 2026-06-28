@@ -93,6 +93,14 @@ describe("Frontend architecture rules", () => {
 		expect(graphViolations).toEqual([]);
 	});
 
+	it("prevents feature modules from importing Recommendation transport directly", () => {
+		const recommendationViolations = violations.filter(
+			(violation) => violation.rule === "feature-recommendation-transport",
+		);
+
+		expect(recommendationViolations).toEqual([]);
+	});
+
 	it("keeps InteractiveGraph props-only without service imports", () => {
 		const interactiveGraphViolations = violations.filter(
 			(violation) => violation.rule === "interactive-graph-props-only",

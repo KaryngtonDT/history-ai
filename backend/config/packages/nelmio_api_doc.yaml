@@ -28,6 +28,9 @@ nelmio_api_doc:
             - { alias: GraphNode, type: App\Presentation\OpenApi\Schema\GraphNode }
             - { alias: GraphEdge, type: App\Presentation\OpenApi\Schema\GraphEdge }
             - { alias: KnowledgeGraph, type: App\Presentation\OpenApi\Schema\KnowledgeGraph }
+            - { alias: RecommendedArtifact, type: App\Presentation\OpenApi\Schema\RecommendedArtifact }
+            - { alias: ArtifactRecommendations, type: App\Presentation\OpenApi\Schema\ArtifactRecommendations }
+            - { alias: RecommendationReason, type: App\Presentation\OpenApi\Schema\RecommendationReasonSchema }
     areas:
         default:
             path_patterns:

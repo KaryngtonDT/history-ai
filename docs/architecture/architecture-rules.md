@@ -68,6 +68,9 @@ Presentation may reference Domain value objects and exceptions when parsing HTTP
 15. **Graph domain** — `Domain/Graph` follows the same purity rules as other domains (no Symfony, Doctrine, Infrastructure, or Presentation).
 16. **Graph application** — `Application/Graph` depends on `Domain/Graph`, `Domain/Relation`, `Domain/Artifact`, and `Domain/Content` only; must not import Infrastructure or Presentation.
 17. **Graph presentation** — controllers, responses, and OpenAPI schemas under `Presentation/Http/.../Graph` and `Presentation/OpenApi/Schema/Graph*` / `KnowledgeGraph.php` may depend on `Application/Graph` and Domain value objects; must not import Infrastructure.
+18. **Recommendation domain** — `Domain/Recommendation` follows the same purity rules as other domains (no Symfony, Doctrine, Infrastructure, or Presentation).
+19. **Recommendation application** — `Application/Recommendation` depends on `Domain/Recommendation`, `Domain/Graph`, `Domain/Relation`, `Domain/Artifact`, and `Domain/Content` only; must not import Infrastructure or Presentation.
+20. **Recommendation presentation** — controllers, responses, and OpenAPI schemas under `Presentation/Http/.../Recommendation` and `Presentation/OpenApi/Schema/RecommendedArtifact.php`, `ArtifactRecommendations.php`, `RecommendationReasonSchema.php` may depend on `Application/Recommendation` and Domain value objects; must not import Infrastructure.
 
 ### Search example (passes CI)
 
@@ -164,6 +167,7 @@ HttpClient + Repository (Http / Mock)
 | Feature modules must not import Map transport (`HttpMapRepository`, `MapRepositoryFactory`, `MapRepository`) | Map UI uses `MapService` only |
 | Feature modules must not import Relation transport (`HttpRelationRepository`, `RelationRepositoryFactory`, `RelationRepository`) | Relations UI uses `RelationService` only |
 | Feature modules must not import Graph transport (`HttpGraphRepository`, `GraphRepositoryFactory`, `GraphRepository`) | Graph UI uses `GraphService` only |
+| Feature modules must not import Recommendation transport (`HttpRecommendationRepository`, `RecommendationRepositoryFactory`, `RecommendationRepository`) | Recommendations UI uses `RecommendationService` only |
 | `InteractiveTimeline` must not import services or repositories | Structured timeline rendering is props-only |
 | `InteractiveMap` must not import services or repositories | Map rendering is props-only |
 | `InteractiveGraph` must not import services or repositories | Graph rendering is props-only |
@@ -171,6 +175,7 @@ HttpClient + Repository (Http / Mock)
 | Map panels may import `MapService` | Service layer owns HTTP/mock wiring |
 | Relation panels may import `RelationService` | Service layer owns HTTP/mock wiring |
 | Graph panels may import `GraphService` | Service layer owns HTTP/mock wiring |
+| Recommendation panels may import `RecommendationService` | Service layer owns HTTP/mock wiring |
 
 Repository factories and Http repositories live under `services/` and are consumed by service classes only.
 
@@ -284,6 +289,32 @@ ProcessingArtifacts
         └── KnowledgeGraphPanel → InteractiveGraph (props-only)
 ```
 
+### Recommendation service layer
+
+```text
+features/recommendation/SeeAlsoRecommendationsPanel
+      │
+      ▼
+RecommendationService.getArtifactRecommendations(contentId, artifactId)
+      │
+      ▼
+RecommendationRepositoryFactory → HttpRecommendationRepository | MockRecommendationRepository
+      │
+      ▼
+HttpClient (HTTP mode only)
+```
+
+Processing page recommendation integration:
+
+```text
+ProcessingArtifacts
+        │
+        ├── artifact cards (id="artifact-{type}" anchors)
+        ├── SeeAlsoRecommendationsPanel (per existing artifact)
+        ├── ArtifactRelationsPanel
+        └── KnowledgeGraphPanel
+```
+
 ## Enforcement
 
 | Tool | Location | Command |
@@ -361,6 +392,13 @@ import { graphService } from "@/services/graph/GraphService"; // ❌ forbidden
 ```
 
 **Fix:** receive graph data via props from `KnowledgeGraphPanel`.
+
+```tsx
+// frontend/src/features/recommendation/SeeAlsoRecommendationsPanel/SeeAlsoRecommendationsPanel.tsx
+import { HttpRecommendationRepository } from "@/services/recommendation/HttpRecommendationRepository"; // ❌ forbidden
+```
+
+**Fix:** import `recommendationService` from `@/services/recommendation/RecommendationService`.
 
 ---
 
