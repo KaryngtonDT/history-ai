@@ -223,6 +223,21 @@ Verification: [Sprint22-Verification.md](../reports/Sprint22-Verification.md)
 
 ---
 
+# UX-01 — Chat RAG (2026-06)
+
+UX-01 delivers a read-only chat API over the semantic retrieval pipeline. Slice 4 adds an optional Gemini chat adapter without changing the HTTP contract.
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `ChatProviderInterface` with `ChatRequest` / `ChatResponse`; `ChatProviderOptions` (temperature, maxTokens, model) |
+| Infrastructure | `MockChatProvider` (default); `GeminiChatProvider`; `GeminiChatTransportInterface`; `CurlGeminiChatTransport` |
+| Application | `AskContentChatHandler` builds `ChatRequest`, maps `ChatResponse` to DTO |
+| API / Frontend / Worker | Unchanged — `POST /api/contents/{contentId}/chat` contract preserved |
+
+Chat provider wiring: `MockChatProvider` remains default. `GeminiChatProvider` is registered but activation is deferred. Gemini env vars: `GEMINI_API_KEY`, `GEMINI_CHAT_MODEL` (default `gemini-2.5-flash`). Tests use mocked transport; no live API calls in CI.
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

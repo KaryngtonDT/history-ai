@@ -433,6 +433,36 @@ php bin/console semantic:embedding:smoke-test "Roman Empire"
 
 Uses `GeminiEmbeddingProvider` directly; does not change runtime provider wiring.
 
+### Chat provider layer (backend)
+
+```text
+AskContentChatHandler
+        │
+        ▼
+ChatRequest (prompt + sources + options)
+        │
+        ▼
+ChatProviderInterface
+        │
+        ├── MockChatProvider              (default)
+        └── GeminiChatProvider            (optional; not default)
+                │
+                ▼
+        GeminiChatTransportInterface
+                │
+                └── CurlGeminiChatTransport
+```
+
+| Component | Role |
+| --------- | ---- |
+| `ChatProviderInterface` | Domain port: `answer(ChatRequest): ChatResponse` |
+| `MockChatProvider` | Deterministic local answer; default for local dev and CI |
+| `GeminiChatProvider` | Gemini `generateContent` REST API; requires `GEMINI_API_KEY` |
+| `GeminiChatTransportInterface` | HTTP transport abstraction; mocked in tests |
+| `CurlGeminiChatTransport` | cURL implementation; not used in CI tests |
+
+Gemini chat env vars: `GEMINI_API_KEY`, `GEMINI_CHAT_MODEL` (default `gemini-2.5-flash`). Provider selection for chat is **not** switched at runtime yet — `MockChatProvider` remains the default alias. Activation of `GeminiChatProvider` as the runtime provider is deferred to a future slice.
+
 ## Enforcement
 
 | Tool | Location | Command |

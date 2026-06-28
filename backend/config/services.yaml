@@ -4,6 +4,7 @@
 parameters:
     worker.base_url: '%env(WORKER_BASE_URL)%'
     gemini.embedding_model_default: 'text-embedding-004'
+    gemini.chat_model_default: 'gemini-2.5-flash'
     embedding.provider_default: 'deterministic'
     gemini.api_key_default: ''
 
@@ -31,6 +32,15 @@ services:
 
     App\Domain\Chat\ChatProviderInterface:
         alias: App\Infrastructure\Chat\MockChatProvider
+
+    App\Infrastructure\Chat\CurlGeminiChatTransport:
+        arguments:
+            $apiKey: '%env(default:gemini.api_key_default:GEMINI_API_KEY)%'
+
+    App\Infrastructure\Chat\GeminiChatProvider:
+        arguments:
+            $apiKey: '%env(default:gemini.api_key_default:GEMINI_API_KEY)%'
+            $defaultModel: '%env(default:gemini.chat_model_default:GEMINI_CHAT_MODEL)%'
 
     App\Domain\Content\ContentRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Content\DoctrineContentRepository
