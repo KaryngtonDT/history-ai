@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Console\Semantic;
 
+use App\Infrastructure\Semantic\GeminiEmbeddingProvider;
 use App\Infrastructure\Semantic\GeminiEmbeddingTransportInterface;
 use App\Presentation\Console\Command\Semantic\GeminiEmbeddingSmokeTestCommand;
 use PHPUnit\Framework\MockObject\MockObject;

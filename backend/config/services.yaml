@@ -73,5 +73,10 @@ services:
         arguments:
             $workerBaseUrl: '%worker.base_url%'
 
+    App\Presentation\Console\Command\Semantic\GeminiEmbeddingSmokeTestCommand:
+        arguments:
+            $apiKey: '%env(default:gemini.api_key_default:GEMINI_API_KEY)%'
+            $model: '%env(default:gemini.embedding_model_default:GEMINI_EMBEDDING_MODEL)%'
+
     App\Shared\:
         resource: '../src/Shared/'

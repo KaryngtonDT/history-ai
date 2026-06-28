@@ -215,6 +215,16 @@ Verification: [Sprint21-Verification.md](../reports/Sprint21-Verification.md)
 
 Provider selection via `EMBEDDING_PROVIDER` env var (`deterministic` default, `gemini` requires `GEMINI_API_KEY`). Test/CI env keeps `EMBEDDING_PROVIDER=deterministic`.
 
+### Manual Gemini smoke test (not CI)
+
+Verify real Gemini embeddings locally without changing runtime provider wiring:
+
+```bash
+docker compose exec backend php bin/console semantic:embedding:smoke-test "Roman Empire"
+```
+
+Requires `GEMINI_API_KEY` in the backend environment. The command uses `GeminiEmbeddingProvider` directly (not `EmbeddingProviderInterface` / factory). It does not call `SemanticRetriever`, `VectorStore`, or persist data. Not used by CI or the default deterministic runtime.
+
 ---
 
 # Project architecture overview

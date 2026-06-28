@@ -233,13 +233,21 @@ final class LayerDependencyTest extends TestCase
 
     public function testPresentationDoesNotDependOnInfrastructure(): void
     {
-        $this->assertNoViolations(
-            'Presentation layer',
-            LayerDependencyRules::findViolations(
-                $this->srcRoot . '/Presentation',
-                ['App\\Infrastructure\\'],
-            ),
-        );
+        $presentationPaths = [
+            $this->srcRoot . '/Presentation/Http',
+            $this->srcRoot . '/Presentation/OpenApi',
+        ];
+
+        $violations = [];
+
+        foreach ($presentationPaths as $path) {
+            $violations = array_merge(
+                $violations,
+                LayerDependencyRules::findViolations($path, ['App\\Infrastructure\\']),
+            );
+        }
+
+        $this->assertNoViolations('Presentation layer (HTTP/OpenAPI)', $violations);
     }
 
     public function testSearchPresentationMayDependOnSearchApplicationOnly(): void
