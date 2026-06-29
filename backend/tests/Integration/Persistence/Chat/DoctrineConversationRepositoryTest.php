@@ -19,6 +19,7 @@ final class DoctrineConversationRepositoryTest extends KernelTestCase
 {
     private const string CONTENT_ID = '550e8400-e29b-41d4-a716-446655440000';
     private const string OTHER_CONTENT_ID = '550e8400-e29b-41d4-a716-446655440099';
+    private const string THIRD_CONTENT_ID = '550e8400-e29b-41d4-a716-446655440088';
 
     private ConversationRepositoryInterface $repository;
 
@@ -43,6 +44,7 @@ final class DoctrineConversationRepositoryTest extends KernelTestCase
         self::assertNotNull($found);
         self::assertTrue($found->id()->equals($conversationId));
         self::assertTrue($found->contentId()->equals(new ContentId(self::CONTENT_ID)));
+        self::assertSame(1, $found->documents()->count());
         self::assertCount(2, $found->messages());
         self::assertSame('Why did Rome fall?', $found->messages()[0]->content());
         self::assertSame('Several factors contributed.', $found->messages()[1]->content());
@@ -163,6 +165,85 @@ final class DoctrineConversationRepositoryTest extends KernelTestCase
                 $found->messages(),
             ),
         );
+    }
+
+    public function testSaveAndFindByIdPreservesMultipleDocumentsInOrder(): void
+    {
+        $conversationId = new ConversationId('550e8400-e29b-41d4-a716-446655440007');
+        $conversation = Conversation::start($conversationId, new ContentId(self::CONTENT_ID))
+            ->addDocument(new ContentId(self::OTHER_CONTENT_ID))
+            ->addDocument(new ContentId(self::THIRD_CONTENT_ID));
+
+        $this->repository->save($conversation);
+
+        $found = $this->repository->findById($conversationId);
+
+        self::assertNotNull($found);
+        self::assertSame(3, $found->documents()->count());
+        self::assertSame(
+            [self::CONTENT_ID, self::OTHER_CONTENT_ID, self::THIRD_CONTENT_ID],
+            array_map(
+                static fn ($document): string => $document->contentId()->value,
+                $found->documents()->all(),
+            ),
+        );
+        self::assertTrue($found->contentId()->equals(new ContentId(self::CONTENT_ID)));
+    }
+
+    public function testSaveUpdatesDocuments(): void
+    {
+        $conversationId = new ConversationId('550e8400-e29b-41d4-a716-446655440008');
+        $initial = Conversation::start($conversationId, new ContentId(self::CONTENT_ID));
+
+        $this->repository->save($initial);
+
+        $updated = $initial->addDocument(new ContentId(self::OTHER_CONTENT_ID));
+        $this->repository->save($updated);
+
+        $found = $this->repository->findById($conversationId);
+
+        self::assertNotNull($found);
+        self::assertSame(2, $found->documents()->count());
+        self::assertTrue($found->containsDocument(new ContentId(self::OTHER_CONTENT_ID)));
+    }
+
+    public function testFindByContentIdReturnsConversationWhenContentIdIsNotPrimaryDocument(): void
+    {
+        $conversationId = new ConversationId('550e8400-e29b-41d4-a716-446655440009');
+        $conversation = Conversation::start(
+            $conversationId,
+            new ContentId(self::OTHER_CONTENT_ID),
+        )->addDocument(new ContentId(self::CONTENT_ID));
+
+        $this->repository->save($conversation);
+
+        $found = $this->repository->findByContentId(new ContentId(self::CONTENT_ID));
+
+        self::assertSame(1, $found->count());
+        self::assertTrue($found->conversations()[0]->id()->equals($conversationId));
+    }
+
+    public function testFindByIdFallsBackToContentIdWhenDocumentsJsonIsEmpty(): void
+    {
+        $conversationId = '550e8400-e29b-41d4-a716-446655440010';
+        $entityManager = static::getContainer()->get(EntityManagerInterface::class);
+        $connection = $entityManager->getConnection();
+        $now = (new \DateTimeImmutable())->format('Y-m-d H:i:s');
+
+        $connection->insert('conversation', [
+            'id' => $conversationId,
+            'content_id' => self::CONTENT_ID,
+            'documents' => '[]',
+            'messages' => '[]',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        $found = $this->repository->findById(new ConversationId($conversationId));
+
+        self::assertNotNull($found);
+        self::assertSame(1, $found->documents()->count());
+        self::assertTrue($found->containsDocument(new ContentId(self::CONTENT_ID)));
     }
 
     private function resetDatabaseSchema(): void

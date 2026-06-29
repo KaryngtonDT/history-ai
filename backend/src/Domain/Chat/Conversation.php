@@ -14,18 +14,16 @@ final readonly class Conversation
 
     public function __construct(
         private ConversationId $id,
-        SelectedDocumentCollection|ContentId $documents,
+        SelectedDocumentCollection $documents,
         private ChatConversation $conversation = new ChatConversation(),
     ) {
-        $this->documents = $documents instanceof ContentId
-            ? SelectedDocumentCollection::fromContentId($documents)
-            : $documents;
-
-        if ($this->documents->count() < 1) {
+        if ($documents->count() < 1) {
             throw new InvalidConversationDocumentException(
                 'A conversation must contain at least one document.',
             );
         }
+
+        $this->documents = $documents;
     }
 
     public static function start(ConversationId $id, ContentId $contentId): self

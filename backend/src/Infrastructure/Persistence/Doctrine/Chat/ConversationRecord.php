@@ -9,6 +9,8 @@ use App\Domain\Chat\ChatMessage;
 use App\Domain\Chat\ChatMessageRole;
 use App\Domain\Chat\Conversation;
 use App\Domain\Chat\ConversationId;
+use App\Domain\Chat\SelectedDocument;
+use App\Domain\Chat\SelectedDocumentCollection;
 use App\Domain\Content\ContentId;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
@@ -25,6 +27,12 @@ class ConversationRecord
 
     #[ORM\Column(name: 'content_id', type: Types::GUID)]
     private string $contentId;
+
+    /**
+     * @var list<array{contentId: string}>
+     */
+    #[ORM\Column(type: Types::JSON)]
+    private array $documents = [];
 
     /**
      * @var list<array{role: string, text: string}>
@@ -47,6 +55,7 @@ class ConversationRecord
         $record = new self();
         $record->id = $conversation->id()->value;
         $record->contentId = $conversation->contentId()->value;
+        $record->documents = self::documentsToJson($conversation);
         $record->messages = self::messagesToJson($conversation);
         $record->createdAt = $now;
         $record->updatedAt = $now;
@@ -57,6 +66,7 @@ class ConversationRecord
     public function updateFromDomain(Conversation $conversation, DateTimeImmutable $now): void
     {
         $this->contentId = $conversation->contentId()->value;
+        $this->documents = self::documentsToJson($conversation);
         $this->messages = self::messagesToJson($conversation);
         $this->updatedAt = $now;
     }
@@ -65,8 +75,40 @@ class ConversationRecord
     {
         return new Conversation(
             new ConversationId($this->id),
-            new ContentId($this->contentId),
+            self::documentsFromJson($this->documents, $this->contentId),
             new ChatConversation(self::messagesFromJson($this->messages)),
+        );
+    }
+
+    /**
+     * @return list<array{contentId: string}>
+     */
+    private static function documentsToJson(Conversation $conversation): array
+    {
+        return array_map(
+            static fn (SelectedDocument $document): array => [
+                'contentId' => $document->contentId()->value,
+            ],
+            $conversation->documents()->all(),
+        );
+    }
+
+    /**
+     * @param list<array{contentId: string}> $documents
+     */
+    private static function documentsFromJson(array $documents, string $fallbackContentId): SelectedDocumentCollection
+    {
+        if ([] === $documents) {
+            return SelectedDocumentCollection::fromContentId(new ContentId($fallbackContentId));
+        }
+
+        return new SelectedDocumentCollection(
+            array_map(
+                static fn (array $document): SelectedDocument => new SelectedDocument(
+                    new ContentId($document['contentId']),
+                ),
+                $documents,
+            ),
         );
     }
 
