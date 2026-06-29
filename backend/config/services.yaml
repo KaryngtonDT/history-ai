@@ -8,6 +8,9 @@ parameters:
     embedding.provider_default: 'deterministic'
     chat.provider_default: 'mock'
     gemini.api_key_default: ''
+    video.upload_max_bytes_default: 524288000
+
+    video.upload_max_bytes: '%env(int:default:video.upload_max_bytes_default:VIDEO_UPLOAD_MAX_BYTES)%'
 
 services:
     _defaults:
@@ -168,3 +171,7 @@ services:
 
     Psr\Log\LoggerInterface:
         class: Psr\Log\NullLogger
+
+    App\Application\Video\Handlers\UploadVideoHandler:
+        arguments:
+            $maxUploadBytes: '%video.upload_max_bytes%'
