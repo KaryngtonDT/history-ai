@@ -18,6 +18,13 @@ export interface GraphEdge {
 	sourceArtifactId: string;
 	targetArtifactId: string;
 	type: GraphEdgeType;
+	weight?: number;
+}
+
+export interface GraphNeighborhood {
+	center: GraphNode;
+	neighbors: GraphNode[];
+	edges: GraphEdge[];
 }
 
 export interface KnowledgeGraph {
@@ -40,6 +47,25 @@ export interface GraphEdgeApiDto {
 export interface KnowledgeGraphApiDto {
 	nodes: GraphNodeApiDto[];
 	edges: GraphEdgeApiDto[];
+}
+
+export interface GraphNodeNeighborhoodApiDto {
+	artifactId: string;
+	type: string;
+	label: string;
+}
+
+export interface GraphEdgeNeighborhoodApiDto {
+	sourceArtifactId: string;
+	targetArtifactId: string;
+	type: string;
+	weight: number;
+}
+
+export interface GraphNeighborhoodApiDto {
+	center: GraphNodeNeighborhoodApiDto;
+	neighbors: GraphNodeNeighborhoodApiDto[];
+	edges: GraphEdgeNeighborhoodApiDto[];
 }
 
 export const EMPTY_KNOWLEDGE_GRAPH: KnowledgeGraph = {
@@ -102,6 +128,74 @@ export function mapGraphEdgeFromApi(dto: GraphEdgeApiDto): GraphEdge {
 		sourceArtifactId: dto.sourceArtifactId,
 		targetArtifactId: dto.targetArtifactId,
 		type: normalizeEdgeType(dto.type),
+	};
+}
+
+export function mapGraphNodeFromNeighborhoodApi(
+	dto: GraphNodeNeighborhoodApiDto,
+): GraphNode {
+	return {
+		artifactId: dto.artifactId,
+		type: normalizeArtifactType(dto.type),
+		title: dto.label,
+	};
+}
+
+export function mapGraphEdgeFromNeighborhoodApi(
+	dto: GraphEdgeNeighborhoodApiDto,
+): GraphEdge {
+	return {
+		sourceArtifactId: dto.sourceArtifactId,
+		targetArtifactId: dto.targetArtifactId,
+		type: normalizeEdgeType(dto.type),
+		weight: dto.weight,
+	};
+}
+
+export function mapGraphNeighborhoodFromApi(
+	dto: GraphNeighborhoodApiDto,
+): GraphNeighborhood {
+	return {
+		center: mapGraphNodeFromNeighborhoodApi(dto.center),
+		neighbors: dto.neighbors.map(mapGraphNodeFromNeighborhoodApi),
+		edges: dto.edges.map(mapGraphEdgeFromNeighborhoodApi),
+	};
+}
+
+export function buildGraphNeighborhoodFromGraph(
+	graph: KnowledgeGraph,
+	artifactId: string,
+): GraphNeighborhood | null {
+	const center = graph.nodes.find((node) => node.artifactId === artifactId);
+
+	if (center === undefined) {
+		return null;
+	}
+
+	const neighborIds = new Set<string>();
+	const connectingEdges: GraphEdge[] = [];
+
+	for (const edge of graph.edges) {
+		if (edge.sourceArtifactId === artifactId) {
+			neighborIds.add(edge.targetArtifactId);
+			connectingEdges.push(edge);
+			continue;
+		}
+
+		if (edge.targetArtifactId === artifactId) {
+			neighborIds.add(edge.sourceArtifactId);
+			connectingEdges.push(edge);
+		}
+	}
+
+	const neighbors = graph.nodes.filter((node) =>
+		neighborIds.has(node.artifactId),
+	);
+
+	return {
+		center,
+		neighbors,
+		edges: connectingEdges,
 	};
 }
 

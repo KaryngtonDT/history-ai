@@ -1,8 +1,10 @@
 import { artifactMocksByContentId } from "@/mock/artifact";
 import type { GraphRepository } from "./GraphRepository";
 import {
+	buildGraphNeighborhoodFromGraph,
 	buildKnowledgeGraphFromArtifacts,
 	EMPTY_KNOWLEDGE_GRAPH,
+	type GraphNeighborhood,
 	type KnowledgeGraph,
 } from "./types";
 
@@ -15,5 +17,14 @@ export class MockGraphRepository implements GraphRepository {
 		}
 
 		return buildKnowledgeGraphFromArtifacts(artifacts);
+	}
+
+	async getGraphNeighborhood(
+		contentId: string,
+		artifactId: string,
+	): Promise<GraphNeighborhood | null> {
+		const graph = await this.getKnowledgeGraph(contentId);
+
+		return buildGraphNeighborhoodFromGraph(graph, artifactId);
 	}
 }

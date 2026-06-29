@@ -18,6 +18,18 @@
 	margin: var(--space-4) 0 var(--space-2);
 }
 
+.neighborhoodLoadingState {
+	display: flex;
+	justify-content: center;
+	margin: var(--space-3) 0;
+}
+
+.neighborhoodMessage {
+	margin: var(--space-3) 0 0;
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
 .emptyState {
 	margin-top: var(--space-3);
 }

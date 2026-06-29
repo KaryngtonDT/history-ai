@@ -31,6 +31,18 @@
 	font-size: var(--font-sm);
 	font-weight: var(--font-weight-semibold);
 	color: var(--shell-text);
+	cursor: pointer;
+}
+
+.nodeChipSelected {
+	border-color: var(--shell-accent);
+	background: rgb(219 234 254 / 80%);
+	box-shadow: 0 0 0 2px rgb(59 130 246 / 25%);
+}
+
+.nodeChipNeighbor {
+	border-color: rgb(14 165 233 / 60%);
+	background: rgb(224 242 254 / 90%);
 }
 
 .sections {
@@ -64,13 +76,42 @@
 	background: var(--shell-surface-muted);
 }
 
+.nodeCardSelected {
+	border-color: var(--shell-accent);
+	background: rgb(219 234 254 / 55%);
+}
+
+.nodeCardNeighbor {
+	border-color: rgb(14 165 233 / 60%);
+	background: rgb(224 242 254 / 70%);
+}
+
+.nodeSelectButton {
+	display: block;
+	width: 100%;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	text-align: left;
+	cursor: pointer;
+}
+
+.nodeSelectButton:focus-visible {
+	outline: 2px solid var(--shell-accent);
+	outline-offset: 2px;
+	border-radius: var(--radius-sm);
+}
+
 .nodeTitle {
 	margin: 0 0 var(--space-2);
 	font-size: var(--font-md);
 }
 
 .nodeLink {
+	display: inline-block;
+	margin-top: var(--space-2);
 	color: var(--shell-accent);
+	font-size: var(--font-sm);
 	font-weight: var(--font-weight-semibold);
 	text-decoration: none;
 }
@@ -102,6 +143,11 @@
 .edgeType {
 	font-size: var(--font-sm);
 	color: var(--shell-text-muted);
+}
+
+.edgeItemHighlighted {
+	border-color: var(--shell-accent);
+	background: rgb(219 234 254 / 55%);
 }
 
 @media (min-width: 48rem) {

@@ -32,6 +32,13 @@ export function contentGraphPath(contentId: string): string {
 	return `${CONTENTS_PATH}/${contentId}/graph`;
 }
 
+export function contentGraphArtifactNeighborhoodPath(
+	contentId: string,
+	artifactId: string,
+): string {
+	return `${CONTENTS_PATH}/${contentId}/graph/artifacts/${artifactId}/neighborhood`;
+}
+
 export function contentArtifactRecommendationsPath(
 	contentId: string,
 	artifactId: string,

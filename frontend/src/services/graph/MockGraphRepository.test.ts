@@ -47,4 +47,46 @@ describe("MockGraphRepository", () => {
 		expect(graph.nodes).toHaveLength(1);
 		expect(graph.edges).toEqual([]);
 	});
+
+	it("returns neighborhood for center artifact in mock graph", async () => {
+		const repository = new MockGraphRepository();
+
+		const neighborhood = await repository.getGraphNeighborhood(
+			ROMAN_EMPIRE_CONTENT_ID,
+			summaryArtifactId,
+		);
+
+		expect(neighborhood).toEqual({
+			center: {
+				artifactId: summaryArtifactId,
+				type: "summary",
+				title: "Summary",
+			},
+			neighbors: [
+				{
+					artifactId: transcriptArtifactId,
+					type: "transcript",
+					title: "Transcript",
+				},
+			],
+			edges: [
+				{
+					sourceArtifactId: summaryArtifactId,
+					targetArtifactId: transcriptArtifactId,
+					type: "derived_from",
+				},
+			],
+		});
+	});
+
+	it("returns null when mock neighborhood center is unknown", async () => {
+		const repository = new MockGraphRepository();
+
+		const neighborhood = await repository.getGraphNeighborhood(
+			ROMAN_EMPIRE_CONTENT_ID,
+			"missing-artifact",
+		);
+
+		expect(neighborhood).toBeNull();
+	});
 });

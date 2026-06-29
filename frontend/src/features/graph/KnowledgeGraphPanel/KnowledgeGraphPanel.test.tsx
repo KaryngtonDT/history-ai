@@ -1,14 +1,17 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { KnowledgeGraphPanel } from "./KnowledgeGraphPanel";
 
-const { mockGetKnowledgeGraph } = vi.hoisted(() => ({
+const { mockGetKnowledgeGraph, mockGetGraphNeighborhood } = vi.hoisted(() => ({
 	mockGetKnowledgeGraph: vi.fn(),
+	mockGetGraphNeighborhood: vi.fn(),
 }));
 
 vi.mock("@/services/graph/GraphService", () => ({
 	graphService: {
 		getKnowledgeGraph: mockGetKnowledgeGraph,
+		getGraphNeighborhood: mockGetGraphNeighborhood,
 	},
 }));
 
@@ -24,6 +27,11 @@ const graph = {
 			type: "summary" as const,
 			title: "Summary",
 		},
+		{
+			artifactId: "550e8400-e29b-41d4-a716-446655440003",
+			type: "quiz" as const,
+			title: "Quiz",
+		},
 	],
 	edges: [
 		{
@@ -31,12 +39,24 @@ const graph = {
 			targetArtifactId: "550e8400-e29b-41d4-a716-446655440001",
 			type: "derived_from" as const,
 		},
+		{
+			sourceArtifactId: "550e8400-e29b-41d4-a716-446655440003",
+			targetArtifactId: "550e8400-e29b-41d4-a716-446655440002",
+			type: "references" as const,
+		},
 	],
+};
+
+const neighborhood = {
+	center: graph.nodes[1],
+	neighbors: [graph.nodes[0], graph.nodes[2]],
+	edges: graph.edges,
 };
 
 describe("KnowledgeGraphPanel", () => {
 	beforeEach(() => {
 		mockGetKnowledgeGraph.mockReset();
+		mockGetGraphNeighborhood.mockReset();
 	});
 
 	it("calls GraphService with content id", async () => {
@@ -75,7 +95,6 @@ describe("KnowledgeGraphPanel", () => {
 		expect(
 			await screen.findByRole("region", { name: "Knowledge graph" }),
 		).toBeInTheDocument();
-		expect(screen.getByRole("link", { name: "Summary" })).toBeInTheDocument();
 		expect(screen.getByText("Derived from")).toBeInTheDocument();
 	});
 
@@ -97,5 +116,96 @@ describe("KnowledgeGraphPanel", () => {
 		);
 
 		expect(await screen.findByText("Unable to load graph")).toBeInTheDocument();
+	});
+
+	it("loads neighborhood when a node is selected", async () => {
+		const user = userEvent.setup();
+		mockGetKnowledgeGraph.mockResolvedValue(graph);
+		mockGetGraphNeighborhood.mockResolvedValue(neighborhood);
+
+		render(
+			<KnowledgeGraphPanel contentId="550e8400-e29b-41d4-a716-446655440000" />,
+		);
+
+		await screen.findByRole("region", { name: "Knowledge graph" });
+		await user.click(
+			screen.getByTestId(
+				"graph-node-select-550e8400-e29b-41d4-a716-446655440002",
+			),
+		);
+
+		await waitFor(() => {
+			expect(mockGetGraphNeighborhood).toHaveBeenCalledWith(
+				"550e8400-e29b-41d4-a716-446655440000",
+				"550e8400-e29b-41d4-a716-446655440002",
+			);
+		});
+	});
+
+	it("shows neighborhood loading state while neighborhood loads", async () => {
+		const user = userEvent.setup();
+		mockGetKnowledgeGraph.mockResolvedValue(graph);
+		mockGetGraphNeighborhood.mockReturnValue(new Promise(() => {}));
+
+		render(
+			<KnowledgeGraphPanel contentId="550e8400-e29b-41d4-a716-446655440000" />,
+		);
+
+		await screen.findByRole("region", { name: "Knowledge graph" });
+		await user.click(
+			screen.getByTestId(
+				"graph-node-select-550e8400-e29b-41d4-a716-446655440002",
+			),
+		);
+
+		expect(
+			screen.getByRole("status", { name: "Loading neighborhood" }),
+		).toBeInTheDocument();
+	});
+
+	it("shows message when neighborhood is not found", async () => {
+		const user = userEvent.setup();
+		mockGetKnowledgeGraph.mockResolvedValue(graph);
+		mockGetGraphNeighborhood.mockResolvedValue(null);
+
+		render(
+			<KnowledgeGraphPanel contentId="550e8400-e29b-41d4-a716-446655440000" />,
+		);
+
+		await screen.findByRole("region", { name: "Knowledge graph" });
+		await user.click(
+			screen.getByTestId(
+				"graph-node-select-550e8400-e29b-41d4-a716-446655440002",
+			),
+		);
+
+		expect(
+			await screen.findByText("Selected artifact is not part of this graph."),
+		).toBeInTheDocument();
+	});
+
+	it("shows message when selected artifact has no neighbors", async () => {
+		const user = userEvent.setup();
+		mockGetKnowledgeGraph.mockResolvedValue(graph);
+		mockGetGraphNeighborhood.mockResolvedValue({
+			center: graph.nodes[0],
+			neighbors: [],
+			edges: [],
+		});
+
+		render(
+			<KnowledgeGraphPanel contentId="550e8400-e29b-41d4-a716-446655440000" />,
+		);
+
+		await screen.findByRole("region", { name: "Knowledge graph" });
+		await user.click(
+			screen.getByTestId(
+				"graph-node-select-550e8400-e29b-41d4-a716-446655440001",
+			),
+		);
+
+		expect(
+			await screen.findByText("No direct neighbors for the selected artifact."),
+		).toBeInTheDocument();
 	});
 });
