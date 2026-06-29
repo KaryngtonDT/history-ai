@@ -277,6 +277,33 @@ Verification: [UX02-Verification.md](../reports/UX02-Verification.md)
 
 ---
 
+# UX-03 — Streaming Chat (2026-06)
+
+UX-03 adds **progressive streaming answers** to the RAG chat experience: domain stream model, provider interface, mock SSE endpoint, frontend SSE service, and progressive UI in `ChatPanel`.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| UX-03-SLICE-01 | Domain `ChatToken`, `ChatStream`, `ChatStreamEvent`, collections | ✅ |
+| UX-03-SLICE-02 | `StreamingChatProviderInterface`; `MockChatProvider` streamable | ✅ |
+| UX-03-SLICE-03 | Mock SSE endpoint `POST /chat/stream` | ✅ |
+| UX-03-SLICE-04 | Frontend `ChatService.streamQuestion()` + SSE parsing | ✅ |
+| UX-03-SLICE-05 | Progressive assistant bubble in `ChatPanel` | ✅ |
+| UX-03-SLICE-06 | OpenAPI `ChatStreamToken` + UX-03 verification report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `ChatToken`, `ChatStream`, `ChatStreamEvent`; `toAnswer()` for aggregation |
+| Application | `AskContentChatStreamHandler`; `ChatStreamResult` DTOs |
+| Presentation | SSE `ChatStreamResponse`; OpenAPI on stream controller |
+| Infrastructure | `MockChatProvider::stream()`; DI `StreamingChatProviderInterface` |
+| Frontend | `HttpChatRepository.streamQuestion()` (fetch + SSE); progressive UI |
+
+Non-streaming `POST /chat` unchanged — full answer with sources and citations.
+
+Verification: [UX03-Verification.md](../reports/UX03-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

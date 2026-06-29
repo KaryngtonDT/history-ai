@@ -22,6 +22,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/contents/{contentId}/artifacts/{artifactId}/recommendations',
         '/api/contents/{contentId}/semantic-search',
         '/api/contents/{contentId}/chat',
+        '/api/contents/{contentId}/chat/stream',
     ];
 
     public function testSwaggerUiIsAvailable(): void
@@ -69,6 +70,7 @@ final class ApiDocumentationTest extends WebTestCase
         );
         self::assertArrayHasKey('get', $spec['paths']['/api/contents/{contentId}/semantic-search']);
         self::assertArrayHasKey('post', $spec['paths']['/api/contents/{contentId}/chat']);
+        self::assertArrayHasKey('post', $spec['paths']['/api/contents/{contentId}/chat/stream']);
     }
 
     public function testOpenApiSpecDocumentsSearchLibraryQueryParameter(): void
@@ -860,6 +862,87 @@ final class ApiDocumentationTest extends WebTestCase
             self::assertContains('artifactId', $citationSchema['required']);
             self::assertContains('chunkId', $citationSchema['required']);
             self::assertContains('score', $citationSchema['required']);
+        }
+    }
+
+    public function testOpenApiSpecDocumentsAskContentChatStreamPathParameter(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/contents/{contentId}/chat/stream']['post'];
+
+        self::assertSame('askContentChatStream', $operation['operationId']);
+
+        $pathParameter = null;
+
+        foreach ($operation['parameters'] as $parameter) {
+            if (($parameter['name'] ?? null) === 'contentId') {
+                $pathParameter = $parameter;
+                break;
+            }
+        }
+
+        self::assertNotNull($pathParameter, 'Missing path parameter: contentId');
+        self::assertSame('path', $pathParameter['in']);
+        self::assertTrue($pathParameter['required']);
+        self::assertSame('string', $pathParameter['schema']['type']);
+        self::assertSame('uuid', $pathParameter['schema']['format']);
+        self::assertSame('550e8400-e29b-41d4-a716-446655440000', $pathParameter['example']);
+    }
+
+    public function testOpenApiSpecDocumentsAskContentChatStreamRequestBody(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $requestBody = $spec['paths']['/api/contents/{contentId}/chat/stream']['post']['requestBody'];
+
+        self::assertTrue($requestBody['required']);
+        self::assertSame(
+            '#/components/schemas/ChatRequest',
+            $requestBody['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsAskContentChatStreamResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/contents/{contentId}/chat/stream']['post']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame(
+            'SSE stream of chat tokens followed by a done event',
+            $responses['200']['description'],
+        );
+        self::assertArrayHasKey('text/event-stream', $responses['200']['content']);
+        self::assertSame(
+            'string',
+            $responses['200']['content']['text/event-stream']['schema']['type'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsChatStreamTokenSchema(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('ChatStreamToken', $spec['components']['schemas']);
+
+        $tokenSchema = $spec['components']['schemas']['ChatStreamToken'];
+
+        self::assertArrayHasKey('index', $tokenSchema['properties']);
+        self::assertArrayHasKey('text', $tokenSchema['properties']);
+        self::assertSame('integer', $tokenSchema['properties']['index']['type']);
+        self::assertSame(0, $tokenSchema['properties']['index']['minimum']);
+        self::assertSame('string', $tokenSchema['properties']['text']['type']);
+        self::assertSame(1, $tokenSchema['properties']['text']['minLength']);
+        self::assertSame('Mock ', $tokenSchema['properties']['text']['example']);
+        if (isset($tokenSchema['required'])) {
+            self::assertContains('index', $tokenSchema['required']);
+            self::assertContains('text', $tokenSchema['required']);
         }
     }
 

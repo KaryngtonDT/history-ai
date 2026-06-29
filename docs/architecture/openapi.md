@@ -164,6 +164,7 @@ Shared OpenAPI schemas:
 | `ChatAnswer` | `Presentation/OpenApi/Schema/ChatAnswer.php` |
 | `ChatSource` | `Presentation/OpenApi/Schema/ChatSource.php` |
 | `ChatCitation` | `Presentation/OpenApi/Schema/ChatCitation.php` |
+| `ChatStreamToken` | `Presentation/OpenApi/Schema/ChatStreamToken.php` |
 
 `GET /api/timeline/{artifactId}` returns a `Timeline` with nested `sections[].events[].text`.
 
@@ -184,6 +185,10 @@ Shared OpenAPI schemas:
 **UX-01 note:** Chat provider selection (`CHAT_PROVIDER`, Gemini adapter) is internal to the backend. The chat HTTP contract and OpenAPI schemas document the stable request/response shape only.
 
 **UX-02 note:** Interactive citations (`citations[]`) are documented in OpenAPI slice 5. Frontend navigation (click `[1]` → scroll + highlight) is a UI concern; the HTTP contract exposes citation metadata only.
+
+`POST /api/contents/{contentId}/chat/stream` accepts a `ChatRequest` body (`question`, 1–2000 characters) and returns `text/event-stream`. The stream emits SSE `token` events with JSON payloads matching `ChatStreamToken` (`index`, `text`), followed by a `done` event with `{}`. Invalid UUID, malformed JSON, or invalid question returns HTTP 400 with `ErrorResponse`. Streaming uses the mock provider by default; Gemini true streaming is not yet exposed.
+
+**UX-03 note:** The streaming chat endpoint is documented in OpenAPI slice 6. Token payloads use `ChatStreamToken`; sources and citations are not included in the SSE stream (non-streaming `POST /chat` remains available for full answers with metadata).
 
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 

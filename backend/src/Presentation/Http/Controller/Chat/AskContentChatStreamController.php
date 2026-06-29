@@ -11,6 +11,7 @@ use App\Domain\Content\Exception\InvalidContentIdException;
 use App\Presentation\Http\Request\Chat\AskContentChatRequest;
 use App\Presentation\Http\Request\Chat\Exception\InvalidChatRequestException;
 use App\Presentation\Http\Response\Chat\ChatStreamResponse;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,44 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class AskContentChatStreamController extends AbstractController
 {
+    #[OA\Post(
+        operationId: 'askContentChatStream',
+        summary: 'Stream a chat answer about content',
+        description: 'Returns a Server-Sent Events stream of answer tokens. Each `token` event carries a `ChatStreamToken` JSON payload (`index`, `text`). A final `done` event signals completion.',
+        tags: ['Chat'],
+        parameters: [
+            new OA\Parameter(
+                name: 'contentId',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid'),
+                example: '550e8400-e29b-41d4-a716-446655440000',
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/ChatRequest'),
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'SSE stream of chat tokens followed by a done event',
+                content: new OA\MediaType(
+                    mediaType: 'text/event-stream',
+                    schema: new OA\Schema(
+                        type: 'string',
+                        description: 'SSE events: `token` (data: ChatStreamToken JSON) and `done` (data: {})',
+                        example: "event: token\ndata: {\"index\":0,\"text\":\"Mock \"}\n\nevent: token\ndata: {\"index\":1,\"text\":\"answer \"}\n\nevent: done\ndata: {}\n\n",
+                    ),
+                ),
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid request',
+                content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse'),
+            ),
+        ],
+    )]
     #[Route(
         '/api/contents/{contentId}/chat/stream',
         name: 'api_contents_chat_stream',

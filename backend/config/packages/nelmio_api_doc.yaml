@@ -37,6 +37,7 @@ nelmio_api_doc:
             - { alias: ChatAnswer, type: App\Presentation\OpenApi\Schema\ChatAnswer }
             - { alias: ChatSource, type: App\Presentation\OpenApi\Schema\ChatSource }
             - { alias: ChatCitation, type: App\Presentation\OpenApi\Schema\ChatCitation }
+            - { alias: ChatStreamToken, type: App\Presentation\OpenApi\Schema\ChatStreamToken }
     areas:
         default:
             path_patterns:

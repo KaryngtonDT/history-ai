@@ -534,6 +534,34 @@ ProcessingArtifacts.handleCitationClick
 
 Citations are **presentation navigation** only — domain and provider logic unchanged after slice 1.
 
+### Streaming chat (UX-03)
+
+```text
+ChatPanel
+        │
+        ▼
+ChatService.streamQuestion()
+        │
+        ▼
+POST /api/contents/{contentId}/chat/stream
+        │
+        ▼
+SSE token events (ChatStreamToken)
+        │
+        ▼
+Assistant bubble grows progressively
+```
+
+| Component | Rule |
+| --------- | ---- |
+| `StreamingChatProviderInterface` | Separate from `ChatProviderInterface`; opt-in streaming |
+| `POST /chat/stream` | `text/event-stream`; `token` + `done` events |
+| `ChatStreamToken` (OpenAPI) | `index`, `text` — token payload only |
+| `HttpChatRepository` | Only place allowed to use `fetch()` for SSE (exception to HttpClient rule) |
+| `ChatPanel` | Uses `streamQuestion()` only; no repository imports |
+
+Streaming does not yet emit sources/citations — use non-streaming `/chat` for full metadata.
+
 ## Enforcement
 
 | Tool | Location | Command |
