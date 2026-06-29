@@ -11,6 +11,8 @@ export interface ChatMessageItem {
 	content: string;
 	sources?: ChatSource[];
 	citations?: ChatCitation[];
+	streaming?: boolean;
+	failed?: boolean;
 }
 
 export interface ChatMessageListProps {
@@ -36,6 +38,8 @@ export function ChatMessageList({
 						speaker={message.role}
 						content={message.content}
 						citations={message.citations}
+						streaming={message.streaming}
+						failed={message.failed}
 						onCitationClick={
 							message.role === "assistant" ? onCitationClick : undefined
 						}

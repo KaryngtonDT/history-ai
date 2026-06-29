@@ -11,6 +11,8 @@ export interface ChatMessageProps {
 	speaker: "user" | "assistant";
 	content: string;
 	citations?: ChatCitationRef[];
+	streaming?: boolean;
+	failed?: boolean;
 	onCitationClick?: (details: CitationClickDetails) => void;
 }
 
@@ -78,20 +80,45 @@ export function ChatMessage({
 	speaker,
 	content,
 	citations,
+	streaming = false,
+	failed = false,
 	onCitationClick,
 }: ChatMessageProps) {
 	const isUser = speaker === "user";
+	const assistantClasses = [
+		styles.message,
+		styles.assistantMessage,
+		streaming ? styles.streamingMessage : "",
+		failed ? styles.failedMessage : "",
+	]
+		.filter(Boolean)
+		.join(" ");
 
 	return (
 		<article
-			className={`${styles.message} ${isUser ? styles.userMessage : styles.assistantMessage}`}
+			className={
+				isUser ? `${styles.message} ${styles.userMessage}` : assistantClasses
+			}
 			aria-label={isUser ? CHAT_USER_PREFIX : CHAT_ASSISTANT_PREFIX}
+			aria-busy={streaming || undefined}
 		>
 			<p className={styles.prefix}>{isUser ? "👤" : "🤖"}</p>
 			<p className={styles.content}>
-				{isUser
-					? content
-					: renderAssistantContent(content, citations, onCitationClick)}
+				{isUser ? (
+					content
+				) : (
+					<>
+						{streaming && content === "" ? (
+							<span className={styles.generating}>Generating...</span>
+						) : null}
+						{content !== ""
+							? renderAssistantContent(content, citations, onCitationClick)
+							: null}
+						{failed ? (
+							<span className={styles.failed}>Unable to generate answer.</span>
+						) : null}
+					</>
+				)}
 			</p>
 		</article>
 	);

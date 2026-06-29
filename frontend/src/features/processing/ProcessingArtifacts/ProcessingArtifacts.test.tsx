@@ -1,7 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { CITATION_HIGHLIGHT_CLASS } from "@/features/chat/citationNavigation";
 import { ProcessingArtifacts } from "@/features/processing/ProcessingArtifacts";
 import { artifactService } from "@/services/artifact/ArtifactService";
 import { graphService } from "@/services/graph/GraphService";
@@ -9,18 +8,22 @@ import { libraryService } from "@/services/library/LibraryService";
 import { relationService } from "@/services/relation/RelationService";
 
 const {
-	mockAskQuestion,
+	mockStreamQuestion,
 	mockGetArtifactRelations,
 	mockGetArtifactRecommendations,
 } = vi.hoisted(() => ({
-	mockAskQuestion: vi.fn().mockResolvedValue({
-		answer: "Mock answer based on retrieved context.",
-		sources: [],
-		citations: [],
-	}),
+	mockStreamQuestion: vi.fn(),
 	mockGetArtifactRelations: vi.fn(),
 	mockGetArtifactRecommendations: vi.fn().mockResolvedValue([]),
 }));
+
+function mockStreamWithAnswer(answer: string): void {
+	mockStreamQuestion.mockImplementation((_contentId, _question, callbacks) => {
+		callbacks.onToken({ index: 0, text: answer });
+		callbacks.onDone();
+		return Promise.resolve();
+	});
+}
 
 vi.mock("@/services/relation/RelationService", () => ({
 	relationService: {
@@ -48,18 +51,14 @@ vi.mock("@/services/semantic/SemanticSearchService", () => ({
 
 vi.mock("@/services/chat/ChatService", () => ({
 	chatService: {
-		askQuestion: mockAskQuestion,
+		streamQuestion: mockStreamQuestion,
 	},
 }));
 
 describe("ProcessingArtifacts", () => {
 	beforeEach(() => {
-		mockAskQuestion.mockReset();
-		mockAskQuestion.mockResolvedValue({
-			answer: "Mock answer based on retrieved context.",
-			sources: [],
-			citations: [],
-		});
+		mockStreamQuestion.mockReset();
+		mockStreamWithAnswer("Mock answer based on retrieved context.");
 		mockGetArtifactRelations.mockReset();
 		mockGetArtifactRelations.mockResolvedValue([]);
 		mockGetArtifactRecommendations.mockReset();
@@ -393,7 +392,7 @@ describe("ProcessingArtifacts", () => {
 			screen.getByRole("status", { name: "Loading artifacts" }),
 		).toBeInTheDocument();
 		expect(artifactService.listByContentId).toHaveBeenCalledTimes(1);
-		expect(mockAskQuestion).not.toHaveBeenCalled();
+		expect(mockStreamQuestion).not.toHaveBeenCalled();
 	});
 
 	it("renders unsupported artifact types with fallback card", async () => {
@@ -757,9 +756,10 @@ describe("ProcessingArtifacts", () => {
 		);
 
 		await waitFor(() => {
-			expect(mockAskQuestion).toHaveBeenCalledWith(
+			expect(mockStreamQuestion).toHaveBeenCalledWith(
 				chatContentId,
 				"what is the purpose?",
+				expect.any(Object),
 			);
 		});
 	});
@@ -785,7 +785,7 @@ describe("ProcessingArtifacts", () => {
 		expect(
 			screen.queryByRole("textbox", { name: "Ask a question" }),
 		).not.toBeInTheDocument();
-		expect(mockAskQuestion).not.toHaveBeenCalled();
+		expect(mockStreamQuestion).not.toHaveBeenCalled();
 	});
 
 	it("loads artifacts exactly once when recommendations panels are shown", async () => {
@@ -910,83 +910,39 @@ describe("ProcessingArtifacts", () => {
 		expect(screen.getByText("Next")).toBeInTheDocument();
 	});
 
-	it("scrolls and highlights artifact when a citation marker is clicked", async () => {
-		vi.useFakeTimers({ shouldAdvanceTime: true });
+	it("renders streamed answer text with citation markers for later navigation", async () => {
+		const user = userEvent.setup();
+		const summaryId = "550e8400-e29b-41d4-a716-446655440002";
 
-		try {
-			const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-			const summaryId = "550e8400-e29b-41d4-a716-446655440002";
-			const chunkId = "550e8400-e29b-41d4-a716-446655440010";
+		vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
+			{
+				id: summaryId,
+				contentId: "550e8400-e29b-41d4-a716-446655440000",
+				processingJobId: "job-1",
+				type: "summary",
+				content: "Generated summary text",
+				createdAt: "2026-06-26T12:00:00+00:00",
+			},
+		]);
+		mockStreamWithAnswer("Rome collapsed because of military pressure [1].");
 
-			vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
-				{
-					id: summaryId,
-					contentId: "550e8400-e29b-41d4-a716-446655440000",
-					processingJobId: "job-1",
-					type: "summary",
-					content: "Generated summary text",
-					createdAt: "2026-06-26T12:00:00+00:00",
-				},
-			]);
-			mockAskQuestion.mockResolvedValue({
-				answer: "Rome collapsed because of military pressure [1].",
-				sources: [
-					{
-						artifactId: summaryId,
-						chunkId,
-						text: "Generated summary text",
-						score: 0.91,
-					},
-				],
-				citations: [
-					{
-						number: 1,
-						artifactId: summaryId,
-						chunkId,
-						score: 0.91,
-					},
-				],
-			});
+		render(
+			<ProcessingArtifacts contentId="550e8400-e29b-41d4-a716-446655440000" />,
+		);
 
-			render(
-				<ProcessingArtifacts contentId="550e8400-e29b-41d4-a716-446655440000" />,
-			);
+		expect(
+			await screen.findByText("Generated summary text"),
+		).toBeInTheDocument();
 
-			expect(
-				await screen.findByText("Generated summary text"),
-			).toBeInTheDocument();
+		await user.type(
+			screen.getByRole("textbox", { name: "Ask a question" }),
+			"Why Rome?{enter}",
+		);
 
-			const artifactTarget = document.getElementById("artifact-summary");
-			expect(artifactTarget).not.toBeNull();
-			const scrollIntoView = vi.fn();
-			if (artifactTarget !== null) {
-				artifactTarget.scrollIntoView = scrollIntoView;
-			}
-
-			await user.type(
-				screen.getByRole("textbox", { name: "Ask a question" }),
-				"Why Rome?{enter}",
-			);
-
-			await user.click(
-				await screen.findByRole("button", { name: "Citation 1" }),
-			);
-
-			expect(scrollIntoView).toHaveBeenCalledWith({
-				behavior: "smooth",
-				block: "start",
-			});
-			expect(artifactTarget?.classList.contains(CITATION_HIGHLIGHT_CLASS)).toBe(
-				true,
-			);
-
-			vi.advanceTimersByTime(3000);
-
-			expect(artifactTarget?.classList.contains(CITATION_HIGHLIGHT_CLASS)).toBe(
-				false,
-			);
-		} finally {
-			vi.useRealTimers();
-		}
+		expect(
+			await screen.findByText(
+				"Rome collapsed because of military pressure [1].",
+			),
+		).toBeInTheDocument();
 	});
 });

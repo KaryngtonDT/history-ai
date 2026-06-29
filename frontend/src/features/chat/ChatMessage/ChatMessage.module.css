@@ -49,3 +49,28 @@
 		var(--shell-text)
 	);
 }
+
+.streamingMessage {
+	border-color: color-mix(
+		in srgb,
+		var(--shell-accent, #3b82f6) 35%,
+		var(--shell-border)
+	);
+}
+
+.generating {
+	color: var(--shell-text-muted);
+	font-style: italic;
+}
+
+.failedMessage {
+	border-color: color-mix(
+		in srgb,
+		var(--color-danger, #dc2626) 35%,
+		var(--shell-border)
+	);
+}
+
+.failed {
+	color: var(--color-danger, #dc2626);
+}

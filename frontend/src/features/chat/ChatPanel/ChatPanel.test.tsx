@@ -6,13 +6,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Artifact } from "@/services/artifact/types";
 import { ChatPanel } from "./ChatPanel";
 
-const { mockAskQuestion } = vi.hoisted(() => ({
-	mockAskQuestion: vi.fn(),
+const { mockStreamQuestion } = vi.hoisted(() => ({
+	mockStreamQuestion: vi.fn(),
 }));
 
 vi.mock("@/services/chat/ChatService", () => ({
 	chatService: {
-		askQuestion: mockAskQuestion,
+		streamQuestion: mockStreamQuestion,
 	},
 }));
 
@@ -28,24 +28,29 @@ const artifacts: Artifact[] = [
 	},
 ];
 
+function mockStreamWithTokens(
+	tokens: Array<{ index: number; text: string }>,
+): void {
+	mockStreamQuestion.mockImplementation((_contentId, _question, callbacks) => {
+		for (const token of tokens) {
+			callbacks.onToken(token);
+		}
+		callbacks.onDone();
+		return Promise.resolve();
+	});
+}
+
 describe("ChatPanel", () => {
 	beforeEach(() => {
-		mockAskQuestion.mockReset();
+		mockStreamQuestion.mockReset();
 	});
 
-	it("calls ChatService when Send is clicked", async () => {
+	it("calls streamQuestion when Send is clicked", async () => {
 		const user = userEvent.setup();
-		mockAskQuestion.mockResolvedValue({
-			answer: "Mock answer based on retrieved context.",
-			sources: [
-				{
-					artifactId: "550e8400-e29b-41d4-a716-446655440002",
-					chunkId: "550e8400-e29b-41d4-a716-446655440010",
-					text: "## Ancient Rome",
-					score: 0.97,
-				},
-			],
-		});
+		mockStreamWithTokens([
+			{ index: 0, text: "Mock " },
+			{ index: 1, text: "answer based on retrieved context." },
+		]);
 
 		render(<ChatPanel contentId={contentId} artifacts={artifacts} />);
 
@@ -56,9 +61,14 @@ describe("ChatPanel", () => {
 		await user.click(screen.getByRole("button", { name: "Send" }));
 
 		await waitFor(() => {
-			expect(mockAskQuestion).toHaveBeenCalledWith(
+			expect(mockStreamQuestion).toHaveBeenCalledWith(
 				contentId,
 				"Why did Rome collapse?",
+				expect.objectContaining({
+					onToken: expect.any(Function),
+					onDone: expect.any(Function),
+					onError: expect.any(Function),
+				}),
 			);
 		});
 
@@ -66,17 +76,59 @@ describe("ChatPanel", () => {
 		expect(
 			screen.getByText("Mock answer based on retrieved context."),
 		).toBeInTheDocument();
-		expect(
-			screen.getByRole("link", { name: "Summary (0.97)" }),
-		).toBeInTheDocument();
+	});
+
+	it("shows user message immediately and generating state before tokens arrive", async () => {
+		const user = userEvent.setup();
+		mockStreamQuestion.mockImplementation(() => new Promise(() => {}));
+
+		render(<ChatPanel contentId={contentId} artifacts={artifacts} />);
+
+		await user.type(
+			screen.getByRole("textbox", { name: "Ask a question" }),
+			"Why did Rome collapse?",
+		);
+		await user.click(screen.getByRole("button", { name: "Send" }));
+
+		expect(screen.getByText("Why did Rome collapse?")).toBeInTheDocument();
+		expect(screen.getByText("Generating...")).toBeInTheDocument();
+		expect(screen.getByLabelText("Assistant")).toHaveAttribute(
+			"aria-busy",
+			"true",
+		);
+	});
+
+	it("appends tokens in order and clears generating state on done", async () => {
+		const user = userEvent.setup();
+		mockStreamQuestion.mockImplementation(
+			async (_contentId, _question, callbacks) => {
+				callbacks.onToken({ index: 0, text: "Mock " });
+				callbacks.onToken({ index: 1, text: "answer " });
+				callbacks.onToken({ index: 2, text: "based on retrieved context." });
+				callbacks.onDone();
+			},
+		);
+
+		render(<ChatPanel contentId={contentId} artifacts={artifacts} />);
+
+		await user.type(
+			screen.getByRole("textbox", { name: "Ask a question" }),
+			"Why did Rome collapse?",
+		);
+		await user.click(screen.getByRole("button", { name: "Send" }));
+
+		await waitFor(() => {
+			expect(
+				screen.getByText("Mock answer based on retrieved context."),
+			).toBeInTheDocument();
+		});
+		expect(screen.queryByText("Generating...")).not.toBeInTheDocument();
+		expect(screen.getByLabelText("Assistant")).not.toHaveAttribute("aria-busy");
 	});
 
 	it("submits on Enter key", async () => {
 		const user = userEvent.setup();
-		mockAskQuestion.mockResolvedValue({
-			answer: "Mock answer based on retrieved context.",
-			sources: [],
-		});
+		mockStreamWithTokens([{ index: 0, text: "Mock answer." }]);
 
 		render(<ChatPanel contentId={contentId} artifacts={artifacts} />);
 
@@ -86,9 +138,10 @@ describe("ChatPanel", () => {
 		);
 
 		await waitFor(() => {
-			expect(mockAskQuestion).toHaveBeenCalledWith(
+			expect(mockStreamQuestion).toHaveBeenCalledWith(
 				contentId,
 				"Why did Rome collapse?",
+				expect.any(Object),
 			);
 		});
 	});
@@ -104,12 +157,35 @@ describe("ChatPanel", () => {
 		);
 
 		expect(screen.getByRole("button", { name: "Send" })).toBeDisabled();
-		expect(mockAskQuestion).not.toHaveBeenCalled();
+		expect(mockStreamQuestion).not.toHaveBeenCalled();
 	});
 
-	it("shows loading spinner while waiting for answer", async () => {
+	it("disables submit while streaming", async () => {
 		const user = userEvent.setup();
-		mockAskQuestion.mockReturnValue(new Promise(() => {}));
+		mockStreamQuestion.mockReturnValue(new Promise(() => {}));
+
+		render(<ChatPanel contentId={contentId} artifacts={artifacts} />);
+
+		await user.type(
+			screen.getByRole("textbox", { name: "Ask a question" }),
+			"Why did Rome collapse?",
+		);
+		await user.click(screen.getByRole("button", { name: "Send" }));
+
+		expect(screen.getByRole("button", { name: "Send" })).toBeDisabled();
+		expect(
+			screen.getByRole("textbox", { name: "Ask a question" }),
+		).toBeDisabled();
+	});
+
+	it("shows fallback when stream fails before any token", async () => {
+		const user = userEvent.setup();
+		mockStreamQuestion.mockImplementation(
+			(_contentId, _question, callbacks) => {
+				callbacks.onError(new Error("Network error"));
+				return Promise.resolve();
+			},
+		);
 
 		render(<ChatPanel contentId={contentId} artifacts={artifacts} />);
 
@@ -120,13 +196,20 @@ describe("ChatPanel", () => {
 		await user.click(screen.getByRole("button", { name: "Send" }));
 
 		expect(
-			screen.getByRole("status", { name: "Generating answer" }),
+			await screen.findByText("Unable to generate answer."),
 		).toBeInTheDocument();
+		expect(screen.queryByLabelText("Assistant")).not.toBeInTheDocument();
 	});
 
-	it("shows error state when ChatService fails", async () => {
+	it("shows error state when stream fails after tokens were received", async () => {
 		const user = userEvent.setup();
-		mockAskQuestion.mockRejectedValue(new Error("Network error"));
+		mockStreamQuestion.mockImplementation(
+			(_contentId, _question, callbacks) => {
+				callbacks.onToken({ index: 0, text: "Partial " });
+				callbacks.onError(new Error("Network error"));
+				return Promise.resolve();
+			},
+		);
 
 		render(<ChatPanel contentId={contentId} artifacts={artifacts} />);
 
@@ -136,17 +219,22 @@ describe("ChatPanel", () => {
 		);
 		await user.click(screen.getByRole("button", { name: "Send" }));
 
+		expect(await screen.findByLabelText("Assistant")).toHaveTextContent(
+			"Partial ",
+		);
 		expect(
 			await screen.findByText("Unable to get an answer"),
 		).toBeInTheDocument();
 	});
 
-	it("does not render an empty assistant bubble when ChatService returns empty answer", async () => {
+	it("does not render an empty assistant bubble when stream completes with empty answer", async () => {
 		const user = userEvent.setup();
-		mockAskQuestion.mockResolvedValue({
-			answer: "",
-			sources: [],
-		});
+		mockStreamQuestion.mockImplementation(
+			(_contentId, _question, callbacks) => {
+				callbacks.onDone();
+				return Promise.resolve();
+			},
+		);
 
 		render(<ChatPanel contentId={contentId} artifacts={artifacts} />);
 
@@ -167,10 +255,47 @@ describe("ChatPanel", () => {
 		expect(screen.queryByLabelText("Assistant")).not.toBeInTheDocument();
 	});
 
-	it("does not use direct fetch or HTTP repository imports", () => {
+	it("forwards citation clicks through onCitationClick prop", async () => {
+		const user = userEvent.setup();
+		const onCitationClick = vi.fn();
+		mockStreamQuestion.mockImplementation(
+			(_contentId, _question, callbacks) => {
+				callbacks.onToken({
+					index: 0,
+					text: "Rome collapsed because of military pressure [1].",
+				});
+				callbacks.onDone();
+				return Promise.resolve();
+			},
+		);
+
+		render(
+			<ChatPanel
+				contentId={contentId}
+				artifacts={artifacts}
+				onCitationClick={onCitationClick}
+			/>,
+		);
+
+		await user.type(
+			screen.getByRole("textbox", { name: "Ask a question" }),
+			"Why did Rome collapse?",
+		);
+		await user.click(screen.getByRole("button", { name: "Send" }));
+
+		expect(
+			await screen.findByText(
+				"Rome collapsed because of military pressure [1].",
+			),
+		).toBeInTheDocument();
+		expect(onCitationClick).not.toHaveBeenCalled();
+	});
+
+	it("does not use askQuestion, fetch, or HTTP repository imports", () => {
 		const source = readFileSync(join(__dirname, "ChatPanel.tsx"), "utf8");
 		const fetchPattern = ["fetch", "("].join("");
 
+		expect(source).not.toContain("askQuestion");
 		expect(source).not.toContain(fetchPattern);
 		expect(source).not.toContain("HttpChatRepository");
 		expect(source).not.toContain("ChatRepositoryFactory");

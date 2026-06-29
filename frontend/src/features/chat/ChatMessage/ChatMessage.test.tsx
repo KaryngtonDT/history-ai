@@ -27,6 +27,16 @@ describe("ChatMessage", () => {
 		expect(screen.getByLabelText("Assistant")).toBeInTheDocument();
 	});
 
+	it("shows generating state for streaming assistant message", () => {
+		render(<ChatMessage speaker="assistant" content="" streaming />);
+
+		expect(screen.getByText("Generating...")).toBeInTheDocument();
+		expect(screen.getByLabelText("Assistant")).toHaveAttribute(
+			"aria-busy",
+			"true",
+		);
+	});
+
 	it("renders citation markers as buttons and emits chunkId on click", async () => {
 		const user = userEvent.setup();
 		const onCitationClick = vi.fn();
