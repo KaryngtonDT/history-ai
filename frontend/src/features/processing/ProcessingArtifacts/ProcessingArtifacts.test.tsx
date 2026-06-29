@@ -68,6 +68,16 @@ vi.mock("@/services/conversation/ConversationService", () => ({
 	},
 }));
 
+vi.mock("@/services/agent/AgentService", () => ({
+	agentService: {
+		runAgent: vi.fn().mockResolvedValue({
+			plan: [],
+			steps: [],
+			finalSummary: "",
+		}),
+	},
+}));
+
 describe("ProcessingArtifacts", () => {
 	beforeEach(() => {
 		mockStreamQuestion.mockReset();
@@ -646,6 +656,26 @@ describe("ProcessingArtifacts", () => {
 			"href",
 			"#artifact-transcript",
 		);
+	});
+
+	it("renders AgentModePanel below knowledge graph", async () => {
+		vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
+			{
+				id: "550e8400-e29b-41d4-a716-446655440002",
+				contentId: "550e8400-e29b-41d4-a716-446655440000",
+				processingJobId: "job-1",
+				type: "summary",
+				content: "Generated summary text",
+				createdAt: "2026-06-26T12:00:00+00:00",
+			},
+		]);
+
+		render(
+			<ProcessingArtifacts contentId="550e8400-e29b-41d4-a716-446655440000" />,
+		);
+
+		expect(await screen.findByText("Agent Mode")).toBeInTheDocument();
+		expect(screen.getByText("No agent run yet")).toBeInTheDocument();
 	});
 
 	it("renders KnowledgeGraphPanel and still fetches artifacts once", async () => {

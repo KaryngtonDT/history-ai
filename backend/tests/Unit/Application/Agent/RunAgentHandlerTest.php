@@ -31,11 +31,7 @@ final class RunAgentHandlerTest extends TestCase
 
         self::assertSame(
             ['semantic_search', 'multi_document_chat'],
-            $result->plannedTools,
-        );
-        self::assertSame(
-            ['semantic_search', 'multi_document_chat'],
-            array_map(static fn ($step) => $step->tool, $result->steps),
+            array_map(static fn ($step) => $step->tool, $result->plan),
         );
         self::assertSame(
             [0, 1],
@@ -56,7 +52,7 @@ final class RunAgentHandlerTest extends TestCase
 
         self::assertSame(
             ['semantic_search', 'knowledge_graph', 'multi_document_chat'],
-            $result->plannedTools,
+            array_map(static fn ($step) => $step->tool, $result->plan),
         );
         self::assertSame('Knowledge graph exploration prepared.', $result->steps[1]->summary);
     }
@@ -67,7 +63,7 @@ final class RunAgentHandlerTest extends TestCase
 
         self::assertSame(
             ['semantic_search', 'conversation_memory', 'multi_document_chat'],
-            $result->plannedTools,
+            array_map(static fn ($step) => $step->tool, $result->plan),
         );
         self::assertSame('Conversation memory prepared.', $result->steps[1]->summary);
     }
@@ -128,7 +124,10 @@ final class RunAgentHandlerTest extends TestCase
         $first = ($this->handler)($command);
         $second = ($this->handler)($command);
 
-        self::assertSame($first->plannedTools, $second->plannedTools);
+        self::assertSame(
+            array_map(static fn ($step) => [$step->order, $step->tool, $step->description], $first->plan),
+            array_map(static fn ($step) => [$step->order, $step->tool, $step->description], $second->plan),
+        );
         self::assertSame(
             array_map(static fn ($step) => $step->summary, $first->steps),
             array_map(static fn ($step) => $step->summary, $second->steps),

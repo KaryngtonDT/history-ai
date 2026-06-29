@@ -80,6 +80,10 @@ export function conversationGraphPath(conversationId: string): string {
 	return `/api/conversations/${conversationId}/graph`;
 }
 
+export function contentAgentRunPath(contentId: string): string {
+	return `${CONTENTS_PATH}/${contentId}/agent/run`;
+}
+
 export function collectionItemsPath(collectionId: string): string {
 	return `${COLLECTIONS_PATH}/${collectionId}/items`;
 }

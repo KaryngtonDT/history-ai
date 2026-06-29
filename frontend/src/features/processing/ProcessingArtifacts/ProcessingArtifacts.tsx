@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { AgentModePanel } from "@/features/agent/AgentModePanel";
 import { ChatPanel } from "@/features/chat/ChatPanel";
 import {
 	CHAT_UNAVAILABLE_DESCRIPTION,
@@ -190,6 +191,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 			))}
 			<ArtifactRelationsPanel contentId={contentId} artifacts={artifacts} />
 			<KnowledgeGraphPanel contentId={contentId} />
+			<AgentModePanel contentId={contentId} />
 			<SemanticSearchPanel contentId={contentId} artifacts={artifacts} />
 			{chatSection}
 		</div>

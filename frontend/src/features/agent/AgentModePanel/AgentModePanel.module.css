@@ -1,0 +1,61 @@
+.agentModePanel {
+	padding: var(--space-5);
+	margin-top: var(--space-4);
+}
+
+.label {
+	margin: 0;
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.agentForm {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-3);
+	align-items: flex-end;
+	margin-top: var(--space-4);
+}
+
+.questionField {
+	display: flex;
+	flex: 1 1 16rem;
+	flex-direction: column;
+	gap: var(--space-2);
+	min-width: 0;
+}
+
+.questionLabel {
+	font-size: var(--font-xs);
+	font-weight: var(--font-weight-medium);
+	color: var(--shell-text-muted);
+}
+
+.questionInput {
+	width: 100%;
+	padding: var(--space-3) var(--space-4);
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-md);
+	font: inherit;
+	color: var(--shell-text);
+	background: var(--shell-surface);
+}
+
+.loadingState {
+	display: flex;
+	justify-content: center;
+	margin-top: var(--space-4);
+}
+
+.errorMessage {
+	margin: var(--space-4) 0 0;
+	font-size: var(--font-sm);
+	color: var(--shell-danger, #b42318);
+}
+
+.emptyState {
+	margin-top: var(--space-3);
+}

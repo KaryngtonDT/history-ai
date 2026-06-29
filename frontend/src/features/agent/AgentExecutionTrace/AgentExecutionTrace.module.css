@@ -1,0 +1,74 @@
+.agentExecutionTrace {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4);
+	margin-top: var(--space-4);
+}
+
+.sectionTitle {
+	margin: 0;
+	font-size: var(--font-xs);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.stepList {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.stepItem {
+	padding: var(--space-3) var(--space-4);
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-md);
+	background: var(--shell-surface-muted);
+}
+
+.stepHeader {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2);
+	align-items: center;
+	margin-bottom: var(--space-2);
+}
+
+.stepOrder {
+	font-size: var(--font-xs);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text-muted);
+}
+
+.stepTool {
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.stepStatus {
+	font-size: var(--font-xs);
+	font-weight: var(--font-weight-medium);
+	color: var(--shell-accent);
+	text-transform: capitalize;
+}
+
+.stepDescription,
+.stepSummary {
+	margin: 0;
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
+.finalSummary {
+	margin: 0;
+	padding: var(--space-3) var(--space-4);
+	border-left: 3px solid var(--shell-accent);
+	font-size: var(--font-sm);
+	color: var(--shell-text);
+	background: var(--shell-surface-muted);
+}
