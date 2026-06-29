@@ -52,8 +52,8 @@ final class RunAgentHandlerTest extends TestCase
 
                 return new AgentToolExecutionResult(
                     AgentTool::MultiDocumentChat,
-                    'No execution.',
-                    [],
+                    'Multi-document chat requires a conversation.',
+                    ['requiresConversation' => true],
                 );
             });
 
@@ -73,7 +73,8 @@ final class RunAgentHandlerTest extends TestCase
         );
         self::assertSame('Semantic search found 2 relevant chunks.', $result->steps[0]->summary);
         self::assertSame(['resultCount' => 2, 'topScore' => 0.91], $result->steps[0]->metadata);
-        self::assertSame('No execution.', $result->steps[1]->summary);
+        self::assertSame('Multi-document chat requires a conversation.', $result->steps[1]->summary);
+        self::assertSame(['requiresConversation' => true], $result->steps[1]->metadata);
         self::assertSame('Agent workflow completed.', $result->finalSummary);
     }
 
@@ -93,6 +94,11 @@ final class RunAgentHandlerTest extends TestCase
                         AgentTool::KnowledgeGraph,
                         'Knowledge graph contains 3 nodes and 3 relationships.',
                         ['nodeCount' => 3, 'edgeCount' => 3],
+                    ),
+                    AgentTool::MultiDocumentChat => new AgentToolExecutionResult(
+                        AgentTool::MultiDocumentChat,
+                        'Multi-document chat requires a conversation.',
+                        ['requiresConversation' => true],
                     ),
                     default => new AgentToolExecutionResult(
                         $execution->tool(),
@@ -118,15 +124,23 @@ final class RunAgentHandlerTest extends TestCase
             ->expects(self::exactly(3))
             ->method('execute')
             ->willReturnCallback(static function (AgentToolExecution $execution): AgentToolExecutionResult {
-                return new AgentToolExecutionResult(
-                    $execution->tool(),
-                    AgentTool::SemanticSearch === $execution->tool()
-                        ? 'Semantic search found no relevant chunks.'
-                        : 'No execution.',
-                    AgentTool::SemanticSearch === $execution->tool()
-                        ? ['resultCount' => 0]
-                        : [],
-                );
+                return match ($execution->tool()) {
+                    AgentTool::SemanticSearch => new AgentToolExecutionResult(
+                        AgentTool::SemanticSearch,
+                        'Semantic search found no relevant chunks.',
+                        ['resultCount' => 0],
+                    ),
+                    AgentTool::ConversationMemory => new AgentToolExecutionResult(
+                        AgentTool::ConversationMemory,
+                        'No execution.',
+                        [],
+                    ),
+                    default => new AgentToolExecutionResult(
+                        AgentTool::MultiDocumentChat,
+                        'Multi-document chat requires a conversation.',
+                        ['requiresConversation' => true],
+                    ),
+                };
             });
 
         $result = ($this->handler)(new RunAgentCommand(self::CONTENT_ID, 'What did we discuss earlier?'));
@@ -171,8 +185,8 @@ final class RunAgentHandlerTest extends TestCase
 
                 return new AgentToolExecutionResult(
                     AgentTool::MultiDocumentChat,
-                    'No execution.',
-                    [],
+                    'Multi-document chat requires a conversation.',
+                    ['requiresConversation' => true],
                 );
             });
 
@@ -264,15 +278,23 @@ final class RunAgentHandlerTest extends TestCase
         $this->toolExecutor
             ->method('execute')
             ->willReturnCallback(static function (AgentToolExecution $execution): AgentToolExecutionResult {
-                return new AgentToolExecutionResult(
-                    $execution->tool(),
-                    AgentTool::SemanticSearch === $execution->tool()
-                        ? 'Semantic search found 1 relevant chunks.'
-                        : 'No execution.',
-                    AgentTool::SemanticSearch === $execution->tool()
-                        ? ['resultCount' => 1, 'topScore' => 0.9]
-                        : [],
-                );
+                return match ($execution->tool()) {
+                    AgentTool::SemanticSearch => new AgentToolExecutionResult(
+                        AgentTool::SemanticSearch,
+                        'Semantic search found 1 relevant chunks.',
+                        ['resultCount' => 1, 'topScore' => 0.9],
+                    ),
+                    AgentTool::KnowledgeGraph => new AgentToolExecutionResult(
+                        AgentTool::KnowledgeGraph,
+                        'Knowledge graph is empty.',
+                        ['nodeCount' => 0, 'edgeCount' => 0],
+                    ),
+                    default => new AgentToolExecutionResult(
+                        AgentTool::MultiDocumentChat,
+                        'Multi-document chat requires a conversation.',
+                        ['requiresConversation' => true],
+                    ),
+                };
             });
 
         $command = new RunAgentCommand(self::CONTENT_ID, 'Compare Rome versus Byzantium');

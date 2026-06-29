@@ -36,7 +36,7 @@ final class RunAgentControllerTest extends WebTestCase
         );
         self::assertSame('completed', $response['steps'][0]['status']);
         self::assertSame('Semantic search found no relevant chunks.', $response['steps'][0]['summary']);
-        self::assertSame('No execution.', $response['steps'][1]['summary']);
+        self::assertSame('Multi-document chat requires a conversation.', $response['steps'][1]['summary']);
         self::assertSame('Agent workflow completed.', $response['finalSummary']);
     }
 
