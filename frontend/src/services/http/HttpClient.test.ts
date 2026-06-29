@@ -52,6 +52,42 @@ describe("HttpClient", () => {
 		expect(data).toEqual({ id: "new-id" });
 	});
 
+	it("performs PUT requests with JSON body", async () => {
+		const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+			new Response(
+				JSON.stringify({
+					conversation: {
+						id: "550e8400-e29b-41d4-a716-446655440001",
+						contentId: "550e8400-e29b-41d4-a716-446655440000",
+						messages: [],
+						documents: [{ contentId: "550e8400-e29b-41d4-a716-446655440000" }],
+					},
+				}),
+				{
+					status: 200,
+					headers: { "Content-Type": "application/json" },
+				},
+			),
+		);
+
+		const client = new HttpClient("http://localhost:8000");
+		const data = await client.put<{ conversation: { id: string } }>(
+			"/api/conversations/550e8400-e29b-41d4-a716-446655440001/documents",
+			{ contentIds: ["550e8400-e29b-41d4-a716-446655440000"] },
+		);
+
+		expect(fetchMock).toHaveBeenCalledWith(
+			"http://localhost:8000/api/conversations/550e8400-e29b-41d4-a716-446655440001/documents",
+			expect.objectContaining({
+				method: "PUT",
+				body: JSON.stringify({
+					contentIds: ["550e8400-e29b-41d4-a716-446655440000"],
+				}),
+			}),
+		);
+		expect(data.conversation.id).toBe("550e8400-e29b-41d4-a716-446655440001");
+	});
+
 	it("throws ApiError when the response is not ok", async () => {
 		vi.spyOn(globalThis, "fetch").mockResolvedValue(
 			new Response(null, { status: 500 }),

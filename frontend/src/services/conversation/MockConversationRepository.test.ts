@@ -45,4 +45,22 @@ describe("MockConversationRepository", () => {
 			text: "Second question",
 		});
 	});
+
+	it("updates selected documents while preserving messages", async () => {
+		const repository = new MockConversationRepository();
+		const otherContentId = "550e8400-e29b-41d4-a716-446655440099";
+
+		await repository.askQuestion(contentId, conversationId, "First question");
+		const updated = await repository.updateDocuments(conversationId, [
+			otherContentId,
+			contentId,
+		]);
+
+		expect(updated.contentId).toBe(otherContentId);
+		expect(updated.documents).toEqual([
+			{ contentId: otherContentId },
+			{ contentId },
+		]);
+		expect(updated.messages).toHaveLength(2);
+	});
 });

@@ -25,6 +25,10 @@ export const CHAT_UNAVAILABLE_DESCRIPTION =
 export const CHAT_EMPTY_ANSWER_MESSAGE =
 	"No answer was returned for this question. Check that the content identifier is valid.";
 
+export const DOCUMENT_SELECTOR_TITLE = "Documents in this conversation";
+
+export const DOCUMENT_SELECTOR_LABEL = "Select documents for this conversation";
+
 export const CHAT_STREAM_EMPTY_MESSAGE = "Unable to generate answer.";
 
 export function formatChatScore(score: number): string {

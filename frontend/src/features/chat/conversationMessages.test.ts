@@ -16,6 +16,7 @@ describe("mapConversationToChatMessageItems", () => {
 						text: "Second answer with citation [1].",
 					},
 				],
+				documents: [{ contentId: "550e8400-e29b-41d4-a716-446655440000" }],
 			},
 			answer: {
 				answer: "Second answer with citation [1].",

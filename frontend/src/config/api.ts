@@ -58,6 +58,10 @@ export function contentConversationChatPath(
 	return `${CONTENTS_PATH}/${contentId}/conversations/${conversationId}/chat`;
 }
 
+export function conversationDocumentsPath(conversationId: string): string {
+	return `/api/conversations/${conversationId}/documents`;
+}
+
 export function collectionItemsPath(collectionId: string): string {
 	return `${COLLECTIONS_PATH}/${collectionId}/items`;
 }

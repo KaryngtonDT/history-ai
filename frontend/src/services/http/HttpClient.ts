@@ -31,9 +31,21 @@ export class HttpClient {
 	}
 
 	async post<T>(path: string, body: unknown): Promise<T> {
+		return this.request<T>("POST", path, body);
+	}
+
+	async put<T>(path: string, body: unknown): Promise<T> {
+		return this.request<T>("PUT", path, body);
+	}
+
+	private async request<T>(
+		method: "POST" | "PUT",
+		path: string,
+		body: unknown,
+	): Promise<T> {
 		try {
 			const response = await fetch(`${this.baseUrl}${path}`, {
-				method: "POST",
+				method,
 				headers: {
 					Accept: "application/json",
 					"Content-Type": "application/json",
@@ -43,7 +55,7 @@ export class HttpClient {
 
 			if (!response.ok) {
 				throw new ApiError(
-					`POST ${path} failed (${response.status})`,
+					`${method} ${path} failed (${response.status})`,
 					response.status,
 				);
 			}
@@ -54,7 +66,7 @@ export class HttpClient {
 				throw error;
 			}
 
-			throw new NetworkError(`POST ${path} failed`, error);
+			throw new NetworkError(`${method} ${path} failed`, error);
 		}
 	}
 }

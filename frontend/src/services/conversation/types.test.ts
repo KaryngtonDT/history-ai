@@ -36,6 +36,7 @@ describe("conversation types", () => {
 					{ role: "user", text: "Why did Rome collapse?" },
 					{ role: "assistant", text: "Mock answer." },
 				],
+				documents: [{ contentId: "550e8400-e29b-41d4-a716-446655440000" }],
 			}),
 		).toEqual({
 			id: "550e8400-e29b-41d4-a716-446655440001",
@@ -44,7 +45,18 @@ describe("conversation types", () => {
 				{ role: "user", text: "Why did Rome collapse?" },
 				{ role: "assistant", text: "Mock answer." },
 			],
+			documents: [{ contentId: "550e8400-e29b-41d4-a716-446655440000" }],
 		});
+	});
+
+	it("defaults documents to primary content id when API omits documents", () => {
+		expect(
+			mapConversationFromApi({
+				id: "550e8400-e29b-41d4-a716-446655440001",
+				contentId: "550e8400-e29b-41d4-a716-446655440000",
+				messages: [],
+			})?.documents,
+		).toEqual([{ contentId: "550e8400-e29b-41d4-a716-446655440000" }]);
 	});
 
 	it("maps conversation chat from API", () => {
@@ -60,6 +72,7 @@ describe("conversation types", () => {
 							text: "Mock answer based on retrieved context [1].",
 						},
 					],
+					documents: [{ contentId: "550e8400-e29b-41d4-a716-446655440000" }],
 				},
 				answer: {
 					answer: "Mock answer based on retrieved context [1].",
@@ -92,6 +105,7 @@ describe("conversation types", () => {
 						text: "Mock answer based on retrieved context [1].",
 					},
 				],
+				documents: [{ contentId: "550e8400-e29b-41d4-a716-446655440000" }],
 			},
 			answer: {
 				answer: "Mock answer based on retrieved context [1].",

@@ -6,17 +6,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Artifact } from "@/services/artifact/types";
 import { ChatPanel } from "./ChatPanel";
 
-const { mockAskQuestion } = vi.hoisted(() => ({
+const { mockAskQuestion, mockUpdateDocuments } = vi.hoisted(() => ({
 	mockAskQuestion: vi.fn(),
+	mockUpdateDocuments: vi.fn(),
 }));
 
 vi.mock("@/services/conversation/ConversationService", () => ({
 	conversationService: {
 		askQuestion: mockAskQuestion,
+		updateDocuments: mockUpdateDocuments,
 	},
 }));
 
 const contentId = "550e8400-e29b-41d4-a716-446655440000";
+const otherContentId = "550e8400-e29b-41d4-a716-446655440099";
 const conversationId = "550e8400-e29b-41d4-a716-446655440001";
 const artifacts: Artifact[] = [
 	{
@@ -43,6 +46,7 @@ function mockConversationResponse(
 				{ role: "user", text: question },
 				{ role: "assistant", text: answerText },
 			],
+			documents: [{ contentId }],
 		},
 		answer: {
 			answer: answerText,
@@ -55,6 +59,7 @@ function mockConversationResponse(
 describe("ChatPanel", () => {
 	beforeEach(() => {
 		mockAskQuestion.mockReset();
+		mockUpdateDocuments.mockReset();
 		vi.spyOn(crypto, "randomUUID").mockReturnValue(conversationId);
 	});
 
@@ -142,6 +147,7 @@ describe("ChatPanel", () => {
 					{ role: "user", text: "Server question" },
 					{ role: "assistant", text: "Server answer" },
 				],
+				documents: [{ contentId }],
 			},
 			answer: {
 				answer: "Server answer",
@@ -242,7 +248,7 @@ describe("ChatPanel", () => {
 	it("shows empty answer fallback for invalid response", async () => {
 		const user = userEvent.setup();
 		mockAskQuestion.mockResolvedValueOnce({
-			conversation: { id: "", contentId: "", messages: [] },
+			conversation: { id: "", contentId: "", messages: [], documents: [] },
 			answer: { answer: "", sources: [], citations: [] },
 		});
 
@@ -278,6 +284,7 @@ describe("ChatPanel", () => {
 						text: "Rome collapsed because of military pressure [1].",
 					},
 				],
+				documents: [{ contentId }],
 			},
 			answer: {
 				answer: "Rome collapsed because of military pressure [1].",
@@ -332,5 +339,75 @@ describe("ChatPanel", () => {
 		expect(source).not.toContain("HttpConversationRepository");
 		expect(source).not.toContain("ConversationRepositoryFactory");
 		expect(source).not.toContain("HttpChatRepository");
+	});
+
+	it("shows document selector after the first conversation exists", async () => {
+		const user = userEvent.setup();
+		mockConversationResponse("Why did Rome collapse?");
+
+		render(<ChatPanel contentId={contentId} artifacts={artifacts} />);
+
+		expect(
+			screen.queryByText("Documents in this conversation"),
+		).not.toBeInTheDocument();
+
+		await user.type(
+			screen.getByRole("textbox", { name: "Ask a question" }),
+			"Why did Rome collapse?",
+		);
+		await user.click(screen.getByRole("button", { name: "Send" }));
+
+		expect(
+			await screen.findByText("Documents in this conversation"),
+		).toBeInTheDocument();
+		expect(screen.getByLabelText("This document")).toBeChecked();
+	});
+
+	it("calls updateDocuments when document selection changes", async () => {
+		const user = userEvent.setup();
+		mockConversationResponse("Why did Rome collapse?");
+		mockUpdateDocuments.mockResolvedValueOnce({
+			id: conversationId,
+			contentId: otherContentId,
+			messages: [
+				{ role: "user", text: "Why did Rome collapse?" },
+				{
+					role: "assistant",
+					text: "Mock answer based on retrieved context.",
+				},
+			],
+			documents: [{ contentId: otherContentId }, { contentId }],
+		});
+
+		const relatedArtifacts: Artifact[] = [
+			...artifacts,
+			{
+				...artifacts[0],
+				id: "550e8400-e29b-41d4-a716-446655440003",
+				contentId: otherContentId,
+			},
+		];
+
+		render(<ChatPanel contentId={contentId} artifacts={relatedArtifacts} />);
+
+		await user.type(
+			screen.getByRole("textbox", { name: "Ask a question" }),
+			"Why did Rome collapse?",
+		);
+		await user.click(screen.getByRole("button", { name: "Send" }));
+
+		await screen.findByText("Documents in this conversation");
+
+		await user.click(screen.getByLabelText(otherContentId));
+
+		await waitFor(() => {
+			expect(mockUpdateDocuments).toHaveBeenCalledWith(conversationId, [
+				contentId,
+				otherContentId,
+			]);
+		});
+
+		expect(mockAskQuestion).toHaveBeenCalledTimes(1);
+		expect(screen.getByLabelText(otherContentId)).toBeChecked();
 	});
 });

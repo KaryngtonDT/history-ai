@@ -13,6 +13,7 @@ import {
 } from "../chatLabels";
 import type { CitationClickDetails } from "../citationNavigation";
 import { mapConversationToChatMessageItems } from "../conversationMessages";
+import { type AvailableDocument, DocumentSelector } from "../DocumentSelector";
 import styles from "./ChatPanel.module.css";
 
 interface ChatPanelProps {
@@ -25,6 +26,22 @@ function createConversationId(): string {
 	return crypto.randomUUID();
 }
 
+function buildAvailableDocuments(
+	contentId: string,
+	artifacts: Artifact[],
+): AvailableDocument[] {
+	const contentIds = new Set<string>([contentId]);
+
+	for (const artifact of artifacts) {
+		contentIds.add(artifact.contentId);
+	}
+
+	return Array.from(contentIds).map((id) => ({
+		contentId: id,
+		label: id === contentId ? "This document" : id,
+	}));
+}
+
 export function ChatPanel({
 	contentId,
 	artifacts,
@@ -35,8 +52,26 @@ export function ChatPanel({
 		null,
 	);
 	const [loading, setLoading] = useState(false);
+	const [documentsUpdating, setDocumentsUpdating] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [question, setQuestion] = useState("");
+
+	const activeContentId = chatResult?.conversation.contentId ?? contentId;
+
+	const availableDocuments = useMemo(
+		() => buildAvailableDocuments(contentId, artifacts),
+		[contentId, artifacts],
+	);
+
+	const selectedContentIds = useMemo(() => {
+		if (chatResult === null || chatResult.conversation.documents.length === 0) {
+			return [contentId];
+		}
+
+		return chatResult.conversation.documents.map(
+			(document) => document.contentId,
+		);
+	}, [chatResult, contentId]);
 
 	const messages = useMemo<ChatMessageItem[]>(() => {
 		if (chatResult === null) {
@@ -53,6 +88,46 @@ export function ChatPanel({
 			),
 		[artifacts],
 	);
+
+	const hasConversation =
+		chatResult !== null && chatResult.conversation.id !== "";
+
+	function handleDocumentSelectionChange(contentIds: string[]): void {
+		if (
+			conversationId === null ||
+			documentsUpdating ||
+			contentIds.length === 0
+		) {
+			return;
+		}
+
+		setDocumentsUpdating(true);
+		setError(null);
+
+		void conversationService
+			.updateDocuments(conversationId, contentIds)
+			.then((conversation) => {
+				if (conversation.id === "") {
+					setError(CHAT_ERROR_MESSAGE);
+					return;
+				}
+
+				setChatResult((current) =>
+					current === null
+						? current
+						: {
+								...current,
+								conversation,
+							},
+				);
+			})
+			.catch(() => {
+				setError(CHAT_ERROR_MESSAGE);
+			})
+			.finally(() => {
+				setDocumentsUpdating(false);
+			});
+	}
 
 	function handleSubmit(): void {
 		const trimmedQuestion = question.trim();
@@ -72,7 +147,7 @@ export function ChatPanel({
 		setError(null);
 
 		void conversationService
-			.askQuestion(contentId, activeConversationId, trimmedQuestion)
+			.askQuestion(activeContentId, activeConversationId, trimmedQuestion)
 			.then((result) => {
 				if (
 					result.conversation.id === "" ||
@@ -97,6 +172,14 @@ export function ChatPanel({
 	return (
 		<Card className={styles.chatPanel}>
 			<p className={styles.label}>{CHAT_PANEL_TITLE}</p>
+			{hasConversation ? (
+				<DocumentSelector
+					availableDocuments={availableDocuments}
+					selectedContentIds={selectedContentIds}
+					onSelectionChange={handleDocumentSelectionChange}
+					disabled={loading || documentsUpdating}
+				/>
+			) : null}
 			<ChatMessageList
 				messages={messages}
 				artifactTypesById={artifactTypesById}
@@ -114,6 +197,7 @@ export function ChatPanel({
 				onChange={setQuestion}
 				onSubmit={handleSubmit}
 				loading={loading}
+				disabled={documentsUpdating}
 			/>
 		</Card>
 	);

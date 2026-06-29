@@ -29,6 +29,7 @@ function mockConversationWithAnswer(
 					{ role: "user", text: question },
 					{ role: "assistant", text: answer },
 				],
+				documents: [{ contentId }],
 			},
 			answer: {
 				answer,
@@ -66,6 +67,7 @@ vi.mock("@/services/semantic/SemanticSearchService", () => ({
 vi.mock("@/services/conversation/ConversationService", () => ({
 	conversationService: {
 		askQuestion: mockAskQuestion,
+		updateDocuments: vi.fn(),
 	},
 }));
 

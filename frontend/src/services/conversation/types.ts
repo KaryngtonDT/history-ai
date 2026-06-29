@@ -12,10 +12,15 @@ export interface ConversationMessage {
 	text: string;
 }
 
+export interface SelectedDocument {
+	contentId: string;
+}
+
 export interface Conversation {
 	id: string;
 	contentId: string;
 	messages: ConversationMessage[];
+	documents: SelectedDocument[];
 }
 
 export interface ConversationChatResult {
@@ -28,10 +33,15 @@ export interface ConversationMessageApiDto {
 	text: string;
 }
 
+export interface SelectedDocumentApiDto {
+	contentId: string;
+}
+
 export interface ConversationApiDto {
 	id: string;
 	contentId: string;
 	messages: ConversationMessageApiDto[];
+	documents?: SelectedDocumentApiDto[];
 }
 
 export interface ConversationChatApiDto {
@@ -39,10 +49,15 @@ export interface ConversationChatApiDto {
 	answer: ChatAnswerApiDto;
 }
 
+export interface UpdateConversationDocumentsApiDto {
+	conversation: ConversationApiDto;
+}
+
 export const EMPTY_CONVERSATION: Conversation = {
 	id: "",
 	contentId: "",
 	messages: [],
+	documents: [],
 };
 
 export const EMPTY_CONVERSATION_CHAT_RESULT: ConversationChatResult = {
@@ -78,6 +93,37 @@ export function mapConversationMessageFromApi(
 	};
 }
 
+export function mapSelectedDocumentFromApi(
+	dto: SelectedDocumentApiDto,
+): SelectedDocument | null {
+	if (
+		typeof dto.contentId !== "string" ||
+		!CONTENT_ID_PATTERN.test(dto.contentId)
+	) {
+		return null;
+	}
+
+	return {
+		contentId: dto.contentId,
+	};
+}
+
+function mapDocumentsFromApi(dto: ConversationApiDto): SelectedDocument[] {
+	if (!Array.isArray(dto.documents)) {
+		return [{ contentId: dto.contentId }];
+	}
+
+	const documents = dto.documents
+		.map(mapSelectedDocumentFromApi)
+		.filter((document): document is SelectedDocument => document !== null);
+
+	if (documents.length === 0) {
+		return [{ contentId: dto.contentId }];
+	}
+
+	return documents;
+}
+
 export function mapConversationFromApi(
 	dto: ConversationApiDto,
 ): Conversation | null {
@@ -99,6 +145,7 @@ export function mapConversationFromApi(
 		id: dto.id,
 		contentId: dto.contentId,
 		messages,
+		documents: mapDocumentsFromApi(dto),
 	};
 }
 
@@ -115,6 +162,16 @@ export function mapConversationChatFromApi(
 		conversation,
 		answer: mapChatAnswerFromApi(dto.answer),
 	};
+}
+
+export function mapUpdateConversationDocumentsFromApi(
+	dto: UpdateConversationDocumentsApiDto,
+): Conversation | null {
+	if (!dto || typeof dto !== "object" || !("conversation" in dto)) {
+		return null;
+	}
+
+	return mapConversationFromApi(dto.conversation);
 }
 
 export function isValidContentId(contentId: string): boolean {

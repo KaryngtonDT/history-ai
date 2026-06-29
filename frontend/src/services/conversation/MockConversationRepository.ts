@@ -10,6 +10,7 @@ import type {
 	Conversation,
 	ConversationChatResult,
 	ConversationMessage,
+	SelectedDocument,
 } from "./types";
 
 export class MockConversationRepository implements ConversationRepository {
@@ -23,7 +24,12 @@ export class MockConversationRepository implements ConversationRepository {
 		const existing = this.conversations.get(conversationId);
 		const conversation: Conversation =
 			existing === undefined
-				? { id: conversationId, contentId, messages: [] }
+				? {
+						id: conversationId,
+						contentId,
+						messages: [],
+						documents: [{ contentId }],
+					}
 				: existing;
 
 		const userMessage: ConversationMessage = {
@@ -38,8 +44,9 @@ export class MockConversationRepository implements ConversationRepository {
 
 		const updatedConversation: Conversation = {
 			id: conversationId,
-			contentId,
+			contentId: conversation.documents[0]?.contentId ?? contentId,
 			messages: [...conversation.messages, userMessage, assistantMessage],
+			documents: conversation.documents,
 		};
 
 		this.conversations.set(conversationId, updatedConversation);
@@ -48,6 +55,35 @@ export class MockConversationRepository implements ConversationRepository {
 			conversation: updatedConversation,
 			answer,
 		};
+	}
+
+	async updateDocuments(
+		conversationId: string,
+		contentIds: string[],
+	): Promise<Conversation> {
+		const existing = this.conversations.get(conversationId);
+
+		if (existing === undefined) {
+			return {
+				id: "",
+				contentId: "",
+				messages: [],
+				documents: [],
+			};
+		}
+
+		const documents: SelectedDocument[] = contentIds.map((id) => ({
+			contentId: id,
+		}));
+		const updatedConversation: Conversation = {
+			...existing,
+			contentId: documents[0]?.contentId ?? existing.contentId,
+			documents,
+		};
+
+		this.conversations.set(conversationId, updatedConversation);
+
+		return updatedConversation;
 	}
 
 	private buildMockAnswer(contentId: string, question: string): ChatAnswer {
