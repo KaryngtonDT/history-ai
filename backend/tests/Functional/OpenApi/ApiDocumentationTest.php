@@ -1594,8 +1594,14 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('plan', $executionSchema['properties']);
         self::assertArrayHasKey('steps', $executionSchema['properties']);
         self::assertArrayHasKey('finalSummary', $executionSchema['properties']);
+        self::assertArrayHasKey('metadata', $executionSchema['properties']);
         self::assertSame('array', $executionSchema['properties']['plan']['type']);
         self::assertSame('array', $executionSchema['properties']['steps']['type']);
+        self::assertSame('object', $executionSchema['properties']['metadata']['type']);
+        self::assertTrue($executionSchema['properties']['metadata']['additionalProperties'] ?? false);
+        self::assertArrayHasKey('example', $executionSchema['properties']['metadata']);
+        self::assertSame(3, $executionSchema['properties']['metadata']['example']['resultCount']);
+        self::assertSame(12, $executionSchema['properties']['metadata']['example']['nodeCount']);
         self::assertSame(
             '#/components/schemas/AgentPlanStep',
             $executionSchema['properties']['plan']['items']['$ref'],
@@ -1610,6 +1616,7 @@ final class ApiDocumentationTest extends WebTestCase
             self::assertContains('plan', $executionSchema['required']);
             self::assertContains('steps', $executionSchema['required']);
             self::assertContains('finalSummary', $executionSchema['required']);
+            self::assertContains('metadata', $executionSchema['required']);
         }
 
         self::assertSame(

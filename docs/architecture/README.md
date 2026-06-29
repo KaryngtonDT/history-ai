@@ -546,6 +546,59 @@ Verification: [Sprint29-Verification.md](../reports/Sprint29-Verification.md)
 
 ---
 
+# Platform Sprint 30 — Agent Metadata & Conversation Memory (2026-06)
+
+Platform Sprint 30 completes the agent tool stack: **Conversation Memory** executes against `ConversationRepositoryInterface`, **metadata aggregation** merges per-step tool metadata into `AgentExecutionResult.metadata`, and the frontend **AgentMetadataPanel** surfaces tool metrics in the agent trace UI. Slice 5 changed **OpenAPI documentation, architecture docs, and verification only** — no business logic in backend handlers, frontend, or worker.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P30-SLICE-01 | `ConversationMemoryExecution`, `ConversationMemoryResult`, `ConversationMemoryToolExecutorInterface`, `NullConversationMemoryToolExecutor` | ✅ |
+| P30-SLICE-02 | `ConversationMemoryToolExecutor`, composite routing | ✅ |
+| P30-SLICE-03 | `AgentMetadata`, `AgentMetadataCollection`, aggregated `AgentExecutionResult.metadata` | ✅ |
+| P30-SLICE-04 | HTTP `metadata` serialization; `AgentMetadataPanel` UI | ✅ |
+| P30-SLICE-05 | OpenAPI top-level metadata, architecture docs, this report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `ConversationMemoryExecution`, `ConversationMemoryResult`, `ConversationMemoryToolExecutorInterface`; `AgentMetadata`, `AgentMetadataCollection` |
+| Application | `RunAgentHandler` aggregates step metadata; `AgentExecutionResultDto.metadata` |
+| Infrastructure | `ConversationMemoryToolExecutor`, `ConversationMemoryAgentToolExecutor`; composite routes all four tools |
+| Presentation | `AgentExecutionResponse` exposes `metadata` and `steps[].metadata`; OpenAPI `AgentExecution.metadata` |
+| Frontend | `AgentMetadataPanel`, `agentMetadataLabels`; types map API metadata |
+
+```text
+AgentModePanel
+        │
+        ▼
+AgentService.runAgent()
+        │
+        ▼
+POST /api/contents/{contentId}/agent/run
+        │
+        ▼
+RunAgentHandler → AgentPlannerInterface
+        │
+        ▼
+CompositeAgentToolExecutor
+        ├── SemanticSearchToolExecutor      ✅ real
+        ├── KnowledgeGraphToolExecutor      ✅ real
+        ├── ConversationMemoryToolExecutor  ✅ real
+        └── MultiDocumentChatToolExecutor   ✅ real
+        │
+        ▼
+AgentMetadataCollection.merge()
+        │
+        ▼
+AgentExecution (plan[], steps[], finalSummary, metadata)
+        │
+        ▼
+AgentExecutionTrace + AgentMetadataPanel
+```
+
+Verification: [Sprint30-Verification.md](../reports/Sprint30-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

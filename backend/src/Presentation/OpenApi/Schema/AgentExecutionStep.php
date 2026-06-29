@@ -31,7 +31,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'metadata',
-            description: 'Tool-specific execution metadata (`object<string, mixed>`). SemanticSearch: `resultCount`, `topScore`. KnowledgeGraph: `nodeCount`, `edgeCount`. MultiDocumentChat: `messageCount`, `sourceCount`, `citationCount`. Missing conversation: `requiresConversation`.',
+            description: 'Tool-specific execution metadata (`object<string, mixed>`). SemanticSearch: `resultCount`, `topScore`. KnowledgeGraph: `nodeCount`, `edgeCount`. ConversationMemory: `messageCount`, `userMessages`, `assistantMessages`. MultiDocumentChat: `messageCount`, `sourceCount`, `citationCount`. Missing conversation: `requiresConversation`.',
             type: 'object',
             additionalProperties: true,
             example: [

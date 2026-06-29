@@ -241,23 +241,41 @@ Shared OpenAPI schemas:
 
 **Platform Sprint 29 note:** Real Tool Execution documents `AgentExecutionStep.metadata` (`object<string, mixed>`) on the agent run response contract. Metadata is tool-specific — see [Agent execution metadata](#agent-execution-metadata) below. Three tools execute real Application handlers; `conversation_memory` remains stubbed.
 
+**Platform Sprint 30 note:** Conversation Memory & Metadata Aggregation documents top-level `AgentExecution.metadata` (merged from all executed steps; later tools overwrite duplicate keys). All four agent tools execute real handlers. The frontend `AgentMetadataPanel` surfaces per-step metadata in the agent trace UI.
+
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 
 ---
 
 # Agent execution metadata
 
-`POST /api/contents/{contentId}/agent/run` returns `AgentExecution.steps[]` entries with `order`, `tool`, `status`, `summary`, and `metadata`.
+`POST /api/contents/{contentId}/agent/run` returns `AgentExecution` with `plan[]`, `steps[]`, `finalSummary`, and aggregated `metadata`.
+
+Each `AgentExecution.steps[]` entry includes `order`, `tool`, `status`, `summary`, and per-step `metadata`.
 
 | Tool | Metadata keys | Example |
 | ---- | ------------- | ------- |
 | `semantic_search` | `resultCount`, `topScore` (when results exist) | `{ "resultCount": 3, "topScore": 0.91 }` |
 | `knowledge_graph` | `nodeCount`, `edgeCount` | `{ "nodeCount": 12, "edgeCount": 18 }` |
+| `conversation_memory` | `messageCount`, `userMessages`, `assistantMessages` | `{ "messageCount": 9, "userMessages": 5, "assistantMessages": 4 }` |
 | `multi_document_chat` | `messageCount`, `sourceCount`, `citationCount` | `{ "messageCount": 4, "sourceCount": 3, "citationCount": 3 }` |
 | `multi_document_chat` (no conversation) | `requiresConversation` | `{ "requiresConversation": true }` |
-| `conversation_memory` | _(stub — empty object)_ | `{}` |
 
-Zero-result semantic search returns `{ "resultCount": 0 }`. Empty knowledge graph returns `{ "nodeCount": 0, "edgeCount": 0 }`. Multi-document chat requires `conversationId` in `AgentRunRequest` to invoke `AskConversationChatHandler`.
+**Aggregated `metadata`:** `RunAgentHandler` merges all step metadata into the top-level `metadata` object using a later-wins policy for duplicate keys. Example after a comparison workflow with conversation:
+
+```json
+{
+  "resultCount": 3,
+  "topScore": 0.91,
+  "nodeCount": 12,
+  "edgeCount": 18,
+  "messageCount": 9,
+  "sourceCount": 3,
+  "citationCount": 3
+}
+```
+
+Zero-result semantic search returns `{ "resultCount": 0 }`. Empty knowledge graph returns `{ "nodeCount": 0, "edgeCount": 0 }`. Missing or empty conversation memory returns `{}` on that step. Multi-document chat requires `conversationId` in `AgentRunRequest` to invoke `AskConversationChatHandler`.
 
 ---
 

@@ -374,10 +374,11 @@ POST /api/contents/{contentId}/agent/run
 | Component | Rule |
 | --------- | ---- |
 | `AgentModePanel` | Owns question, loading, error, and result state; calls `agentService.runAgent()` only |
-| `AgentExecutionTrace` | Props-only display of `plan[]`, `steps[]`, and `finalSummary` |
+| `AgentExecutionTrace` | Props-only display of `plan[]`, `steps[]`, `finalSummary`; composes `AgentMetadataPanel` |
 | `AgentService` | Validates UUIDs and question length; returns `EMPTY_AGENT_EXECUTION` on client-side invalid input or HTTP 400 |
 | `HttpAgentRepository` | Only agent repository using `HttpClient.post()`; no direct `fetch()` |
 | `DeterministicAgentPlanner` | Keyword-based plan only; no LLM planner |
+| `AgentMetadataPanel` | Props-only; renders per-tool metadata sections from `execution.steps[].metadata` |
 
 ### Agent tool execution (backend)
 
@@ -391,18 +392,24 @@ AgentToolExecutorInterface
 CompositeAgentToolExecutor
       ├── SemanticSearchToolExecutor → SearchSemanticChunksHandler
       ├── KnowledgeGraphToolExecutor → GetKnowledgeGraphHandler
+      ├── ConversationMemoryAgentToolExecutor → ConversationMemoryToolExecutor → ConversationRepositoryInterface
       ├── MultiDocumentChatToolExecutor → AskConversationChatHandler
-      └── NullAgentToolExecutor (ConversationMemory stub)
+      └── NullAgentToolExecutor (unused fallback)
+      │
+      ▼
+AgentMetadataCollection.merge() → AgentExecutionResult.metadata
 ```
 
 | Component | Rule |
 | --------- | ---- |
 | `AgentToolExecutorInterface` | Domain port; `RunAgentHandler` depends on this only — not concrete tool classes |
-| `CompositeAgentToolExecutor` | Routes by `AgentTool` enum; wires real executors + fallback no-op |
+| `CompositeAgentToolExecutor` | Routes by `AgentTool` enum; all four tools have real executors |
 | `SemanticSearchToolExecutor` | Delegates to `SearchSemanticChunksHandler`; metadata: `resultCount`, `topScore` |
 | `KnowledgeGraphToolExecutor` | Delegates to `GetKnowledgeGraphHandler`; metadata: `nodeCount`, `edgeCount` |
+| `ConversationMemoryToolExecutor` | Loads conversation via `ConversationRepositoryInterface`; metadata: `messageCount`, `userMessages`, `assistantMessages` |
 | `MultiDocumentChatToolExecutor` | Delegates to `AskConversationChatHandler` when `conversationId` present; metadata: `messageCount`, `sourceCount`, `citationCount` or `requiresConversation` |
-| `NullAgentToolExecutor` | Returns `"No execution."` for stubbed tools (`ConversationMemory`) |
+| `AgentMetadata` / `AgentMetadataCollection` | Domain types; merge step metadata with later-wins policy |
+| `AgentMetadataPanel` | Frontend feature; maps tool metadata keys to human-readable labels |
 | Continue-on-failure | Failed tool step marks `failed` summary; remaining steps still execute |
 
 Infrastructure executors must not call HTTP or duplicate Application handler logic.
