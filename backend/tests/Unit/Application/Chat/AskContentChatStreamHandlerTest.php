@@ -30,7 +30,9 @@ use App\Infrastructure\Chat\MockChatProvider;
 use App\Infrastructure\Semantic\DeterministicEmbeddingGenerator;
 use App\Infrastructure\Semantic\DeterministicEmbeddingProvider;
 use App\Infrastructure\Semantic\InMemoryVectorStore;
+use App\Tests\Unit\Application\Platform\Support\FixedClock;
 use App\Tests\Unit\Application\Platform\Support\FixedRequestContextProvider;
+use App\Tests\Unit\Application\Platform\Support\RecordingPerformanceMetricsRecorder;
 use App\Tests\Unit\Application\Platform\Support\RecordingPlatformLogger;
 use App\Domain\Platform\CorrelationId;
 use PHPUnit\Framework\TestCase;
@@ -42,10 +44,13 @@ final class AskContentChatStreamHandlerTest extends TestCase
         ?VectorStoreInterface $vectorStore = null,
         ?StreamingChatProviderInterface $streamingChatProvider = null,
         ?RecordingPlatformLogger $platformLogger = null,
+        ?RecordingPerformanceMetricsRecorder $metricsRecorder = null,
+        ?FixedClock $clock = null,
     ): AskContentChatStreamHandler {
         $store = $vectorStore ?? new InMemoryVectorStore();
         $contextProvider = new FixedRequestContextProvider(new CorrelationId('c6f98b8a-3f2e-4a1b-9c8d-1e2f3a4b5c6d'));
         $logger = $platformLogger ?? new RecordingPlatformLogger($contextProvider);
+        $recorder = $metricsRecorder ?? new RecordingPerformanceMetricsRecorder();
 
         return new AskContentChatStreamHandler(
             $repository,
@@ -56,6 +61,8 @@ final class AskContentChatStreamHandlerTest extends TestCase
             new ChatOrchestrator(),
             $streamingChatProvider ?? new MockChatProvider(),
             $logger,
+            $recorder,
+            $clock ?? new FixedClock(),
         );
     }
 
@@ -219,6 +226,51 @@ final class AskContentChatStreamHandlerTest extends TestCase
             'c6f98b8a-3f2e-4a1b-9c8d-1e2f3a4b5c6d',
             $platformLogger->records()[0]['context']['correlationId'],
         );
+    }
+
+    public function testRecordsPerformanceMetricsOncePerRequest(): void
+    {
+        $contentId = ContentId::generate();
+        $metricsRecorder = new RecordingPerformanceMetricsRecorder();
+        $artifacts = [
+            $this->createArtifact(
+                '550e8400-e29b-41d4-a716-446655440002',
+                $contentId,
+                ArtifactType::Summary,
+                "## Ancient Rome\n753 BC — Foundation of Rome",
+            ),
+        ];
+
+        $repository = $this->createMock(ArtifactRepositoryInterface::class);
+        $repository
+            ->method('findByContentId')
+            ->willReturn($artifacts);
+
+        $this->createHandler($repository, metricsRecorder: $metricsRecorder)
+            ->__invoke(new AskContentChatStreamCommand($contentId->value, 'Ancient Rome'));
+
+        self::assertCount(1, $metricsRecorder->recordings());
+        self::assertSame(
+            ['chunking_ms', 'embedding_ms', 'vector_index_ms', 'retrieval_ms', 'provider_ms', 'total_ms'],
+            $metricsRecorder->recordings()[0]->names(),
+        );
+    }
+
+    public function testRecordsProviderAndTotalMetricsWhenNoArtifactsExist(): void
+    {
+        $contentId = ContentId::generate();
+        $metricsRecorder = new RecordingPerformanceMetricsRecorder();
+
+        $repository = $this->createMock(ArtifactRepositoryInterface::class);
+        $repository
+            ->method('findByContentId')
+            ->willReturn([]);
+
+        $this->createHandler($repository, metricsRecorder: $metricsRecorder)
+            ->__invoke(new AskContentChatStreamCommand($contentId->value, 'Why did Rome fall?'));
+
+        self::assertCount(1, $metricsRecorder->recordings());
+        self::assertSame(['provider_ms', 'total_ms'], $metricsRecorder->recordings()[0]->names());
     }
 
     private function createArtifact(

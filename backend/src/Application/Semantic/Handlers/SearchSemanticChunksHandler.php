@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Application\Semantic\Handlers;
 
+use App\Application\Platform\ClockInterface;
+use App\Application\Platform\PerformanceMetricCollection;
+use App\Application\Platform\PerformanceMetricsRecorderInterface;
+use App\Application\Platform\PerformanceTimer;
 use App\Application\Platform\PlatformLoggerInterface;
 use App\Application\Semantic\DTO\SemanticSearchResult;
 use App\Application\Semantic\Queries\SearchSemanticChunksQuery;
@@ -31,6 +35,8 @@ final class SearchSemanticChunksHandler
         private readonly VectorStoreInterface $vectorStore,
         private readonly SemanticRetriever $semanticRetriever,
         private readonly PlatformLoggerInterface $platformLogger,
+        private readonly PerformanceMetricsRecorderInterface $performanceMetricsRecorder,
+        private readonly ClockInterface $clock,
     ) {
     }
 
@@ -49,13 +55,20 @@ final class SearchSemanticChunksHandler
 
     private function handle(SearchSemanticChunksQuery $query): SemanticSearchResult
     {
+        $metrics = PerformanceMetricCollection::empty();
+        $totalTimer = new PerformanceTimer($this->clock);
+        $totalTimer->start();
+
         $artifacts = $this->artifactRepository->findByContentId(
             new ContentId($query->contentId),
         );
 
         if ([] === $artifacts) {
-            return SemanticSearchResult::empty();
+            return $this->complete(SemanticSearchResult::empty(), $metrics, $totalTimer);
         }
+
+        $chunkTimer = new PerformanceTimer($this->clock);
+        $chunkTimer->start();
 
         /** @var list<\App\Domain\Semantic\Chunk> $chunks */
         $chunks = [];
@@ -66,28 +79,51 @@ final class SearchSemanticChunksHandler
             }
         }
 
+        $metrics = $metrics->with($chunkTimer->stop('chunking_ms'));
+
         if ([] === $chunks) {
-            return SemanticSearchResult::empty();
+            return $this->complete(SemanticSearchResult::empty(), $metrics, $totalTimer);
         }
 
+        $embeddingTimer = new PerformanceTimer($this->clock);
+        $embeddingTimer->start();
         $embeddedChunks = $this->embeddingGenerator->generate(new ChunkCollection($chunks));
+        $metrics = $metrics->with($embeddingTimer->stop('embedding_ms'));
 
         if ($embeddedChunks->isEmpty()) {
-            return SemanticSearchResult::empty();
+            return $this->complete(SemanticSearchResult::empty(), $metrics, $totalTimer);
         }
 
+        $indexTimer = new PerformanceTimer($this->clock);
+        $indexTimer->start();
         $this->vectorStore->index($this->toVectorDocuments($embeddedChunks));
+        $metrics = $metrics->with($indexTimer->stop('vector_index_ms'));
 
+        $retrievalTimer = new PerformanceTimer($this->clock);
+        $retrievalTimer->start();
         $retrievedChunks = $this->semanticRetriever->retrieve(
             new SemanticQuery($query->query),
             $this->embeddingGenerator,
         );
+        $metrics = $metrics->with($retrievalTimer->stop('retrieval_ms'));
 
         $this->platformLogger->info(self::COMPONENT, 'retrieval completed', [
             'resultCount' => $retrievedChunks->count(),
         ]);
 
-        return SemanticSearchResult::fromDomain($retrievedChunks);
+        return $this->complete(SemanticSearchResult::fromDomain($retrievedChunks), $metrics, $totalTimer);
+    }
+
+    private function complete(
+        SemanticSearchResult $result,
+        PerformanceMetricCollection $metrics,
+        PerformanceTimer $totalTimer,
+    ): SemanticSearchResult {
+        $this->performanceMetricsRecorder->record(
+            $metrics->with($totalTimer->stop('total_ms')),
+        );
+
+        return $result;
     }
 
     private function toVectorDocuments(EmbeddedChunkCollection $embeddedChunks): VectorDocumentCollection

@@ -114,5 +114,11 @@ services:
     App\Application\Platform\PlatformLoggerInterface:
         alias: App\Infrastructure\Platform\PlatformLogger
 
+    App\Application\Platform\ClockInterface:
+        alias: App\Infrastructure\Platform\SystemClock
+
+    App\Application\Platform\PerformanceMetricsRecorderInterface:
+        alias: App\Infrastructure\Platform\LoggingPerformanceMetricsRecorder
+
     Psr\Log\LoggerInterface:
         class: Psr\Log\NullLogger
