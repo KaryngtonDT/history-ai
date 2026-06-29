@@ -15,6 +15,9 @@ parameters:
     stt.provider_default: 'faster_whisper'
     stt.faster_whisper.binary_default: 'faster-whisper'
     stt.faster_whisper.model_default: 'base'
+    translation.provider_default: 'ollama'
+    ollama.base_url_default: 'http://ollama:11434'
+    ollama.model_default: 'qwen3'
 
 services:
     _defaults:
@@ -33,6 +36,7 @@ services:
             - '../src/Infrastructure/Semantic/EmbeddingProviderFactory.php'
             - '../src/Infrastructure/Chat/ChatProviderFactory.php'
             - '../src/Infrastructure/Speech/SpeechToTextProviderFactory.php'
+            - '../src/Infrastructure/Translation/TranslationProviderFactory.php'
 
     App\Domain\Recommendation\RecommendationEngine: ~
     App\Domain\Recommendation\RecommendationScoringEngine: ~
@@ -211,3 +215,18 @@ services:
         arguments:
             $binary: '%env(default:stt.faster_whisper.binary_default:STT_FASTER_WHISPER_BINARY)%'
             $model: '%env(default:stt.faster_whisper.model_default:STT_FASTER_WHISPER_MODEL)%'
+
+    App\Infrastructure\Translation\OllamaClientInterface:
+        alias: App\Infrastructure\Translation\CurlOllamaClient
+
+    App\Infrastructure\Translation\CurlOllamaClient:
+        arguments:
+            $baseUrl: '%env(default:ollama.base_url_default:OLLAMA_BASE_URL)%'
+
+    App\Infrastructure\Translation\OllamaTranslationProvider:
+        arguments:
+            $model: '%env(default:ollama.model_default:OLLAMA_MODEL)%'
+
+    App\Infrastructure\Translation\TranslationProviderFactory:
+        arguments:
+            $defaultProviderName: '%env(default:translation.provider_default:TRANSLATION_PROVIDER)%'

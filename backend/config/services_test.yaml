@@ -65,6 +65,10 @@ when@test:
             class: App\Infrastructure\Speech\FixedFasterWhisperProcessRunner
             public: true
 
+        App\Infrastructure\Translation\OllamaClientInterface:
+            class: App\Infrastructure\Translation\FixedOllamaClient
+            public: true
+
         App\Application\Video\Ports\VideoProcessingQueueInterface:
             class: App\Infrastructure\Video\NoOpVideoProcessingQueue
             public: true
