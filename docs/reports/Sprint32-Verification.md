@@ -16,7 +16,7 @@ Platform Sprint 32 delivers the **Speech-to-Text Foundation** for Phase 2 (AI Vi
 | ---- | ------ |
 | Backend PHPUnit | ✅ 1067 tests, 3599 assertions |
 | Backend architecture | ✅ 36 tests, 45 assertions |
-| Backend OpenAPI | ✅ 68 tests, 713 assertions |
+| Backend OpenAPI | ✅ 64 tests, 713 assertions |
 | Frontend build | ✅ OK |
 | Frontend Vitest | ✅ 549 tests (108 files) |
 | Frontend Biome | ✅ clean (519 files) |
@@ -230,6 +230,6 @@ Sprint 33 can focus exclusively on **multilingual translation** via a provider s
 | 2 | `6d73470` | feat(stt): integrate faster-whisper provider |
 | 3 | `7062328` | feat(worker): generate transcript artifacts |
 | 4 | `b80e61c` | feat(frontend): add transcript viewer |
-| 5 | *(this commit)* | docs(stt): document speech-to-text foundation |
+| 5 | `a1b1390` | docs(stt): document speech-to-text foundation |
 
 **Additional fix during slice 03:** `bdb6292` — fix(stt): move TranscriptJsonMapper to application layer (architecture compliance).
