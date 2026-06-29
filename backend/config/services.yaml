@@ -16,6 +16,7 @@ parameters:
     stt.faster_whisper.binary_default: 'faster-whisper'
     stt.faster_whisper.model_default: 'base'
     translation.provider_default: 'ollama'
+    translation.languages_default: 'fr,de'
     ollama.base_url_default: 'http://ollama:11434'
     ollama.model_default: 'qwen3'
 
@@ -95,6 +96,13 @@ services:
 
     App\Domain\Speech\TranscriptRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Speech\DoctrineTranscriptRepository
+
+    App\Domain\Translation\TranslationRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Translation\DoctrineTranslationRepository
+
+    App\Application\Translation\DefaultTranslationLanguagesProvider:
+        arguments:
+            $configuredLanguages: '%env(default:translation.languages_default:TRANSLATION_LANGUAGES)%'
 
     App\Infrastructure\Speech\FasterWhisperProcessRunnerInterface:
         alias: App\Infrastructure\Speech\ShellFasterWhisperProcessRunner

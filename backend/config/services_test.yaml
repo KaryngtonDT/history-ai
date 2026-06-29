@@ -61,6 +61,10 @@ when@test:
             alias: App\Infrastructure\Persistence\Doctrine\Speech\DoctrineTranscriptRepository
             public: true
 
+        App\Domain\Translation\TranslationRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\Translation\DoctrineTranslationRepository
+            public: true
+
         App\Infrastructure\Speech\FasterWhisperProcessRunnerInterface:
             class: App\Infrastructure\Speech\FixedFasterWhisperProcessRunner
             public: true

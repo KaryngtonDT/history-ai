@@ -14,29 +14,25 @@ final class FixedOllamaClient implements OllamaClientInterface
             $prompt = '';
         }
 
+        /** @var list<array{index: int, translatedText: string}> $segments */
         $segments = [];
 
-        if (str_contains($prompt, 'Hello world')) {
-            if (str_contains($prompt, 'French') || str_contains($prompt, 'french')) {
-                $segments[] = ['index' => 0, 'translatedText' => 'Bonjour le monde'];
-            } elseif (str_contains($prompt, 'German') || str_contains($prompt, 'german')) {
-                $segments[] = ['index' => 0, 'translatedText' => 'Hallo Welt'];
-            } else {
-                $segments[] = ['index' => 0, 'translatedText' => 'Translated text'];
+        if (preg_match_all('/^(\d+): (.+)$/m', $prompt, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $index = (int) $match[1];
+                $sourceText = $match[2];
+                $translatedText = match (true) {
+                    str_contains($prompt, 'french') => sprintf('[FR] %s', $sourceText),
+                    str_contains($prompt, 'german') => sprintf('[DE] %s', $sourceText),
+                    str_contains($prompt, 'spanish') => sprintf('[ES] %s', $sourceText),
+                    str_contains($prompt, 'italian') => sprintf('[IT] %s', $sourceText),
+                    default => sprintf('[TR] %s', $sourceText),
+                };
+                $segments[] = ['index' => $index, 'translatedText' => $translatedText];
             }
-        } elseif (str_contains($prompt, 'First segment')) {
-            if (str_contains($prompt, 'French') || str_contains($prompt, 'french')) {
-                $segments = [
-                    ['index' => 0, 'translatedText' => 'Premier segment.'],
-                    ['index' => 1, 'translatedText' => 'Deuxième segment.'],
-                ];
-            } else {
-                $segments = [
-                    ['index' => 0, 'translatedText' => 'Erstes Segment.'],
-                    ['index' => 1, 'translatedText' => 'Zweites Segment.'],
-                ];
-            }
-        } else {
+        }
+
+        if ([] === $segments) {
             $segments[] = ['index' => 0, 'translatedText' => 'Translated text'];
         }
 

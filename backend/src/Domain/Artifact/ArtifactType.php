@@ -12,4 +12,5 @@ enum ArtifactType: string
     case Podcast = 'podcast';
     case Timeline = 'timeline';
     case Transcript = 'transcript';
+    case Translation = 'translation';
 }

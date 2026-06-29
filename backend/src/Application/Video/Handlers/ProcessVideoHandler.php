@@ -17,6 +17,8 @@ use App\Domain\Speech\TranscriptRepositoryInterface;
 use App\Domain\Video\VideoId;
 use App\Domain\Video\VideoRepositoryInterface;
 use App\Application\Speech\TranscriptJsonMapper;
+use App\Application\Translation\DefaultTranslationLanguagesProvider;
+use App\Application\Translation\VideoTranslationGenerator;
 use Throwable;
 
 final class ProcessVideoHandler
@@ -27,6 +29,8 @@ final class ProcessVideoHandler
         private readonly TranscriptRepositoryInterface $transcriptRepository,
         private readonly ArtifactRepositoryInterface $artifactRepository,
         private readonly TranscriptJsonMapper $transcriptJsonMapper,
+        private readonly VideoTranslationGenerator $videoTranslationGenerator,
+        private readonly DefaultTranslationLanguagesProvider $defaultTranslationLanguages,
     ) {
     }
 
@@ -54,6 +58,13 @@ final class ProcessVideoHandler
                 ArtifactContent::fromString($this->transcriptJsonMapper->toJson($transcript)),
             );
             $this->artifactRepository->save($artifact);
+
+            if ([] !== $this->defaultTranslationLanguages->all()) {
+                $this->videoTranslationGenerator->generate(
+                    $videoId,
+                    $this->defaultTranslationLanguages->all(),
+                );
+            }
 
             $this->videoRepository->save($processing->complete());
         } catch (Throwable) {

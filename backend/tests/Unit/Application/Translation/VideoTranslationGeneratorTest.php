@@ -1,0 +1,89 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Unit\Application\Translation;
+
+use App\Application\Translation\TranslationJsonMapper;
+use App\Application\Translation\VideoTranslationGenerator;
+use App\Domain\Artifact\ArtifactRepositoryInterface;
+use App\Domain\Artifact\ArtifactType;
+use App\Domain\Content\ContentId;
+use App\Domain\Speech\Transcript;
+use App\Domain\Speech\TranscriptId;
+use App\Domain\Speech\TranscriptLanguage;
+use App\Domain\Speech\TranscriptRepositoryInterface;
+use App\Domain\Speech\TranscriptSegment;
+use App\Domain\Speech\TranscriptSegmentCollection;
+use App\Domain\Translation\TranslationLanguage;
+use App\Domain\Translation\TranslationRepositoryInterface;
+use App\Domain\Video\VideoId;
+use App\Infrastructure\Translation\FixedOllamaClient;
+use App\Infrastructure\Translation\MockTranslationProvider;
+use App\Infrastructure\Translation\OllamaTranslationPromptBuilder;
+use App\Infrastructure\Translation\OllamaTranslationProvider;
+use App\Infrastructure\Translation\TranslationProviderFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+
+final class VideoTranslationGeneratorTest extends TestCase
+{
+    private TranscriptRepositoryInterface&MockObject $transcriptRepository;
+
+    private TranslationRepositoryInterface&MockObject $translationRepository;
+
+    private ArtifactRepositoryInterface&MockObject $artifactRepository;
+
+    private VideoTranslationGenerator $generator;
+
+    protected function setUp(): void
+    {
+        $this->transcriptRepository = $this->createMock(TranscriptRepositoryInterface::class);
+        $this->translationRepository = $this->createMock(TranslationRepositoryInterface::class);
+        $this->artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+
+        $ollamaProvider = new OllamaTranslationProvider(
+            new FixedOllamaClient(),
+            new OllamaTranslationPromptBuilder(),
+            'qwen3',
+        );
+        $factory = new TranslationProviderFactory('ollama', $ollamaProvider, new MockTranslationProvider());
+
+        $this->generator = new VideoTranslationGenerator(
+            $this->transcriptRepository,
+            $this->translationRepository,
+            $this->artifactRepository,
+            $factory,
+            new TranslationJsonMapper(),
+        );
+    }
+
+    public function testGeneratesTranslationAndArtifact(): void
+    {
+        $videoId = new VideoId('550e8400-e29b-41d4-a716-446655440099');
+        $transcript = Transcript::create(
+            new TranscriptId('550e8400-e29b-41d4-a716-446655440010'),
+            TranscriptLanguage::English,
+            new TranscriptSegmentCollection([
+                TranscriptSegment::create(0, 0.0, 2.0, 'Hello world'),
+            ]),
+        );
+
+        $this->transcriptRepository
+            ->expects(self::once())
+            ->method('findByVideoId')
+            ->with($videoId)
+            ->willReturn($transcript);
+
+        $this->translationRepository->expects(self::once())->method('save');
+        $this->artifactRepository
+            ->expects(self::once())
+            ->method('save')
+            ->with(self::callback(
+                static fn ($artifact): bool => $artifact->type() === ArtifactType::Translation
+                    && $artifact->contentId()->equals(new ContentId($videoId->value)),
+            ));
+
+        $this->generator->generate($videoId, [TranslationLanguage::French]);
+    }
+}

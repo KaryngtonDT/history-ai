@@ -22,6 +22,8 @@ use App\Domain\Video\VideoLanguage;
 use App\Domain\Video\VideoRepositoryInterface;
 use App\Domain\Video\VideoStatus;
 use App\Application\Speech\TranscriptJsonMapper;
+use App\Application\Translation\DefaultTranslationLanguagesProvider;
+use App\Application\Translation\VideoTranslationGenerator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -35,6 +37,8 @@ final class ProcessVideoHandlerTest extends TestCase
 
     private ArtifactRepositoryInterface&MockObject $artifactRepository;
 
+    private VideoTranslationGenerator&MockObject $videoTranslationGenerator;
+
     private ProcessVideoHandler $handler;
 
     protected function setUp(): void
@@ -43,6 +47,7 @@ final class ProcessVideoHandlerTest extends TestCase
         $this->speechToTextProvider = $this->createMock(SpeechToTextProviderInterface::class);
         $this->transcriptRepository = $this->createMock(TranscriptRepositoryInterface::class);
         $this->artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+        $this->videoTranslationGenerator = $this->createMock(VideoTranslationGenerator::class);
 
         $this->handler = new ProcessVideoHandler(
             $this->videoRepository,
@@ -50,6 +55,8 @@ final class ProcessVideoHandlerTest extends TestCase
             $this->transcriptRepository,
             $this->artifactRepository,
             new TranscriptJsonMapper(),
+            $this->videoTranslationGenerator,
+            new DefaultTranslationLanguagesProvider(''),
         );
     }
 
@@ -108,6 +115,8 @@ final class ProcessVideoHandlerTest extends TestCase
                 return $artifact->type() === ArtifactType::Transcript
                     && $artifact->contentId()->equals(new ContentId($videoId->value));
             }));
+
+        $this->videoTranslationGenerator->expects(self::never())->method('generate');
 
         ($this->handler)(new ProcessVideoMessage($videoId->value));
     }

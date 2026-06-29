@@ -39,7 +39,7 @@ final class OllamaTranslationProviderTest extends TestCase
         self::assertSame(TranslationLanguage::English, $translation->sourceLanguage());
         self::assertSame(TranslationLanguage::French, $translation->targetLanguage());
         self::assertSame(TranslationProvider::Qwen, $translation->provider());
-        self::assertSame('Bonjour le monde', $translation->text());
+        self::assertSame('[FR] Hello world', $translation->text());
         self::assertSame(1, $translation->segmentCount());
     }
 }
