@@ -599,6 +599,48 @@ Verification: [Sprint30-Verification.md](../reports/Sprint30-Verification.md)
 
 ---
 
+# Platform Sprint 31 — Video Processing Foundation (2026-06)
+
+Platform Sprint 31 delivers the **video upload foundation** for the AI Video Localization Platform (Phase 2): domain model, multipart upload API, local storage, Doctrine persistence, queue dispatch, frontend upload UI, and OpenAPI documentation. Slice 5 changed **OpenAPI documentation, architecture docs, and verification only** — no business logic in backend handlers, frontend, or worker.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P31-SLICE-01 | `VideoJob`, `VideoId`, `VideoStatus`, `VideoLanguage`, `VideoJobCollection` | ✅ |
+| P31-SLICE-02 | `POST /api/videos` multipart upload endpoint | ✅ |
+| P31-SLICE-03 | `LocalVideoStorage`, `DoctrineVideoRepository`, `ProcessVideoMessage` queue | ✅ |
+| P31-SLICE-04 | `VideoUploadPanel`, `VideoService`, upload progress UI | ✅ |
+| P31-SLICE-05 | OpenAPI video schemas, architecture docs, this report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `VideoJob` aggregate, lifecycle transitions, `VideoExtension`, `VideoUploadSize` |
+| Application | `UploadVideoHandler`, `VideoStorageInterface`, `VideoProcessingQueueInterface`, `ProcessVideoMessage` |
+| Infrastructure | `LocalVideoStorage`, `DoctrineVideoRepository`, `MessengerVideoProcessingQueue` |
+| Presentation | `UploadVideoController`, OpenAPI `UploadVideoResponse` / `VideoStatus` |
+| Frontend | `VideoUploadPanel`, `VideoService`, `HttpClient.postFormData()` for progress |
+
+```text
+Frontend VideoUploadPanel
+        │
+        ▼
+POST /api/videos (multipart, field: video)
+        │
+        ▼
+UploadVideoHandler
+        ├── validate format + size
+        ├── LocalVideoStorage.store()
+        ├── VideoJob.withStoragePath().queue()
+        ├── DoctrineVideoRepository.save()
+        └── MessengerVideoProcessingQueue.dispatch(ProcessVideoMessage)
+        │
+        ▼
+HTTP 201 { videoId, status: "queued" }
+```
+
+Verification: [Sprint31-Verification.md](../reports/Sprint31-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

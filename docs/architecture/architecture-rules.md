@@ -796,6 +796,45 @@ CachedEmbeddingProvider
 
 `CachedEmbeddingProvider` must not import Application layer types (architecture test enforces Semantic infra boundary).
 
+### Video processing foundation (Platform Sprint 31)
+
+```text
+Frontend VideoUploadPanel (/video/upload)
+        │
+        ▼
+VideoService.validateVideo() + uploadVideo()
+        │
+        ▼
+HttpVideoRepository → HttpClient.postFormData()
+        │
+        ▼
+POST /api/videos (multipart/form-data, field: video)
+        │
+        ▼
+UploadVideoHandler
+        ├── VideoExtension.fromFilename()
+        ├── VideoUploadSize.assertWithinLimit()
+        ├── LocalVideoStorage → var/video-storage/{videoId}.{ext}
+        ├── VideoJob.withStoragePath().queue()
+        ├── DoctrineVideoRepository.save()
+        └── MessengerVideoProcessingQueue → ProcessVideoMessage (sync transport)
+        │
+        ▼
+HTTP 201 { videoId, status: "queued" }
+```
+
+| Component | Role |
+| --------- | ---- |
+| `VideoJob` | Immutable aggregate: `Uploaded → Queued → Processing → Completed/Failed` |
+| `VideoExtension` | Domain rule: mp4, mov, mkv only |
+| `VideoUploadSize` | Domain rule: max bytes from `VIDEO_UPLOAD_MAX_BYTES` |
+| `LocalVideoStorage` | Stores uploaded binary on disk before queue dispatch |
+| `ProcessVideoMessageHandler` | No-op stub until worker pipeline (Sprint 32+) |
+| `VideoUploadPanel` | Drag-and-drop, progress bar, success/error states |
+| `HttpClient.postFormData()` | XHR-based multipart upload with progress callbacks |
+
+Feature components must use `videoService`, not `HttpVideoRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

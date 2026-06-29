@@ -56,6 +56,8 @@ nelmio_api_doc:
             - { alias: AgentExecutionStep, type: App\Presentation\OpenApi\Schema\AgentExecutionStep }
             - { alias: AgentExecution, type: App\Presentation\OpenApi\Schema\AgentExecution }
             - { alias: AgentRunRequest, type: App\Presentation\OpenApi\Schema\AgentRunRequest }
+            - { alias: VideoStatus, type: App\Presentation\OpenApi\Schema\VideoStatusSchema }
+            - { alias: UploadVideoResponse, type: App\Presentation\OpenApi\Schema\UploadVideoResponseSchema }
     areas:
         default:
             path_patterns:

@@ -6,6 +6,8 @@ AI-powered platform that transforms educational content into structured learning
 
 Milestone 1 — Project Foundation (in progress)
 
+**Phase 2 — AI Video Localization Platform** started at Platform Sprint 31. Users can upload video files (mp4, mov, mkv) via `/video/upload`; jobs are persisted and queued for future processing pipelines (transcription, translation, dubbing).
+
 ## Prerequisites
 
 - Docker & Docker Compose

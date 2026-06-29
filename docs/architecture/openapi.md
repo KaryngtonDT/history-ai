@@ -66,6 +66,7 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Chat | POST | `/api/contents/{contentId}/conversations/{conversationId}/chat` |
 | Chat | POST | `/api/contents/{contentId}/conversations/{conversationId}/chat/stream` |
 | Chat | PUT | `/api/conversations/{conversationId}/documents` |
+| Video | POST | `/api/videos` |
 | Platform | GET | `/internal/platform/metrics` |
 
 ---
@@ -243,6 +244,8 @@ Shared OpenAPI schemas:
 
 **Platform Sprint 30 note:** Conversation Memory & Metadata Aggregation documents top-level `AgentExecution.metadata` (merged from all executed steps; later tools overwrite duplicate keys). All four agent tools execute real handlers. The frontend `AgentMetadataPanel` surfaces per-step metadata in the agent trace UI.
 
+**Platform Sprint 31 note:** Video Processing Foundation adds `POST /api/videos` with multipart upload (`video` field), `UploadVideoResponse`, and `VideoStatus`. Supported formats: mp4, mov, mkv. Successful uploads return HTTP 201 with `{ videoId, status: "queued" }`. Maximum file size is controlled by `VIDEO_UPLOAD_MAX_BYTES` (default 500 MB). No processing or worker endpoints are documented yet.
+
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 
 ---
@@ -276,6 +279,25 @@ Each `AgentExecution.steps[]` entry includes `order`, `tool`, `status`, `summary
 ```
 
 Zero-result semantic search returns `{ "resultCount": 0 }`. Empty knowledge graph returns `{ "nodeCount": 0, "edgeCount": 0 }`. Missing or empty conversation memory returns `{}` on that step. Multi-document chat requires `conversationId` in `AgentRunRequest` to invoke `AskConversationChatHandler`.
+
+---
+
+# Video upload
+
+`POST /api/videos` accepts `multipart/form-data` with a single required field `video` (binary).
+
+| Response | Body |
+| -------- | ---- |
+| 201 Created | `{ "videoId": "<uuid>", "status": "queued" }` |
+| 400 Bad Request | `{ "error": "Invalid request" }` |
+
+| Validation | Rule |
+| ---------- | ---- |
+| Formats | `.mp4`, `.mov`, `.mkv` |
+| Max size | `VIDEO_UPLOAD_MAX_BYTES` env (default 524288000) |
+| Field name | `video` |
+
+After upload the backend stores the file locally, persists a `VideoJob`, transitions status to `queued`, and dispatches `ProcessVideoMessage` (noop handler until Sprint 32+). The frontend `VideoUploadPanel` at `/video/upload` performs client-side format validation and reports upload progress.
 
 ---
 

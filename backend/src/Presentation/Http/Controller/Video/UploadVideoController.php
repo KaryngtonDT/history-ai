@@ -8,6 +8,7 @@ use App\Application\Video\Commands\UploadVideoCommand;
 use App\Application\Video\Handlers\UploadVideoHandler;
 use App\Domain\Video\Exception\InvalidVideoJobException;
 use App\Presentation\Http\Response\Video\UploadVideoResponse;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,6 +18,41 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class UploadVideoController extends AbstractController
 {
+    #[OA\Post(
+        operationId: 'uploadVideo',
+        summary: 'Upload video',
+        description: 'Accepts a multipart video file (mp4, mov, or mkv), stores it locally, persists a VideoJob, and queues it for future processing. Maximum upload size is controlled by VIDEO_UPLOAD_MAX_BYTES (default 500 MB).',
+        tags: ['Video'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: 'multipart/form-data',
+                schema: new OA\Schema(
+                    required: ['video'],
+                    properties: [
+                        new OA\Property(
+                            property: 'video',
+                            description: 'Video file. Supported extensions: mp4, mov, mkv.',
+                            type: 'string',
+                            format: 'binary',
+                        ),
+                    ],
+                ),
+            ),
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Video uploaded and queued',
+                content: new OA\JsonContent(ref: '#/components/schemas/UploadVideoResponse'),
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid request',
+                content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse'),
+            ),
+        ],
+    )]
     #[Route('/api/videos', name: 'api_videos_upload', methods: ['POST'])]
     public function __invoke(Request $request, UploadVideoHandler $handler): JsonResponse
     {

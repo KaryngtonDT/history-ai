@@ -29,6 +29,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/contents/{contentId}/conversations/{conversationId}/chat/stream',
         '/api/conversations/{conversationId}/documents',
         '/api/conversations/{conversationId}/graph',
+        '/api/videos',
         '/internal/platform/metrics',
     ];
 
@@ -93,6 +94,7 @@ final class ApiDocumentationTest extends WebTestCase
         );
         self::assertArrayHasKey('put', $spec['paths']['/api/conversations/{conversationId}/documents']);
         self::assertArrayHasKey('get', $spec['paths']['/api/conversations/{conversationId}/graph']);
+        self::assertArrayHasKey('post', $spec['paths']['/api/videos']);
         self::assertArrayHasKey('get', $spec['paths']['/internal/platform/metrics']);
     }
 
@@ -1663,6 +1665,78 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertSame('string', $statusSchema['type']);
         self::assertSame(['completed', 'skipped', 'failed'], $statusSchema['enum']);
         self::assertSame('completed', $statusSchema['example']);
+    }
+
+    public function testOpenApiSpecDocumentsUploadVideoOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos']['post'];
+
+        self::assertSame('uploadVideo', $operation['operationId']);
+        self::assertContains('Video', $operation['tags']);
+    }
+
+    public function testOpenApiSpecDocumentsUploadVideoRequestBody(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $requestBody = $spec['paths']['/api/videos']['post']['requestBody'];
+
+        self::assertTrue($requestBody['required']);
+        self::assertArrayHasKey('multipart/form-data', $requestBody['content']);
+
+        $schema = $requestBody['content']['multipart/form-data']['schema'];
+        self::assertContains('video', $schema['required']);
+        self::assertSame('string', $schema['properties']['video']['type']);
+        self::assertSame('binary', $schema['properties']['video']['format']);
+    }
+
+    public function testOpenApiSpecDocumentsUploadVideoResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/videos']['post']['responses'];
+
+        self::assertArrayHasKey('201', $responses);
+        self::assertSame('Video uploaded and queued', $responses['201']['description']);
+        self::assertSame(
+            '#/components/schemas/UploadVideoResponse',
+            $responses['201']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsVideoSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('VideoStatus', $spec['components']['schemas']);
+        self::assertArrayHasKey('UploadVideoResponse', $spec['components']['schemas']);
+
+        $statusSchema = $spec['components']['schemas']['VideoStatus'];
+        $responseSchema = $spec['components']['schemas']['UploadVideoResponse'];
+
+        self::assertSame('string', $statusSchema['type']);
+        self::assertSame(
+            ['uploaded', 'queued', 'processing', 'completed', 'failed'],
+            $statusSchema['enum'],
+        );
+        self::assertSame('queued', $statusSchema['example']);
+
+        self::assertSame(
+            '#/components/schemas/VideoStatus',
+            $responseSchema['properties']['status']['$ref'],
+        );
+        self::assertSame('string', $responseSchema['properties']['videoId']['type']);
+        self::assertSame('uuid', $responseSchema['properties']['videoId']['format']);
+        if (isset($responseSchema['required'])) {
+            self::assertContains('videoId', $responseSchema['required']);
+            self::assertContains('status', $responseSchema['required']);
+        }
     }
 
     /**
