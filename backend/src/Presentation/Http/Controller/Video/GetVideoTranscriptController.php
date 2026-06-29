@@ -8,6 +8,7 @@ use App\Application\Speech\Handlers\GetVideoTranscriptHandler;
 use App\Application\Speech\Queries\GetVideoTranscriptQuery;
 use App\Domain\Speech\Exception\InvalidTranscriptException;
 use App\Presentation\Http\Response\Speech\VideoTranscriptResponse;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;

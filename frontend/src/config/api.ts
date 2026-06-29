@@ -14,6 +14,10 @@ export const SEARCH_LIBRARY_PATH = "/api/search/library";
 
 export const VIDEOS_PATH = "/api/videos";
 
+export function videoTranscriptPath(videoId: string): string {
+	return `${VIDEOS_PATH}/${videoId}/transcript`;
+}
+
 export function timelinePath(artifactId: string): string {
 	return `/api/timeline/${artifactId}`;
 }

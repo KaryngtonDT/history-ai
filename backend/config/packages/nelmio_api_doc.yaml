@@ -58,6 +58,9 @@ nelmio_api_doc:
             - { alias: AgentRunRequest, type: App\Presentation\OpenApi\Schema\AgentRunRequest }
             - { alias: VideoStatus, type: App\Presentation\OpenApi\Schema\VideoStatusSchema }
             - { alias: UploadVideoResponse, type: App\Presentation\OpenApi\Schema\UploadVideoResponseSchema }
+            - { alias: TranscriptLanguage, type: App\Presentation\OpenApi\Schema\TranscriptLanguageSchema }
+            - { alias: TranscriptSegment, type: App\Presentation\OpenApi\Schema\TranscriptSegmentSchema }
+            - { alias: Transcript, type: App\Presentation\OpenApi\Schema\TranscriptSchema }
     areas:
         default:
             path_patterns:
