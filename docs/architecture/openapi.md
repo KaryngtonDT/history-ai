@@ -56,6 +56,8 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Map | GET | `/api/maps/timeline/{artifactId}` |
 | Relations | GET | `/api/contents/{contentId}/relations` |
 | Graph | GET | `/api/contents/{contentId}/graph` |
+| Graph | GET | `/api/contents/{contentId}/graph/artifacts/{artifactId}/neighborhood` |
+| Graph | GET | `/api/conversations/{conversationId}/graph` |
 | Recommendations | GET | `/api/contents/{contentId}/artifacts/{artifactId}/recommendations` |
 | Semantic | GET | `/api/contents/{contentId}/semantic-search` |
 | Chat | POST | `/api/contents/{contentId}/chat` |
@@ -158,7 +160,9 @@ Shared OpenAPI schemas:
 | `ArtifactRelations` | `Presentation/OpenApi/Schema/ArtifactRelations.php` |
 | `ArtifactRelationType` | `Presentation/OpenApi/Schema/ArtifactRelationTypeSchema.php` |
 | `GraphNode` | `Presentation/OpenApi/Schema/GraphNode.php` |
+| `GraphNeighborhoodNode` | `Presentation/OpenApi/Schema/GraphNeighborhoodNode.php` |
 | `GraphEdge` | `Presentation/OpenApi/Schema/GraphEdge.php` |
+| `GraphNeighborhood` | `Presentation/OpenApi/Schema/GraphNeighborhood.php` |
 | `KnowledgeGraph` | `Presentation/OpenApi/Schema/KnowledgeGraph.php` |
 | `RecommendedArtifact` | `Presentation/OpenApi/Schema/RecommendedArtifact.php` |
 | `ArtifactRecommendations` | `Presentation/OpenApi/Schema/ArtifactRecommendations.php` |
@@ -185,6 +189,12 @@ Shared OpenAPI schemas:
 `GET /api/contents/{contentId}/relations` returns an `ArtifactRelations` envelope with `relations[]` entries (`sourceArtifactId`, `targetArtifactId`, `type`). The `type` field uses the `ArtifactRelationType` enum: `related`, `derived_from`, `references`, `next`, `previous`.
 
 `GET /api/contents/{contentId}/graph` returns a `KnowledgeGraph` with `nodes[]` (`artifactId`, `type`, `title`) and `edges[]` (`sourceArtifactId`, `targetArtifactId`, `type`). Node `type` uses `ArtifactType`; edge `type` reuses `ArtifactRelationType`.
+
+`GET /api/contents/{contentId}/graph/artifacts/{artifactId}/neighborhood` returns a `GraphNeighborhood` with `center` and `neighbors[]` as `GraphNeighborhoodNode` entries (`artifactId`, `type`, `label`) and `edges[]` as `GraphEdge` entries (`sourceArtifactId`, `targetArtifactId`, `type`, `weight`). Only direct neighbors (one hop) are returned. Invalid UUID returns HTTP 400 with `ErrorResponse`. Unknown artifact in the content graph returns HTTP 404 with `ErrorResponse`.
+
+`GET /api/conversations/{conversationId}/graph` returns a conversation-scoped `KnowledgeGraph` built from artifacts belonging to the documents selected in the conversation (`documents[]` order preserved). Invalid UUID returns HTTP 400 with `ErrorResponse`. Unknown conversation returns HTTP 404 with `ErrorResponse`.
+
+**Platform Sprint 27 note:** Knowledge Graph Explorer 2.0 adds neighborhood and conversation-scoped graph endpoints. Content-level `GET …/graph` behavior is unchanged. Neighborhood nodes use `label` (not `title`) in JSON; content graph nodes continue to use `title`.
 
 `GET /api/contents/{contentId}/artifacts/{artifactId}/recommendations` returns an `ArtifactRecommendations` envelope with `recommendations[]` entries (`artifactId`, `type`, `title`, `reason`, `score`). The `type` field uses `ArtifactType`; `reason` uses the `RecommendationReason` enum: `related`, `derived_from`, `references`, `next`, `previous`. The `score` field is an integer from 0 to 100 (relevance weight derived from `reason`; higher scores appear first in the API response).
 
@@ -223,6 +233,8 @@ Shared OpenAPI schemas:
 **Platform Sprint 25 note:** Multi-document selection adds `SelectedDocument`, `UpdateConversationDocumentsRequest`, `ConversationResponse`, and `PUT /api/conversations/{conversationId}/documents`. The `Conversation` schema now includes `documents[]`.
 
 **Platform Sprint 26 note:** Conversation streaming adds `ConversationStreamEvent` and `POST /api/contents/{contentId}/conversations/{conversationId}/chat/stream` (`text/event-stream` with `token`, `conversation`, and `done` events).
+
+**Platform Sprint 27 note:** Knowledge Graph Explorer 2.0 adds `GraphNeighborhood`, `GraphNeighborhoodNode`, and documents `GraphEdge.weight` for neighborhood edges. Content-level `KnowledgeGraph` responses omit `weight` on edges. New paths: `GET …/graph/artifacts/{artifactId}/neighborhood` and `GET /api/conversations/{conversationId}/graph`.
 
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 

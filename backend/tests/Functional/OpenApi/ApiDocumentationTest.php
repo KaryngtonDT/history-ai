@@ -19,6 +19,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/maps/timeline/{artifactId}',
         '/api/contents/{contentId}/relations',
         '/api/contents/{contentId}/graph',
+        '/api/contents/{contentId}/graph/artifacts/{artifactId}/neighborhood',
         '/api/contents/{contentId}/artifacts/{artifactId}/recommendations',
         '/api/contents/{contentId}/semantic-search',
         '/api/contents/{contentId}/chat',
@@ -26,6 +27,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/contents/{contentId}/conversations/{conversationId}/chat',
         '/api/contents/{contentId}/conversations/{conversationId}/chat/stream',
         '/api/conversations/{conversationId}/documents',
+        '/api/conversations/{conversationId}/graph',
         '/internal/platform/metrics',
     ];
 
@@ -70,6 +72,10 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('get', $spec['paths']['/api/contents/{contentId}/graph']);
         self::assertArrayHasKey(
             'get',
+            $spec['paths']['/api/contents/{contentId}/graph/artifacts/{artifactId}/neighborhood'],
+        );
+        self::assertArrayHasKey(
+            'get',
             $spec['paths']['/api/contents/{contentId}/artifacts/{artifactId}/recommendations'],
         );
         self::assertArrayHasKey('get', $spec['paths']['/api/contents/{contentId}/semantic-search']);
@@ -84,6 +90,7 @@ final class ApiDocumentationTest extends WebTestCase
             $spec['paths']['/api/contents/{contentId}/conversations/{conversationId}/chat/stream'],
         );
         self::assertArrayHasKey('put', $spec['paths']['/api/conversations/{conversationId}/documents']);
+        self::assertArrayHasKey('get', $spec['paths']['/api/conversations/{conversationId}/graph']);
         self::assertArrayHasKey('get', $spec['paths']['/internal/platform/metrics']);
     }
 
@@ -519,6 +526,9 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('sourceArtifactId', $edgeSchema['properties']);
         self::assertArrayHasKey('targetArtifactId', $edgeSchema['properties']);
         self::assertArrayHasKey('type', $edgeSchema['properties']);
+        self::assertArrayHasKey('weight', $edgeSchema['properties']);
+        self::assertSame('number', $edgeSchema['properties']['weight']['type']);
+        self::assertSame('float', $edgeSchema['properties']['weight']['format']);
         self::assertSame(
             '#/components/schemas/ArtifactRelationType',
             $edgeSchema['properties']['type']['$ref'],
@@ -528,6 +538,141 @@ final class ApiDocumentationTest extends WebTestCase
             self::assertContains('targetArtifactId', $edgeSchema['required']);
             self::assertContains('type', $edgeSchema['required']);
         }
+    }
+
+    public function testOpenApiSpecDocumentsGetGraphNeighborhoodPathParameters(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/contents/{contentId}/graph/artifacts/{artifactId}/neighborhood']['get'];
+
+        self::assertSame('getGraphNeighborhood', $operation['operationId']);
+
+        $parameterNames = array_map(
+            static fn (array $parameter): string => $parameter['name'],
+            $operation['parameters'],
+        );
+
+        self::assertSame(['contentId', 'artifactId'], $parameterNames);
+    }
+
+    public function testOpenApiSpecDocumentsGetGraphNeighborhoodResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/contents/{contentId}/graph/artifacts/{artifactId}/neighborhood']['get']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Direct artifact neighborhood', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/GraphNeighborhood',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('404', $responses);
+        self::assertSame('Artifact not found', $responses['404']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['404']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsGraphNeighborhoodSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('GraphNeighborhood', $spec['components']['schemas']);
+        self::assertArrayHasKey('GraphNeighborhoodNode', $spec['components']['schemas']);
+
+        $neighborhoodSchema = $spec['components']['schemas']['GraphNeighborhood'];
+        $nodeSchema = $spec['components']['schemas']['GraphNeighborhoodNode'];
+
+        self::assertSame(
+            '#/components/schemas/GraphNeighborhoodNode',
+            $neighborhoodSchema['properties']['center']['$ref'],
+        );
+        self::assertSame(
+            '#/components/schemas/GraphNeighborhoodNode',
+            $neighborhoodSchema['properties']['neighbors']['items']['$ref'],
+        );
+        self::assertSame(
+            '#/components/schemas/GraphEdge',
+            $neighborhoodSchema['properties']['edges']['items']['$ref'],
+        );
+        if (isset($neighborhoodSchema['required'])) {
+            self::assertContains('center', $neighborhoodSchema['required']);
+            self::assertContains('neighbors', $neighborhoodSchema['required']);
+            self::assertContains('edges', $neighborhoodSchema['required']);
+        }
+
+        self::assertArrayHasKey('artifactId', $nodeSchema['properties']);
+        self::assertArrayHasKey('type', $nodeSchema['properties']);
+        self::assertArrayHasKey('label', $nodeSchema['properties']);
+        self::assertSame(
+            '#/components/schemas/ArtifactType',
+            $nodeSchema['properties']['type']['$ref'],
+        );
+        if (isset($nodeSchema['required'])) {
+            self::assertContains('artifactId', $nodeSchema['required']);
+            self::assertContains('type', $nodeSchema['required']);
+            self::assertContains('label', $nodeSchema['required']);
+        }
+    }
+
+    public function testOpenApiSpecDocumentsGetConversationKnowledgeGraphPathParameter(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/conversations/{conversationId}/graph']['get'];
+
+        self::assertSame('getConversationKnowledgeGraph', $operation['operationId']);
+
+        $pathParameter = null;
+
+        foreach ($operation['parameters'] as $parameter) {
+            if (($parameter['name'] ?? null) === 'conversationId') {
+                $pathParameter = $parameter;
+                break;
+            }
+        }
+
+        self::assertNotNull($pathParameter, 'Missing path parameter: conversationId');
+        self::assertSame('path', $pathParameter['in']);
+        self::assertTrue($pathParameter['required']);
+        self::assertSame('string', $pathParameter['schema']['type']);
+        self::assertSame('uuid', $pathParameter['schema']['format']);
+        self::assertSame('550e8400-e29b-41d4-a716-446655440001', $pathParameter['example']);
+    }
+
+    public function testOpenApiSpecDocumentsGetConversationKnowledgeGraphResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/conversations/{conversationId}/graph']['get']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Conversation-scoped knowledge graph projection', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/KnowledgeGraph',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('404', $responses);
+        self::assertSame('Conversation not found', $responses['404']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['404']['content']['application/json']['schema']['$ref'],
+        );
     }
 
     public function testOpenApiSpecDocumentsGetArtifactRecommendationsPathParameters(): void

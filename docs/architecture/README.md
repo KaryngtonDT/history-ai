@@ -420,6 +420,42 @@ Verification: [Sprint26-Verification.md](../reports/Sprint26-Verification.md)
 
 ---
 
+# Platform Sprint 27 — Knowledge Graph Explorer 2.0 (2026-06)
+
+Platform Sprint 27 extends the Sprint 17 knowledge graph with interactive neighborhood exploration and conversation-scoped graph projections. Slice 5 changed **OpenAPI documentation, architecture docs, and verification only** — no business logic in backend handlers, frontend, or worker.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P27-SLICE-01 | Graph domain collections, `GraphNeighborhood`, `neighborsOf()` | ✅ |
+| P27-SLICE-02 | `GET …/graph/artifacts/{artifactId}/neighborhood` | ✅ |
+| P27-SLICE-03 | `GraphService.getGraphNeighborhood()`; interactive `KnowledgeGraphPanel` | ✅ |
+| P27-SLICE-04 | `GET /api/conversations/{conversationId}/graph` | ✅ |
+| P27-SLICE-05 | OpenAPI + architecture docs + this report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `GraphNodeCollection`, `GraphEdgeCollection`, `GraphNeighborhood`, `neighborsOf()` |
+| Backend API | Neighborhood endpoint; conversation-scoped graph endpoint |
+| Frontend | `getGraphNeighborhood()`, `getConversationGraph()`; node highlight UX |
+| OpenAPI | `GraphNeighborhood`, `GraphNeighborhoodNode`; `GraphEdge.weight` |
+
+```text
+KnowledgeGraphPanel
+        │
+        ▼
+GraphService
+        ├── GET /contents/{contentId}/graph
+        ├── GET /contents/{contentId}/graph/artifacts/{artifactId}/neighborhood
+        └── GET /conversations/{conversationId}/graph
+        │
+        ▼
+InteractiveGraph (selected / neighbors / edges highlight)
+```
+
+Verification: [Sprint27-Verification.md](../reports/Sprint27-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

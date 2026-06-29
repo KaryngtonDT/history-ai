@@ -26,6 +26,13 @@ use OpenApi\Attributes as OA;
             property: 'type',
             ref: '#/components/schemas/ArtifactRelationType',
         ),
+        new OA\Property(
+            property: 'weight',
+            type: 'number',
+            format: 'float',
+            example: 1.0,
+            description: 'Edge weight for neighborhood projections. Omitted on content-level knowledge graph edges.',
+        ),
     ],
 )]
 final class GraphEdge

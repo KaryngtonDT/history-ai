@@ -269,8 +269,9 @@ ProcessingArtifacts
 ```text
 features/graph/KnowledgeGraphPanel
       │
-      ▼
-GraphService.getKnowledgeGraph()
+      ├── GraphService.getKnowledgeGraph(contentId)           — full content graph
+      ├── GraphService.getGraphNeighborhood(contentId, id)   — one-hop neighborhood
+      └── GraphService.getConversationGraph(conversationId)    — conversation-scoped graph
       │
       ▼
 GraphRepositoryFactory → HttpGraphRepository | MockGraphRepository
@@ -278,6 +279,10 @@ GraphRepositoryFactory → HttpGraphRepository | MockGraphRepository
       ▼
 HttpClient (HTTP mode only)
 ```
+
+**KnowledgeGraphPanel** loads the content graph by default. When `conversationId` is provided, it loads the conversation-scoped graph instead. Node clicks call `getGraphNeighborhood()` for highlight data. The panel must not import graph repositories directly.
+
+**InteractiveGraph** is props-only: selected node, neighbor nodes, and highlighted edges are passed from the panel. It emits `onNodeSelect(artifactId)` on click.
 
 Processing page graph integration:
 
@@ -287,6 +292,8 @@ ProcessingArtifacts
         ├── artifact cards (id="artifact-{type}" anchors)
         ├── ArtifactRelationsPanel
         └── KnowledgeGraphPanel → InteractiveGraph (props-only)
+              │
+              optional conversationId (future ChatPanel wiring)
 ```
 
 ### Recommendation service layer

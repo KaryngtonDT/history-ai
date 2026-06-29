@@ -26,7 +26,9 @@ nelmio_api_doc:
             - { alias: ArtifactRelations, type: App\Presentation\OpenApi\Schema\ArtifactRelations }
             - { alias: ArtifactRelationType, type: App\Presentation\OpenApi\Schema\ArtifactRelationTypeSchema }
             - { alias: GraphNode, type: App\Presentation\OpenApi\Schema\GraphNode }
+            - { alias: GraphNeighborhoodNode, type: App\Presentation\OpenApi\Schema\GraphNeighborhoodNode }
             - { alias: GraphEdge, type: App\Presentation\OpenApi\Schema\GraphEdge }
+            - { alias: GraphNeighborhood, type: App\Presentation\OpenApi\Schema\GraphNeighborhood }
             - { alias: KnowledgeGraph, type: App\Presentation\OpenApi\Schema\KnowledgeGraph }
             - { alias: RecommendedArtifact, type: App\Presentation\OpenApi\Schema\RecommendedArtifact }
             - { alias: ArtifactRecommendations, type: App\Presentation\OpenApi\Schema\ArtifactRecommendations }

@@ -10,6 +10,8 @@ use App\Presentation\OpenApi\Schema\ArtifactRelationTypeSchema;
 use App\Presentation\OpenApi\Schema\ArtifactRecommendations;
 use App\Presentation\OpenApi\Schema\Coordinates;
 use App\Presentation\OpenApi\Schema\GraphEdge;
+use App\Presentation\OpenApi\Schema\GraphNeighborhood;
+use App\Presentation\OpenApi\Schema\GraphNeighborhoodNode;
 use App\Presentation\OpenApi\Schema\GraphNode;
 use App\Presentation\OpenApi\Schema\HistoricalPlace;
 use App\Presentation\OpenApi\Schema\KnowledgeGraph;
