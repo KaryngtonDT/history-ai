@@ -61,6 +61,13 @@ nelmio_api_doc:
             - { alias: TranscriptLanguage, type: App\Presentation\OpenApi\Schema\TranscriptLanguageSchema }
             - { alias: TranscriptSegment, type: App\Presentation\OpenApi\Schema\TranscriptSegmentSchema }
             - { alias: Transcript, type: App\Presentation\OpenApi\Schema\TranscriptSchema }
+            - { alias: TranslationLanguage, type: App\Presentation\OpenApi\Schema\TranslationLanguageSchema }
+            - { alias: TranslationProvider, type: App\Presentation\OpenApi\Schema\TranslationProviderSchema }
+            - { alias: TranslationSegment, type: App\Presentation\OpenApi\Schema\TranslationSegmentSchema }
+            - { alias: Translation, type: App\Presentation\OpenApi\Schema\TranslationSchema }
+            - { alias: VideoTranslationSummary, type: App\Presentation\OpenApi\Schema\VideoTranslationSummarySchema }
+            - { alias: VideoTranslationsList, type: App\Presentation\OpenApi\Schema\VideoTranslationsListSchema }
+            - { alias: GenerateVideoTranslationsRequest, type: App\Presentation\OpenApi\Schema\GenerateVideoTranslationsRequestSchema }
     areas:
         default:
             path_patterns:

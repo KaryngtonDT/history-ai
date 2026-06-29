@@ -675,6 +675,40 @@ Verification: [Sprint32-Verification.md](../reports/Sprint32-Verification.md)
 
 ---
 
+# Platform Sprint 33 — Multilingual Translation Foundation (2026-06)
+
+Platform Sprint 33 delivers the **multilingual translation foundation** for Phase 2: domain model, Ollama/Qwen provider, worker integration, translation artifact pipeline, frontend viewer, and OpenAPI documentation.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P33-SLICE-01 | `Translation`, `TranslationSegment`, `TranslationLanguage`, `TranslationProviderInterface` | ✅ |
+| P33-SLICE-02 | `OllamaTranslationProvider`, `TranslationProviderFactory`, prompt builder | ✅ |
+| P33-SLICE-03 | `VideoTranslationGenerator`, translation persistence, translation artifacts, REST API | ✅ |
+| P33-SLICE-04 | `TranslationPanel`, `TranslationLanguageTabs`, `TranslationService` | ✅ |
+| P33-SLICE-05 | OpenAPI translation schemas, architecture docs, verification report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `Translation` aggregate, `TranslationSegment`, `TranslationLanguage`, `TranslationProvider`, translation provider port |
+| Application | `VideoTranslationGenerator`, `GetVideoTranslationHandler`, `ListVideoTranslationsHandler`, `GenerateVideoTranslationsHandler`, `TranslationJsonMapper` |
+| Infrastructure | `OllamaTranslationProvider`, `DoctrineTranslationRepository`, `FixedOllamaClient` (test) |
+| Presentation | Translation controllers, OpenAPI `Translation` / `TranslationSegment` / `TranslationLanguage` / `TranslationProvider` |
+| Frontend | `TranslationPanel`, `TranslationLanguageTabs`, `TranslationService` at `/video/:videoId/translations` |
+
+```text
+Video Upload → Transcript → TranslationProviderFactory → Ollama (Qwen)
+        │
+        ▼
+Translation persisted + ArtifactType::Translation (per language)
+        │
+        ▼
+GET/POST /api/videos/{videoId}/translations → TranslationPanel
+```
+
+Verification: [Sprint33-Verification.md](../reports/Sprint33-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

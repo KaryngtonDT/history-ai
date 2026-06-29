@@ -14,9 +14,9 @@ use App\Domain\Processing\ProcessingJobId;
 use App\Domain\Speech\TranscriptRepositoryInterface;
 use App\Domain\Translation\TranslationLanguage;
 use App\Domain\Translation\TranslationProvider;
+use App\Domain\Translation\TranslationProviderResolverInterface;
 use App\Domain\Translation\TranslationRepositoryInterface;
 use App\Domain\Video\VideoId;
-use App\Infrastructure\Translation\TranslationProviderFactory;
 
 class VideoTranslationGenerator
 {
@@ -24,7 +24,7 @@ class VideoTranslationGenerator
         private readonly TranscriptRepositoryInterface $transcriptRepository,
         private readonly TranslationRepositoryInterface $translationRepository,
         private readonly ArtifactRepositoryInterface $artifactRepository,
-        private readonly TranslationProviderFactory $translationProviderFactory,
+        private readonly TranslationProviderResolverInterface $translationProviderResolver,
         private readonly TranslationJsonMapper $translationJsonMapper,
     ) {
     }
@@ -43,7 +43,7 @@ class VideoTranslationGenerator
             return;
         }
 
-        $translationProvider = $this->translationProviderFactory->create($provider);
+        $translationProvider = $this->translationProviderResolver->resolve($provider);
 
         foreach ($targetLanguages as $targetLanguage) {
             if ($targetLanguage === TranslationLanguage::Unknown) {

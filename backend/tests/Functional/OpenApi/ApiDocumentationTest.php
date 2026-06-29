@@ -1823,6 +1823,155 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertContains('segments', $transcriptSchema['required']);
     }
 
+    public function testOpenApiSpecDocumentsListVideoTranslationsOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/translations']['get'];
+
+        self::assertSame('listVideoTranslations', $operation['operationId']);
+        self::assertContains('Video', $operation['tags']);
+    }
+
+    public function testOpenApiSpecDocumentsGetVideoTranslationOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/translations/{language}']['get'];
+
+        self::assertSame('getVideoTranslation', $operation['operationId']);
+        self::assertContains('Video', $operation['tags']);
+    }
+
+    public function testOpenApiSpecDocumentsGenerateVideoTranslationsOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/translations']['post'];
+
+        self::assertSame('generateVideoTranslations', $operation['operationId']);
+        self::assertContains('Video', $operation['tags']);
+    }
+
+    public function testOpenApiSpecDocumentsGetVideoTranslationParameters(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $parameters = $spec['paths']['/api/videos/{videoId}/translations/{language}']['get']['parameters'];
+
+        $languageParameter = null;
+
+        foreach ($parameters as $parameter) {
+            if (($parameter['name'] ?? null) === 'language') {
+                $languageParameter = $parameter;
+                break;
+            }
+        }
+
+        self::assertNotNull($languageParameter, 'Missing path parameter: language');
+        self::assertSame('path', $languageParameter['in']);
+        self::assertTrue($languageParameter['required']);
+        self::assertSame(
+            '#/components/schemas/TranslationLanguage',
+            $languageParameter['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsGetVideoTranslationResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/videos/{videoId}/translations/{language}']['get']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Translation found', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/Translation',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request or translation not found', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsListVideoTranslationsResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/videos/{videoId}/translations']['get']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Translations found', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/VideoTranslationsList',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsGenerateVideoTranslationsRequestBody(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $requestBody = $spec['paths']['/api/videos/{videoId}/translations']['post']['requestBody'];
+
+        self::assertTrue($requestBody['required']);
+        self::assertSame(
+            '#/components/schemas/GenerateVideoTranslationsRequest',
+            $requestBody['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsTranslationSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('TranslationLanguage', $spec['components']['schemas']);
+        self::assertArrayHasKey('TranslationProvider', $spec['components']['schemas']);
+        self::assertArrayHasKey('TranslationSegment', $spec['components']['schemas']);
+        self::assertArrayHasKey('Translation', $spec['components']['schemas']);
+        self::assertArrayHasKey('VideoTranslationSummary', $spec['components']['schemas']);
+        self::assertArrayHasKey('VideoTranslationsList', $spec['components']['schemas']);
+        self::assertArrayHasKey('GenerateVideoTranslationsRequest', $spec['components']['schemas']);
+
+        $languageSchema = $spec['components']['schemas']['TranslationLanguage'];
+        $providerSchema = $spec['components']['schemas']['TranslationProvider'];
+        $segmentSchema = $spec['components']['schemas']['TranslationSegment'];
+        $translationSchema = $spec['components']['schemas']['Translation'];
+
+        self::assertSame('string', $languageSchema['type']);
+        self::assertSame(
+            ['english', 'french', 'german', 'spanish', 'italian', 'unknown'],
+            $languageSchema['enum'],
+        );
+
+        self::assertSame('string', $providerSchema['type']);
+        self::assertSame(['qwen', 'deepseek', 'gemini', 'gpt', 'mock'], $providerSchema['enum']);
+
+        self::assertSame('integer', $segmentSchema['properties']['index']['type']);
+        self::assertSame('string', $segmentSchema['properties']['sourceText']['type']);
+        self::assertSame('string', $segmentSchema['properties']['translatedText']['type']);
+
+        self::assertSame(
+            '#/components/schemas/TranslationLanguage',
+            $translationSchema['properties']['targetLanguage']['$ref'],
+        );
+        self::assertSame(
+            '#/components/schemas/TranslationProvider',
+            $translationSchema['properties']['provider']['$ref'],
+        );
+        self::assertSame(
+            '#/components/schemas/TranslationSegment',
+            $translationSchema['properties']['segments']['items']['$ref'],
+        );
+        self::assertContains('videoId', $translationSchema['required']);
+        self::assertContains('segments', $translationSchema['required']);
+    }
+
+    public function testOpenApiSpecDocumentsTranslationArtifactType(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $artifactTypeSchema = $spec['components']['schemas']['ArtifactType'];
+
+        self::assertContains('translation', $artifactTypeSchema['enum']);
+    }
+
     /**
      * @return array<string, mixed>
      */

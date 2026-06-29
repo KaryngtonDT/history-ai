@@ -7,6 +7,7 @@ namespace App\Presentation\Http\Controller\Video;
 use App\Application\Translation\Commands\GenerateVideoTranslationsCommand;
 use App\Application\Translation\Handlers\GenerateVideoTranslationsHandler;
 use App\Domain\Translation\Exception\InvalidTranslationException;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,42 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class GenerateVideoTranslationsController extends AbstractController
 {
+    #[OA\Post(
+        operationId: 'generateVideoTranslations',
+        summary: 'Generate video translations',
+        description: 'Translates the video transcript into one or more target languages using the configured translation provider. Creates one translation artifact per language.',
+        tags: ['Video'],
+        parameters: [
+            new OA\Parameter(
+                name: 'videoId',
+                in: 'path',
+                required: true,
+                description: 'UUID of the uploaded video job.',
+                schema: new OA\Schema(type: 'string', format: 'uuid'),
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/GenerateVideoTranslationsRequest'),
+        ),
+        responses: [
+            new OA\Response(
+                response: 202,
+                description: 'Translation generation accepted',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'status', type: 'string', example: 'generated'),
+                    ],
+                    type: 'object',
+                ),
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid request',
+                content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse'),
+            ),
+        ],
+    )]
     #[Route('/api/videos/{videoId}/translations', name: 'api_videos_translations_generate', methods: ['POST'])]
     public function __invoke(string $videoId, Request $request, GenerateVideoTranslationsHandler $handler): JsonResponse
     {

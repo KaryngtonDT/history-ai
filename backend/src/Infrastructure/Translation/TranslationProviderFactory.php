@@ -6,9 +6,10 @@ namespace App\Infrastructure\Translation;
 
 use App\Domain\Translation\TranslationProvider;
 use App\Domain\Translation\TranslationProviderInterface;
+use App\Domain\Translation\TranslationProviderResolverInterface;
 use App\Infrastructure\Translation\Exception\InvalidTranslationConfigurationException;
 
-final class TranslationProviderFactory
+final class TranslationProviderFactory implements TranslationProviderResolverInterface
 {
     public const string PROVIDER_OLLAMA = 'ollama';
 
@@ -20,6 +21,11 @@ final class TranslationProviderFactory
     }
 
     public function create(?TranslationProvider $provider = null): TranslationProviderInterface
+    {
+        return $this->resolve($provider);
+    }
+
+    public function resolve(?TranslationProvider $provider = null): TranslationProviderInterface
     {
         if (null !== $provider) {
             return match ($provider) {

@@ -10,6 +10,7 @@ enum LibraryItemType: string
     case Quiz = 'quiz';
     case Flashcards = 'flashcards';
     case Transcript = 'transcript';
+    case Translation = 'translation';
     case Timeline = 'timeline';
     case Podcast = 'podcast';
 }

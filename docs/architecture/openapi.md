@@ -68,6 +68,9 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Chat | PUT | `/api/conversations/{conversationId}/documents` |
 | Video | POST | `/api/videos` |
 | Video | GET | `/api/videos/{videoId}/transcript` |
+| Video | GET | `/api/videos/{videoId}/translations` |
+| Video | GET | `/api/videos/{videoId}/translations/{language}` |
+| Video | POST | `/api/videos/{videoId}/translations` |
 | Platform | GET | `/internal/platform/metrics` |
 
 ---
@@ -138,6 +141,7 @@ The public API documents these **artifact types** (worker-generated learning out
 | Type | Value | Status |
 | ---- | ----- | ------ |
 | Transcript | `transcript` | ✅ Documented |
+| Translation | `translation` | ✅ Documented |
 | Summary | `summary` | ✅ Documented |
 | Quiz | `quiz` | ✅ Documented |
 | Flashcards | `flashcards` | ✅ Documented |
@@ -247,7 +251,9 @@ Shared OpenAPI schemas:
 
 **Platform Sprint 31 note:** Video Processing Foundation adds `POST /api/videos` with multipart upload (`video` field), `UploadVideoResponse`, and `VideoStatus`. Supported formats: mp4, mov, mkv. Successful uploads return HTTP 201 with `{ videoId, status: "queued" }`. Maximum file size is controlled by `VIDEO_UPLOAD_MAX_BYTES` (default 500 MB). Processing and transcript retrieval are documented in Sprint 32.
 
-**Platform Sprint 32 note:** Speech-to-Text Foundation adds `GET /api/videos/{videoId}/transcript` with `Transcript`, `TranscriptSegment`, and `TranscriptLanguage` schemas. The endpoint returns segmented timestamps after the video job completes and a transcript artifact is generated. No translation, TTS, or lip-sync endpoints are documented yet.
+**Platform Sprint 32 note:** Speech-to-Text Foundation adds `GET /api/videos/{videoId}/transcript` with `Transcript`, `TranscriptSegment`, and `TranscriptLanguage` schemas. The endpoint returns segmented timestamps after the video job completes and a transcript artifact is generated. No TTS or lip-sync endpoints are documented yet.
+
+**Platform Sprint 33 note:** Multilingual Translation Foundation adds `GET /api/videos/{videoId}/translations`, `GET /api/videos/{videoId}/translations/{language}`, and `POST /api/videos/{videoId}/translations` with `Translation`, `TranslationSegment`, `TranslationLanguage`, and `TranslationProvider` schemas. The worker auto-translates configured languages (`TRANSLATION_LANGUAGES`, default `fr,de`) after transcription. No TTS, lip-sync, or video rendering endpoints are documented yet.
 
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 
@@ -320,6 +326,33 @@ After upload the backend stores the file locally, persists a `VideoJob`, transit
 | `Transcript` | Full transcript with `segments[]` |
 
 The frontend `TranscriptPanel` at `/video/:videoId/transcript` loads the transcript via `TranscriptService` and renders a read-only timeline with timestamps and segment highlighting.
+
+# Video translations
+
+`GET /api/videos/{videoId}/translations` returns summaries of all available translations for a video job.
+
+| Status | Body |
+| ------ | ---- |
+| 200 OK | `VideoTranslationsList` — `{ videoId, translations[] }` |
+| 400 Bad Request | `{ "error": "Invalid request" }` |
+
+`GET /api/videos/{videoId}/translations/{language}` returns the full translated transcript for one target language.
+
+| Status | Body |
+| ------ | ---- |
+| 200 OK | `Translation` — `{ videoId, translationId, sourceLanguage, targetLanguage, provider, text, segmentCount, segments[] }` |
+| 400 Bad Request | `{ "error": "Invalid request" }` (invalid UUID, language, or translation not found) |
+
+`POST /api/videos/{videoId}/translations` accepts `GenerateVideoTranslationsRequest` (`targetLanguages[]`, optional `provider`) and returns HTTP 202 with `{ "status": "generated" }`.
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `TranslationLanguage` | `english`, `french`, `german`, `spanish`, `italian`, `unknown` |
+| `TranslationProvider` | `qwen`, `deepseek`, `gemini`, `gpt`, `mock` |
+| `TranslationSegment` | `index`, `sourceText`, `translatedText` |
+| `Translation` | Full translation with side-by-side segments |
+
+The frontend `TranslationPanel` at `/video/:videoId/translations` lets users select target languages and a translation engine, generate translations, and view source vs translated text side by side via `TranslationService`.
 
 ---
 

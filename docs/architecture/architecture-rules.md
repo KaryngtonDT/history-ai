@@ -872,6 +872,40 @@ Frontend TranscriptPanel (/video/:videoId/transcript)
 
 Feature components must use `transcriptService`, not `HttpTranscriptRepository` or `HttpClient` directly.
 
+### Multilingual translation foundation (Platform Sprint 33)
+
+```text
+Transcript Artifact
+        │
+        ▼
+ProcessVideoHandler (TRANSLATION_LANGUAGES=fr,de)
+        ├── TranslationProviderFactory → OllamaTranslationProvider (Qwen)
+        ├── TranslationRepository.save() (one row per language)
+        └── ArtifactRepository.create(ArtifactType::Translation) × N
+        │
+        ▼
+GET /api/videos/{videoId}/translations
+GET /api/videos/{videoId}/translations/{language}
+POST /api/videos/{videoId}/translations
+        │
+        ▼
+Frontend TranslationPanel (/video/:videoId/translations)
+        │
+        └── TranslationService → HttpTranslationRepository
+```
+
+| Component | Role |
+| --------- | ---- |
+| `Translation` | Immutable domain aggregate with source/target language and segments |
+| `TranslationProviderInterface` | Domain port: `translate(Transcript, TranslationLanguage): Translation` |
+| `OllamaTranslationProvider` | Infrastructure adapter invoking Ollama (Qwen 3) |
+| `TranslationProviderFactory` | Selects provider from `TRANSLATION_PROVIDER` env |
+| `VideoTranslationGenerator` | Application orchestration: STT transcript → translate → persist → artifact |
+| `TranslationJsonMapper` | Application-layer JSON serialization for persistence |
+| `TranslationPanel` | Read-only viewer with language tabs and side-by-side comparison |
+
+Feature components must use `translationService`, not `HttpTranslationRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

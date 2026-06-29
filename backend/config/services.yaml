@@ -235,6 +235,9 @@ services:
         arguments:
             $model: '%env(default:ollama.model_default:OLLAMA_MODEL)%'
 
+    App\Domain\Translation\TranslationProviderResolverInterface:
+        alias: App\Infrastructure\Translation\TranslationProviderFactory
+
     App\Infrastructure\Translation\TranslationProviderFactory:
         arguments:
             $defaultProviderName: '%env(default:translation.provider_default:TRANSLATION_PROVIDER)%'

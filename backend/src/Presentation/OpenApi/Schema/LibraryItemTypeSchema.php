@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
     schema: 'LibraryItemType',
     type: 'string',
     description: 'Artifact type saved as a library item.',
-    enum: ['summary', 'quiz', 'flashcards', 'transcript', 'timeline', 'podcast'],
+    enum: ['summary', 'quiz', 'flashcards', 'transcript', 'translation', 'timeline', 'podcast'],
     example: 'timeline',
 )]
 final class LibraryItemTypeSchema
