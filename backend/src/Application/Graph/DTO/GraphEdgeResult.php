@@ -12,6 +12,7 @@ final readonly class GraphEdgeResult
         public string $sourceArtifactId,
         public string $targetArtifactId,
         public string $type,
+        public float $weight = 1.0,
     ) {
     }
 
@@ -21,6 +22,7 @@ final readonly class GraphEdgeResult
             sourceArtifactId: $edge->sourceArtifactId()->value,
             targetArtifactId: $edge->targetArtifactId()->value,
             type: $edge->relationType()->value,
+            weight: $edge->weight(),
         );
     }
 }
