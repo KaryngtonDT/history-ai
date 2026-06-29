@@ -38,9 +38,13 @@ nelmio_api_doc:
             - { alias: ChatSource, type: App\Presentation\OpenApi\Schema\ChatSource }
             - { alias: ChatCitation, type: App\Presentation\OpenApi\Schema\ChatCitation }
             - { alias: ChatStreamToken, type: App\Presentation\OpenApi\Schema\ChatStreamToken }
+            - { alias: PerformanceMetric, type: App\Presentation\OpenApi\Schema\PerformanceMetric }
+            - { alias: PerformanceMetricSnapshot, type: App\Presentation\OpenApi\Schema\PerformanceMetricSnapshot }
+            - { alias: PlatformMetricsResponse, type: App\Presentation\OpenApi\Schema\PlatformMetricsResponse }
     areas:
         default:
             path_patterns:
                 - ^/api(?!/docs)
+                - ^/internal/platform
             with_attribute: false
             disable_default_routes: true

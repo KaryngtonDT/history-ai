@@ -23,6 +23,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/contents/{contentId}/semantic-search',
         '/api/contents/{contentId}/chat',
         '/api/contents/{contentId}/chat/stream',
+        '/internal/platform/metrics',
     ];
 
     public function testSwaggerUiIsAvailable(): void
@@ -71,6 +72,7 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('get', $spec['paths']['/api/contents/{contentId}/semantic-search']);
         self::assertArrayHasKey('post', $spec['paths']['/api/contents/{contentId}/chat']);
         self::assertArrayHasKey('post', $spec['paths']['/api/contents/{contentId}/chat/stream']);
+        self::assertArrayHasKey('get', $spec['paths']['/internal/platform/metrics']);
     }
 
     public function testOpenApiSpecDocumentsSearchLibraryQueryParameter(): void
@@ -943,6 +945,112 @@ final class ApiDocumentationTest extends WebTestCase
         if (isset($tokenSchema['required'])) {
             self::assertContains('index', $tokenSchema['required']);
             self::assertContains('text', $tokenSchema['required']);
+        }
+    }
+
+    public function testOpenApiSpecDocumentsGetPlatformMetricsOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/internal/platform/metrics']['get'];
+
+        self::assertSame('getPlatformMetrics', $operation['operationId']);
+        self::assertContains('Platform', $operation['tags']);
+    }
+
+    public function testOpenApiSpecDocumentsGetPlatformMetricsQueryParameter(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/internal/platform/metrics']['get'];
+
+        $queryParameter = null;
+
+        foreach ($operation['parameters'] as $parameter) {
+            if (($parameter['name'] ?? null) === 'limit') {
+                $queryParameter = $parameter;
+                break;
+            }
+        }
+
+        self::assertNotNull($queryParameter, 'Missing query parameter: limit');
+        self::assertSame('query', $queryParameter['in']);
+        self::assertFalse($queryParameter['required']);
+        self::assertSame('integer', $queryParameter['schema']['type']);
+        self::assertSame(1, $queryParameter['schema']['minimum']);
+        self::assertSame(100, $queryParameter['schema']['maximum']);
+        self::assertSame(20, $queryParameter['schema']['example']);
+    }
+
+    public function testOpenApiSpecDocumentsGetPlatformMetricsResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/internal/platform/metrics']['get']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame(
+            'Recent performance metric snapshots (newest first)',
+            $responses['200']['description'],
+        );
+        self::assertSame(
+            '#/components/schemas/PlatformMetricsResponse',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid limit', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsPlatformMetricsSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('PerformanceMetric', $spec['components']['schemas']);
+        self::assertArrayHasKey('PerformanceMetricSnapshot', $spec['components']['schemas']);
+        self::assertArrayHasKey('PlatformMetricsResponse', $spec['components']['schemas']);
+
+        $metricSchema = $spec['components']['schemas']['PerformanceMetric'];
+        $snapshotSchema = $spec['components']['schemas']['PerformanceMetricSnapshot'];
+        $responseSchema = $spec['components']['schemas']['PlatformMetricsResponse'];
+
+        self::assertArrayHasKey('name', $metricSchema['properties']);
+        self::assertArrayHasKey('durationMs', $metricSchema['properties']);
+        self::assertSame('string', $metricSchema['properties']['name']['type']);
+        self::assertSame('integer', $metricSchema['properties']['durationMs']['type']);
+        self::assertSame(0, $metricSchema['properties']['durationMs']['minimum']);
+        if (isset($metricSchema['required'])) {
+            self::assertContains('name', $metricSchema['required']);
+            self::assertContains('durationMs', $metricSchema['required']);
+        }
+
+        self::assertArrayHasKey('correlationId', $snapshotSchema['properties']);
+        self::assertArrayHasKey('recordedAt', $snapshotSchema['properties']);
+        self::assertArrayHasKey('metrics', $snapshotSchema['properties']);
+        self::assertSame('string', $snapshotSchema['properties']['correlationId']['type']);
+        self::assertSame('uuid', $snapshotSchema['properties']['correlationId']['format']);
+        self::assertSame('string', $snapshotSchema['properties']['recordedAt']['type']);
+        self::assertSame('date-time', $snapshotSchema['properties']['recordedAt']['format']);
+        self::assertSame('array', $snapshotSchema['properties']['metrics']['type']);
+        self::assertSame(
+            '#/components/schemas/PerformanceMetric',
+            $snapshotSchema['properties']['metrics']['items']['$ref'],
+        );
+        if (isset($snapshotSchema['required'])) {
+            self::assertContains('correlationId', $snapshotSchema['required']);
+            self::assertContains('recordedAt', $snapshotSchema['required']);
+            self::assertContains('metrics', $snapshotSchema['required']);
+        }
+
+        self::assertArrayHasKey('snapshots', $responseSchema['properties']);
+        self::assertSame('array', $responseSchema['properties']['snapshots']['type']);
+        self::assertSame(
+            '#/components/schemas/PerformanceMetricSnapshot',
+            $responseSchema['properties']['snapshots']['items']['$ref'],
+        );
+        if (isset($responseSchema['required'])) {
+            self::assertContains('snapshots', $responseSchema['required']);
         }
     }
 

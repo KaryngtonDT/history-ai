@@ -10,7 +10,7 @@ Status: Active
 
 History AI exposes a **machine-readable OpenAPI 3.1** specification for the public REST API. Interactive documentation is served via **Swagger UI** at `/api/docs`.
 
-Internal routes (`/api/processing/*`, `/api/internal/*`) are intentionally excluded.
+Internal processing routes (`/api/processing/*`) remain intentionally excluded. **Platform Sprint 23** documents one internal diagnostic route (`GET /internal/platform/metrics`) under the `Platform` tag for operators and contract tests.
 
 ---
 
@@ -35,7 +35,7 @@ NelmioApiDocBundle + swagger-php
 | Nelmio config | `backend/config/packages/nelmio_api_doc.yaml` |
 | Doc routes | `backend/config/routes/nelmio_api_doc.yaml` |
 
-The **`default`** area uses `disable_default_routes: true`, so only controller actions annotated with OpenAPI attributes (`#[OA\Post]`, `#[OA\Get]`, …) appear in the spec. Processing and internal endpoints stay excluded without a deny list.
+The **`default`** area uses `disable_default_routes: true`, so only controller actions annotated with OpenAPI attributes (`#[OA\Post]`, `#[OA\Get]`, …) appear in the spec. Processing endpoints stay excluded without a deny list. The area includes `^/internal/platform` so the metrics diagnostic endpoint is documented when annotated.
 
 ---
 
@@ -59,6 +59,8 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Recommendations | GET | `/api/contents/{contentId}/artifacts/{artifactId}/recommendations` |
 | Semantic | GET | `/api/contents/{contentId}/semantic-search` |
 | Chat | POST | `/api/contents/{contentId}/chat` |
+| Chat | POST | `/api/contents/{contentId}/chat/stream` |
+| Platform | GET | `/internal/platform/metrics` |
 
 ---
 
@@ -165,6 +167,9 @@ Shared OpenAPI schemas:
 | `ChatSource` | `Presentation/OpenApi/Schema/ChatSource.php` |
 | `ChatCitation` | `Presentation/OpenApi/Schema/ChatCitation.php` |
 | `ChatStreamToken` | `Presentation/OpenApi/Schema/ChatStreamToken.php` |
+| `PerformanceMetric` | `Presentation/OpenApi/Schema/PerformanceMetric.php` |
+| `PerformanceMetricSnapshot` | `Presentation/OpenApi/Schema/PerformanceMetricSnapshot.php` |
+| `PlatformMetricsResponse` | `Presentation/OpenApi/Schema/PlatformMetricsResponse.php` |
 
 `GET /api/timeline/{artifactId}` returns a `Timeline` with nested `sections[].events[].text`.
 
@@ -190,6 +195,10 @@ Shared OpenAPI schemas:
 
 **UX-03 note:** The streaming chat endpoint is documented in OpenAPI slice 6. Token payloads use `ChatStreamToken`; sources and citations are not included in the SSE stream (non-streaming `POST /chat` remains available for full answers with metadata).
 
+`GET /internal/platform/metrics` returns a `PlatformMetricsResponse` envelope with `snapshots[]` entries (`correlationId`, `recordedAt`, `metrics[]`). Each metric has `name` and `durationMs` (integer milliseconds). The optional query parameter `limit` accepts 1–100 (default 20). Invalid `limit` returns HTTP 400 with `ErrorResponse`. This endpoint is internal diagnostics only — not consumed by the frontend.
+
+**Platform Sprint 23 note:** Correlation IDs, performance timers, metrics store, and embedding cache are internal platform concerns. Only the metrics read API is documented in OpenAPI slice 5.
+
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 
 ---
@@ -202,7 +211,7 @@ Library save (`POST /api/library/items`) accepts any `LibraryItemType`, includin
 | Caching | The spec is generated at request time; no build step required. |
 | Versioning | Bump `info.version` in `nelmio_api_doc.yaml` when the public contract changes. |
 | Contract tests | Future slices can consume `/api/docs.json` for consumer-driven contract tests or SDK generation. |
-| Security | Documented routes match the public API only; internal worker callbacks stay undocumented by design. |
+| Security | Documented routes match the public API plus the internal platform metrics diagnostic; processing worker callbacks stay undocumented by design. |
 
 ---
 

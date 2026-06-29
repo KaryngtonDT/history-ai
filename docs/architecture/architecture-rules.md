@@ -562,6 +562,54 @@ Assistant bubble grows progressively
 
 Streaming does not yet emit sources/citations — use non-streaming `/chat` for full metadata.
 
+### Platform observability (Platform Sprint 23)
+
+```text
+HTTP request
+        │
+        ▼
+RequestCorrelationIdListener
+        │
+        ├── X-Correlation-ID header (in/out)
+        └── RequestContext (correlationId)
+        │
+        ▼
+SearchSemanticChunksHandler / AskContentChatHandler / AskContentChatStreamHandler
+        │
+        ├── PerformanceTimer (per stage)
+        └── CompositePerformanceMetricsRecorder
+                ├── LoggingPerformanceMetricsRecorder → PlatformLogger
+                └── InMemoryPerformanceMetricsStore (ring buffer, max 100)
+        │
+        ▼
+GET /internal/platform/metrics?limit=20
+        │
+        ▼
+PlatformMetricsResponse JSON (snapshots[], newest first)
+```
+
+| Component | Role |
+| --------- | ---- |
+| `CorrelationId` | Domain value object (UUID); propagated via `RequestContext` |
+| `PerformanceTimer` | Application helper; records named stage durations in milliseconds |
+| `InMemoryPerformanceMetricsStore` | Infrastructure ring buffer; exposes recent snapshots via reader port |
+| `CachedEmbeddingProvider` | Wraps `EmbeddingProviderInterface`; LRU in-memory cache (max 1000 keys) |
+| `GET /internal/platform/metrics` | Internal diagnostic endpoint; optional `limit` query (1–100, default 20) |
+
+Embedding cache wiring:
+
+```text
+EmbeddingProviderFactory
+        │
+        ▼
+CachedEmbeddingProvider
+        │
+        ├── InMemoryEmbeddingCache (LRU)
+        └── UncachedEmbeddingProvider (deterministic | gemini)
+```
+
+`CachedEmbeddingProvider` must not import Application layer types (architecture test enforces Semantic infra boundary).
+
 ## Enforcement
 
 | Tool | Location | Command |

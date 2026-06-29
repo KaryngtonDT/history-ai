@@ -304,6 +304,31 @@ Verification: [UX03-Verification.md](../reports/UX03-Verification.md)
 
 ---
 
+# Platform Sprint 23 — Observability & Performance (2026-06)
+
+Platform Sprint 23 hardened cross-cutting platform concerns: correlation IDs, performance metrics, an internal metrics API, and embedding cache. Slice 5 changed **documentation and OpenAPI only** — no business logic in backend handlers, frontend, or worker.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P23-SLICE-01 | `CorrelationId`, `RequestContext`, `X-Correlation-ID` header, structured logging | ✅ |
+| P23-SLICE-02 | `PerformanceTimer`, `PerformanceMetric`, RAG pipeline timings | ✅ |
+| P23-SLICE-03 | `InMemoryPerformanceMetricsStore`; `GET /internal/platform/metrics` | ✅ |
+| P23-SLICE-04 | `EmbeddingCacheInterface`, `CachedEmbeddingProvider` (LRU, max 1000) | ✅ |
+| P23-SLICE-05 | OpenAPI `PerformanceMetric*`, architecture docs, this report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `CorrelationId`; `PerformanceMetric`, `PerformanceMetricCollection`; `EmbeddingCacheKey`, `EmbeddingCacheInterface` |
+| Application | `RequestContext`, `PerformanceTimer`, `PerformanceMetricsRecorderInterface`, `PerformanceMetricsReaderInterface` |
+| Infrastructure | `RequestCorrelationIdListener`, `PlatformLogger`, `LoggingPerformanceMetricsRecorder`, `InMemoryPerformanceMetricsStore`, `CompositePerformanceMetricsRecorder`, `CachedEmbeddingProvider`, `InMemoryEmbeddingCache` |
+| Presentation | `GET /internal/platform/metrics`; OpenAPI schemas `PerformanceMetric`, `PerformanceMetricSnapshot`, `PlatformMetricsResponse` |
+
+Handlers instrumented: `SearchSemanticChunksHandler`, `AskContentChatHandler`, `AskContentChatStreamHandler`. Metrics captured: `chunking_ms`, `embedding_ms`, `vector_index_ms`, `retrieval_ms`, `provider_ms`, `total_ms`.
+
+Verification: [Platform23-Verification.md](../reports/Platform23-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:
