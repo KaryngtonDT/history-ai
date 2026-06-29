@@ -1,0 +1,21 @@
+.tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.tab,
+.tabActive {
+	border: 1px solid var(--color-border);
+	border-radius: 999px;
+	padding: 0.35rem 0.85rem;
+	background: transparent;
+	cursor: pointer;
+	font: inherit;
+}
+
+.tabActive {
+	background: var(--color-primary);
+	border-color: var(--color-primary);
+	color: var(--color-primary-contrast);
+}

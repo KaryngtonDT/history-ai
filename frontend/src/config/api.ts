@@ -18,6 +18,17 @@ export function videoTranscriptPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/transcript`;
 }
 
+export function videoTranslationsPath(videoId: string): string {
+	return `${VIDEOS_PATH}/${videoId}/translations`;
+}
+
+export function videoTranslationPath(
+	videoId: string,
+	language: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/translations/${language}`;
+}
+
 export function timelinePath(artifactId: string): string {
 	return `/api/timeline/${artifactId}`;
 }

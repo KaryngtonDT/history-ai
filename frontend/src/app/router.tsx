@@ -8,6 +8,7 @@ import { LibraryPage } from "@/pages/Library/LibraryPage";
 import { ProcessingPage } from "@/pages/Processing/ProcessingPage";
 import { SettingsPage } from "@/pages/Settings/SettingsPage";
 import { VideoTranscriptPage } from "@/pages/VideoTranscript/VideoTranscriptPage";
+import { VideoTranslationsPage } from "@/pages/VideoTranslations/VideoTranslationsPage";
 import { VideoUploadPage } from "@/pages/VideoUpload/VideoUploadPage";
 
 export function AppRouter() {
@@ -20,6 +21,10 @@ export function AppRouter() {
 				<Route
 					path="/video/:videoId/transcript"
 					element={<VideoTranscriptPage />}
+				/>
+				<Route
+					path="/video/:videoId/translations"
+					element={<VideoTranslationsPage />}
 				/>
 				<Route path="/library" element={<LibraryPage />} />
 				<Route path="/library/:libraryItemId" element={<LibraryItemPage />} />

@@ -1,0 +1,1 @@
+export { TranslationLanguageTabs } from "./TranslationLanguageTabs";
