@@ -1,0 +1,193 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Application\Chat;
+
+use App\Application\Platform\ClockInterface;
+use App\Application\Platform\PerformanceMetricCollection;
+use App\Application\Platform\PerformanceMetricsRecorderInterface;
+use App\Application\Platform\PerformanceTimer;
+use App\Application\Platform\PlatformLoggerInterface;
+use App\Domain\Artifact\Artifact;
+use App\Domain\Chat\ChatContext;
+use App\Domain\Chat\ChatOrchestrator;
+use App\Domain\Chat\ChatProviderOptions;
+use App\Domain\Chat\ChatQuestion;
+use App\Domain\Chat\ChatRequest;
+use App\Domain\Chat\ChatStream;
+use App\Domain\Chat\StreamingChatProviderInterface;
+use App\Domain\Semantic\ChunkCollection;
+use App\Domain\Semantic\Chunker;
+use App\Domain\Semantic\EmbeddedChunk;
+use App\Domain\Semantic\EmbeddedChunkCollection;
+use App\Domain\Semantic\EmbeddingGeneratorInterface;
+use App\Domain\Semantic\RetrievedChunkCollection;
+use App\Domain\Semantic\SemanticQuery;
+use App\Domain\Semantic\SemanticRetriever;
+use App\Domain\Semantic\VectorDocument;
+use App\Domain\Semantic\VectorDocumentCollection;
+use App\Domain\Semantic\VectorStoreInterface;
+
+final class ContentChatStreamer
+{
+    private const int SEMANTIC_QUERY_MAX_LENGTH = 500;
+
+    public function __construct(
+        private readonly Chunker $chunker,
+        private readonly EmbeddingGeneratorInterface $embeddingGenerator,
+        private readonly VectorStoreInterface $vectorStore,
+        private readonly SemanticRetriever $semanticRetriever,
+        private readonly ChatOrchestrator $chatOrchestrator,
+        private readonly StreamingChatProviderInterface $streamingChatProvider,
+        private readonly PlatformLoggerInterface $platformLogger,
+        private readonly PerformanceMetricsRecorderInterface $performanceMetricsRecorder,
+        private readonly ClockInterface $clock,
+    ) {
+    }
+
+    /**
+     * @param list<Artifact> $artifacts
+     */
+    public function stream(array $artifacts, ChatQuestion $question, string $component): ChatStream
+    {
+        $metrics = PerformanceMetricCollection::empty();
+        $totalTimer = new PerformanceTimer($this->clock);
+        $totalTimer->start();
+
+        if ([] === $artifacts) {
+            $providerTimer = new PerformanceTimer($this->clock);
+            $providerTimer->start();
+
+            $context = new ChatContext($question, RetrievedChunkCollection::empty());
+            $prompt = $this->chatOrchestrator->buildPrompt($context);
+            $stream = $this->streamingChatProvider->stream(ChatRequest::create(
+                $prompt,
+                $context->sources(),
+                ChatProviderOptions::defaults(),
+            ));
+
+            $metrics = $metrics->with($providerTimer->stop('provider_ms'));
+
+            $this->platformLogger->info($component, 'retrieval completed', [
+                'chunkCount' => 0,
+            ]);
+            $this->platformLogger->info($component, 'provider completed');
+
+            return $this->complete($stream, $metrics, $totalTimer);
+        }
+
+        [$retrievedChunks, $ragMetrics] = $this->measureRetrieval($artifacts, $question);
+        $metrics = $metrics->merge($ragMetrics);
+
+        $this->platformLogger->info($component, 'retrieval completed', [
+            'chunkCount' => $retrievedChunks->count(),
+        ]);
+
+        $providerTimer = new PerformanceTimer($this->clock);
+        $providerTimer->start();
+
+        $context = new ChatContext($question, $retrievedChunks);
+        $prompt = $this->chatOrchestrator->buildPrompt($context);
+        $stream = $this->streamingChatProvider->stream(ChatRequest::create(
+            $prompt,
+            $context->sources(),
+            ChatProviderOptions::defaults(),
+        ));
+
+        $metrics = $metrics->with($providerTimer->stop('provider_ms'));
+
+        $this->platformLogger->info($component, 'provider completed');
+
+        return $this->complete($stream, $metrics, $totalTimer);
+    }
+
+    /**
+     * @param list<Artifact> $artifacts
+     *
+     * @return array{0: RetrievedChunkCollection, 1: PerformanceMetricCollection}
+     */
+    private function measureRetrieval(array $artifacts, ChatQuestion $question): array
+    {
+        $metrics = PerformanceMetricCollection::empty();
+
+        $chunkTimer = new PerformanceTimer($this->clock);
+        $chunkTimer->start();
+
+        /** @var list<\App\Domain\Semantic\Chunk> $chunks */
+        $chunks = [];
+
+        foreach ($artifacts as $artifact) {
+            foreach ($this->chunker->chunk($artifact)->chunks() as $chunk) {
+                $chunks[] = $chunk;
+            }
+        }
+
+        $metrics = $metrics->with($chunkTimer->stop('chunking_ms'));
+
+        if ([] === $chunks) {
+            return [RetrievedChunkCollection::empty(), $metrics];
+        }
+
+        $embeddingTimer = new PerformanceTimer($this->clock);
+        $embeddingTimer->start();
+        $embeddedChunks = $this->embeddingGenerator->generate(new ChunkCollection($chunks));
+        $metrics = $metrics->with($embeddingTimer->stop('embedding_ms'));
+
+        if ($embeddedChunks->isEmpty()) {
+            return [RetrievedChunkCollection::empty(), $metrics];
+        }
+
+        $indexTimer = new PerformanceTimer($this->clock);
+        $indexTimer->start();
+        $this->vectorStore->index($this->toVectorDocuments($embeddedChunks));
+        $metrics = $metrics->with($indexTimer->stop('vector_index_ms'));
+
+        $retrievalTimer = new PerformanceTimer($this->clock);
+        $retrievalTimer->start();
+        $retrievedChunks = $this->semanticRetriever->retrieve(
+            $this->toSemanticQuery($question),
+            $this->embeddingGenerator,
+        );
+        $metrics = $metrics->with($retrievalTimer->stop('retrieval_ms'));
+
+        return [$retrievedChunks, $metrics];
+    }
+
+    private function complete(
+        ChatStream $stream,
+        PerformanceMetricCollection $metrics,
+        PerformanceTimer $totalTimer,
+    ): ChatStream {
+        $this->performanceMetricsRecorder->record(
+            $metrics->with($totalTimer->stop('total_ms')),
+        );
+
+        return $stream;
+    }
+
+    private function toSemanticQuery(ChatQuestion $question): SemanticQuery
+    {
+        $value = $question->value();
+
+        if (strlen($value) > self::SEMANTIC_QUERY_MAX_LENGTH) {
+            $value = substr($value, 0, self::SEMANTIC_QUERY_MAX_LENGTH);
+        }
+
+        return new SemanticQuery($value);
+    }
+
+    private function toVectorDocuments(EmbeddedChunkCollection $embeddedChunks): VectorDocumentCollection
+    {
+        /** @var list<VectorDocument> $documents */
+        $documents = array_map(
+            static fn (EmbeddedChunk $embeddedChunk): VectorDocument => new VectorDocument(
+                $embeddedChunk->chunk(),
+                $embeddedChunk->vector(),
+            ),
+            $embeddedChunks->embeddedChunks(),
+        );
+
+        return new VectorDocumentCollection($documents);
+    }
+}
