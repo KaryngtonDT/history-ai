@@ -89,6 +89,12 @@ services:
     App\Domain\Video\VideoRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Video\DoctrineVideoRepository
 
+    App\Domain\Speech\TranscriptRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Speech\DoctrineTranscriptRepository
+
+    App\Infrastructure\Speech\FasterWhisperProcessRunnerInterface:
+        alias: App\Infrastructure\Speech\ShellFasterWhisperProcessRunner
+
     App\Application\Video\Ports\VideoStorageInterface:
         alias: App\Infrastructure\Video\LocalVideoStorage
 

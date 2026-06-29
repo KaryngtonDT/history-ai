@@ -57,6 +57,14 @@ when@test:
             alias: App\Infrastructure\Persistence\Doctrine\Video\DoctrineVideoRepository
             public: true
 
+        App\Domain\Speech\TranscriptRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\Speech\DoctrineTranscriptRepository
+            public: true
+
+        App\Infrastructure\Speech\FasterWhisperProcessRunnerInterface:
+            class: App\Infrastructure\Speech\FixedFasterWhisperProcessRunner
+            public: true
+
         App\Application\Video\Ports\VideoProcessingQueueInterface:
             class: App\Infrastructure\Video\NoOpVideoProcessingQueue
             public: true
