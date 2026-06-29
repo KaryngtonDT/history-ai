@@ -163,6 +163,83 @@ final class AskConversationChatControllerTest extends WebTestCase
         self::assertCount(1, $response['answer']['citations']);
     }
 
+    public function testPostAllowsRouteContentIdWhenItIsNotPrimaryDocument(): void
+    {
+        $client = static::createClient();
+        $this->resetDatabaseSchema();
+
+        $repository = static::getContainer()->get(ConversationRepositoryInterface::class);
+        $repository->save(
+            Conversation::start(
+                new ConversationId(self::CONVERSATION_ID),
+                new ContentId(self::OTHER_CONTENT_ID),
+            )->addDocument(new ContentId(self::CONTENT_ID)),
+        );
+
+        $client->request(
+            'POST',
+            $this->conversationChatUrl(self::CONTENT_ID, self::CONVERSATION_ID),
+            server: ['CONTENT_TYPE' => 'application/json'],
+            content: json_encode(['question' => 'Why did Rome collapse?'], JSON_THROW_ON_ERROR),
+        );
+
+        self::assertResponseStatusCodeSame(200);
+
+        $response = json_decode($client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertSame(MockChatProvider::MOCK_ANSWER, $response['answer']['answer']);
+    }
+
+    public function testPostUsesArtifactsFromAllSelectedDocuments(): void
+    {
+        $client = static::createClient();
+        $this->resetDatabaseSchema();
+
+        $artifactRepository = static::getContainer()->get(ArtifactRepositoryInterface::class);
+        $artifactRepository->save(Artifact::create(
+            new ArtifactId('550e8400-e29b-41d4-a716-446655440002'),
+            new ContentId(self::CONTENT_ID),
+            ProcessingJobId::generate(),
+            ArtifactType::Summary,
+            ArtifactContent::fromString('## Roman Empire summary'),
+        ));
+        $artifactRepository->save(Artifact::create(
+            new ArtifactId('550e8400-e29b-41d4-a716-446655440003'),
+            new ContentId(self::OTHER_CONTENT_ID),
+            ProcessingJobId::generate(),
+            ArtifactType::Summary,
+            ArtifactContent::fromString('## Byzantine Empire summary'),
+        ));
+
+        $repository = static::getContainer()->get(ConversationRepositoryInterface::class);
+        $repository->save(
+            Conversation::start(
+                new ConversationId(self::CONVERSATION_ID),
+                new ContentId(self::CONTENT_ID),
+            )->addDocument(new ContentId(self::OTHER_CONTENT_ID)),
+        );
+
+        $client->request(
+            'POST',
+            $this->conversationChatUrl(self::CONTENT_ID, self::CONVERSATION_ID),
+            server: ['CONTENT_TYPE' => 'application/json'],
+            content: json_encode(['question' => '## Roman Empire summary'], JSON_THROW_ON_ERROR),
+        );
+
+        self::assertResponseStatusCodeSame(200);
+
+        $response = json_decode($client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertSame('Mock answer based on retrieved context [1][2].', $response['answer']['answer']);
+        self::assertCount(2, $response['answer']['sources']);
+        self::assertSame(
+            '550e8400-e29b-41d4-a716-446655440002',
+            $response['answer']['sources'][0]['artifactId'],
+        );
+        self::assertSame(
+            '550e8400-e29b-41d4-a716-446655440003',
+            $response['answer']['sources'][1]['artifactId'],
+        );
+    }
+
     public function testPostRejectsConversationFromAnotherContent(): void
     {
         $client = static::createClient();

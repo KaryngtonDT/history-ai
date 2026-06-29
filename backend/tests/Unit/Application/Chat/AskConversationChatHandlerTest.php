@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Application\Chat;
 
 use App\Application\Chat\Commands\AskConversationChatCommand;
-use App\Application\Chat\Handlers\AskContentChatHandler;
+use App\Application\Chat\ContentChatAnswerer;
 use App\Application\Chat\Handlers\AskConversationChatHandler;
+use App\Domain\Artifact\Artifact;
+use App\Domain\Artifact\ArtifactContent;
+use App\Domain\Artifact\ArtifactId;
 use App\Domain\Artifact\ArtifactRepositoryInterface;
+use App\Domain\Artifact\ArtifactType;
 use App\Domain\Chat\ChatMessage;
 use App\Domain\Chat\ChatMessageRole;
 use App\Domain\Chat\ChatOrchestrator;
@@ -16,9 +20,9 @@ use App\Domain\Chat\ConversationId;
 use App\Domain\Chat\ConversationRepositoryInterface;
 use App\Domain\Chat\Exception\ConversationContentMismatchException;
 use App\Domain\Content\ContentId;
+use App\Domain\Processing\ProcessingJobId;
 use App\Domain\Semantic\Chunker;
 use App\Domain\Semantic\SemanticRetriever;
-use App\Domain\Semantic\VectorStoreInterface;
 use App\Infrastructure\Chat\MockChatProvider;
 use App\Infrastructure\Semantic\DeterministicEmbeddingGenerator;
 use App\Infrastructure\Semantic\DeterministicEmbeddingProvider;
@@ -42,20 +46,27 @@ final class AskConversationChatHandlerTest extends TestCase
         $contentId = new ContentId(self::CONTENT_ID);
         $saved = null;
 
-        $repository = $this->createMock(ConversationRepositoryInterface::class);
-        $repository
+        $conversationRepository = $this->createMock(ConversationRepositoryInterface::class);
+        $conversationRepository
             ->expects(self::once())
             ->method('findById')
             ->with($conversationId)
             ->willReturn(null);
-        $repository
+        $conversationRepository
             ->expects(self::once())
             ->method('save')
             ->willReturnCallback(static function (Conversation $conversation) use (&$saved): void {
                 $saved = $conversation;
             });
 
-        $result = (new AskConversationChatHandler($repository, $this->createContentChatHandler()))
+        $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+        $artifactRepository
+            ->expects(self::once())
+            ->method('findByContentId')
+            ->with($contentId)
+            ->willReturn([]);
+
+        $result = $this->createHandler($conversationRepository, $artifactRepository)
             ->__invoke(new AskConversationChatCommand(self::CONTENT_ID, self::CONVERSATION_ID, 'Why did Rome fall?'));
 
         self::assertNotNull($saved);
@@ -76,13 +87,13 @@ final class AskConversationChatHandlerTest extends TestCase
             ->appendUser(new ChatMessage(ChatMessageRole::User, 'Earlier question'))
             ->appendAssistant(new ChatMessage(ChatMessageRole::Assistant, 'Earlier answer'));
 
-        $repository = $this->createMock(ConversationRepositoryInterface::class);
-        $repository
+        $conversationRepository = $this->createMock(ConversationRepositoryInterface::class);
+        $conversationRepository
             ->expects(self::once())
             ->method('findById')
             ->with($conversationId)
             ->willReturn($existing);
-        $repository
+        $conversationRepository
             ->expects(self::once())
             ->method('save')
             ->with(self::callback(static function (Conversation $conversation): bool {
@@ -93,7 +104,10 @@ final class AskConversationChatHandlerTest extends TestCase
                     && MockChatProvider::MOCK_ANSWER === $conversation->messages()[3]->content();
             }));
 
-        $result = (new AskConversationChatHandler($repository, $this->createContentChatHandler()))
+        $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+        $artifactRepository->method('findByContentId')->willReturn([]);
+
+        $result = $this->createHandler($conversationRepository, $artifactRepository)
             ->__invoke(new AskConversationChatCommand(self::CONTENT_ID, self::CONVERSATION_ID, 'Follow-up question'));
 
         self::assertCount(4, $result->conversation->messages);
@@ -110,9 +124,9 @@ final class AskConversationChatHandlerTest extends TestCase
             ->appendUser(new ChatMessage(ChatMessageRole::User, 'One'))
             ->appendAssistant(new ChatMessage(ChatMessageRole::Assistant, 'Two'));
 
-        $repository = $this->createMock(ConversationRepositoryInterface::class);
-        $repository->method('findById')->willReturn($existing);
-        $repository
+        $conversationRepository = $this->createMock(ConversationRepositoryInterface::class);
+        $conversationRepository->method('findById')->willReturn($existing);
+        $conversationRepository
             ->expects(self::once())
             ->method('save')
             ->with(self::callback(static function (Conversation $conversation): bool {
@@ -122,38 +136,140 @@ final class AskConversationChatHandlerTest extends TestCase
                 );
             }));
 
-        (new AskConversationChatHandler($repository, $this->createContentChatHandler()))
+        $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+        $artifactRepository->method('findByContentId')->willReturn([]);
+
+        $this->createHandler($conversationRepository, $artifactRepository)
             ->__invoke(new AskConversationChatCommand(self::CONTENT_ID, self::CONVERSATION_ID, 'Three'));
     }
 
-    public function testRejectsConversationFromAnotherContent(): void
+    public function testRejectsConversationWhenRouteContentIdIsNotSelected(): void
     {
         $conversationId = new ConversationId(self::CONVERSATION_ID);
         $existing = Conversation::start($conversationId, new ContentId(self::OTHER_CONTENT_ID));
 
-        $repository = $this->createMock(ConversationRepositoryInterface::class);
-        $repository
+        $conversationRepository = $this->createMock(ConversationRepositoryInterface::class);
+        $conversationRepository
             ->expects(self::once())
             ->method('findById')
             ->willReturn($existing);
-        $repository->expects(self::never())->method('save');
+        $conversationRepository->expects(self::never())->method('save');
+
+        $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+        $artifactRepository->expects(self::never())->method('findByContentId');
 
         $this->expectException(ConversationContentMismatchException::class);
 
-        (new AskConversationChatHandler($repository, $this->createContentChatHandler()))
+        $this->createHandler($conversationRepository, $artifactRepository)
             ->__invoke(new AskConversationChatCommand(self::CONTENT_ID, self::CONVERSATION_ID, 'Why did Rome fall?'));
     }
 
-    private function createContentChatHandler(): AskContentChatHandler
+    public function testAllowsRouteContentIdWhenItIsNotPrimaryDocument(): void
     {
-        $repository = $this->createMock(ArtifactRepositoryInterface::class);
-        $repository->method('findByContentId')->willReturn([]);
+        $conversationId = new ConversationId(self::CONVERSATION_ID);
+        $existing = Conversation::start($conversationId, new ContentId(self::OTHER_CONTENT_ID))
+            ->addDocument(new ContentId(self::CONTENT_ID));
 
+        $conversationRepository = $this->createMock(ConversationRepositoryInterface::class);
+        $conversationRepository->method('findById')->willReturn($existing);
+        $conversationRepository->expects(self::once())->method('save');
+
+        $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+        $artifactRepository->method('findByContentId')->willReturn([]);
+
+        $result = $this->createHandler($conversationRepository, $artifactRepository)
+            ->__invoke(new AskConversationChatCommand(self::CONTENT_ID, self::CONVERSATION_ID, 'Why did Rome fall?'));
+
+        self::assertSame(MockChatProvider::MOCK_ANSWER, $result->answer->answer);
+    }
+
+    public function testLoadsArtifactsInSelectedDocumentOrder(): void
+    {
+        $conversationId = new ConversationId(self::CONVERSATION_ID);
+        $existing = Conversation::start($conversationId, new ContentId(self::CONTENT_ID))
+            ->addDocument(new ContentId(self::OTHER_CONTENT_ID));
+
+        $primaryArtifact = $this->createArtifact(
+            '550e8400-e29b-41d4-a716-446655440002',
+            self::CONTENT_ID,
+            'Primary artifact content',
+        );
+        $secondaryArtifact = $this->createArtifact(
+            '550e8400-e29b-41d4-a716-446655440003',
+            self::OTHER_CONTENT_ID,
+            'Secondary artifact content',
+        );
+
+        $conversationRepository = $this->createMock(ConversationRepositoryInterface::class);
+        $conversationRepository->method('findById')->willReturn($existing);
+        $conversationRepository->expects(self::once())->method('save');
+
+        $lookupOrder = [];
+        $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+        $artifactRepository
+            ->method('findByContentId')
+            ->willReturnCallback(static function (ContentId $contentId) use (
+                &$lookupOrder,
+                $primaryArtifact,
+                $secondaryArtifact,
+            ): array {
+                $lookupOrder[] = $contentId->value;
+
+                return match ($contentId->value) {
+                    self::CONTENT_ID => [$primaryArtifact],
+                    self::OTHER_CONTENT_ID => [$secondaryArtifact],
+                    default => [],
+                };
+            });
+
+        $result = $this->createHandler($conversationRepository, $artifactRepository)
+            ->__invoke(new AskConversationChatCommand(self::CONTENT_ID, self::CONVERSATION_ID, 'Primary artifact content'));
+
+        self::assertSame([self::CONTENT_ID, self::OTHER_CONTENT_ID], $lookupOrder);
+        self::assertSame('Mock answer based on retrieved context [1][2].', $result->answer->answer);
+        self::assertCount(2, $result->answer->sources);
+        self::assertSame($primaryArtifact->id()->value, $result->answer->sources[0]->artifactId);
+        self::assertSame($secondaryArtifact->id()->value, $result->answer->sources[1]->artifactId);
+    }
+
+    public function testReturnsMockAnswerWithEmptySourcesWhenNoArtifactsExistAcrossDocuments(): void
+    {
+        $conversationId = new ConversationId(self::CONVERSATION_ID);
+        $existing = Conversation::start($conversationId, new ContentId(self::CONTENT_ID))
+            ->addDocument(new ContentId(self::OTHER_CONTENT_ID));
+
+        $conversationRepository = $this->createMock(ConversationRepositoryInterface::class);
+        $conversationRepository->method('findById')->willReturn($existing);
+        $conversationRepository->expects(self::once())->method('save');
+
+        $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+        $artifactRepository->method('findByContentId')->willReturn([]);
+
+        $result = $this->createHandler($conversationRepository, $artifactRepository)
+            ->__invoke(new AskConversationChatCommand(self::CONTENT_ID, self::CONVERSATION_ID, 'Why did Rome fall?'));
+
+        self::assertSame(MockChatProvider::MOCK_ANSWER, $result->answer->answer);
+        self::assertSame([], $result->answer->sources);
+        self::assertSame([], $result->answer->citations);
+    }
+
+    private function createHandler(
+        ConversationRepositoryInterface $conversationRepository,
+        ArtifactRepositoryInterface $artifactRepository,
+    ): AskConversationChatHandler {
+        return new AskConversationChatHandler(
+            $conversationRepository,
+            $artifactRepository,
+            $this->createContentChatAnswerer(),
+        );
+    }
+
+    private function createContentChatAnswerer(): ContentChatAnswerer
+    {
         $vectorStore = new InMemoryVectorStore();
         $contextProvider = new FixedRequestContextProvider(new CorrelationId('c6f98b8a-3f2e-4a1b-9c8d-1e2f3a4b5c6d'));
 
-        return new AskContentChatHandler(
-            $repository,
+        return new ContentChatAnswerer(
             new Chunker(),
             new DeterministicEmbeddingGenerator(new DeterministicEmbeddingProvider()),
             $vectorStore,
@@ -163,6 +279,17 @@ final class AskConversationChatHandlerTest extends TestCase
             new RecordingPlatformLogger($contextProvider),
             new RecordingPerformanceMetricsRecorder(),
             new FixedClock(),
+        );
+    }
+
+    private function createArtifact(string $id, string $contentId, string $content): Artifact
+    {
+        return Artifact::create(
+            new ArtifactId($id),
+            new ContentId($contentId),
+            ProcessingJobId::generate(),
+            ArtifactType::Summary,
+            ArtifactContent::fromString($content),
         );
     }
 }

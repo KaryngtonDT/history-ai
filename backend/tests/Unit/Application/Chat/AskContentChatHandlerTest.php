@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Application\Chat;
 
 use App\Application\Chat\Commands\AskContentChatCommand;
+use App\Application\Chat\ContentChatAnswerer;
 use App\Application\Chat\Handlers\AskContentChatHandler;
 use App\Domain\Artifact\Artifact;
 use App\Domain\Artifact\ArtifactContent;
@@ -36,6 +37,29 @@ use PHPUnit\Framework\TestCase;
 
 final class AskContentChatHandlerTest extends TestCase
 {
+    private function createContentChatAnswerer(
+        ?VectorStoreInterface $vectorStore = null,
+        ?ChatProviderInterface $chatProvider = null,
+        ?RecordingPlatformLogger $platformLogger = null,
+        ?RecordingPerformanceMetricsRecorder $metricsRecorder = null,
+        ?FixedClock $clock = null,
+    ): ContentChatAnswerer {
+        $store = $vectorStore ?? new InMemoryVectorStore();
+        $contextProvider = new FixedRequestContextProvider(new CorrelationId('c6f98b8a-3f2e-4a1b-9c8d-1e2f3a4b5c6d'));
+
+        return new ContentChatAnswerer(
+            new Chunker(),
+            new DeterministicEmbeddingGenerator(new DeterministicEmbeddingProvider()),
+            $store,
+            new SemanticRetriever($store),
+            new ChatOrchestrator(),
+            $chatProvider ?? new MockChatProvider(),
+            $platformLogger ?? new RecordingPlatformLogger($contextProvider),
+            $metricsRecorder ?? new RecordingPerformanceMetricsRecorder(),
+            $clock ?? new FixedClock(),
+        );
+    }
+
     private function createHandler(
         ArtifactRepositoryInterface $repository,
         ?VectorStoreInterface $vectorStore = null,
@@ -44,22 +68,18 @@ final class AskContentChatHandlerTest extends TestCase
         ?RecordingPerformanceMetricsRecorder $metricsRecorder = null,
         ?FixedClock $clock = null,
     ): AskContentChatHandler {
-        $store = $vectorStore ?? new InMemoryVectorStore();
         $contextProvider = new FixedRequestContextProvider(new CorrelationId('c6f98b8a-3f2e-4a1b-9c8d-1e2f3a4b5c6d'));
-        $logger = $platformLogger ?? new RecordingPlatformLogger($contextProvider);
-        $recorder = $metricsRecorder ?? new RecordingPerformanceMetricsRecorder();
 
         return new AskContentChatHandler(
             $repository,
-            new Chunker(),
-            new DeterministicEmbeddingGenerator(new DeterministicEmbeddingProvider()),
-            $store,
-            new SemanticRetriever($store),
-            new ChatOrchestrator(),
-            $chatProvider ?? new MockChatProvider(),
-            $logger,
-            $recorder,
-            $clock ?? new FixedClock(),
+            $this->createContentChatAnswerer(
+                $vectorStore,
+                $chatProvider,
+                $platformLogger,
+                $metricsRecorder,
+                $clock,
+            ),
+            $platformLogger ?? new RecordingPlatformLogger($contextProvider),
         );
     }
 
