@@ -1,0 +1,63 @@
+.agentMetadataPanel {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+}
+
+.sectionTitle {
+	margin: 0;
+	font-size: var(--font-xs);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.sectionList {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+}
+
+.metadataSection {
+	padding: var(--space-3) var(--space-4);
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-md);
+	background: var(--shell-surface-muted);
+}
+
+.metadataTitle {
+	margin: 0 0 var(--space-2);
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.metadataList {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+	margin: 0;
+}
+
+.metadataItem {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2);
+	align-items: baseline;
+	justify-content: space-between;
+}
+
+.metadataLabel {
+	margin: 0;
+	font-size: var(--font-xs);
+	font-weight: var(--font-weight-medium);
+	color: var(--shell-text-muted);
+}
+
+.metadataValue {
+	margin: 0;
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}

@@ -38,6 +38,10 @@ final class RunAgentControllerTest extends WebTestCase
         self::assertSame('Semantic search found no relevant chunks.', $response['steps'][0]['summary']);
         self::assertSame('Multi-document chat requires a conversation.', $response['steps'][1]['summary']);
         self::assertSame('Agent workflow completed.', $response['finalSummary']);
+        self::assertArrayHasKey('metadata', $response);
+        self::assertIsArray($response['metadata']);
+        self::assertArrayHasKey('metadata', $response['steps'][0]);
+        self::assertIsArray($response['steps'][0]['metadata']);
     }
 
     public function testPostReturnsComparisonPlanWithKnowledgeGraphStep(): void

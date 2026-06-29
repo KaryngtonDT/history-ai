@@ -72,7 +72,12 @@ describe("AgentModePanel", () => {
 
 	it("shows error state when agent returns empty execution", async () => {
 		const user = userEvent.setup();
-		mockRunAgent.mockResolvedValue({ plan: [], steps: [], finalSummary: "" });
+		mockRunAgent.mockResolvedValue({
+			plan: [],
+			steps: [],
+			finalSummary: "",
+			metadata: {},
+		});
 
 		render(<AgentModePanel contentId="550e8400-e29b-41d4-a716-446655440000" />);
 

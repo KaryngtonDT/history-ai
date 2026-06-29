@@ -1,3 +1,4 @@
+import { AgentMetadataPanel } from "@/features/agent/AgentMetadataPanel";
 import type { AgentExecution } from "@/services/agent/types";
 import { formatAgentToolLabel } from "@/services/agent/types";
 import styles from "./AgentExecutionTrace.module.css";
@@ -48,6 +49,7 @@ export function AgentExecutionTrace({ execution }: AgentExecutionTraceProps) {
 					))}
 				</ol>
 			</section>
+			<AgentMetadataPanel execution={execution} />
 			<p className={styles.finalSummary}>{execution.finalSummary}</p>
 		</div>
 	);

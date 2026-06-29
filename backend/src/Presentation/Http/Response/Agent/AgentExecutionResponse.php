@@ -11,8 +11,9 @@ final class AgentExecutionResponse
     /**
      * @return array{
      *     plan: list<array{order: int, tool: string, description: string}>,
-     *     steps: list<array{order: int, tool: string, status: string, summary: string}>,
-     *     finalSummary: string
+     *     steps: list<array{order: int, tool: string, status: string, summary: string, metadata: array<string, mixed>}>,
+     *     finalSummary: string,
+     *     metadata: array<string, mixed>
      * }
      */
     public static function fromResult(AgentExecutionResultDto $result): array
@@ -32,10 +33,12 @@ final class AgentExecutionResponse
                     'tool' => $step->tool,
                     'status' => $step->status,
                     'summary' => $step->summary,
+                    'metadata' => $step->metadata,
                 ],
                 $result->steps,
             ),
             'finalSummary' => $result->finalSummary,
+            'metadata' => $result->metadata,
         ];
     }
 }

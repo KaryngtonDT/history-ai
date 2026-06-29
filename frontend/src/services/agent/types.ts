@@ -17,12 +17,16 @@ export interface AgentExecutionStep {
 	tool: AgentTool;
 	status: AgentExecutionStatus;
 	summary: string;
+	metadata: AgentMetadata;
 }
+
+export type AgentMetadata = Record<string, unknown>;
 
 export interface AgentExecution {
 	plan: AgentPlanStep[];
 	steps: AgentExecutionStep[];
 	finalSummary: string;
+	metadata: AgentMetadata;
 }
 
 export interface AgentPlanStepApiDto {
@@ -36,12 +40,14 @@ export interface AgentExecutionStepApiDto {
 	tool: string;
 	status: string;
 	summary: string;
+	metadata?: AgentMetadata;
 }
 
 export interface AgentExecutionApiDto {
 	plan: AgentPlanStepApiDto[];
 	steps: AgentExecutionStepApiDto[];
 	finalSummary: string;
+	metadata?: AgentMetadata;
 }
 
 export interface RunAgentRequestDto {
@@ -53,6 +59,7 @@ export const EMPTY_AGENT_EXECUTION: AgentExecution = {
 	plan: [],
 	steps: [],
 	finalSummary: "",
+	metadata: {},
 };
 
 const AGENT_TOOLS = new Set<AgentTool>([
@@ -89,6 +96,13 @@ const MEMORY_KEYWORDS = [
 	"vorher",
 	"verlauf",
 ];
+
+const STEP_METADATA: Partial<Record<AgentTool, AgentMetadata>> = {
+	semantic_search: { resultCount: 2, topScore: 0.91 },
+	knowledge_graph: { nodeCount: 3, edgeCount: 3 },
+	conversation_memory: { messageCount: 0 },
+	multi_document_chat: { requiresConversation: true },
+};
 
 const STEP_SUMMARIES: Record<AgentTool, string> = {
 	semantic_search: "Semantic search prepared.",
@@ -152,12 +166,20 @@ export function buildMockAgentExecution(question: string): AgentExecution {
 		tool,
 		status: "completed",
 		summary: STEP_SUMMARIES[tool],
+		metadata: { ...(STEP_METADATA[tool] ?? {}) },
 	}));
+
+	const metadata: AgentMetadata = {};
+
+	for (const step of steps) {
+		Object.assign(metadata, step.metadata);
+	}
 
 	return {
 		plan,
 		steps,
 		finalSummary: "Agent workflow completed.",
+		metadata,
 	};
 }
 
@@ -175,8 +197,10 @@ export function mapAgentExecutionFromApi(
 			tool: normalizeAgentTool(step.tool),
 			status: normalizeAgentStatus(step.status),
 			summary: step.summary,
+			metadata: step.metadata ?? {},
 		})),
 		finalSummary: dto.finalSummary,
+		metadata: dto.metadata ?? {},
 	};
 }
 

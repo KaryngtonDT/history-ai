@@ -17,9 +17,12 @@ describe("AgentExecutionTrace", () => {
 		).toBeInTheDocument();
 		expect(screen.getByText("Plan")).toBeInTheDocument();
 		expect(screen.getByText("Execution")).toBeInTheDocument();
-		expect(screen.getAllByText("Semantic Search")).toHaveLength(2);
-		expect(screen.getAllByText("Knowledge Graph")).toHaveLength(2);
-		expect(screen.getAllByText("Multi-Document Chat")).toHaveLength(2);
+		expect(screen.getByText("Metadata")).toBeInTheDocument();
+		expect(screen.getAllByText("Semantic Search")).toHaveLength(3);
+		expect(screen.getAllByText("Knowledge Graph")).toHaveLength(3);
+		expect(screen.getAllByText("Multi-Document Chat")).toHaveLength(3);
+		expect(screen.getByText("Chunks")).toBeInTheDocument();
+		expect(screen.getByText("Nodes")).toBeInTheDocument();
 		expect(screen.getAllByText("completed")).toHaveLength(3);
 		expect(screen.getByText("Agent workflow completed.")).toBeInTheDocument();
 	});

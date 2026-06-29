@@ -69,15 +69,22 @@ describe("HttpAgentRepository", () => {
 					tool: "semantic_search",
 					status: "completed",
 					summary: "Semantic search prepared.",
+					metadata: { resultCount: 2, topScore: 0.91 },
 				},
 				{
 					order: 1,
 					tool: "multi_document_chat",
 					status: "completed",
 					summary: "Multi-document chat prepared.",
+					metadata: { requiresConversation: true },
 				},
 			],
 			finalSummary: "Agent workflow completed.",
+			metadata: {
+				resultCount: 2,
+				topScore: 0.91,
+				requiresConversation: true,
+			},
 		});
 		const httpClient = { get: vi.fn(), post } as unknown as HttpClient;
 		const repository = new HttpAgentRepository(httpClient);
@@ -106,15 +113,22 @@ describe("HttpAgentRepository", () => {
 					tool: "semantic_search",
 					status: "completed",
 					summary: "Semantic search prepared.",
+					metadata: { resultCount: 2, topScore: 0.91 },
 				},
 				{
 					order: 1,
 					tool: "multi_document_chat",
 					status: "completed",
 					summary: "Multi-document chat prepared.",
+					metadata: { requiresConversation: true },
 				},
 			],
 			finalSummary: "Agent workflow completed.",
+			metadata: {
+				resultCount: 2,
+				topScore: 0.91,
+				requiresConversation: true,
+			},
 		});
 	});
 
