@@ -21,7 +21,7 @@ use App\Domain\Video\VideoJob;
 use App\Domain\Video\VideoLanguage;
 use App\Domain\Video\VideoRepositoryInterface;
 use App\Domain\Video\VideoStatus;
-use App\Infrastructure\Speech\TranscriptJsonMapper;
+use App\Application\Speech\TranscriptJsonMapper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

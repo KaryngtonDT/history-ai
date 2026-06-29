@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Infrastructure\Speech;
+namespace App\Tests\Unit\Application\Speech;
 
+use App\Application\Speech\TranscriptJsonMapper;
 use App\Domain\Speech\Transcript;
 use App\Domain\Speech\TranscriptId;
 use App\Domain\Speech\TranscriptLanguage;
 use App\Domain\Speech\TranscriptSegment;
 use App\Domain\Speech\TranscriptSegmentCollection;
-use App\Infrastructure\Speech\TranscriptJsonMapper;
 use PHPUnit\Framework\TestCase;
 
 final class TranscriptJsonMapperTest extends TestCase

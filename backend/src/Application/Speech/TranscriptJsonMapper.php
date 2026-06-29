@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Speech;
+namespace App\Application\Speech;
 
+use App\Domain\Speech\Exception\InvalidTranscriptException;
 use App\Domain\Speech\Transcript;
 use App\Domain\Speech\TranscriptId;
 use App\Domain\Speech\TranscriptLanguage;
 use App\Domain\Speech\TranscriptSegment;
 use App\Domain\Speech\TranscriptSegmentCollection;
-use App\Infrastructure\Speech\Exception\FasterWhisperProviderException;
 use JsonException;
 
 final class TranscriptJsonMapper
@@ -59,11 +59,11 @@ final class TranscriptJsonMapper
             /** @var mixed $decoded */
             $decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
-            throw new FasterWhisperProviderException('Stored transcript is not valid JSON.', 0, $exception);
+            throw new InvalidTranscriptException('Stored transcript is not valid JSON.', 0, $exception);
         }
 
         if (!is_array($decoded)) {
-            throw new FasterWhisperProviderException('Stored transcript must be a JSON object.');
+            throw new InvalidTranscriptException('Stored transcript must be a JSON object.');
         }
 
         $transcriptId = is_string($decoded['transcriptId'] ?? null)
@@ -74,14 +74,14 @@ final class TranscriptJsonMapper
             : TranscriptLanguage::Unknown->value;
 
         if (null === $transcriptId) {
-            throw new FasterWhisperProviderException('Stored transcript must include transcriptId.');
+            throw new InvalidTranscriptException('Stored transcript must include transcriptId.');
         }
 
         $language = TranscriptLanguage::tryFrom($languageValue) ?? TranscriptLanguage::Unknown;
         $rawSegments = $decoded['segments'] ?? [];
 
         if (!is_array($rawSegments)) {
-            throw new FasterWhisperProviderException('Stored transcript must include segments array.');
+            throw new InvalidTranscriptException('Stored transcript must include segments array.');
         }
 
         /** @var list<TranscriptSegment> $segments */

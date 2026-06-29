@@ -7,7 +7,7 @@ namespace App\Infrastructure\Persistence\Doctrine\Speech;
 use App\Domain\Speech\Transcript;
 use App\Domain\Speech\TranscriptRepositoryInterface;
 use App\Domain\Video\VideoId;
-use App\Infrastructure\Speech\TranscriptJsonMapper;
+use App\Application\Speech\TranscriptJsonMapper;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class DoctrineTranscriptRepository implements TranscriptRepositoryInterface

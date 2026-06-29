@@ -6,7 +6,7 @@ namespace App\Infrastructure\Persistence\Doctrine\Speech;
 
 use App\Domain\Speech\Transcript;
 use App\Domain\Video\VideoId;
-use App\Infrastructure\Speech\TranscriptJsonMapper;
+use App\Application\Speech\TranscriptJsonMapper;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;

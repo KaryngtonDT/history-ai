@@ -16,7 +16,7 @@ use App\Domain\Speech\SpeechToTextProviderInterface;
 use App\Domain\Speech\TranscriptRepositoryInterface;
 use App\Domain\Video\VideoId;
 use App\Domain\Video\VideoRepositoryInterface;
-use App\Infrastructure\Speech\TranscriptJsonMapper;
+use App\Application\Speech\TranscriptJsonMapper;
 use Throwable;
 
 final class ProcessVideoHandler
