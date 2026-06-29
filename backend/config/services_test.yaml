@@ -48,3 +48,7 @@ when@test:
         App\Domain\Chat\StreamingChatProviderInterface:
             alias: App\Infrastructure\Chat\MockChatProvider
             public: true
+
+        App\Domain\Chat\ConversationRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\Chat\DoctrineConversationRepository
+            public: true

@@ -76,6 +76,9 @@ services:
     App\Domain\CollectionItem\CollectionItemRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\CollectionItem\DoctrineCollectionItemRepository
 
+    App\Domain\Chat\ConversationRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Chat\DoctrineConversationRepository
+
     App\Application\Processing\Ports\ProcessingOrchestratorInterface:
         alias: App\Infrastructure\Processing\HttpWorkerDispatcher
 
