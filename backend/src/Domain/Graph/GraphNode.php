@@ -11,8 +11,8 @@ final readonly class GraphNode
 {
     public function __construct(
         private ArtifactId $artifactId,
-        private ArtifactType $artifactType,
-        private string $title,
+        private ArtifactType $type,
+        private string $label,
     ) {
     }
 
@@ -21,13 +21,13 @@ final readonly class GraphNode
         return $this->artifactId;
     }
 
-    public function artifactType(): ArtifactType
+    public function type(): ArtifactType
     {
-        return $this->artifactType;
+        return $this->type;
     }
 
-    public function title(): string
+    public function label(): string
     {
-        return $this->title;
+        return $this->label;
     }
 }

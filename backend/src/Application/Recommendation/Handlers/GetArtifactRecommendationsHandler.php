@@ -50,7 +50,7 @@ final class GetArtifactRecommendationsHandler
         KnowledgeGraph $graph,
         ArtifactId $artifactId,
     ): bool {
-        foreach ($graph->nodes() as $node) {
+        foreach ($graph->nodes()->all() as $node) {
             if ($node->artifactId()->equals($artifactId)) {
                 return true;
             }

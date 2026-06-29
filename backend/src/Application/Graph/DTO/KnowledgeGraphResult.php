@@ -25,11 +25,11 @@ final readonly class KnowledgeGraphResult
         return new self(
             nodes: array_map(
                 static fn (GraphNode $node): GraphNodeResult => GraphNodeResult::fromDomain($node),
-                $graph->nodes(),
+                $graph->nodes()->all(),
             ),
             edges: array_map(
                 static fn (GraphEdge $edge): GraphEdgeResult => GraphEdgeResult::fromDomain($edge),
-                $graph->edges(),
+                $graph->edges()->all(),
             ),
         );
     }

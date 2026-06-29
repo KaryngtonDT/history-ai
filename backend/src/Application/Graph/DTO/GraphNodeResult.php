@@ -19,8 +19,8 @@ final readonly class GraphNodeResult
     {
         return new self(
             artifactId: $node->artifactId()->value,
-            type: $node->artifactType()->value,
-            title: $node->title(),
+            type: $node->type()->value,
+            title: $node->label(),
         );
     }
 }

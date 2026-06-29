@@ -27,7 +27,7 @@ final class RecommendationEngine
 
         $recommendations = [];
 
-        foreach ($graph->nodes() as $node) {
+        foreach ($graph->nodes()->all() as $node) {
             $nodeId = $node->artifactId()->value;
 
             if ($node->artifactId()->equals($currentArtifactId)) {
@@ -40,8 +40,8 @@ final class RecommendationEngine
 
             $recommendations[] = new RecommendedArtifact(
                 artifactId: $node->artifactId(),
-                artifactType: $node->artifactType(),
-                title: $node->title(),
+                artifactType: $node->type(),
+                title: $node->label(),
                 reason: $neighbourReasons[$nodeId],
             );
         }
@@ -58,7 +58,7 @@ final class RecommendationEngine
     ): array {
         $neighbourReasons = [];
 
-        foreach ($graph->edges() as $edge) {
+        foreach ($graph->edges()->all() as $edge) {
             $neighbourId = $this->resolveNeighbourId($edge, $currentArtifactId);
 
             if (null === $neighbourId) {

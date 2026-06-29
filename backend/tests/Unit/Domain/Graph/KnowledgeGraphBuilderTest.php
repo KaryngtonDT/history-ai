@@ -48,7 +48,7 @@ final class KnowledgeGraphBuilderTest extends TestCase
         self::assertSame(0, $graph->edgeCount());
         self::assertSame(
             ['Transcript', 'Summary'],
-            array_map(static fn (GraphNode $node): string => $node->title(), $graph->nodes()),
+            array_map(static fn (GraphNode $node): string => $node->label(), $graph->nodes()->all()),
         );
     }
 
@@ -78,7 +78,7 @@ final class KnowledgeGraphBuilderTest extends TestCase
             [ArtifactRelationType::DerivedFrom],
             array_map(
                 static fn (GraphEdge $edge): ArtifactRelationType => $edge->relationType(),
-                $graph->edges(),
+                $graph->edges()->all(),
             ),
         );
     }
@@ -110,8 +110,8 @@ final class KnowledgeGraphBuilderTest extends TestCase
                 ArtifactType::Summary,
             ],
             array_map(
-                static fn (GraphNode $node): ArtifactType => $node->artifactType(),
-                $graph->nodes(),
+                static fn (GraphNode $node): ArtifactType => $node->type(),
+                $graph->nodes()->all(),
             ),
         );
     }
@@ -155,7 +155,7 @@ final class KnowledgeGraphBuilderTest extends TestCase
             ],
             array_map(
                 static fn (GraphEdge $edge): ArtifactRelationType => $edge->relationType(),
-                $graph->edges(),
+                $graph->edges()->all(),
             ),
         );
     }
@@ -239,13 +239,13 @@ final class KnowledgeGraphBuilderTest extends TestCase
         self::assertSame(3, $graph->nodeCount());
         self::assertGreaterThan(0, $graph->edgeCount());
         self::assertTrue($this->containsEdge(
-            $graph->edges(),
+            $graph->edges()->all(),
             $summary->id()->value,
             $transcript->id()->value,
             ArtifactRelationType::DerivedFrom,
         ));
         self::assertTrue($this->containsEdge(
-            $graph->edges(),
+            $graph->edges()->all(),
             $quiz->id()->value,
             $summary->id()->value,
             ArtifactRelationType::References,

@@ -7,7 +7,9 @@ namespace App\Tests\Unit\Domain\Recommendation;
 use App\Domain\Artifact\ArtifactId;
 use App\Domain\Artifact\ArtifactType;
 use App\Domain\Graph\GraphEdge;
+use App\Domain\Graph\GraphEdgeCollection;
 use App\Domain\Graph\GraphNode;
+use App\Domain\Graph\GraphNodeCollection;
 use App\Domain\Graph\KnowledgeGraph;
 use App\Domain\Recommendation\RecommendationEngine;
 use App\Domain\Recommendation\RecommendationReason;
@@ -37,14 +39,14 @@ final class RecommendationEngineTest extends TestCase
     public function testIsolatedNodeReturnsEmptyCollection(): void
     {
         $graph = new KnowledgeGraph(
-            [
+            new GraphNodeCollection([
                 $this->createNode(
                     '550e8400-e29b-41d4-a716-446655440001',
                     ArtifactType::Summary,
                     'Summary',
                 ),
-            ],
-            [],
+            ]),
+            new GraphEdgeCollection([]),
         );
 
         $result = $this->engine->recommend(
@@ -92,7 +94,7 @@ final class RecommendationEngineTest extends TestCase
     {
         $summaryId = new ArtifactId('550e8400-e29b-41d4-a716-446655440002');
         $graph = new KnowledgeGraph(
-            [
+            new GraphNodeCollection([
                 $this->createNode(
                     '550e8400-e29b-41d4-a716-446655440004',
                     ArtifactType::Timeline,
@@ -113,8 +115,8 @@ final class RecommendationEngineTest extends TestCase
                     ArtifactType::Quiz,
                     'Quiz',
                 ),
-            ],
-            [
+            ]),
+            new GraphEdgeCollection([
                 new GraphEdge(
                     $summaryId,
                     new ArtifactId('550e8400-e29b-41d4-a716-446655440001'),
@@ -130,7 +132,7 @@ final class RecommendationEngineTest extends TestCase
                     $summaryId,
                     ArtifactRelationType::References,
                 ),
-            ],
+            ]),
         );
 
         $result = $this->engine->recommend($graph, $summaryId);
@@ -149,7 +151,7 @@ final class RecommendationEngineTest extends TestCase
         $summaryId = new ArtifactId('550e8400-e29b-41d4-a716-446655440002');
         $transcriptId = new ArtifactId('550e8400-e29b-41d4-a716-446655440001');
         $graph = new KnowledgeGraph(
-            [
+            new GraphNodeCollection([
                 $this->createNode(
                     '550e8400-e29b-41d4-a716-446655440001',
                     ArtifactType::Transcript,
@@ -160,11 +162,11 @@ final class RecommendationEngineTest extends TestCase
                     ArtifactType::Summary,
                     'Summary',
                 ),
-            ],
-            [
+            ]),
+            new GraphEdgeCollection([
                 new GraphEdge($summaryId, $transcriptId, ArtifactRelationType::DerivedFrom),
                 new GraphEdge($transcriptId, $summaryId, ArtifactRelationType::Related),
-            ],
+            ]),
         );
 
         $result = $this->engine->recommend($graph, $summaryId);
@@ -203,7 +205,7 @@ final class RecommendationEngineTest extends TestCase
         $timelineId = new ArtifactId('550e8400-e29b-41d4-a716-446655440004');
 
         return new KnowledgeGraph(
-            [
+            new GraphNodeCollection([
                 $this->createNode(
                     '550e8400-e29b-41d4-a716-446655440001',
                     ArtifactType::Transcript,
@@ -224,12 +226,12 @@ final class RecommendationEngineTest extends TestCase
                     ArtifactType::Timeline,
                     'Timeline',
                 ),
-            ],
-            [
+            ]),
+            new GraphEdgeCollection([
                 new GraphEdge($summaryId, $transcriptId, ArtifactRelationType::DerivedFrom),
                 new GraphEdge($quizId, $summaryId, ArtifactRelationType::References),
                 new GraphEdge($timelineId, $summaryId, ArtifactRelationType::References),
-            ],
+            ]),
         );
     }
 
@@ -240,8 +242,8 @@ final class RecommendationEngineTest extends TestCase
     ): GraphNode {
         return new GraphNode(
             artifactId: new ArtifactId($artifactId),
-            artifactType: $artifactType,
-            title: $title,
+            type: $artifactType,
+            label: $title,
         );
     }
 }

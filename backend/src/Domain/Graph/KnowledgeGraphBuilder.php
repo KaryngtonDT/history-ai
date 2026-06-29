@@ -70,7 +70,10 @@ final class KnowledgeGraphBuilder
             $edgeKeys[$edgeKey] = true;
         }
 
-        return new KnowledgeGraph($nodes, $edges);
+        return new KnowledgeGraph(
+            new GraphNodeCollection($nodes),
+            new GraphEdgeCollection($edges),
+        );
     }
 
     private static function titleForType(ArtifactType $type): string
