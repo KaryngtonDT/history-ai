@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { ROMAN_EMPIRE_CONTENT_ID } from "@/mock/artifact";
+import {
+	MOCK_CONVERSATION_ID,
+	mockConversationDocumentsById,
+} from "@/mock/conversationGraph";
 import { MockGraphRepository } from "./MockGraphRepository";
 import { EMPTY_KNOWLEDGE_GRAPH } from "./types";
 
@@ -88,5 +92,37 @@ describe("MockGraphRepository", () => {
 		);
 
 		expect(neighborhood).toBeNull();
+	});
+
+	it("returns conversation graph for known mock conversation", async () => {
+		const repository = new MockGraphRepository();
+
+		const graph = await repository.getConversationGraph(MOCK_CONVERSATION_ID);
+
+		expect(mockConversationDocumentsById[MOCK_CONVERSATION_ID]).toEqual([
+			ROMAN_EMPIRE_CONTENT_ID,
+		]);
+		expect(graph.nodes).toEqual([
+			{
+				artifactId: transcriptArtifactId,
+				type: "transcript",
+				title: "Transcript",
+			},
+			{
+				artifactId: summaryArtifactId,
+				type: "summary",
+				title: "Summary",
+			},
+		]);
+	});
+
+	it("returns empty graph for unknown mock conversation", async () => {
+		const repository = new MockGraphRepository();
+
+		const graph = await repository.getConversationGraph(
+			"550e8400-e29b-41d4-a716-446655440099",
+		);
+
+		expect(graph).toEqual(EMPTY_KNOWLEDGE_GRAPH);
 	});
 });

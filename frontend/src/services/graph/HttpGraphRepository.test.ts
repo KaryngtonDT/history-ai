@@ -259,4 +259,82 @@ describe("HttpGraphRepository", () => {
 			),
 		).rejects.toBeInstanceOf(ApiError);
 	});
+
+	it("uses GET /api/conversations/{conversationId}/graph", async () => {
+		const get = vi.fn().mockResolvedValue({ nodes: [], edges: [] });
+		const httpClient = { get, post: vi.fn() } as unknown as HttpClient;
+		const repository = new HttpGraphRepository(httpClient);
+
+		await repository.getConversationGraph(
+			"550e8400-e29b-41d4-a716-446655440001",
+		);
+
+		expect(get).toHaveBeenCalledWith(
+			"/api/conversations/550e8400-e29b-41d4-a716-446655440001/graph",
+		);
+	});
+
+	it("maps conversation graph API DTO to knowledge graph", async () => {
+		const get = vi.fn().mockResolvedValue({
+			nodes: [
+				{
+					artifactId: "550e8400-e29b-41d4-a716-446655440001",
+					type: "transcript",
+					title: "Transcript",
+				},
+			],
+			edges: [],
+		});
+		const httpClient = { get, post: vi.fn() } as unknown as HttpClient;
+		const repository = new HttpGraphRepository(httpClient);
+
+		const result = await repository.getConversationGraph(
+			"550e8400-e29b-41d4-a716-446655440001",
+		);
+
+		expect(result).toEqual({
+			nodes: [
+				{
+					artifactId: "550e8400-e29b-41d4-a716-446655440001",
+					type: "transcript",
+					title: "Transcript",
+				},
+			],
+			edges: [],
+		});
+	});
+
+	it("returns empty graph when conversation graph API responds with 404", async () => {
+		const get = vi.fn().mockRejectedValue(new ApiError("GET failed", 404));
+		const httpClient = { get, post: vi.fn() } as unknown as HttpClient;
+		const repository = new HttpGraphRepository(httpClient);
+
+		const result = await repository.getConversationGraph(
+			"550e8400-e29b-41d4-a716-446655440099",
+		);
+
+		expect(result).toEqual(EMPTY_KNOWLEDGE_GRAPH);
+	});
+
+	it("returns empty graph when conversation id is invalid on the server", async () => {
+		const get = vi.fn().mockRejectedValue(new ApiError("GET failed", 400));
+		const httpClient = { get, post: vi.fn() } as unknown as HttpClient;
+		const repository = new HttpGraphRepository(httpClient);
+
+		const result = await repository.getConversationGraph(
+			"550e8400-e29b-41d4-a716-446655440001",
+		);
+
+		expect(result).toEqual(EMPTY_KNOWLEDGE_GRAPH);
+	});
+
+	it("propagates non-400/404 conversation graph HTTP errors", async () => {
+		const get = vi.fn().mockRejectedValue(new ApiError("GET failed", 500));
+		const httpClient = { get, post: vi.fn() } as unknown as HttpClient;
+		const repository = new HttpGraphRepository(httpClient);
+
+		await expect(
+			repository.getConversationGraph("550e8400-e29b-41d4-a716-446655440001"),
+		).rejects.toBeInstanceOf(ApiError);
+	});
 });

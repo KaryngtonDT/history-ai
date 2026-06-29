@@ -3,15 +3,21 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { KnowledgeGraphPanel } from "./KnowledgeGraphPanel";
 
-const { mockGetKnowledgeGraph, mockGetGraphNeighborhood } = vi.hoisted(() => ({
+const {
+	mockGetKnowledgeGraph,
+	mockGetGraphNeighborhood,
+	mockGetConversationGraph,
+} = vi.hoisted(() => ({
 	mockGetKnowledgeGraph: vi.fn(),
 	mockGetGraphNeighborhood: vi.fn(),
+	mockGetConversationGraph: vi.fn(),
 }));
 
 vi.mock("@/services/graph/GraphService", () => ({
 	graphService: {
 		getKnowledgeGraph: mockGetKnowledgeGraph,
 		getGraphNeighborhood: mockGetGraphNeighborhood,
+		getConversationGraph: mockGetConversationGraph,
 	},
 }));
 
@@ -57,6 +63,7 @@ describe("KnowledgeGraphPanel", () => {
 	beforeEach(() => {
 		mockGetKnowledgeGraph.mockReset();
 		mockGetGraphNeighborhood.mockReset();
+		mockGetConversationGraph.mockReset();
 	});
 
 	it("calls GraphService with content id", async () => {
@@ -71,6 +78,7 @@ describe("KnowledgeGraphPanel", () => {
 				"550e8400-e29b-41d4-a716-446655440000",
 			);
 		});
+		expect(mockGetConversationGraph).not.toHaveBeenCalled();
 	});
 
 	it("shows loading state while graph loads", () => {
@@ -207,5 +215,59 @@ describe("KnowledgeGraphPanel", () => {
 		expect(
 			await screen.findByText("No direct neighbors for the selected artifact."),
 		).toBeInTheDocument();
+	});
+
+	it("uses conversation graph when conversation id is provided", async () => {
+		mockGetConversationGraph.mockResolvedValue(graph);
+
+		render(
+			<KnowledgeGraphPanel
+				contentId="550e8400-e29b-41d4-a716-446655440000"
+				conversationId="550e8400-e29b-41d4-a716-446655440001"
+			/>,
+		);
+
+		await waitFor(() => {
+			expect(mockGetConversationGraph).toHaveBeenCalledWith(
+				"550e8400-e29b-41d4-a716-446655440001",
+			);
+		});
+		expect(mockGetKnowledgeGraph).not.toHaveBeenCalled();
+		expect(
+			await screen.findByRole("region", { name: "Knowledge graph" }),
+		).toBeInTheDocument();
+	});
+
+	it("reloads conversation graph when conversation id changes", async () => {
+		const conversationGraph = {
+			nodes: [graph.nodes[0]],
+			edges: [],
+		};
+		mockGetConversationGraph.mockResolvedValue(conversationGraph);
+
+		const { rerender } = render(
+			<KnowledgeGraphPanel
+				contentId="550e8400-e29b-41d4-a716-446655440000"
+				conversationId="550e8400-e29b-41d4-a716-446655440001"
+			/>,
+		);
+
+		await waitFor(() => {
+			expect(mockGetConversationGraph).toHaveBeenCalledTimes(1);
+		});
+
+		rerender(
+			<KnowledgeGraphPanel
+				contentId="550e8400-e29b-41d4-a716-446655440000"
+				conversationId="550e8400-e29b-41d4-a716-446655440002"
+			/>,
+		);
+
+		await waitFor(() => {
+			expect(mockGetConversationGraph).toHaveBeenCalledWith(
+				"550e8400-e29b-41d4-a716-446655440002",
+			);
+		});
+		expect(mockGetConversationGraph).toHaveBeenCalledTimes(2);
 	});
 });

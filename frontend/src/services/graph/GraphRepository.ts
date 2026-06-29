@@ -6,4 +6,5 @@ export interface GraphRepository {
 		contentId: string,
 		artifactId: string,
 	): Promise<GraphNeighborhood | null>;
+	getConversationGraph(conversationId: string): Promise<KnowledgeGraph>;
 }

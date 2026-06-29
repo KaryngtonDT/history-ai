@@ -47,6 +47,16 @@ export class GraphService {
 			normalizedArtifactId,
 		);
 	}
+
+	getConversationGraph(conversationId: string): Promise<KnowledgeGraph> {
+		const normalized = conversationId.trim();
+
+		if (normalized === "" || !UUID_PATTERN.test(normalized)) {
+			return Promise.resolve(EMPTY_KNOWLEDGE_GRAPH);
+		}
+
+		return this.repository.getConversationGraph(normalized);
+	}
 }
 
 export const graphService = new GraphService(createGraphRepository());

@@ -1,4 +1,5 @@
 import { artifactMocksByContentId } from "@/mock/artifact";
+import { mockConversationDocumentsById } from "@/mock/conversationGraph";
 import type { GraphRepository } from "./GraphRepository";
 import {
 	buildGraphNeighborhoodFromGraph,
@@ -26,5 +27,23 @@ export class MockGraphRepository implements GraphRepository {
 		const graph = await this.getKnowledgeGraph(contentId);
 
 		return buildGraphNeighborhoodFromGraph(graph, artifactId);
+	}
+
+	async getConversationGraph(conversationId: string): Promise<KnowledgeGraph> {
+		const contentIds = mockConversationDocumentsById[conversationId];
+
+		if (contentIds === undefined || contentIds.length === 0) {
+			return EMPTY_KNOWLEDGE_GRAPH;
+		}
+
+		const artifacts = contentIds.flatMap(
+			(contentId) => artifactMocksByContentId[contentId] ?? [],
+		);
+
+		if (artifacts.length === 0) {
+			return EMPTY_KNOWLEDGE_GRAPH;
+		}
+
+		return buildKnowledgeGraphFromArtifacts(artifacts);
 	}
 }

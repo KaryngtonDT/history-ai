@@ -1,6 +1,7 @@
 import {
 	contentGraphArtifactNeighborhoodPath,
 	contentGraphPath,
+	conversationGraphPath,
 } from "@/config/api";
 import type { HttpClient } from "@/services/http/HttpClient";
 import { ApiError } from "@/shared/errors";
@@ -54,6 +55,25 @@ export class HttpGraphRepository implements GraphRepository {
 				(error.status === 400 || error.status === 404)
 			) {
 				return null;
+			}
+
+			throw error;
+		}
+	}
+
+	async getConversationGraph(conversationId: string): Promise<KnowledgeGraph> {
+		try {
+			const dto = await this.httpClient.get<KnowledgeGraphApiDto>(
+				conversationGraphPath(conversationId),
+			);
+
+			return mapKnowledgeGraphFromApi(dto);
+		} catch (error) {
+			if (
+				error instanceof ApiError &&
+				(error.status === 400 || error.status === 404)
+			) {
+				return EMPTY_KNOWLEDGE_GRAPH;
 			}
 
 			throw error;

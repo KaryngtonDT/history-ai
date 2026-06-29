@@ -12,6 +12,7 @@ import styles from "./KnowledgeGraphPanel.module.css";
 
 interface KnowledgeGraphPanelProps {
 	contentId: string;
+	conversationId?: string | null;
 }
 
 type KnowledgeGraphViewState =
@@ -27,7 +28,10 @@ type NeighborhoodViewState =
 	| { status: "not_found"; artifactId: string }
 	| { status: "error"; artifactId: string };
 
-export function KnowledgeGraphPanel({ contentId }: KnowledgeGraphPanelProps) {
+export function KnowledgeGraphPanel({
+	contentId,
+	conversationId = null,
+}: KnowledgeGraphPanelProps) {
 	const [viewState, setViewState] = useState<KnowledgeGraphViewState>({
 		status: "loading",
 	});
@@ -40,8 +44,12 @@ export function KnowledgeGraphPanel({ contentId }: KnowledgeGraphPanelProps) {
 		setViewState({ status: "loading" });
 		setNeighborhoodState({ status: "idle" });
 
-		graphService
-			.getKnowledgeGraph(contentId)
+		const graphRequest =
+			conversationId !== null && conversationId !== ""
+				? graphService.getConversationGraph(conversationId)
+				: graphService.getKnowledgeGraph(contentId);
+
+		graphRequest
 			.then((graph) => {
 				if (cancelled) {
 					return;
@@ -63,7 +71,7 @@ export function KnowledgeGraphPanel({ contentId }: KnowledgeGraphPanelProps) {
 		return () => {
 			cancelled = true;
 		};
-	}, [contentId]);
+	}, [contentId, conversationId]);
 
 	const handleNodeSelect = useCallback(
 		(artifactId: string) => {

@@ -76,6 +76,10 @@ export function conversationDocumentsPath(conversationId: string): string {
 	return `/api/conversations/${conversationId}/documents`;
 }
 
+export function conversationGraphPath(conversationId: string): string {
+	return `/api/conversations/${conversationId}/graph`;
+}
+
 export function collectionItemsPath(collectionId: string): string {
 	return `${COLLECTIONS_PATH}/${collectionId}/items`;
 }

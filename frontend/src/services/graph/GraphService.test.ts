@@ -31,6 +31,7 @@ function createRepositoryMock(
 	return {
 		getKnowledgeGraph: vi.fn().mockResolvedValue(EMPTY_KNOWLEDGE_GRAPH),
 		getGraphNeighborhood: vi.fn().mockResolvedValue(null),
+		getConversationGraph: vi.fn().mockResolvedValue(EMPTY_KNOWLEDGE_GRAPH),
 		...overrides,
 	};
 }
@@ -262,6 +263,66 @@ describe("GraphService", () => {
 		expect(getGraphNeighborhood).toHaveBeenCalledWith(
 			"550e8400-e29b-41d4-a716-446655440000",
 			"550e8400-e29b-41d4-a716-446655440002",
+		);
+	});
+});
+
+describe("GraphService conversation graph", () => {
+	it("returns conversation graph from repository", async () => {
+		const getConversationGraph = vi.fn().mockResolvedValue(graph);
+		const service = new GraphService(
+			createRepositoryMock({ getConversationGraph }),
+		);
+
+		const result = await service.getConversationGraph(
+			"550e8400-e29b-41d4-a716-446655440001",
+		);
+
+		expect(getConversationGraph).toHaveBeenCalledWith(
+			"550e8400-e29b-41d4-a716-446655440001",
+		);
+		expect(result).toEqual(graph);
+	});
+
+	it("returns empty graph when repository returns no nodes or edges", async () => {
+		const getConversationGraph = vi
+			.fn()
+			.mockResolvedValue(EMPTY_KNOWLEDGE_GRAPH);
+		const service = new GraphService(
+			createRepositoryMock({ getConversationGraph }),
+		);
+
+		const result = await service.getConversationGraph(
+			"550e8400-e29b-41d4-a716-446655440001",
+		);
+
+		expect(result).toEqual(EMPTY_KNOWLEDGE_GRAPH);
+	});
+
+	it("returns empty graph for invalid conversation id without calling repository", async () => {
+		const getConversationGraph = vi.fn();
+		const service = new GraphService(
+			createRepositoryMock({ getConversationGraph }),
+		);
+
+		const result = await service.getConversationGraph("conversation-1");
+
+		expect(getConversationGraph).not.toHaveBeenCalled();
+		expect(result).toEqual(EMPTY_KNOWLEDGE_GRAPH);
+	});
+
+	it("trims conversation id before delegating to repository", async () => {
+		const getConversationGraph = vi.fn().mockResolvedValue(graph);
+		const service = new GraphService(
+			createRepositoryMock({ getConversationGraph }),
+		);
+
+		await service.getConversationGraph(
+			"  550e8400-e29b-41d4-a716-446655440001  ",
+		);
+
+		expect(getConversationGraph).toHaveBeenCalledWith(
+			"550e8400-e29b-41d4-a716-446655440001",
 		);
 	});
 });
