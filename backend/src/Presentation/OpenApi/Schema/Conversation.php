@@ -8,7 +8,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Schema(
     schema: 'Conversation',
-    required: ['id', 'contentId', 'messages'],
+    required: ['id', 'contentId', 'messages', 'documents'],
     properties: [
         new OA\Property(
             property: 'id',
@@ -26,6 +26,11 @@ use OpenApi\Attributes as OA;
             property: 'messages',
             type: 'array',
             items: new OA\Items(ref: '#/components/schemas/ConversationMessage'),
+        ),
+        new OA\Property(
+            property: 'documents',
+            type: 'array',
+            items: new OA\Items(ref: '#/components/schemas/SelectedDocument'),
         ),
     ],
 )]

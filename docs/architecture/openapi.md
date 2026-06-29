@@ -199,15 +199,21 @@ Shared OpenAPI schemas:
 
 **UX-03 note:** The streaming chat endpoint is documented in OpenAPI slice 6. Token payloads use `ChatStreamToken`; sources and citations are not included in the SSE stream (non-streaming `POST /chat` remains available for full answers with metadata).
 
-`POST /api/contents/{contentId}/conversations/{conversationId}/chat` accepts a `ChatRequest` body (`question`, 1–2000 characters) and returns a `ConversationChatResponse` with `conversation` (`id`, `contentId`, `messages[]` of `role` + `text`) and `answer` (`ChatAnswer` with `answer`, `sources[]`, `citations[]`). The client supplies `conversationId` (UUID); the backend creates the conversation on first use and appends user/assistant messages on each call. Invalid UUID, malformed JSON, invalid question, or conversation/content mismatch returns HTTP 400 with `ErrorResponse`.
+`POST /api/contents/{contentId}/conversations/{conversationId}/chat` accepts a `ChatRequest` body (`question`, 1–2000 characters) and returns a `ConversationChatResponse` with `conversation` (`id`, `contentId`, `messages[]` of `role` + `text`, `documents[]` of `contentId`) and `answer` (`ChatAnswer` with `answer`, `sources[]`, `citations[]`). The client supplies `conversationId` (UUID); the backend creates the conversation on first use and appends user/assistant messages on each call. RAG retrieval uses all documents listed in `conversation.documents[]`. Invalid UUID, malformed JSON, invalid question, or conversation/content mismatch returns HTTP 400 with `ErrorResponse`.
 
-**Sprint 24 note:** Persistent conversations are synchronous JSON only. `POST /chat/stream` remains documented for single-turn streaming; conversation-aware streaming is planned for Sprint 25.
+**Sprint 24 note:** Persistent conversations are synchronous JSON only. `POST /chat/stream` remains documented for single-turn streaming; conversation-aware streaming is planned for a future sprint.
+
+`PUT /api/conversations/{conversationId}/documents` accepts an `UpdateConversationDocumentsRequest` body (`contentIds[]`, at least one UUID) and returns a `ConversationResponse` envelope with the updated `conversation` (`id`, `contentId`, `messages[]`, `documents[]`). The selection is replaced entirely; messages are preserved; duplicate ids are deduplicated server-side while preserving order. Invalid UUID, malformed JSON, empty `contentIds`, or invalid content id returns HTTP 400 with `ErrorResponse`. Unknown conversation returns HTTP 404 with `ErrorResponse`. This endpoint does not generate a chat answer.
+
+**Platform Sprint 25 note:** Multi-document conversations are synchronous JSON only. The frontend `DocumentSelector` persists selection through this endpoint before subsequent chat calls use the updated document set.
 
 `GET /internal/platform/metrics` returns a `PlatformMetricsResponse` envelope with `snapshots[]` entries (`correlationId`, `recordedAt`, `metrics[]`). Each metric has `name` and `durationMs` (integer milliseconds). The optional query parameter `limit` accepts 1–100 (default 20). Invalid `limit` returns HTTP 400 with `ErrorResponse`. This endpoint is internal diagnostics only — not consumed by the frontend.
 
 **Platform Sprint 23 note:** Correlation IDs, performance timers, metrics store, and embedding cache are internal platform concerns. Only the metrics read API is documented in OpenAPI slice 5.
 
 **Platform Sprint 24 note:** Conversation memory OpenAPI schemas (`Conversation`, `ConversationMessage`, `ConversationChatResponse`) document the stable HTTP contract only; persistence and RAG orchestration remain internal.
+
+**Platform Sprint 25 note:** Multi-document selection adds `SelectedDocument`, `UpdateConversationDocumentsRequest`, `ConversationResponse`, and `PUT /api/conversations/{conversationId}/documents`. The `Conversation` schema now includes `documents[]`.
 
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 

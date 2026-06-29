@@ -359,6 +359,38 @@ Verification: [Sprint24-Verification.md](../reports/Sprint24-Verification.md)
 
 ---
 
+# Platform Sprint 25 — Multi-Document RAG (2026-06)
+
+Platform Sprint 25 delivers **multi-document conversations**: domain model, Doctrine persistence, RAG across selected documents, document selection API, frontend `DocumentSelector`, and OpenAPI documentation. Slice 5 changed **documentation and OpenAPI only** — no business logic in backend handlers, frontend, or worker.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P25-SLICE-01 | `SelectedDocument`, `SelectedDocumentCollection`; multi-doc `Conversation` domain | ✅ |
+| P25-SLICE-02 | `documents` JSON column; `DoctrineConversationRepository` multi-doc | ✅ |
+| P25-SLICE-03 | `ContentChatAnswerer`; RAG across all selected documents | ✅ |
+| P25-SLICE-04A | `PUT /api/conversations/{conversationId}/documents` | ✅ |
+| P25-SLICE-04B | Frontend `DocumentSelector`; `ConversationService.updateDocuments()` | ✅ |
+| P25-SLICE-05 | OpenAPI multi-doc schemas, architecture docs, this report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `SelectedDocument`, `SelectedDocumentCollection`; `Conversation::withDocuments()` |
+| Application | `UpdateConversationDocumentsHandler`; `SelectedDocumentResult`; `documents[]` on `ConversationResult` |
+| Infrastructure | `documents` JSON on `ConversationRecord`; multi-doc repository queries |
+| Presentation | `UpdateConversationDocumentsController`; OpenAPI `SelectedDocument`, `UpdateConversationDocumentsRequest`, `ConversationResponse` |
+| Frontend | `DocumentSelector`; `ChatPanel` document selection via `updateDocuments()` |
+
+```text
+ChatPanel → DocumentSelector → ConversationService.updateDocuments()
+        → PUT /conversations/{id}/documents → conversation.documents[]
+        → POST /contents/{contentId}/conversations/{id}/chat
+        → RAG over all selected documents
+```
+
+Verification: [Sprint25-Verification.md](../reports/Sprint25-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

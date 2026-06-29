@@ -24,6 +24,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/contents/{contentId}/chat',
         '/api/contents/{contentId}/chat/stream',
         '/api/contents/{contentId}/conversations/{conversationId}/chat',
+        '/api/conversations/{conversationId}/documents',
         '/internal/platform/metrics',
     ];
 
@@ -77,6 +78,7 @@ final class ApiDocumentationTest extends WebTestCase
             'post',
             $spec['paths']['/api/contents/{contentId}/conversations/{conversationId}/chat'],
         );
+        self::assertArrayHasKey('put', $spec['paths']['/api/conversations/{conversationId}/documents']);
         self::assertArrayHasKey('get', $spec['paths']['/internal/platform/metrics']);
     }
 
@@ -1041,6 +1043,14 @@ final class ApiDocumentationTest extends WebTestCase
             '#/components/schemas/ConversationMessage',
             $conversationSchema['properties']['messages']['items']['$ref'],
         );
+        self::assertSame('array', $conversationSchema['properties']['documents']['type']);
+        self::assertSame(
+            '#/components/schemas/SelectedDocument',
+            $conversationSchema['properties']['documents']['items']['$ref'],
+        );
+        if (isset($conversationSchema['required'])) {
+            self::assertContains('documents', $conversationSchema['required']);
+        }
 
         self::assertSame('string', $messageSchema['properties']['role']['type']);
         self::assertContains('user', $messageSchema['properties']['role']['enum']);
@@ -1054,6 +1064,98 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertSame(
             '#/components/schemas/ChatAnswer',
             $responseSchema['properties']['answer']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsUpdateConversationDocumentsPathParameter(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/conversations/{conversationId}/documents']['put'];
+
+        self::assertSame('updateConversationDocuments', $operation['operationId']);
+
+        $pathParameter = null;
+
+        foreach ($operation['parameters'] as $parameter) {
+            if (($parameter['name'] ?? null) === 'conversationId') {
+                $pathParameter = $parameter;
+                break;
+            }
+        }
+
+        self::assertNotNull($pathParameter, 'Missing path parameter: conversationId');
+        self::assertSame('path', $pathParameter['in']);
+        self::assertTrue($pathParameter['required']);
+        self::assertSame('string', $pathParameter['schema']['type']);
+        self::assertSame('uuid', $pathParameter['schema']['format']);
+        self::assertSame('550e8400-e29b-41d4-a716-446655440001', $pathParameter['example']);
+    }
+
+    public function testOpenApiSpecDocumentsUpdateConversationDocumentsRequestBody(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $requestBody = $spec['paths']['/api/conversations/{conversationId}/documents']['put']['requestBody'];
+
+        self::assertTrue($requestBody['required']);
+        self::assertSame(
+            '#/components/schemas/UpdateConversationDocumentsRequest',
+            $requestBody['content']['application/json']['schema']['$ref'],
+        );
+
+        $contentIdsProperty = $spec['components']['schemas']['UpdateConversationDocumentsRequest']['properties']['contentIds'];
+
+        self::assertSame('array', $contentIdsProperty['type']);
+        self::assertSame(1, $contentIdsProperty['minItems']);
+        self::assertSame('string', $contentIdsProperty['items']['type']);
+        self::assertSame('uuid', $contentIdsProperty['items']['format']);
+    }
+
+    public function testOpenApiSpecDocumentsUpdateConversationDocumentsResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/conversations/{conversationId}/documents']['put']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Updated conversation', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/ConversationResponse',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('404', $responses);
+        self::assertSame('Conversation not found', $responses['404']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['404']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsSelectedDocumentSchema(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('SelectedDocument', $spec['components']['schemas']);
+        self::assertArrayHasKey('ConversationResponse', $spec['components']['schemas']);
+
+        $selectedDocumentSchema = $spec['components']['schemas']['SelectedDocument'];
+        $conversationResponseSchema = $spec['components']['schemas']['ConversationResponse'];
+
+        self::assertSame('string', $selectedDocumentSchema['properties']['contentId']['type']);
+        self::assertSame('uuid', $selectedDocumentSchema['properties']['contentId']['format']);
+        if (isset($selectedDocumentSchema['required'])) {
+            self::assertContains('contentId', $selectedDocumentSchema['required']);
+        }
+
+        self::assertSame(
+            '#/components/schemas/Conversation',
+            $conversationResponseSchema['properties']['conversation']['$ref'],
         );
     }
 

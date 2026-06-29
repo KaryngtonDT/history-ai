@@ -493,6 +493,7 @@ ChatPanel (only component using ConversationService)
 | --------- | ---- |
 | `ChatPanel` | Calls `conversationService.askQuestion()` only |
 | `ChatInput`, `ChatMessage`, `ChatMessageList`, `SourcesPanel` | Props-only; no service imports |
+| `DocumentSelector` | Props-only; no service imports |
 | `features/chat` | Must not import `HttpChatRepository`, `ChatRepositoryFactory`, `ChatRepository`, `HttpConversationRepository`, `ConversationRepositoryFactory`, or `ConversationRepository` |
 
 Enforced by `findFeatureChatTransportViolations()` in `frontend/src/architecture/architectureRules.ts`.
@@ -535,6 +536,38 @@ ChatPanel renders conversation.messages (server source of truth)
 | `ConversationService` (frontend) | Only entry point for conversation HTTP from features |
 | `ChatPanel` | Owns `conversationId` + `chatResult`; no local message append |
 | `chatService.streamQuestion()` | Preserved for future conversation streaming; unused in `ChatPanel` |
+
+### Multi-document conversations (Platform Sprint 25)
+
+```text
+ChatPanel
+        │
+        ▼
+DocumentSelector (props-only)
+        │
+        ▼
+ConversationService.updateDocuments()
+        │
+        ▼
+PUT /api/conversations/{conversationId}/documents
+        │
+        ▼
+Conversation.documents[] (persisted)
+        │
+        ▼
+POST /api/contents/{contentId}/conversations/{conversationId}/chat
+        │
+        ▼
+AskConversationChatHandler → RAG across all selected documents
+```
+
+| Component | Rule |
+| --------- | ---- |
+| `SelectedDocument`, `SelectedDocumentCollection` | Domain value objects; deduplication preserves order |
+| `UpdateConversationDocumentsHandler` | Replaces document selection; preserves messages; no RAG |
+| `DocumentSelector` | Props-only; emits `onSelectionChange(contentIds)`; no service imports |
+| `ChatPanel` | Owns selection via `conversation.documents`; backend response is source of truth |
+| `ConversationService.updateDocuments()` | Only frontend entry point for document selection HTTP |
 
 ### Interactive citations (UX-02)
 
