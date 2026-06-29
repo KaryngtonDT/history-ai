@@ -117,8 +117,21 @@ services:
     App\Application\Platform\ClockInterface:
         alias: App\Infrastructure\Platform\SystemClock
 
+    App\Infrastructure\Platform\InMemoryPerformanceMetricsStore:
+        arguments:
+            $maxSize: 100
+
+    App\Infrastructure\Platform\CompositePerformanceMetricsRecorder:
+        arguments:
+            $recorders:
+                - '@App\Infrastructure\Platform\LoggingPerformanceMetricsRecorder'
+                - '@App\Infrastructure\Platform\InMemoryPerformanceMetricsStore'
+
     App\Application\Platform\PerformanceMetricsRecorderInterface:
-        alias: App\Infrastructure\Platform\LoggingPerformanceMetricsRecorder
+        alias: App\Infrastructure\Platform\CompositePerformanceMetricsRecorder
+
+    App\Application\Platform\PerformanceMetricsReaderInterface:
+        alias: App\Infrastructure\Platform\InMemoryPerformanceMetricsStore
 
     Psr\Log\LoggerInterface:
         class: Psr\Log\NullLogger
