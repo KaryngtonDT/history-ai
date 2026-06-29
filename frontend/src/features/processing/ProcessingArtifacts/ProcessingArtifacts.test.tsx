@@ -8,21 +8,35 @@ import { libraryService } from "@/services/library/LibraryService";
 import { relationService } from "@/services/relation/RelationService";
 
 const {
-	mockStreamQuestion,
+	mockAskQuestion,
 	mockGetArtifactRelations,
 	mockGetArtifactRecommendations,
 } = vi.hoisted(() => ({
-	mockStreamQuestion: vi.fn(),
+	mockAskQuestion: vi.fn(),
 	mockGetArtifactRelations: vi.fn(),
 	mockGetArtifactRecommendations: vi.fn().mockResolvedValue([]),
 }));
 
-function mockStreamWithAnswer(answer: string): void {
-	mockStreamQuestion.mockImplementation((_contentId, _question, callbacks) => {
-		callbacks.onToken({ index: 0, text: answer });
-		callbacks.onDone();
-		return Promise.resolve();
-	});
+function mockConversationWithAnswer(
+	answer = "Mock answer based on retrieved context.",
+): void {
+	mockAskQuestion.mockImplementation((contentId, conversationId, question) =>
+		Promise.resolve({
+			conversation: {
+				id: conversationId,
+				contentId,
+				messages: [
+					{ role: "user", text: question },
+					{ role: "assistant", text: answer },
+				],
+			},
+			answer: {
+				answer,
+				sources: [],
+				citations: [],
+			},
+		}),
+	);
 }
 
 vi.mock("@/services/relation/RelationService", () => ({
@@ -49,16 +63,16 @@ vi.mock("@/services/semantic/SemanticSearchService", () => ({
 	},
 }));
 
-vi.mock("@/services/chat/ChatService", () => ({
-	chatService: {
-		streamQuestion: mockStreamQuestion,
+vi.mock("@/services/conversation/ConversationService", () => ({
+	conversationService: {
+		askQuestion: mockAskQuestion,
 	},
 }));
 
 describe("ProcessingArtifacts", () => {
 	beforeEach(() => {
-		mockStreamQuestion.mockReset();
-		mockStreamWithAnswer("Mock answer based on retrieved context.");
+		mockAskQuestion.mockReset();
+		mockConversationWithAnswer();
 		mockGetArtifactRelations.mockReset();
 		mockGetArtifactRelations.mockResolvedValue([]);
 		mockGetArtifactRecommendations.mockReset();
@@ -392,7 +406,7 @@ describe("ProcessingArtifacts", () => {
 			screen.getByRole("status", { name: "Loading artifacts" }),
 		).toBeInTheDocument();
 		expect(artifactService.listByContentId).toHaveBeenCalledTimes(1);
-		expect(mockStreamQuestion).not.toHaveBeenCalled();
+		expect(mockAskQuestion).not.toHaveBeenCalled();
 	});
 
 	it("renders unsupported artifact types with fallback card", async () => {
@@ -756,15 +770,15 @@ describe("ProcessingArtifacts", () => {
 		);
 
 		await waitFor(() => {
-			expect(mockStreamQuestion).toHaveBeenCalledWith(
+			expect(mockAskQuestion).toHaveBeenCalledWith(
 				chatContentId,
+				expect.any(String),
 				"what is the purpose?",
-				expect.any(Object),
 			);
 		});
 	});
 
-	it("shows chat unavailable for non-uuid content id without calling ChatService", async () => {
+	it("shows chat unavailable for non-uuid content id without calling ConversationService", async () => {
 		vi.spyOn(artifactService, "listByContentId").mockResolvedValue([
 			{
 				id: "artifact-1",
@@ -785,7 +799,7 @@ describe("ProcessingArtifacts", () => {
 		expect(
 			screen.queryByRole("textbox", { name: "Ask a question" }),
 		).not.toBeInTheDocument();
-		expect(mockStreamQuestion).not.toHaveBeenCalled();
+		expect(mockAskQuestion).not.toHaveBeenCalled();
 	});
 
 	it("loads artifacts exactly once when recommendations panels are shown", async () => {
@@ -910,7 +924,7 @@ describe("ProcessingArtifacts", () => {
 		expect(screen.getByText("Next")).toBeInTheDocument();
 	});
 
-	it("renders streamed answer text with citation markers for later navigation", async () => {
+	it("renders conversation answer text with citation markers for later navigation", async () => {
 		const user = userEvent.setup();
 		const summaryId = "550e8400-e29b-41d4-a716-446655440002";
 
@@ -924,7 +938,9 @@ describe("ProcessingArtifacts", () => {
 				createdAt: "2026-06-26T12:00:00+00:00",
 			},
 		]);
-		mockStreamWithAnswer("Rome collapsed because of military pressure [1].");
+		mockConversationWithAnswer(
+			"Rome collapsed because of military pressure [1].",
+		);
 
 		render(
 			<ProcessingArtifacts contentId="550e8400-e29b-41d4-a716-446655440000" />,

@@ -51,6 +51,13 @@ export function contentChatStreamPath(contentId: string): string {
 	return `${CONTENTS_PATH}/${contentId}/chat/stream`;
 }
 
+export function contentConversationChatPath(
+	contentId: string,
+	conversationId: string,
+): string {
+	return `${CONTENTS_PATH}/${contentId}/conversations/${conversationId}/chat`;
+}
+
 export function collectionItemsPath(collectionId: string): string {
 	return `${COLLECTIONS_PATH}/${collectionId}/items`;
 }

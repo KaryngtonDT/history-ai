@@ -2,16 +2,17 @@ import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { Artifact } from "@/services/artifact/types";
-import { chatService } from "@/services/chat/ChatService";
+import { conversationService } from "@/services/conversation/ConversationService";
+import type { ConversationChatResult } from "@/services/conversation/types";
 import { ChatInput } from "../ChatInput";
 import { type ChatMessageItem, ChatMessageList } from "../ChatMessageList";
 import {
 	CHAT_EMPTY_ANSWER_MESSAGE,
 	CHAT_ERROR_MESSAGE,
 	CHAT_PANEL_TITLE,
-	CHAT_STREAM_EMPTY_MESSAGE,
 } from "../chatLabels";
 import type { CitationClickDetails } from "../citationNavigation";
+import { mapConversationToChatMessageItems } from "../conversationMessages";
 import styles from "./ChatPanel.module.css";
 
 interface ChatPanelProps {
@@ -20,8 +21,8 @@ interface ChatPanelProps {
 	onCitationClick?: (details: CitationClickDetails) => void;
 }
 
-function createMessageId(): string {
-	return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+function createConversationId(): string {
+	return crypto.randomUUID();
 }
 
 export function ChatPanel({
@@ -29,10 +30,21 @@ export function ChatPanel({
 	artifacts,
 	onCitationClick,
 }: ChatPanelProps) {
-	const [messages, setMessages] = useState<ChatMessageItem[]>([]);
-	const [streaming, setStreaming] = useState(false);
+	const [conversationId, setConversationId] = useState<string | null>(null);
+	const [chatResult, setChatResult] = useState<ConversationChatResult | null>(
+		null,
+	);
+	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [question, setQuestion] = useState("");
+
+	const messages = useMemo<ChatMessageItem[]>(() => {
+		if (chatResult === null) {
+			return [];
+		}
+
+		return mapConversationToChatMessageItems(chatResult);
+	}, [chatResult]);
 
 	const artifactTypesById = useMemo(
 		() =>
@@ -42,126 +54,43 @@ export function ChatPanel({
 		[artifacts],
 	);
 
-	function removeAssistantMessage(assistantMessageId: string): void {
-		setMessages((currentMessages) =>
-			currentMessages.filter((message) => message.id !== assistantMessageId),
-		);
-	}
-
 	function handleSubmit(): void {
 		const trimmedQuestion = question.trim();
 
-		if (trimmedQuestion === "" || streaming) {
+		if (trimmedQuestion === "" || loading) {
 			return;
 		}
 
-		const userMessage: ChatMessageItem = {
-			id: createMessageId(),
-			role: "user",
-			content: trimmedQuestion,
-		};
-		const assistantMessageId = createMessageId();
+		const activeConversationId = conversationId ?? createConversationId();
 
-		setMessages((currentMessages) => [
-			...currentMessages,
-			userMessage,
-			{
-				id: assistantMessageId,
-				role: "assistant",
-				content: "",
-				streaming: true,
-			},
-		]);
+		if (conversationId === null) {
+			setConversationId(activeConversationId);
+		}
+
 		setQuestion("");
-		setStreaming(true);
+		setLoading(true);
 		setError(null);
 
-		let receivedToken = false;
-
-		void chatService
-			.streamQuestion(contentId, trimmedQuestion, {
-				onToken: (token) => {
-					receivedToken = true;
-					setMessages((currentMessages) =>
-						currentMessages.map((message) =>
-							message.id === assistantMessageId
-								? {
-										...message,
-										content: message.content + token.text,
-									}
-								: message,
-						),
-					);
-				},
-				onDone: () => {
-					setStreaming(false);
-					setMessages((currentMessages) => {
-						const assistantMessage = currentMessages.find(
-							(message) => message.id === assistantMessageId,
-						);
-
-						if (assistantMessage === undefined) {
-							return currentMessages;
-						}
-
-						if (assistantMessage.content.trim() === "") {
-							setError(CHAT_EMPTY_ANSWER_MESSAGE);
-							return currentMessages.filter(
-								(message) => message.id !== assistantMessageId,
-							);
-						}
-
-						return currentMessages.map((message) =>
-							message.id === assistantMessageId
-								? { ...message, streaming: false }
-								: message,
-						);
-					});
-				},
-				onError: () => {
-					setStreaming(false);
-
-					if (!receivedToken) {
-						removeAssistantMessage(assistantMessageId);
-						setError(CHAT_STREAM_EMPTY_MESSAGE);
-						return;
-					}
-
-					setMessages((currentMessages) =>
-						currentMessages.map((message) =>
-							message.id === assistantMessageId
-								? {
-										...message,
-										streaming: false,
-										failed: true,
-									}
-								: message,
-						),
-					);
-					setError(CHAT_ERROR_MESSAGE);
-				},
-			})
-			.catch(() => {
-				setStreaming(false);
-
-				if (!receivedToken) {
-					removeAssistantMessage(assistantMessageId);
-					setError(CHAT_STREAM_EMPTY_MESSAGE);
+		void conversationService
+			.askQuestion(contentId, activeConversationId, trimmedQuestion)
+			.then((result) => {
+				if (
+					result.conversation.id === "" ||
+					result.conversation.messages.length === 0 ||
+					result.answer.answer.trim() === ""
+				) {
+					setError(CHAT_EMPTY_ANSWER_MESSAGE);
 					return;
 				}
 
-				setMessages((currentMessages) =>
-					currentMessages.map((message) =>
-						message.id === assistantMessageId
-							? {
-									...message,
-									streaming: false,
-									failed: true,
-								}
-							: message,
-					),
-				);
+				setConversationId(result.conversation.id);
+				setChatResult(result);
+			})
+			.catch(() => {
 				setError(CHAT_ERROR_MESSAGE);
+			})
+			.finally(() => {
+				setLoading(false);
 			});
 	}
 
@@ -184,7 +113,7 @@ export function ChatPanel({
 				value={question}
 				onChange={setQuestion}
 				onSubmit={handleSubmit}
-				loading={streaming}
+				loading={loading}
 			/>
 		</Card>
 	);

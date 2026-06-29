@@ -605,6 +605,23 @@ export function findFeatureChatTransportViolations(): ArchitectureViolation[] {
 			pattern: /from\s+["']@\/services\/chat\/ChatRepository["']/,
 			detail: "Feature components must use ChatService, not ChatRepository",
 		},
+		{
+			pattern:
+				/from\s+["']@\/services\/conversation\/HttpConversationRepository["']/,
+			detail:
+				"Feature components must use ConversationService, not HttpConversationRepository",
+		},
+		{
+			pattern:
+				/from\s+["']@\/services\/conversation\/ConversationRepositoryFactory["']/,
+			detail: "Feature components must not wire ConversationRepositoryFactory",
+		},
+		{
+			pattern:
+				/from\s+["']@\/services\/conversation\/ConversationRepository["']/,
+			detail:
+				"Feature components must use ConversationService, not ConversationRepository",
+		},
 	];
 
 	for (const filePath of collectSourceFiles(chatFeaturesRoot)) {
