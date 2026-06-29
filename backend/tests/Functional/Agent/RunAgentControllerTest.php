@@ -55,7 +55,7 @@ final class RunAgentControllerTest extends WebTestCase
 
         $response = json_decode($client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
         self::assertContains('knowledge_graph', array_column($response['plan'], 'tool'));
-        self::assertSame('No execution.', $response['steps'][1]['summary']);
+        self::assertSame('Knowledge graph is empty.', $response['steps'][1]['summary']);
     }
 
     public function testPostReturnsMemoryPlanWithConversationMemoryStep(): void

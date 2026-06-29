@@ -13,16 +13,17 @@ final class CompositeAgentToolExecutor implements AgentToolExecutorInterface
 {
     public function __construct(
         private readonly AgentToolExecutorInterface $semanticSearchToolExecutor,
+        private readonly AgentToolExecutorInterface $knowledgeGraphToolExecutor,
         private readonly AgentToolExecutorInterface $fallbackToolExecutor,
     ) {
     }
 
     public function execute(AgentToolExecution $execution): AgentToolExecutionResult
     {
-        if (AgentTool::SemanticSearch === $execution->tool()) {
-            return $this->semanticSearchToolExecutor->execute($execution);
-        }
-
-        return $this->fallbackToolExecutor->execute($execution);
+        return match ($execution->tool()) {
+            AgentTool::SemanticSearch => $this->semanticSearchToolExecutor->execute($execution),
+            AgentTool::KnowledgeGraph => $this->knowledgeGraphToolExecutor->execute($execution),
+            default => $this->fallbackToolExecutor->execute($execution),
+        };
     }
 }

@@ -41,6 +41,7 @@ services:
     App\Infrastructure\Agent\CompositeAgentToolExecutor:
         arguments:
             $semanticSearchToolExecutor: '@App\Infrastructure\Agent\SemanticSearchToolExecutor'
+            $knowledgeGraphToolExecutor: '@App\Infrastructure\Agent\KnowledgeGraphToolExecutor'
             $fallbackToolExecutor: '@App\Infrastructure\Agent\NullAgentToolExecutor'
 
     App\Domain\Chat\ChatProviderInterface:

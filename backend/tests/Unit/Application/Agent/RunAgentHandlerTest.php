@@ -89,6 +89,11 @@ final class RunAgentHandlerTest extends TestCase
                         'Semantic search found 1 relevant chunks.',
                         ['resultCount' => 1, 'topScore' => 0.85],
                     ),
+                    AgentTool::KnowledgeGraph => new AgentToolExecutionResult(
+                        AgentTool::KnowledgeGraph,
+                        'Knowledge graph contains 3 nodes and 3 relationships.',
+                        ['nodeCount' => 3, 'edgeCount' => 3],
+                    ),
                     default => new AgentToolExecutionResult(
                         $execution->tool(),
                         'No execution.',
@@ -103,7 +108,8 @@ final class RunAgentHandlerTest extends TestCase
             ['semantic_search', 'knowledge_graph', 'multi_document_chat'],
             array_map(static fn ($step) => $step->tool, $result->plan),
         );
-        self::assertSame('No execution.', $result->steps[1]->summary);
+        self::assertSame('Knowledge graph contains 3 nodes and 3 relationships.', $result->steps[1]->summary);
+        self::assertSame(['nodeCount' => 3, 'edgeCount' => 3], $result->steps[1]->metadata);
     }
 
     public function testExecutesMemoryPlanWithConversationMemoryStep(): void

@@ -18,6 +18,7 @@ final class CompositeAgentToolExecutorTest extends TestCase
     {
         $composite = new CompositeAgentToolExecutor(
             $this->createMock(AgentToolExecutorInterface::class),
+            $this->createMock(AgentToolExecutorInterface::class),
             new NullAgentToolExecutor(),
         );
 
@@ -44,10 +45,52 @@ final class CompositeAgentToolExecutorTest extends TestCase
             ->with($execution)
             ->willReturn($expected);
 
+        $knowledgeGraphExecutor = $this->createMock(AgentToolExecutorInterface::class);
+        $knowledgeGraphExecutor->expects(self::never())->method('execute');
+
         $fallbackExecutor = $this->createMock(AgentToolExecutorInterface::class);
         $fallbackExecutor->expects(self::never())->method('execute');
 
-        $result = (new CompositeAgentToolExecutor($semanticExecutor, $fallbackExecutor))->execute($execution);
+        $result = (new CompositeAgentToolExecutor(
+            $semanticExecutor,
+            $knowledgeGraphExecutor,
+            $fallbackExecutor,
+        ))->execute($execution);
+
+        self::assertSame($expected, $result);
+    }
+
+    public function testRoutesKnowledgeGraphToKnowledgeGraphToolExecutor(): void
+    {
+        $execution = new AgentToolExecution(
+            AgentTool::KnowledgeGraph,
+            'Compare Rome versus Byzantium',
+            '550e8400-e29b-41d4-a716-446655440000',
+        );
+        $expected = new AgentToolExecutionResult(
+            AgentTool::KnowledgeGraph,
+            'Knowledge graph contains 18 nodes and 24 relationships.',
+            ['nodeCount' => 18, 'edgeCount' => 24],
+        );
+
+        $semanticExecutor = $this->createMock(AgentToolExecutorInterface::class);
+        $semanticExecutor->expects(self::never())->method('execute');
+
+        $knowledgeGraphExecutor = $this->createMock(AgentToolExecutorInterface::class);
+        $knowledgeGraphExecutor
+            ->expects(self::once())
+            ->method('execute')
+            ->with($execution)
+            ->willReturn($expected);
+
+        $fallbackExecutor = $this->createMock(AgentToolExecutorInterface::class);
+        $fallbackExecutor->expects(self::never())->method('execute');
+
+        $result = (new CompositeAgentToolExecutor(
+            $semanticExecutor,
+            $knowledgeGraphExecutor,
+            $fallbackExecutor,
+        ))->execute($execution);
 
         self::assertSame($expected, $result);
     }
@@ -55,13 +98,16 @@ final class CompositeAgentToolExecutorTest extends TestCase
     public function testRoutesNonSemanticToolsToNullAgentToolExecutor(): void
     {
         $execution = new AgentToolExecution(
-            AgentTool::KnowledgeGraph,
-            'Compare Rome versus Byzantium',
+            AgentTool::MultiDocumentChat,
+            'What is Rome?',
             '550e8400-e29b-41d4-a716-446655440000',
         );
 
         $semanticExecutor = $this->createMock(AgentToolExecutorInterface::class);
         $semanticExecutor->expects(self::never())->method('execute');
+
+        $knowledgeGraphExecutor = $this->createMock(AgentToolExecutorInterface::class);
+        $knowledgeGraphExecutor->expects(self::never())->method('execute');
 
         $fallbackExecutor = $this->createMock(AgentToolExecutorInterface::class);
         $fallbackExecutor
@@ -69,12 +115,16 @@ final class CompositeAgentToolExecutorTest extends TestCase
             ->method('execute')
             ->with($execution)
             ->willReturn(new AgentToolExecutionResult(
-                AgentTool::KnowledgeGraph,
+                AgentTool::MultiDocumentChat,
                 'No execution.',
                 [],
             ));
 
-        $result = (new CompositeAgentToolExecutor($semanticExecutor, $fallbackExecutor))->execute($execution);
+        $result = (new CompositeAgentToolExecutor(
+            $semanticExecutor,
+            $knowledgeGraphExecutor,
+            $fallbackExecutor,
+        ))->execute($execution);
 
         self::assertSame('No execution.', $result->summary());
         self::assertSame([], $result->metadata());
