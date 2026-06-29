@@ -391,6 +391,35 @@ Verification: [Sprint25-Verification.md](../reports/Sprint25-Verification.md)
 
 ---
 
+# Platform Sprint 26 — Conversation Streaming (2026-06)
+
+Platform Sprint 26 delivers **conversation-aware streaming chat**: domain stream model, SSE API with persistence, frontend `ChatPanel` integration, and OpenAPI documentation. Slice 4 changed **documentation and OpenAPI only** — no business logic in backend handlers, frontend, or worker.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P26-SLICE-01 | `ConversationStream`, `ConversationStreamEvent` domain | ✅ |
+| P26-SLICE-02 | `POST …/conversations/{conversationId}/chat/stream` SSE API | ✅ |
+| P26-SLICE-03 | `ConversationService.streamQuestion()`; `ChatPanel` streaming UX | ✅ |
+| P26-SLICE-04 | OpenAPI + architecture docs + this report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `ConversationStream`, `ConversationStreamEvent`, `ConversationStreamEventCollection` |
+| Application | `AskConversationChatStreamHandler`; `ContentChatStreamer`; stream DTOs |
+| Presentation | `AskConversationChatStreamController`; `ConversationChatStreamResponse`; OpenAPI `ConversationStreamEvent` |
+| Frontend | `ConversationService.streamQuestion()`; optimistic tokens + `conversation` event as source of truth |
+
+```text
+ChatPanel → ConversationService.streamQuestion()
+        → POST /contents/{contentId}/conversations/{id}/chat/stream
+        → SSE token → conversation → done
+        → frontend conversation.messages = backend source of truth
+```
+
+Verification: [Sprint26-Verification.md](../reports/Sprint26-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

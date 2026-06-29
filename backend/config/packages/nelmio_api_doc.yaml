@@ -44,6 +44,7 @@ nelmio_api_doc:
             - { alias: SelectedDocument, type: App\Presentation\OpenApi\Schema\SelectedDocument }
             - { alias: UpdateConversationDocumentsRequest, type: App\Presentation\OpenApi\Schema\UpdateConversationDocumentsRequest }
             - { alias: ConversationResponse, type: App\Presentation\OpenApi\Schema\ConversationResponse }
+            - { alias: ConversationStreamEvent, type: App\Presentation\OpenApi\Schema\ConversationStreamEvent }
             - { alias: PerformanceMetric, type: App\Presentation\OpenApi\Schema\PerformanceMetric }
             - { alias: PerformanceMetricSnapshot, type: App\Presentation\OpenApi\Schema\PerformanceMetricSnapshot }
             - { alias: PlatformMetricsResponse, type: App\Presentation\OpenApi\Schema\PlatformMetricsResponse }

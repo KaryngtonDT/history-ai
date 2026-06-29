@@ -491,7 +491,7 @@ ChatPanel (only component using ConversationService)
 
 | Component | Rule |
 | --------- | ---- |
-| `ChatPanel` | Calls `conversationService.askQuestion()` only |
+| `ChatPanel` | Calls `conversationService.streamQuestion()` for questions; `updateDocuments()` for selection |
 | `ChatInput`, `ChatMessage`, `ChatMessageList`, `SourcesPanel` | Props-only; no service imports |
 | `DocumentSelector` | Props-only; no service imports |
 | `features/chat` | Must not import `HttpChatRepository`, `ChatRepositoryFactory`, `ChatRepository`, `HttpConversationRepository`, `ConversationRepositoryFactory`, or `ConversationRepository` |
@@ -534,8 +534,9 @@ ChatPanel renders conversation.messages (server source of truth)
 | `ConversationRepositoryInterface` | Domain port: `save`, `findById`, `findByContentId` |
 | `AskConversationChatHandler` | Appends user message, delegates RAG, appends assistant message, persists |
 | `ConversationService` (frontend) | Only entry point for conversation HTTP from features |
-| `ChatPanel` | Owns `conversationId` + `chatResult`; no local message append |
-| `chatService.streamQuestion()` | Preserved for future conversation streaming; unused in `ChatPanel` |
+| `ChatPanel` | Owns `conversationId` + `chatResult`; streams via `streamQuestion()`; `conversation` SSE event is source of truth |
+| `chatService.streamQuestion()` | Preserved for single-turn streaming; unused in `ChatPanel` |
+| `ConversationService.askQuestion()` | Preserved for non-streaming callers; unused in `ChatPanel` |
 
 ### Multi-document conversations (Platform Sprint 25)
 
@@ -568,6 +569,39 @@ AskConversationChatHandler → RAG across all selected documents
 | `DocumentSelector` | Props-only; emits `onSelectionChange(contentIds)`; no service imports |
 | `ChatPanel` | Owns selection via `conversation.documents`; backend response is source of truth |
 | `ConversationService.updateDocuments()` | Only frontend entry point for document selection HTTP |
+
+### Conversation streaming (Platform Sprint 26)
+
+```text
+ChatPanel
+        │
+        ▼
+ConversationService.streamQuestion()
+        │
+        ▼
+POST /api/contents/{contentId}/conversations/{conversationId}/chat/stream
+        │
+        ▼
+AskConversationChatStreamHandler
+        │
+        ├── ContentChatStreamer (multi-doc RAG + StreamingChatProviderInterface)
+        └── ConversationRepository (persist after full stream)
+        │
+        ▼
+SSE: token → conversation → done
+        │
+        ▼
+ChatPanel replaces local messages with conversation event payload
+```
+
+| Component | Rule |
+| --------- | ---- |
+| `ConversationStream` | Domain aggregate for streamed tokens; `toAssistantMessage()` after completion |
+| `AskConversationChatStreamHandler` | Mirrors non-streaming flow; persists once after stream completes |
+| `ContentChatStreamer` | Shared RAG streaming pipeline; does not change `AskConversationChatHandler` |
+| `HttpConversationRepository` | Allowed to use `fetch()` for SSE (with `HttpChatRepository`) |
+| `ChatPanel` | Optimistic user message + growing assistant bubble during tokens; `conversation` event is source of truth |
+| `DocumentSelector` | Unchanged; still uses `updateDocuments()` only |
 
 ### Interactive citations (UX-02)
 
@@ -602,7 +636,7 @@ Citations are **presentation navigation** only — domain and provider logic unc
 ### Streaming chat (UX-03)
 
 ```text
-ChatPanel
+ChatPanel (legacy single-turn — not used after Sprint 26)
         │
         ▼
 ChatService.streamQuestion()
@@ -620,12 +654,14 @@ Assistant bubble grows progressively
 | Component | Rule |
 | --------- | ---- |
 | `StreamingChatProviderInterface` | Separate from `ChatProviderInterface`; opt-in streaming |
-| `POST /chat/stream` | `text/event-stream`; `token` + `done` events |
-| `ChatStreamToken` (OpenAPI) | `index`, `text` — token payload only |
-| `HttpChatRepository` | Only place allowed to use `fetch()` for SSE (exception to HttpClient rule) |
-| `ChatPanel` | Uses `streamQuestion()` for legacy single-turn streaming; persistent chat uses `ConversationService` |
+| `POST /chat/stream` | `text/event-stream`; `token` + `done` events (single-turn) |
+| `POST …/conversations/{id}/chat/stream` | `text/event-stream`; `token` + `conversation` + `done` (Platform Sprint 26) |
+| `ChatStreamToken` (OpenAPI) | `index`, `text` — token payload for both stream endpoints |
+| `ConversationStreamEvent` (OpenAPI) | `conversation` — persisted conversation payload in SSE |
+| `HttpChatRepository` / `HttpConversationRepository` | Only places allowed to use `fetch()` for SSE |
+| `ChatPanel` | Uses `ConversationService.streamQuestion()` for persistent multi-doc chat |
 
-Streaming does not yet emit sources/citations — use non-streaming `/chat` for full metadata.
+Streaming does not yet emit sources/citations — use non-streaming `POST …/chat` for full metadata.
 
 ### Platform observability (Platform Sprint 23)
 
