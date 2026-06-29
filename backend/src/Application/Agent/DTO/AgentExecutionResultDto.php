@@ -11,11 +11,13 @@ final readonly class AgentExecutionResultDto
     /**
      * @param list<AgentPlanStepResult>        $plan
      * @param list<AgentExecutionStepResult> $steps
+     * @param array<string, mixed>           $metadata
      */
     public function __construct(
         public array $plan,
         public array $steps,
         public string $finalSummary,
+        public array $metadata = [],
     ) {
     }
 
@@ -31,6 +33,7 @@ final readonly class AgentExecutionResultDto
                 $result->steps()->all(),
             ),
             finalSummary: $result->finalSummary(),
+            metadata: $result->metadata()->values(),
         );
     }
 }

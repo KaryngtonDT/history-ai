@@ -14,6 +14,7 @@ final readonly class AgentExecutionResult
         private AgentPlan $plan,
         private AgentExecutionStepCollection $steps,
         string $finalSummary,
+        private AgentMetadata $metadata = new AgentMetadata([]),
     ) {
         $trimmed = trim($finalSummary);
 
@@ -37,5 +38,10 @@ final readonly class AgentExecutionResult
     public function finalSummary(): string
     {
         return $this->finalSummary;
+    }
+
+    public function metadata(): AgentMetadata
+    {
+        return $this->metadata;
     }
 }

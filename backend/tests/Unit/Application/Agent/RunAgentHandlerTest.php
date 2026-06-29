@@ -75,6 +75,14 @@ final class RunAgentHandlerTest extends TestCase
         self::assertSame(['resultCount' => 2, 'topScore' => 0.91], $result->steps[0]->metadata);
         self::assertSame('Multi-document chat requires a conversation.', $result->steps[1]->summary);
         self::assertSame(['requiresConversation' => true], $result->steps[1]->metadata);
+        self::assertSame(
+            [
+                'resultCount' => 2,
+                'topScore' => 0.91,
+                'requiresConversation' => true,
+            ],
+            $result->metadata,
+        );
         self::assertSame('Agent workflow completed.', $result->finalSummary);
     }
 

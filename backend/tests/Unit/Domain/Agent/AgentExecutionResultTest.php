@@ -8,6 +8,7 @@ use App\Domain\Agent\AgentExecutionResult;
 use App\Domain\Agent\AgentExecutionStatus;
 use App\Domain\Agent\AgentExecutionStep;
 use App\Domain\Agent\AgentExecutionStepCollection;
+use App\Domain\Agent\AgentMetadata;
 use App\Domain\Agent\AgentPlan;
 use App\Domain\Agent\AgentTool;
 use App\Domain\Agent\Exception\InvalidAgentPlanException;
@@ -30,6 +31,7 @@ final class AgentExecutionResultTest extends TestCase
         self::assertSame($plan, $result->plan());
         self::assertSame($steps, $result->steps());
         self::assertSame('Agent workflow completed.', $result->finalSummary());
+        self::assertSame([], $result->metadata()->values());
     }
 
     public function testTrimsFinalSummary(): void
@@ -64,5 +66,39 @@ final class AgentExecutionResultTest extends TestCase
 
         self::assertSame(1, $result->plan()->toolCount());
         self::assertSame(1, $result->steps()->count());
+        self::assertSame([], $result->metadata()->values());
+    }
+
+    public function testExposesAggregatedMetadata(): void
+    {
+        $plan = AgentPlan::empty()
+            ->append(AgentTool::SemanticSearch, 'Search Rome')
+            ->append(AgentTool::KnowledgeGraph, 'Explore graph');
+        $steps = new AgentExecutionStepCollection([
+            new AgentExecutionStep(
+                0,
+                AgentTool::SemanticSearch,
+                AgentExecutionStatus::Completed,
+                'Semantic search found 2 relevant chunks.',
+                ['resultCount' => 2, 'topScore' => 0.91],
+            ),
+            new AgentExecutionStep(
+                1,
+                AgentTool::KnowledgeGraph,
+                AgentExecutionStatus::Completed,
+                'Knowledge graph contains 3 nodes and 3 relationships.',
+                ['nodeCount' => 3, 'edgeCount' => 3],
+            ),
+        ]);
+        $metadata = new AgentMetadata([
+            'resultCount' => 2,
+            'topScore' => 0.91,
+            'nodeCount' => 3,
+            'edgeCount' => 3,
+        ]);
+
+        $result = new AgentExecutionResult($plan, $steps, 'Agent workflow completed.', $metadata);
+
+        self::assertTrue($metadata->equals($result->metadata()));
     }
 }

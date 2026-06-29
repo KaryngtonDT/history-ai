@@ -6,6 +6,7 @@ namespace App\Application\Agent\Handlers;
 
 use App\Application\Agent\Commands\RunAgentCommand;
 use App\Application\Agent\DTO\AgentExecutionResultDto;
+use App\Domain\Agent\AgentMetadataCollection;
 use App\Domain\Agent\AgentExecutionResult;
 use App\Domain\Agent\AgentExecutionStatus;
 use App\Domain\Agent\AgentExecutionStep;
@@ -72,6 +73,7 @@ final class RunAgentHandler
             $plan,
             $executionSteps,
             self::FINAL_SUMMARY,
+            AgentMetadataCollection::fromExecutionSteps($executionSteps)->merge(),
         );
     }
 
