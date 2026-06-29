@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Presentation\Http\Response\Chat;
 
 use App\Application\Chat\DTO\ConversationChatResult;
-use App\Application\Chat\DTO\ConversationMessageResult;
 
 final class ConversationChatResponse
 {
@@ -14,7 +13,8 @@ final class ConversationChatResponse
      *     conversation: array{
      *         id: string,
      *         contentId: string,
-     *         messages: list<array{role: string, text: string}>
+     *         messages: list<array{role: string, text: string}>,
+     *         documents: list<array{contentId: string}>
      *     },
      *     answer: array{
      *         answer: string,
@@ -36,17 +36,7 @@ final class ConversationChatResponse
     public static function fromResult(ConversationChatResult $result): array
     {
         return [
-            'conversation' => [
-                'id' => $result->conversation->id,
-                'contentId' => $result->conversation->contentId,
-                'messages' => array_map(
-                    static fn (ConversationMessageResult $message): array => [
-                        'role' => $message->role,
-                        'text' => $message->text,
-                    ],
-                    $result->conversation->messages,
-                ),
-            ],
+            'conversation' => ConversationResponse::conversationToArray($result->conversation),
             'answer' => ChatAnswerResponse::fromResult($result->answer),
         ];
     }

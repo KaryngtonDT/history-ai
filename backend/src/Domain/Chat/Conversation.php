@@ -77,6 +77,11 @@ final readonly class Conversation
         );
     }
 
+    public function withDocuments(SelectedDocumentCollection $documents): self
+    {
+        return new self($this->id, $documents, $this->conversation);
+    }
+
     public function appendUser(ChatMessage $message): self
     {
         if (ChatMessageRole::User !== $message->role()) {
