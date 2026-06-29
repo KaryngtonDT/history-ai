@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Semantic\Handlers;
 
+use App\Application\Platform\PlatformLoggerInterface;
 use App\Application\Semantic\DTO\SemanticSearchResult;
 use App\Application\Semantic\Queries\SearchSemanticChunksQuery;
 use App\Domain\Artifact\ArtifactRepositoryInterface;
@@ -21,16 +22,32 @@ use App\Domain\Semantic\VectorStoreInterface;
 
 final class SearchSemanticChunksHandler
 {
+    private const string COMPONENT = 'SearchSemanticChunksHandler';
+
     public function __construct(
         private readonly ArtifactRepositoryInterface $artifactRepository,
         private readonly Chunker $chunker,
         private readonly EmbeddingGeneratorInterface $embeddingGenerator,
         private readonly VectorStoreInterface $vectorStore,
         private readonly SemanticRetriever $semanticRetriever,
+        private readonly PlatformLoggerInterface $platformLogger,
     ) {
     }
 
     public function __invoke(SearchSemanticChunksQuery $query): SemanticSearchResult
+    {
+        $this->platformLogger->info(self::COMPONENT, 'request started', [
+            'contentId' => $query->contentId,
+        ]);
+
+        try {
+            return $this->handle($query);
+        } finally {
+            $this->platformLogger->info(self::COMPONENT, 'request completed');
+        }
+    }
+
+    private function handle(SearchSemanticChunksQuery $query): SemanticSearchResult
     {
         $artifacts = $this->artifactRepository->findByContentId(
             new ContentId($query->contentId),
@@ -65,6 +82,10 @@ final class SearchSemanticChunksHandler
             new SemanticQuery($query->query),
             $this->embeddingGenerator,
         );
+
+        $this->platformLogger->info(self::COMPONENT, 'retrieval completed', [
+            'resultCount' => $retrievedChunks->count(),
+        ]);
 
         return SemanticSearchResult::fromDomain($retrievedChunks);
     }

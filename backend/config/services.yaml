@@ -107,3 +107,12 @@ services:
 
     App\Shared\:
         resource: '../src/Shared/'
+
+    App\Application\Platform\RequestContextProviderInterface:
+        alias: App\Infrastructure\Platform\RequestContextProvider
+
+    App\Application\Platform\PlatformLoggerInterface:
+        alias: App\Infrastructure\Platform\PlatformLogger
+
+    Psr\Log\LoggerInterface:
+        class: Psr\Log\NullLogger

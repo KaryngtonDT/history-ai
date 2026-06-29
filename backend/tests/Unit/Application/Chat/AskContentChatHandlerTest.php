@@ -27,6 +27,9 @@ use App\Infrastructure\Chat\MockChatProvider;
 use App\Infrastructure\Semantic\DeterministicEmbeddingGenerator;
 use App\Infrastructure\Semantic\DeterministicEmbeddingProvider;
 use App\Infrastructure\Semantic\InMemoryVectorStore;
+use App\Tests\Unit\Application\Platform\Support\FixedRequestContextProvider;
+use App\Tests\Unit\Application\Platform\Support\RecordingPlatformLogger;
+use App\Domain\Platform\CorrelationId;
 use PHPUnit\Framework\TestCase;
 
 final class AskContentChatHandlerTest extends TestCase
@@ -35,8 +38,11 @@ final class AskContentChatHandlerTest extends TestCase
         ArtifactRepositoryInterface $repository,
         ?VectorStoreInterface $vectorStore = null,
         ?ChatProviderInterface $chatProvider = null,
+        ?RecordingPlatformLogger $platformLogger = null,
     ): AskContentChatHandler {
         $store = $vectorStore ?? new InMemoryVectorStore();
+        $contextProvider = new FixedRequestContextProvider(new CorrelationId('c6f98b8a-3f2e-4a1b-9c8d-1e2f3a4b5c6d'));
+        $logger = $platformLogger ?? new RecordingPlatformLogger($contextProvider);
 
         return new AskContentChatHandler(
             $repository,
@@ -46,6 +52,7 @@ final class AskContentChatHandlerTest extends TestCase
             new SemanticRetriever($store),
             new ChatOrchestrator(),
             $chatProvider ?? new MockChatProvider(),
+            $logger,
         );
     }
 
@@ -173,6 +180,30 @@ final class AskContentChatHandlerTest extends TestCase
 
         $this->createHandler($repository, chatProvider: $chatProvider)
             ->__invoke(new AskContentChatCommand($contentId->value, 'Why did Rome fall?'));
+    }
+
+    public function testLogsLifecycleWithCorrelationId(): void
+    {
+        $contentId = ContentId::generate();
+        $contextProvider = new FixedRequestContextProvider(new CorrelationId('c6f98b8a-3f2e-4a1b-9c8d-1e2f3a4b5c6d'));
+        $platformLogger = new RecordingPlatformLogger($contextProvider);
+
+        $repository = $this->createMock(ArtifactRepositoryInterface::class);
+        $repository
+            ->method('findByContentId')
+            ->willReturn([]);
+
+        $this->createHandler($repository, platformLogger: $platformLogger)
+            ->__invoke(new AskContentChatCommand($contentId->value, 'Why did Rome fall?'));
+
+        self::assertSame(
+            ['request started', 'retrieval completed', 'provider completed', 'request completed'],
+            $platformLogger->messages(),
+        );
+        self::assertSame(
+            'c6f98b8a-3f2e-4a1b-9c8d-1e2f3a4b5c6d',
+            $platformLogger->records()[0]['context']['correlationId'],
+        );
     }
 
     private function createArtifact(

@@ -21,6 +21,9 @@ use App\Domain\Semantic\VectorStoreInterface;
 use App\Infrastructure\Semantic\DeterministicEmbeddingGenerator;
 use App\Infrastructure\Semantic\DeterministicEmbeddingProvider;
 use App\Infrastructure\Semantic\InMemoryVectorStore;
+use App\Tests\Unit\Application\Platform\Support\FixedRequestContextProvider;
+use App\Tests\Unit\Application\Platform\Support\RecordingPlatformLogger;
+use App\Domain\Platform\CorrelationId;
 use PHPUnit\Framework\TestCase;
 
 final class SearchSemanticChunksHandlerTest extends TestCase
@@ -28,8 +31,11 @@ final class SearchSemanticChunksHandlerTest extends TestCase
     private function createHandler(
         ArtifactRepositoryInterface $repository,
         ?VectorStoreInterface $vectorStore = null,
+        ?RecordingPlatformLogger $platformLogger = null,
     ): SearchSemanticChunksHandler {
         $store = $vectorStore ?? new InMemoryVectorStore();
+        $contextProvider = new FixedRequestContextProvider(new CorrelationId('c6f98b8a-3f2e-4a1b-9c8d-1e2f3a4b5c6d'));
+        $logger = $platformLogger ?? new RecordingPlatformLogger($contextProvider);
 
         return new SearchSemanticChunksHandler(
             $repository,
@@ -37,6 +43,7 @@ final class SearchSemanticChunksHandlerTest extends TestCase
             new DeterministicEmbeddingGenerator(new DeterministicEmbeddingProvider()),
             $store,
             new SemanticRetriever($store),
+            $logger,
         );
     }
 
@@ -174,6 +181,31 @@ final class SearchSemanticChunksHandlerTest extends TestCase
         self::assertStringContainsString('Ancient Rome', $result->results[0]->text);
         self::assertGreaterThanOrEqual(0.0, $result->results[0]->score);
         self::assertLessThanOrEqual(1.0, $result->results[0]->score);
+    }
+
+    public function testLogsLifecycleWithCorrelationId(): void
+    {
+        $contentId = ContentId::generate();
+        $contextProvider = new FixedRequestContextProvider(new CorrelationId('c6f98b8a-3f2e-4a1b-9c8d-1e2f3a4b5c6d'));
+        $platformLogger = new RecordingPlatformLogger($contextProvider);
+
+        $repository = $this->createMock(ArtifactRepositoryInterface::class);
+        $repository
+            ->expects(self::once())
+            ->method('findByContentId')
+            ->willReturn([]);
+
+        $this->createHandler($repository, platformLogger: $platformLogger)
+            ->__invoke(new SearchSemanticChunksQuery($contentId->value, 'rome'));
+
+        self::assertSame(
+            ['request started', 'request completed'],
+            $platformLogger->messages(),
+        );
+        self::assertSame(
+            'c6f98b8a-3f2e-4a1b-9c8d-1e2f3a4b5c6d',
+            $platformLogger->records()[0]['context']['correlationId'],
+        );
     }
 
     private function createArtifact(

@@ -6,6 +6,7 @@ namespace App\Application\Chat\Handlers;
 
 use App\Application\Chat\Commands\AskContentChatCommand;
 use App\Application\Chat\DTO\ChatAnswerResult;
+use App\Application\Platform\PlatformLoggerInterface;
 use App\Domain\Artifact\ArtifactRepositoryInterface;
 use App\Domain\Chat\ChatContext;
 use App\Domain\Chat\ChatOrchestrator;
@@ -29,6 +30,7 @@ use App\Domain\Semantic\VectorStoreInterface;
 final class AskContentChatHandler
 {
     private const int SEMANTIC_QUERY_MAX_LENGTH = 500;
+    private const string COMPONENT = 'AskContentChatHandler';
 
     public function __construct(
         private readonly ArtifactRepositoryInterface $artifactRepository,
@@ -38,10 +40,24 @@ final class AskContentChatHandler
         private readonly SemanticRetriever $semanticRetriever,
         private readonly ChatOrchestrator $chatOrchestrator,
         private readonly ChatProviderInterface $chatProvider,
+        private readonly PlatformLoggerInterface $platformLogger,
     ) {
     }
 
     public function __invoke(AskContentChatCommand $command): ChatAnswerResult
+    {
+        $this->platformLogger->info(self::COMPONENT, 'request started', [
+            'contentId' => $command->contentId,
+        ]);
+
+        try {
+            return $this->handle($command);
+        } finally {
+            $this->platformLogger->info(self::COMPONENT, 'request completed');
+        }
+    }
+
+    private function handle(AskContentChatCommand $command): ChatAnswerResult
     {
         $question = new ChatQuestion($command->question);
         $artifacts = $this->artifactRepository->findByContentId(
@@ -52,6 +68,10 @@ final class AskContentChatHandler
             ? RetrievedChunkCollection::empty()
             : $this->retrieveChunks($artifacts, $question);
 
+        $this->platformLogger->info(self::COMPONENT, 'retrieval completed', [
+            'chunkCount' => $retrievedChunks->count(),
+        ]);
+
         $context = new ChatContext($question, $retrievedChunks);
         $prompt = $this->chatOrchestrator->buildPrompt($context);
         $response = $this->chatProvider->answer(ChatRequest::create(
@@ -59,6 +79,8 @@ final class AskContentChatHandler
             $context->sources(),
             ChatProviderOptions::defaults(),
         ));
+
+        $this->platformLogger->info(self::COMPONENT, 'provider completed');
 
         return ChatAnswerResult::fromDomain($response);
     }

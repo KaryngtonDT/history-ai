@@ -130,6 +130,19 @@ final class LayerDependencyTest extends TestCase
         );
     }
 
+    public function testPlatformDomainDoesNotDependOnOuterLayersOrFrameworks(): void
+    {
+        self::assertFileExists($this->srcRoot . '/Domain/Platform/CorrelationId.php');
+
+        $this->assertNoViolations(
+            'Platform domain',
+            LayerDependencyRules::findViolations(
+                $this->srcRoot . '/Domain/Platform',
+                self::DOMAIN_FORBIDDEN_PREFIXES,
+            ),
+        );
+    }
+
     public function testSemanticVectorDomainDoesNotDependOnOuterLayersOrFrameworks(): void
     {
         self::assertFileExists($this->srcRoot . '/Domain/Semantic/VectorStoreInterface.php');
