@@ -11,5 +11,5 @@ export function createConversationRepository(): ConversationRepository {
 	}
 
 	const httpClient = new HttpClient(API_BASE_URL);
-	return new HttpConversationRepository(httpClient);
+	return new HttpConversationRepository(httpClient, API_BASE_URL);
 }

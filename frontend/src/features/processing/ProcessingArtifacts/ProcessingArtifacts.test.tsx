@@ -8,11 +8,11 @@ import { libraryService } from "@/services/library/LibraryService";
 import { relationService } from "@/services/relation/RelationService";
 
 const {
-	mockAskQuestion,
+	mockStreamQuestion,
 	mockGetArtifactRelations,
 	mockGetArtifactRecommendations,
 } = vi.hoisted(() => ({
-	mockAskQuestion: vi.fn(),
+	mockStreamQuestion: vi.fn(),
 	mockGetArtifactRelations: vi.fn(),
 	mockGetArtifactRecommendations: vi.fn().mockResolvedValue([]),
 }));
@@ -20,9 +20,10 @@ const {
 function mockConversationWithAnswer(
 	answer = "Mock answer based on retrieved context.",
 ): void {
-	mockAskQuestion.mockImplementation((contentId, conversationId, question) =>
-		Promise.resolve({
-			conversation: {
+	mockStreamQuestion.mockImplementation(
+		async (contentId, conversationId, question, callbacks) => {
+			callbacks.onToken({ index: 0, text: answer });
+			callbacks.onConversation({
 				id: conversationId,
 				contentId,
 				messages: [
@@ -30,13 +31,9 @@ function mockConversationWithAnswer(
 					{ role: "assistant", text: answer },
 				],
 				documents: [{ contentId }],
-			},
-			answer: {
-				answer,
-				sources: [],
-				citations: [],
-			},
-		}),
+			});
+			callbacks.onDone();
+		},
 	);
 }
 
@@ -66,14 +63,14 @@ vi.mock("@/services/semantic/SemanticSearchService", () => ({
 
 vi.mock("@/services/conversation/ConversationService", () => ({
 	conversationService: {
-		askQuestion: mockAskQuestion,
+		streamQuestion: mockStreamQuestion,
 		updateDocuments: vi.fn(),
 	},
 }));
 
 describe("ProcessingArtifacts", () => {
 	beforeEach(() => {
-		mockAskQuestion.mockReset();
+		mockStreamQuestion.mockReset();
 		mockConversationWithAnswer();
 		mockGetArtifactRelations.mockReset();
 		mockGetArtifactRelations.mockResolvedValue([]);
@@ -408,7 +405,7 @@ describe("ProcessingArtifacts", () => {
 			screen.getByRole("status", { name: "Loading artifacts" }),
 		).toBeInTheDocument();
 		expect(artifactService.listByContentId).toHaveBeenCalledTimes(1);
-		expect(mockAskQuestion).not.toHaveBeenCalled();
+		expect(mockStreamQuestion).not.toHaveBeenCalled();
 	});
 
 	it("renders unsupported artifact types with fallback card", async () => {
@@ -772,10 +769,11 @@ describe("ProcessingArtifacts", () => {
 		);
 
 		await waitFor(() => {
-			expect(mockAskQuestion).toHaveBeenCalledWith(
+			expect(mockStreamQuestion).toHaveBeenCalledWith(
 				chatContentId,
 				expect.any(String),
 				"what is the purpose?",
+				expect.any(Object),
 			);
 		});
 	});
@@ -801,7 +799,7 @@ describe("ProcessingArtifacts", () => {
 		expect(
 			screen.queryByRole("textbox", { name: "Ask a question" }),
 		).not.toBeInTheDocument();
-		expect(mockAskQuestion).not.toHaveBeenCalled();
+		expect(mockStreamQuestion).not.toHaveBeenCalled();
 	});
 
 	it("loads artifacts exactly once when recommendations panels are shown", async () => {

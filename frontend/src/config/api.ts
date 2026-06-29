@@ -58,6 +58,13 @@ export function contentConversationChatPath(
 	return `${CONTENTS_PATH}/${contentId}/conversations/${conversationId}/chat`;
 }
 
+export function contentConversationChatStreamPath(
+	contentId: string,
+	conversationId: string,
+): string {
+	return `${CONTENTS_PATH}/${contentId}/conversations/${conversationId}/chat/stream`;
+}
+
 export function conversationDocumentsPath(conversationId: string): string {
 	return `/api/conversations/${conversationId}/documents`;
 }

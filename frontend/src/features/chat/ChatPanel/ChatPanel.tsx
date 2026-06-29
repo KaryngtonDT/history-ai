@@ -2,14 +2,18 @@ import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { Artifact } from "@/services/artifact/types";
+import { EMPTY_CHAT_ANSWER } from "@/services/chat/types";
 import { conversationService } from "@/services/conversation/ConversationService";
-import type { ConversationChatResult } from "@/services/conversation/types";
+import type {
+	Conversation,
+	ConversationChatResult,
+} from "@/services/conversation/types";
 import { ChatInput } from "../ChatInput";
 import { type ChatMessageItem, ChatMessageList } from "../ChatMessageList";
 import {
-	CHAT_EMPTY_ANSWER_MESSAGE,
 	CHAT_ERROR_MESSAGE,
 	CHAT_PANEL_TITLE,
+	CHAT_STREAM_EMPTY_MESSAGE,
 } from "../chatLabels";
 import type { CitationClickDetails } from "../citationNavigation";
 import { mapConversationToChatMessageItems } from "../conversationMessages";
@@ -20,6 +24,11 @@ interface ChatPanelProps {
 	contentId: string;
 	artifacts: Artifact[];
 	onCitationClick?: (details: CitationClickDetails) => void;
+}
+
+interface StreamingState {
+	userMessage: string;
+	assistantText: string;
 }
 
 function createConversationId(): string {
@@ -42,6 +51,23 @@ function buildAvailableDocuments(
 	}));
 }
 
+function buildChatResultFromConversation(
+	conversation: Conversation,
+	previousAnswer: ConversationChatResult["answer"] | null,
+): ConversationChatResult {
+	const lastAssistantMessage = conversation.messages.findLast(
+		(message) => message.role === "assistant",
+	);
+
+	return {
+		conversation,
+		answer: previousAnswer ?? {
+			...EMPTY_CHAT_ANSWER,
+			answer: lastAssistantMessage?.text ?? "",
+		},
+	};
+}
+
 export function ChatPanel({
 	contentId,
 	artifacts,
@@ -49,6 +75,9 @@ export function ChatPanel({
 }: ChatPanelProps) {
 	const [conversationId, setConversationId] = useState<string | null>(null);
 	const [chatResult, setChatResult] = useState<ConversationChatResult | null>(
+		null,
+	);
+	const [streamingState, setStreamingState] = useState<StreamingState | null>(
 		null,
 	);
 	const [loading, setLoading] = useState(false);
@@ -74,12 +103,27 @@ export function ChatPanel({
 	}, [chatResult, contentId]);
 
 	const messages = useMemo<ChatMessageItem[]>(() => {
-		if (chatResult === null) {
-			return [];
+		const baseMessages =
+			chatResult === null ? [] : mapConversationToChatMessageItems(chatResult);
+
+		if (streamingState === null) {
+			return baseMessages;
 		}
 
-		return mapConversationToChatMessageItems(chatResult);
-	}, [chatResult]);
+		return [
+			...baseMessages,
+			{
+				id: "streaming-user",
+				role: "user" as const,
+				content: streamingState.userMessage,
+			},
+			{
+				id: "streaming-assistant",
+				role: "assistant" as const,
+				content: streamingState.assistantText,
+			},
+		];
+	}, [chatResult, streamingState]);
 
 	const artifactTypesById = useMemo(
 		() =>
@@ -129,6 +173,14 @@ export function ChatPanel({
 			});
 	}
 
+	function handleStreamFailure(receivedConversation: boolean): void {
+		setStreamingState(null);
+
+		if (!receivedConversation) {
+			setError(CHAT_STREAM_EMPTY_MESSAGE);
+		}
+	}
+
 	function handleSubmit(): void {
 		const trimmedQuestion = question.trim();
 
@@ -145,27 +197,51 @@ export function ChatPanel({
 		setQuestion("");
 		setLoading(true);
 		setError(null);
+		setStreamingState({
+			userMessage: trimmedQuestion,
+			assistantText: "",
+		});
+
+		let receivedConversation = false;
 
 		void conversationService
-			.askQuestion(activeContentId, activeConversationId, trimmedQuestion)
-			.then((result) => {
-				if (
-					result.conversation.id === "" ||
-					result.conversation.messages.length === 0 ||
-					result.answer.answer.trim() === ""
-				) {
-					setError(CHAT_EMPTY_ANSWER_MESSAGE);
-					return;
-				}
+			.streamQuestion(activeContentId, activeConversationId, trimmedQuestion, {
+				onToken: (token) => {
+					setStreamingState((current) =>
+						current === null
+							? current
+							: {
+									...current,
+									assistantText: current.assistantText + token.text,
+								},
+					);
+				},
+				onConversation: (conversation) => {
+					receivedConversation = true;
+					setConversationId(conversation.id);
+					setChatResult((current) =>
+						buildChatResultFromConversation(
+							conversation,
+							current?.answer ?? null,
+						),
+					);
+					setStreamingState(null);
+				},
+				onDone: () => {
+					setLoading(false);
 
-				setConversationId(result.conversation.id);
-				setChatResult(result);
+					if (!receivedConversation) {
+						handleStreamFailure(false);
+					}
+				},
+				onError: () => {
+					setLoading(false);
+					handleStreamFailure(receivedConversation);
+				},
 			})
 			.catch(() => {
-				setError(CHAT_ERROR_MESSAGE);
-			})
-			.finally(() => {
 				setLoading(false);
+				handleStreamFailure(receivedConversation);
 			});
 	}
 

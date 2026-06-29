@@ -12,6 +12,7 @@ const HTTP_CLIENT_RELATIVE = "services/http/HttpClient.ts";
 const HTTP_FETCH_ALLOWED_RELATIVE = [
 	HTTP_CLIENT_RELATIVE,
 	"services/chat/HttpChatRepository.ts",
+	"services/conversation/HttpConversationRepository.ts",
 ];
 
 const EXCLUDED_PATH_PREFIXES = ["architecture/"];
@@ -85,7 +86,7 @@ export function findFetchViolations(): ArchitectureViolation[] {
 				rule: "fetch-centralization",
 				file: relativePath,
 				detail:
-					"fetch() must only appear in HttpClient.ts or HttpChatRepository.ts",
+					"fetch() must only appear in HttpClient.ts, HttpChatRepository.ts, or HttpConversationRepository.ts",
 			});
 		}
 	}

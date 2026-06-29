@@ -3,6 +3,7 @@ import {
 	buildMockAnswerWithCitationMarkers,
 	buildMockChatCitationsFromSources,
 	buildMockChatSourcesFromArtifacts,
+	buildMockStreamTokens,
 	type ChatAnswer,
 } from "@/services/chat/types";
 import type { ConversationRepository } from "./ConversationRepository";
@@ -10,6 +11,7 @@ import type {
 	Conversation,
 	ConversationChatResult,
 	ConversationMessage,
+	ConversationStreamCallbacks,
 	SelectedDocument,
 } from "./types";
 
@@ -55,6 +57,50 @@ export class MockConversationRepository implements ConversationRepository {
 			conversation: updatedConversation,
 			answer,
 		};
+	}
+
+	async streamQuestion(
+		contentId: string,
+		conversationId: string,
+		question: string,
+		callbacks: ConversationStreamCallbacks,
+	): Promise<void> {
+		const existing = this.conversations.get(conversationId);
+		const conversation: Conversation =
+			existing === undefined
+				? {
+						id: conversationId,
+						contentId,
+						messages: [],
+						documents: [{ contentId }],
+					}
+				: existing;
+
+		const userMessage: ConversationMessage = {
+			role: "user",
+			text: question,
+		};
+		const answer = this.buildMockAnswer(contentId, question);
+		const tokens = buildMockStreamTokens(answer.sources.length);
+
+		for (const [index, text] of tokens.entries()) {
+			callbacks.onToken({ index, text });
+		}
+
+		const assistantMessage: ConversationMessage = {
+			role: "assistant",
+			text: answer.answer,
+		};
+		const updatedConversation: Conversation = {
+			id: conversationId,
+			contentId: conversation.documents[0]?.contentId ?? contentId,
+			messages: [...conversation.messages, userMessage, assistantMessage],
+			documents: conversation.documents,
+		};
+
+		this.conversations.set(conversationId, updatedConversation);
+		callbacks.onConversation(updatedConversation);
+		callbacks.onDone();
 	}
 
 	async updateDocuments(

@@ -28,6 +28,7 @@ function createRepositoryMock(
 ): ConversationRepository {
 	return {
 		askQuestion: vi.fn().mockResolvedValue(EMPTY_CONVERSATION_CHAT_RESULT),
+		streamQuestion: vi.fn().mockResolvedValue(undefined),
 		updateDocuments: vi.fn().mockResolvedValue(EMPTY_CONVERSATION),
 		...overrides,
 	};
@@ -177,5 +178,101 @@ describe("ConversationService", () => {
 
 		expect(updateDocuments).not.toHaveBeenCalled();
 		expect(response).toEqual(EMPTY_CONVERSATION);
+	});
+
+	it("delegates streamQuestion to repository after validation", async () => {
+		const streamQuestion = vi.fn().mockResolvedValue(undefined);
+		const service = new ConversationService(
+			createRepositoryMock({ streamQuestion }),
+		);
+		const callbacks = {
+			onToken: vi.fn(),
+			onConversation: vi.fn(),
+			onDone: vi.fn(),
+			onError: vi.fn(),
+		};
+
+		await service.streamQuestion(
+			"550e8400-e29b-41d4-a716-446655440000",
+			"550e8400-e29b-41d4-a716-446655440001",
+			"Why did Rome fall?",
+			callbacks,
+		);
+
+		expect(streamQuestion).toHaveBeenCalledWith(
+			"550e8400-e29b-41d4-a716-446655440000",
+			"550e8400-e29b-41d4-a716-446655440001",
+			"Why did Rome fall?",
+			callbacks,
+		);
+	});
+
+	it("calls onError for invalid content id without calling repository", async () => {
+		const streamQuestion = vi.fn();
+		const onError = vi.fn();
+		const service = new ConversationService(
+			createRepositoryMock({ streamQuestion }),
+		);
+
+		await service.streamQuestion(
+			"invalid",
+			"550e8400-e29b-41d4-a716-446655440001",
+			"Why did Rome fall?",
+			{
+				onToken: vi.fn(),
+				onConversation: vi.fn(),
+				onDone: vi.fn(),
+				onError,
+			},
+		);
+
+		expect(streamQuestion).not.toHaveBeenCalled();
+		expect(onError).toHaveBeenCalledWith(expect.any(Error));
+	});
+
+	it("calls onError for invalid conversation id without calling repository", async () => {
+		const streamQuestion = vi.fn();
+		const onError = vi.fn();
+		const service = new ConversationService(
+			createRepositoryMock({ streamQuestion }),
+		);
+
+		await service.streamQuestion(
+			"550e8400-e29b-41d4-a716-446655440000",
+			"invalid",
+			"Why did Rome fall?",
+			{
+				onToken: vi.fn(),
+				onConversation: vi.fn(),
+				onDone: vi.fn(),
+				onError,
+			},
+		);
+
+		expect(streamQuestion).not.toHaveBeenCalled();
+		expect(onError).toHaveBeenCalledWith(expect.any(Error));
+	});
+
+	it("calls onError for empty question without calling repository", async () => {
+		const streamQuestion = vi.fn();
+		const onError = vi.fn();
+		const service = new ConversationService(
+			createRepositoryMock({ streamQuestion }),
+		);
+
+		await service.streamQuestion(
+			"550e8400-e29b-41d4-a716-446655440000",
+			"550e8400-e29b-41d4-a716-446655440001",
+			"   ",
+			{
+				onToken: vi.fn(),
+				onConversation: vi.fn(),
+				onDone: vi.fn(),
+				onError,
+			},
+		);
+
+		expect(streamQuestion).not.toHaveBeenCalled();
+		expect(onError).toHaveBeenCalledWith(expect.any(Error));
 	});
 });

@@ -53,6 +53,27 @@ export interface UpdateConversationDocumentsApiDto {
 	conversation: ConversationApiDto;
 }
 
+export interface ConversationStreamToken {
+	index: number;
+	text: string;
+}
+
+export interface ConversationStreamCallbacks {
+	onToken(token: ConversationStreamToken): void;
+	onConversation(conversation: Conversation): void;
+	onDone(): void;
+	onError(error: Error): void;
+}
+
+export interface ConversationStreamTokenApiDto {
+	index: number;
+	text: string;
+}
+
+export interface ConversationStreamApiDto {
+	conversation: ConversationApiDto;
+}
+
 export const EMPTY_CONVERSATION: Conversation = {
 	id: "",
 	contentId: "",
@@ -180,4 +201,35 @@ export function isValidContentId(contentId: string): boolean {
 
 export function isValidConversationId(conversationId: string): boolean {
 	return CONVERSATION_ID_PATTERN.test(conversationId);
+}
+
+export function mapConversationStreamTokenFromApi(
+	dto: ConversationStreamTokenApiDto,
+): ConversationStreamToken | null {
+	if (
+		typeof dto.index !== "number" ||
+		!Number.isInteger(dto.index) ||
+		dto.index < 0
+	) {
+		return null;
+	}
+
+	if (typeof dto.text !== "string" || dto.text === "") {
+		return null;
+	}
+
+	return {
+		index: dto.index,
+		text: dto.text,
+	};
+}
+
+export function mapConversationStreamFromApi(
+	dto: ConversationStreamApiDto,
+): Conversation | null {
+	if (!dto || typeof dto !== "object" || !("conversation" in dto)) {
+		return null;
+	}
+
+	return mapConversationFromApi(dto.conversation);
 }

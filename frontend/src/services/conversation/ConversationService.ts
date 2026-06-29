@@ -3,6 +3,7 @@ import { createConversationRepository } from "./ConversationRepositoryFactory";
 import {
 	type Conversation,
 	type ConversationChatResult,
+	type ConversationStreamCallbacks,
 	EMPTY_CONVERSATION,
 	EMPTY_CONVERSATION_CHAT_RESULT,
 	isValidContentId,
@@ -39,6 +40,42 @@ export class ConversationService {
 			normalizedContentId,
 			normalizedConversationId,
 			normalizedQuestion,
+		);
+	}
+
+	streamQuestion(
+		contentId: string,
+		conversationId: string,
+		question: string,
+		callbacks: ConversationStreamCallbacks,
+	): Promise<void> {
+		const normalizedContentId = contentId.trim();
+		const normalizedConversationId = conversationId.trim();
+		const normalizedQuestion = question.trim();
+
+		if (normalizedContentId === "" || !isValidContentId(normalizedContentId)) {
+			callbacks.onError(new Error("Invalid content id"));
+			return Promise.resolve();
+		}
+
+		if (
+			normalizedConversationId === "" ||
+			!isValidConversationId(normalizedConversationId)
+		) {
+			callbacks.onError(new Error("Invalid conversation id"));
+			return Promise.resolve();
+		}
+
+		if (normalizedQuestion === "") {
+			callbacks.onError(new Error("Invalid question"));
+			return Promise.resolve();
+		}
+
+		return this.repository.streamQuestion(
+			normalizedContentId,
+			normalizedConversationId,
+			normalizedQuestion,
+			callbacks,
 		);
 	}
 
