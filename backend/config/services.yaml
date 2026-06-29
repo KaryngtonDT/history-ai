@@ -79,9 +79,6 @@ services:
     App\Application\Processing\Ports\ProcessingOrchestratorInterface:
         alias: App\Infrastructure\Processing\HttpWorkerDispatcher
 
-    App\Domain\Semantic\EmbeddingProviderInterface:
-        factory: ['@App\Infrastructure\Semantic\EmbeddingProviderFactory', 'create']
-
     App\Infrastructure\Semantic\EmbeddingProviderFactory:
         arguments:
             $providerName: '%env(default:embedding.provider_default:EMBEDDING_PROVIDER)%'
@@ -89,6 +86,22 @@ services:
             $deterministicProvider: '@App\Infrastructure\Semantic\DeterministicEmbeddingProvider'
             $geminiTransport: '@App\Infrastructure\Semantic\CurlGeminiEmbeddingTransport'
             $geminiModel: '%env(default:gemini.embedding_model_default:GEMINI_EMBEDDING_MODEL)%'
+
+    App\Infrastructure\Semantic\UncachedEmbeddingProvider:
+        factory: ['@App\Infrastructure\Semantic\EmbeddingProviderFactory', 'create']
+
+    App\Domain\Semantic\EmbeddingCacheInterface:
+        alias: App\Infrastructure\Semantic\InMemoryEmbeddingCache
+
+    App\Infrastructure\Semantic\InMemoryEmbeddingCache:
+        arguments:
+            $maxSize: 1000
+
+    App\Domain\Semantic\EmbeddingProviderInterface:
+        class: App\Infrastructure\Semantic\CachedEmbeddingProvider
+        arguments:
+            $inner: '@App\Infrastructure\Semantic\UncachedEmbeddingProvider'
+            $cache: '@App\Infrastructure\Semantic\InMemoryEmbeddingCache'
 
     App\Domain\Semantic\EmbeddingGeneratorInterface:
         alias: App\Infrastructure\Semantic\DeterministicEmbeddingGenerator
