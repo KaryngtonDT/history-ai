@@ -377,7 +377,35 @@ POST /api/contents/{contentId}/agent/run
 | `AgentExecutionTrace` | Props-only display of `plan[]`, `steps[]`, and `finalSummary` |
 | `AgentService` | Validates UUIDs and question length; returns `EMPTY_AGENT_EXECUTION` on client-side invalid input or HTTP 400 |
 | `HttpAgentRepository` | Only agent repository using `HttpClient.post()`; no direct `fetch()` |
-| `DeterministicAgentPlanner` | Keyword-based plan only; executor does not call real Semantic Search, Graph, Chat, or Memory tools yet |
+| `DeterministicAgentPlanner` | Keyword-based plan only; no LLM planner |
+
+### Agent tool execution (backend)
+
+```text
+RunAgentHandler
+      │
+      ▼
+AgentToolExecutorInterface
+      │
+      ▼
+CompositeAgentToolExecutor
+      ├── SemanticSearchToolExecutor → SearchSemanticChunksHandler
+      ├── KnowledgeGraphToolExecutor → GetKnowledgeGraphHandler
+      ├── MultiDocumentChatToolExecutor → AskConversationChatHandler
+      └── NullAgentToolExecutor (ConversationMemory stub)
+```
+
+| Component | Rule |
+| --------- | ---- |
+| `AgentToolExecutorInterface` | Domain port; `RunAgentHandler` depends on this only — not concrete tool classes |
+| `CompositeAgentToolExecutor` | Routes by `AgentTool` enum; wires real executors + fallback no-op |
+| `SemanticSearchToolExecutor` | Delegates to `SearchSemanticChunksHandler`; metadata: `resultCount`, `topScore` |
+| `KnowledgeGraphToolExecutor` | Delegates to `GetKnowledgeGraphHandler`; metadata: `nodeCount`, `edgeCount` |
+| `MultiDocumentChatToolExecutor` | Delegates to `AskConversationChatHandler` when `conversationId` present; metadata: `messageCount`, `sourceCount`, `citationCount` or `requiresConversation` |
+| `NullAgentToolExecutor` | Returns `"No execution."` for stubbed tools (`ConversationMemory`) |
+| Continue-on-failure | Failed tool step marks `failed` summary; remaining steps still execute |
+
+Infrastructure executors must not call HTTP or duplicate Application handler logic.
 
 Processing page agent integration:
 

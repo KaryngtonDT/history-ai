@@ -239,7 +239,25 @@ Shared OpenAPI schemas:
 
 **Platform Sprint 28 note:** Agent Workflows adds `POST /api/contents/{contentId}/agent/run` with `AgentRunRequest`, `AgentExecution`, `AgentPlanStep`, `AgentExecutionStep`, `AgentTool`, and `AgentExecutionStatus`. The endpoint returns a deterministic plan and execution trace only — no real tool calls, persistence, or streaming.
 
+**Platform Sprint 29 note:** Real Tool Execution documents `AgentExecutionStep.metadata` (`object<string, mixed>`) on the agent run response contract. Metadata is tool-specific — see [Agent execution metadata](#agent-execution-metadata) below. Three tools execute real Application handlers; `conversation_memory` remains stubbed.
+
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
+
+---
+
+# Agent execution metadata
+
+`POST /api/contents/{contentId}/agent/run` returns `AgentExecution.steps[]` entries with `order`, `tool`, `status`, `summary`, and `metadata`.
+
+| Tool | Metadata keys | Example |
+| ---- | ------------- | ------- |
+| `semantic_search` | `resultCount`, `topScore` (when results exist) | `{ "resultCount": 3, "topScore": 0.91 }` |
+| `knowledge_graph` | `nodeCount`, `edgeCount` | `{ "nodeCount": 12, "edgeCount": 18 }` |
+| `multi_document_chat` | `messageCount`, `sourceCount`, `citationCount` | `{ "messageCount": 4, "sourceCount": 3, "citationCount": 3 }` |
+| `multi_document_chat` (no conversation) | `requiresConversation` | `{ "requiresConversation": true }` |
+| `conversation_memory` | _(stub — empty object)_ | `{}` |
+
+Zero-result semantic search returns `{ "resultCount": 0 }`. Empty knowledge graph returns `{ "nodeCount": 0, "edgeCount": 0 }`. Multi-document chat requires `conversationId` in `AgentRunRequest` to invoke `AskConversationChatHandler`.
 
 ---
 

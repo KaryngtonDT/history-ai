@@ -1632,11 +1632,18 @@ final class ApiDocumentationTest extends WebTestCase
             $executionStepSchema['properties']['status']['$ref'],
         );
         self::assertSame('string', $executionStepSchema['properties']['summary']['type']);
+        self::assertArrayHasKey('metadata', $executionStepSchema['properties']);
+        self::assertSame('object', $executionStepSchema['properties']['metadata']['type']);
+        self::assertTrue($executionStepSchema['properties']['metadata']['additionalProperties'] ?? false);
+        self::assertArrayHasKey('example', $executionStepSchema['properties']['metadata']);
+        self::assertSame(3, $executionStepSchema['properties']['metadata']['example']['resultCount']);
+        self::assertSame(0.91, $executionStepSchema['properties']['metadata']['example']['topScore']);
         if (isset($executionStepSchema['required'])) {
             self::assertContains('order', $executionStepSchema['required']);
             self::assertContains('tool', $executionStepSchema['required']);
             self::assertContains('status', $executionStepSchema['required']);
             self::assertContains('summary', $executionStepSchema['required']);
+            self::assertContains('metadata', $executionStepSchema['required']);
         }
 
         self::assertSame('string', $toolSchema['type']);

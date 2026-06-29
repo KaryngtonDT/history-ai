@@ -8,7 +8,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Schema(
     schema: 'AgentExecutionStep',
-    required: ['order', 'tool', 'status', 'summary'],
+    required: ['order', 'tool', 'status', 'summary', 'metadata'],
     properties: [
         new OA\Property(
             property: 'order',
@@ -27,7 +27,17 @@ use OpenApi\Attributes as OA;
         new OA\Property(
             property: 'summary',
             type: 'string',
-            example: 'Semantic search prepared.',
+            example: 'Semantic search found 3 relevant chunks.',
+        ),
+        new OA\Property(
+            property: 'metadata',
+            description: 'Tool-specific execution metadata (`object<string, mixed>`). SemanticSearch: `resultCount`, `topScore`. KnowledgeGraph: `nodeCount`, `edgeCount`. MultiDocumentChat: `messageCount`, `sourceCount`, `citationCount`. Missing conversation: `requiresConversation`.',
+            type: 'object',
+            additionalProperties: true,
+            example: [
+                'resultCount' => 3,
+                'topScore' => 0.91,
+            ],
         ),
     ],
 )]

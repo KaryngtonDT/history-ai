@@ -500,6 +500,52 @@ Verification: [Sprint28-Verification.md](../reports/Sprint28-Verification.md)
 
 ---
 
+# Platform Sprint 29 — Real Tool Execution (2026-06)
+
+Platform Sprint 29 wires **real agent tool execution** through `AgentToolExecutorInterface`. Three tools delegate to existing Application handlers; `ConversationMemory` remains a no-op stub. Slice 5 changed **OpenAPI documentation, architecture docs, and verification only** — no business logic in backend handlers, frontend, or worker.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P29-SLICE-01 | `AgentToolExecution`, `AgentToolExecutionResult`, `AgentToolExecutorInterface`, `NullAgentToolExecutor` | ✅ |
+| P29-SLICE-02 | `SemanticSearchToolExecutor` → `SearchSemanticChunksHandler` | ✅ |
+| P29-SLICE-03 | `KnowledgeGraphToolExecutor` → `GetKnowledgeGraphHandler` | ✅ |
+| P29-SLICE-04 | `MultiDocumentChatToolExecutor` → `AskConversationChatHandler` | ✅ |
+| P29-SLICE-05 | OpenAPI metadata, architecture docs, this report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `AgentToolExecution`, `AgentToolExecutionResult`, `AgentToolExecutorInterface`; `AgentExecutionStep.metadata` |
+| Application | `RunAgentHandler` delegates each step to `AgentToolExecutorInterface`; continue-on-failure policy |
+| Infrastructure | `CompositeAgentToolExecutor`, `SemanticSearchToolExecutor`, `KnowledgeGraphToolExecutor`, `MultiDocumentChatToolExecutor`, `NullAgentToolExecutor` |
+| OpenAPI | `AgentExecutionStep.metadata` documented with tool-specific examples |
+
+```text
+AgentModePanel
+        │
+        ▼
+AgentService.runAgent()
+        │
+        ▼
+POST /api/contents/{contentId}/agent/run
+        │
+        ▼
+RunAgentHandler → AgentPlannerInterface
+        │
+        ▼
+CompositeAgentToolExecutor
+        ├── SemanticSearchToolExecutor      ✅ real
+        ├── KnowledgeGraphToolExecutor      ✅ real
+        ├── MultiDocumentChatToolExecutor     ✅ real
+        └── NullAgentToolExecutor           ❌ memory stub
+        │
+        ▼
+AgentExecutionResult + step metadata
+```
+
+Verification: [Sprint29-Verification.md](../reports/Sprint29-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:
