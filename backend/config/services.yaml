@@ -36,7 +36,12 @@ services:
         alias: App\Infrastructure\Agent\DeterministicAgentPlanner
 
     App\Domain\Agent\AgentToolExecutorInterface:
-        alias: App\Infrastructure\Agent\NullAgentToolExecutor
+        alias: App\Infrastructure\Agent\CompositeAgentToolExecutor
+
+    App\Infrastructure\Agent\CompositeAgentToolExecutor:
+        arguments:
+            $semanticSearchToolExecutor: '@App\Infrastructure\Agent\SemanticSearchToolExecutor'
+            $fallbackToolExecutor: '@App\Infrastructure\Agent\NullAgentToolExecutor'
 
     App\Domain\Chat\ChatProviderInterface:
         factory: ['@App\Infrastructure\Chat\ChatProviderFactory', 'create']

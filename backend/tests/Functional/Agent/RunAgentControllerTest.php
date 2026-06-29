@@ -35,8 +35,8 @@ final class RunAgentControllerTest extends WebTestCase
             array_column($response['steps'], 'tool'),
         );
         self::assertSame('completed', $response['steps'][0]['status']);
-        self::assertSame('Semantic search prepared.', $response['steps'][0]['summary']);
-        self::assertSame('Multi-document chat prepared.', $response['steps'][1]['summary']);
+        self::assertSame('Semantic search found no relevant chunks.', $response['steps'][0]['summary']);
+        self::assertSame('No execution.', $response['steps'][1]['summary']);
         self::assertSame('Agent workflow completed.', $response['finalSummary']);
     }
 
@@ -55,7 +55,7 @@ final class RunAgentControllerTest extends WebTestCase
 
         $response = json_decode($client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
         self::assertContains('knowledge_graph', array_column($response['plan'], 'tool'));
-        self::assertSame('Knowledge graph exploration prepared.', $response['steps'][1]['summary']);
+        self::assertSame('No execution.', $response['steps'][1]['summary']);
     }
 
     public function testPostReturnsMemoryPlanWithConversationMemoryStep(): void
@@ -73,7 +73,7 @@ final class RunAgentControllerTest extends WebTestCase
 
         $response = json_decode($client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
         self::assertContains('conversation_memory', array_column($response['plan'], 'tool'));
-        self::assertSame('Conversation memory prepared.', $response['steps'][1]['summary']);
+        self::assertSame('No execution.', $response['steps'][1]['summary']);
     }
 
     public function testPostAcceptsOptionalConversationId(): void

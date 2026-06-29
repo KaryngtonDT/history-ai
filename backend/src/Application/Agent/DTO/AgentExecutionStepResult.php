@@ -8,11 +8,15 @@ use App\Domain\Agent\AgentExecutionStep;
 
 final readonly class AgentExecutionStepResult
 {
+    /**
+     * @param array<string, mixed> $metadata
+     */
     public function __construct(
         public int $order,
         public string $tool,
         public string $status,
         public string $summary,
+        public array $metadata = [],
     ) {
     }
 
@@ -23,6 +27,7 @@ final readonly class AgentExecutionStepResult
             tool: $step->tool()->value,
             status: $step->status()->value,
             summary: $step->summary(),
+            metadata: $step->metadata(),
         );
     }
 }

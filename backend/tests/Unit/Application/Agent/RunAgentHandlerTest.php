@@ -7,26 +7,56 @@ namespace App\Tests\Unit\Application\Agent;
 use App\Application\Agent\Commands\RunAgentCommand;
 use App\Application\Agent\Handlers\RunAgentHandler;
 use App\Domain\Agent\AgentExecutionStatus;
+use App\Domain\Agent\AgentTool;
+use App\Domain\Agent\AgentToolExecution;
+use App\Domain\Agent\AgentToolExecutionResult;
+use App\Domain\Agent\AgentToolExecutorInterface;
 use App\Domain\Agent\Exception\InvalidAgentPlanException;
 use App\Domain\Chat\Exception\InvalidConversationIdException;
 use App\Domain\Content\Exception\InvalidContentIdException;
 use App\Infrastructure\Agent\DeterministicAgentPlanner;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 final class RunAgentHandlerTest extends TestCase
 {
     private const string CONTENT_ID = '550e8400-e29b-41d4-a716-446655440000';
     private const string CONVERSATION_ID = '550e8400-e29b-41d4-a716-446655440001';
 
+    private AgentToolExecutorInterface $toolExecutor;
+
     private RunAgentHandler $handler;
 
     protected function setUp(): void
     {
-        $this->handler = new RunAgentHandler(new DeterministicAgentPlanner());
+        $this->toolExecutor = $this->createMock(AgentToolExecutorInterface::class);
+        $this->handler = new RunAgentHandler(
+            new DeterministicAgentPlanner(),
+            $this->toolExecutor,
+        );
     }
 
     public function testExecutesDefaultPlanInOrder(): void
     {
+        $this->toolExecutor
+            ->expects(self::exactly(2))
+            ->method('execute')
+            ->willReturnCallback(static function (AgentToolExecution $execution): AgentToolExecutionResult {
+                if (AgentTool::SemanticSearch === $execution->tool()) {
+                    return new AgentToolExecutionResult(
+                        AgentTool::SemanticSearch,
+                        'Semantic search found 2 relevant chunks.',
+                        ['resultCount' => 2, 'topScore' => 0.91],
+                    );
+                }
+
+                return new AgentToolExecutionResult(
+                    AgentTool::MultiDocumentChat,
+                    'No execution.',
+                    [],
+                );
+            });
+
         $result = ($this->handler)(new RunAgentCommand(self::CONTENT_ID, 'What is Rome?'));
 
         self::assertSame(
@@ -41,35 +71,125 @@ final class RunAgentHandlerTest extends TestCase
             array_fill(0, 2, AgentExecutionStatus::Completed->value),
             array_map(static fn ($step) => $step->status, $result->steps),
         );
-        self::assertSame('Semantic search prepared.', $result->steps[0]->summary);
-        self::assertSame('Multi-document chat prepared.', $result->steps[1]->summary);
+        self::assertSame('Semantic search found 2 relevant chunks.', $result->steps[0]->summary);
+        self::assertSame(['resultCount' => 2, 'topScore' => 0.91], $result->steps[0]->metadata);
+        self::assertSame('No execution.', $result->steps[1]->summary);
         self::assertSame('Agent workflow completed.', $result->finalSummary);
     }
 
     public function testExecutesComparisonPlanWithKnowledgeGraphStep(): void
     {
+        $this->toolExecutor
+            ->expects(self::exactly(3))
+            ->method('execute')
+            ->willReturnCallback(static function (AgentToolExecution $execution): AgentToolExecutionResult {
+                return match ($execution->tool()) {
+                    AgentTool::SemanticSearch => new AgentToolExecutionResult(
+                        AgentTool::SemanticSearch,
+                        'Semantic search found 1 relevant chunks.',
+                        ['resultCount' => 1, 'topScore' => 0.85],
+                    ),
+                    default => new AgentToolExecutionResult(
+                        $execution->tool(),
+                        'No execution.',
+                        [],
+                    ),
+                };
+            });
+
         $result = ($this->handler)(new RunAgentCommand(self::CONTENT_ID, 'Compare Rome versus Byzantium'));
 
         self::assertSame(
             ['semantic_search', 'knowledge_graph', 'multi_document_chat'],
             array_map(static fn ($step) => $step->tool, $result->plan),
         );
-        self::assertSame('Knowledge graph exploration prepared.', $result->steps[1]->summary);
+        self::assertSame('No execution.', $result->steps[1]->summary);
     }
 
     public function testExecutesMemoryPlanWithConversationMemoryStep(): void
     {
+        $this->toolExecutor
+            ->expects(self::exactly(3))
+            ->method('execute')
+            ->willReturnCallback(static function (AgentToolExecution $execution): AgentToolExecutionResult {
+                return new AgentToolExecutionResult(
+                    $execution->tool(),
+                    AgentTool::SemanticSearch === $execution->tool()
+                        ? 'Semantic search found no relevant chunks.'
+                        : 'No execution.',
+                    AgentTool::SemanticSearch === $execution->tool()
+                        ? ['resultCount' => 0]
+                        : [],
+                );
+            });
+
         $result = ($this->handler)(new RunAgentCommand(self::CONTENT_ID, 'What did we discuss earlier?'));
 
         self::assertSame(
             ['semantic_search', 'conversation_memory', 'multi_document_chat'],
             array_map(static fn ($step) => $step->tool, $result->plan),
         );
-        self::assertSame('Conversation memory prepared.', $result->steps[1]->summary);
+        self::assertSame('No execution.', $result->steps[1]->summary);
+    }
+
+    public function testPassesConversationIdToToolExecutor(): void
+    {
+        $this->toolExecutor
+            ->expects(self::exactly(2))
+            ->method('execute')
+            ->with(self::callback(static function (AgentToolExecution $execution): bool {
+                return self::CONVERSATION_ID === $execution->conversationId();
+            }))
+            ->willReturn(new AgentToolExecutionResult(
+                AgentTool::SemanticSearch,
+                'Semantic search found no relevant chunks.',
+                ['resultCount' => 0],
+            ));
+
+        ($this->handler)(new RunAgentCommand(
+            self::CONTENT_ID,
+            'What is Rome?',
+            self::CONVERSATION_ID,
+        ));
+    }
+
+    public function testMarksFailedStepAndContinuesExecution(): void
+    {
+        $this->toolExecutor
+            ->expects(self::exactly(2))
+            ->method('execute')
+            ->willReturnCallback(static function (AgentToolExecution $execution): AgentToolExecutionResult {
+                if (AgentTool::SemanticSearch === $execution->tool()) {
+                    throw new RuntimeException('Semantic search failed.');
+                }
+
+                return new AgentToolExecutionResult(
+                    AgentTool::MultiDocumentChat,
+                    'No execution.',
+                    [],
+                );
+            });
+
+        $result = ($this->handler)(new RunAgentCommand(self::CONTENT_ID, 'What is Rome?'));
+
+        self::assertSame(AgentExecutionStatus::Failed->value, $result->steps[0]->status);
+        self::assertSame('Tool execution failed.', $result->steps[0]->summary);
+        self::assertSame([], $result->steps[0]->metadata);
+        self::assertSame(AgentExecutionStatus::Completed->value, $result->steps[1]->status);
+        self::assertSame('Agent workflow completed.', $result->finalSummary);
     }
 
     public function testAcceptsOptionalConversationId(): void
     {
+        $this->toolExecutor
+            ->expects(self::exactly(2))
+            ->method('execute')
+            ->willReturn(new AgentToolExecutionResult(
+                AgentTool::SemanticSearch,
+                'Semantic search found no relevant chunks.',
+                ['resultCount' => 0],
+            ));
+
         $result = ($this->handler)(new RunAgentCommand(
             self::CONTENT_ID,
             'What is Rome?',
@@ -82,6 +202,16 @@ final class RunAgentHandlerTest extends TestCase
 
     public function testIgnoresBlankConversationId(): void
     {
+        $this->toolExecutor
+            ->expects(self::exactly(2))
+            ->method('execute')
+            ->with(self::callback(static fn (AgentToolExecution $execution): bool => null === $execution->conversationId()))
+            ->willReturn(new AgentToolExecutionResult(
+                AgentTool::SemanticSearch,
+                'Semantic search found no relevant chunks.',
+                ['resultCount' => 0],
+            ));
+
         $result = ($this->handler)(new RunAgentCommand(
             self::CONTENT_ID,
             'What is Rome?',
@@ -93,6 +223,8 @@ final class RunAgentHandlerTest extends TestCase
 
     public function testRejectsInvalidContentId(): void
     {
+        $this->toolExecutor->expects(self::never())->method('execute');
+
         $this->expectException(InvalidContentIdException::class);
 
         ($this->handler)(new RunAgentCommand('not-a-valid-uuid', 'What is Rome?'));
@@ -100,6 +232,8 @@ final class RunAgentHandlerTest extends TestCase
 
     public function testRejectsInvalidConversationId(): void
     {
+        $this->toolExecutor->expects(self::never())->method('execute');
+
         $this->expectException(InvalidConversationIdException::class);
 
         ($this->handler)(new RunAgentCommand(
@@ -111,6 +245,8 @@ final class RunAgentHandlerTest extends TestCase
 
     public function testRejectsEmptyQuestion(): void
     {
+        $this->toolExecutor->expects(self::never())->method('execute');
+
         $this->expectException(InvalidAgentPlanException::class);
         $this->expectExceptionMessage('Agent question cannot be empty');
 
@@ -119,6 +255,20 @@ final class RunAgentHandlerTest extends TestCase
 
     public function testProducesDeterministicExecutionTrace(): void
     {
+        $this->toolExecutor
+            ->method('execute')
+            ->willReturnCallback(static function (AgentToolExecution $execution): AgentToolExecutionResult {
+                return new AgentToolExecutionResult(
+                    $execution->tool(),
+                    AgentTool::SemanticSearch === $execution->tool()
+                        ? 'Semantic search found 1 relevant chunks.'
+                        : 'No execution.',
+                    AgentTool::SemanticSearch === $execution->tool()
+                        ? ['resultCount' => 1, 'topScore' => 0.9]
+                        : [],
+                );
+            });
+
         $command = new RunAgentCommand(self::CONTENT_ID, 'Compare Rome versus Byzantium');
 
         $first = ($this->handler)($command);

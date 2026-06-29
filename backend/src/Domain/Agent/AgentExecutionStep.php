@@ -10,11 +10,15 @@ final readonly class AgentExecutionStep
 {
     private string $summary;
 
+    /**
+     * @param array<string, mixed> $metadata
+     */
     public function __construct(
         private int $order,
         private AgentTool $tool,
         private AgentExecutionStatus $status,
         string $summary,
+        private array $metadata = [],
     ) {
         if ($order < 0) {
             throw new InvalidAgentPlanException(
@@ -51,11 +55,20 @@ final readonly class AgentExecutionStep
         return $this->summary;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    public function metadata(): array
+    {
+        return $this->metadata;
+    }
+
     public function equals(self $other): bool
     {
         return $this->order === $other->order
             && $this->tool === $other->tool
             && $this->status === $other->status
-            && $this->summary === $other->summary;
+            && $this->summary === $other->summary
+            && $this->metadata === $other->metadata;
     }
 }
