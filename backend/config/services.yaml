@@ -32,6 +32,9 @@ services:
     App\Domain\Semantic\SemanticRetriever: ~
     App\Domain\Chat\ChatOrchestrator: ~
 
+    App\Domain\Agent\AgentPlannerInterface:
+        alias: App\Infrastructure\Agent\DeterministicAgentPlanner
+
     App\Domain\Chat\ChatProviderInterface:
         factory: ['@App\Infrastructure\Chat\ChatProviderFactory', 'create']
 
