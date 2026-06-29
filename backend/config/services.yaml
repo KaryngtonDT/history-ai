@@ -39,12 +39,13 @@ services:
         alias: App\Infrastructure\Agent\CompositeAgentToolExecutor
 
     App\Domain\Agent\ConversationMemoryToolExecutorInterface:
-        alias: App\Infrastructure\Agent\NullConversationMemoryToolExecutor
+        alias: App\Infrastructure\Agent\ConversationMemoryToolExecutor
 
     App\Infrastructure\Agent\CompositeAgentToolExecutor:
         arguments:
             $semanticSearchToolExecutor: '@App\Infrastructure\Agent\SemanticSearchToolExecutor'
             $knowledgeGraphToolExecutor: '@App\Infrastructure\Agent\KnowledgeGraphToolExecutor'
+            $conversationMemoryToolExecutor: '@App\Infrastructure\Agent\ConversationMemoryAgentToolExecutor'
             $multiDocumentChatToolExecutor: '@App\Infrastructure\Agent\MultiDocumentChatToolExecutor'
             $fallbackToolExecutor: '@App\Infrastructure\Agent\NullAgentToolExecutor'
 

@@ -73,7 +73,7 @@ final class RunAgentControllerTest extends WebTestCase
 
         $response = json_decode($client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
         self::assertContains('conversation_memory', array_column($response['plan'], 'tool'));
-        self::assertSame('No execution.', $response['steps'][1]['summary']);
+        self::assertSame('No conversation memory.', $response['steps'][1]['summary']);
     }
 
     public function testPostAcceptsOptionalConversationId(): void

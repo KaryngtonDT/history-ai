@@ -132,7 +132,7 @@ final class RunAgentHandlerTest extends TestCase
                     ),
                     AgentTool::ConversationMemory => new AgentToolExecutionResult(
                         AgentTool::ConversationMemory,
-                        'No execution.',
+                        'No conversation memory.',
                         [],
                     ),
                     default => new AgentToolExecutionResult(
@@ -149,7 +149,7 @@ final class RunAgentHandlerTest extends TestCase
             ['semantic_search', 'conversation_memory', 'multi_document_chat'],
             array_map(static fn ($step) => $step->tool, $result->plan),
         );
-        self::assertSame('No execution.', $result->steps[1]->summary);
+        self::assertSame('No conversation memory.', $result->steps[1]->summary);
     }
 
     public function testPassesConversationIdToToolExecutor(): void

@@ -14,6 +14,7 @@ final class CompositeAgentToolExecutor implements AgentToolExecutorInterface
     public function __construct(
         private readonly AgentToolExecutorInterface $semanticSearchToolExecutor,
         private readonly AgentToolExecutorInterface $knowledgeGraphToolExecutor,
+        private readonly AgentToolExecutorInterface $conversationMemoryToolExecutor,
         private readonly AgentToolExecutorInterface $multiDocumentChatToolExecutor,
         private readonly AgentToolExecutorInterface $fallbackToolExecutor,
     ) {
@@ -24,6 +25,7 @@ final class CompositeAgentToolExecutor implements AgentToolExecutorInterface
         return match ($execution->tool()) {
             AgentTool::SemanticSearch => $this->semanticSearchToolExecutor->execute($execution),
             AgentTool::KnowledgeGraph => $this->knowledgeGraphToolExecutor->execute($execution),
+            AgentTool::ConversationMemory => $this->conversationMemoryToolExecutor->execute($execution),
             AgentTool::MultiDocumentChat => $this->multiDocumentChatToolExecutor->execute($execution),
             default => $this->fallbackToolExecutor->execute($execution),
         };

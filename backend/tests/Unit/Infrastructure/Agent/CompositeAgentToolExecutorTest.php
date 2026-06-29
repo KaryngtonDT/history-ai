@@ -20,6 +20,7 @@ final class CompositeAgentToolExecutorTest extends TestCase
             $this->createMock(AgentToolExecutorInterface::class),
             $this->createMock(AgentToolExecutorInterface::class),
             $this->createMock(AgentToolExecutorInterface::class),
+            $this->createMock(AgentToolExecutorInterface::class),
             new NullAgentToolExecutor(),
         );
 
@@ -49,6 +50,9 @@ final class CompositeAgentToolExecutorTest extends TestCase
         $knowledgeGraphExecutor = $this->createMock(AgentToolExecutorInterface::class);
         $knowledgeGraphExecutor->expects(self::never())->method('execute');
 
+        $conversationMemoryExecutor = $this->createMock(AgentToolExecutorInterface::class);
+        $conversationMemoryExecutor->expects(self::never())->method('execute');
+
         $multiDocumentChatExecutor = $this->createMock(AgentToolExecutorInterface::class);
         $multiDocumentChatExecutor->expects(self::never())->method('execute');
 
@@ -58,6 +62,7 @@ final class CompositeAgentToolExecutorTest extends TestCase
         $result = (new CompositeAgentToolExecutor(
             $semanticExecutor,
             $knowledgeGraphExecutor,
+            $conversationMemoryExecutor,
             $multiDocumentChatExecutor,
             $fallbackExecutor,
         ))->execute($execution);
@@ -88,6 +93,9 @@ final class CompositeAgentToolExecutorTest extends TestCase
             ->with($execution)
             ->willReturn($expected);
 
+        $conversationMemoryExecutor = $this->createMock(AgentToolExecutorInterface::class);
+        $conversationMemoryExecutor->expects(self::never())->method('execute');
+
         $multiDocumentChatExecutor = $this->createMock(AgentToolExecutorInterface::class);
         $multiDocumentChatExecutor->expects(self::never())->method('execute');
 
@@ -97,6 +105,55 @@ final class CompositeAgentToolExecutorTest extends TestCase
         $result = (new CompositeAgentToolExecutor(
             $semanticExecutor,
             $knowledgeGraphExecutor,
+            $conversationMemoryExecutor,
+            $multiDocumentChatExecutor,
+            $fallbackExecutor,
+        ))->execute($execution);
+
+        self::assertSame($expected, $result);
+    }
+
+    public function testRoutesConversationMemoryToConversationMemoryToolExecutor(): void
+    {
+        $execution = new AgentToolExecution(
+            AgentTool::ConversationMemory,
+            'What did we discuss earlier?',
+            '550e8400-e29b-41d4-a716-446655440000',
+            '550e8400-e29b-41d4-a716-446655440001',
+        );
+        $expected = new AgentToolExecutionResult(
+            AgentTool::ConversationMemory,
+            'Conversation memory contains 4 messages.',
+            [
+                'messageCount' => 4,
+                'userMessages' => 2,
+                'assistantMessages' => 2,
+            ],
+        );
+
+        $semanticExecutor = $this->createMock(AgentToolExecutorInterface::class);
+        $semanticExecutor->expects(self::never())->method('execute');
+
+        $knowledgeGraphExecutor = $this->createMock(AgentToolExecutorInterface::class);
+        $knowledgeGraphExecutor->expects(self::never())->method('execute');
+
+        $conversationMemoryExecutor = $this->createMock(AgentToolExecutorInterface::class);
+        $conversationMemoryExecutor
+            ->expects(self::once())
+            ->method('execute')
+            ->with($execution)
+            ->willReturn($expected);
+
+        $multiDocumentChatExecutor = $this->createMock(AgentToolExecutorInterface::class);
+        $multiDocumentChatExecutor->expects(self::never())->method('execute');
+
+        $fallbackExecutor = $this->createMock(AgentToolExecutorInterface::class);
+        $fallbackExecutor->expects(self::never())->method('execute');
+
+        $result = (new CompositeAgentToolExecutor(
+            $semanticExecutor,
+            $knowledgeGraphExecutor,
+            $conversationMemoryExecutor,
             $multiDocumentChatExecutor,
             $fallbackExecutor,
         ))->execute($execution);
@@ -124,6 +181,9 @@ final class CompositeAgentToolExecutorTest extends TestCase
         $knowledgeGraphExecutor = $this->createMock(AgentToolExecutorInterface::class);
         $knowledgeGraphExecutor->expects(self::never())->method('execute');
 
+        $conversationMemoryExecutor = $this->createMock(AgentToolExecutorInterface::class);
+        $conversationMemoryExecutor->expects(self::never())->method('execute');
+
         $multiDocumentChatExecutor = $this->createMock(AgentToolExecutorInterface::class);
         $multiDocumentChatExecutor
             ->expects(self::once())
@@ -137,49 +197,11 @@ final class CompositeAgentToolExecutorTest extends TestCase
         $result = (new CompositeAgentToolExecutor(
             $semanticExecutor,
             $knowledgeGraphExecutor,
+            $conversationMemoryExecutor,
             $multiDocumentChatExecutor,
             $fallbackExecutor,
         ))->execute($execution);
 
         self::assertSame($expected, $result);
-    }
-
-    public function testRoutesConversationMemoryToNullAgentToolExecutor(): void
-    {
-        $execution = new AgentToolExecution(
-            AgentTool::ConversationMemory,
-            'What did we discuss earlier?',
-            '550e8400-e29b-41d4-a716-446655440000',
-        );
-
-        $semanticExecutor = $this->createMock(AgentToolExecutorInterface::class);
-        $semanticExecutor->expects(self::never())->method('execute');
-
-        $knowledgeGraphExecutor = $this->createMock(AgentToolExecutorInterface::class);
-        $knowledgeGraphExecutor->expects(self::never())->method('execute');
-
-        $multiDocumentChatExecutor = $this->createMock(AgentToolExecutorInterface::class);
-        $multiDocumentChatExecutor->expects(self::never())->method('execute');
-
-        $fallbackExecutor = $this->createMock(AgentToolExecutorInterface::class);
-        $fallbackExecutor
-            ->expects(self::once())
-            ->method('execute')
-            ->with($execution)
-            ->willReturn(new AgentToolExecutionResult(
-                AgentTool::ConversationMemory,
-                'No execution.',
-                [],
-            ));
-
-        $result = (new CompositeAgentToolExecutor(
-            $semanticExecutor,
-            $knowledgeGraphExecutor,
-            $multiDocumentChatExecutor,
-            $fallbackExecutor,
-        ))->execute($execution);
-
-        self::assertSame('No execution.', $result->summary());
-        self::assertSame([], $result->metadata());
     }
 }
