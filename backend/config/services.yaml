@@ -12,6 +12,9 @@ parameters:
 
     video.upload_max_bytes: '%env(int:default:video.upload_max_bytes_default:VIDEO_UPLOAD_MAX_BYTES)%'
     video.storage_dir: '%kernel.project_dir%/var/video-storage'
+    stt.provider_default: 'faster_whisper'
+    stt.faster_whisper.binary_default: 'faster-whisper'
+    stt.faster_whisper.model_default: 'base'
 
 services:
     _defaults:
@@ -29,6 +32,7 @@ services:
         exclude:
             - '../src/Infrastructure/Semantic/EmbeddingProviderFactory.php'
             - '../src/Infrastructure/Chat/ChatProviderFactory.php'
+            - '../src/Infrastructure/Speech/SpeechToTextProviderFactory.php'
 
     App\Domain\Recommendation\RecommendationEngine: ~
     App\Domain\Recommendation\RecommendationScoringEngine: ~
@@ -189,3 +193,15 @@ services:
     App\Infrastructure\Video\LocalVideoStorage:
         arguments:
             $storageDirectory: '%video.storage_dir%'
+
+    App\Domain\Speech\SpeechToTextProviderInterface:
+        factory: ['@App\Infrastructure\Speech\SpeechToTextProviderFactory', 'create']
+
+    App\Infrastructure\Speech\SpeechToTextProviderFactory:
+        arguments:
+            $providerName: '%env(default:stt.provider_default:STT_PROVIDER)%'
+
+    App\Infrastructure\Speech\FasterWhisperProvider:
+        arguments:
+            $binary: '%env(default:stt.faster_whisper.binary_default:STT_FASTER_WHISPER_BINARY)%'
+            $model: '%env(default:stt.faster_whisper.model_default:STT_FASTER_WHISPER_MODEL)%'
