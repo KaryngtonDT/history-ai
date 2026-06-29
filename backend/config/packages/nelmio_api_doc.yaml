@@ -50,6 +50,12 @@ nelmio_api_doc:
             - { alias: PerformanceMetric, type: App\Presentation\OpenApi\Schema\PerformanceMetric }
             - { alias: PerformanceMetricSnapshot, type: App\Presentation\OpenApi\Schema\PerformanceMetricSnapshot }
             - { alias: PlatformMetricsResponse, type: App\Presentation\OpenApi\Schema\PlatformMetricsResponse }
+            - { alias: AgentTool, type: App\Presentation\OpenApi\Schema\AgentToolSchema }
+            - { alias: AgentExecutionStatus, type: App\Presentation\OpenApi\Schema\AgentExecutionStatusSchema }
+            - { alias: AgentPlanStep, type: App\Presentation\OpenApi\Schema\AgentPlanStep }
+            - { alias: AgentExecutionStep, type: App\Presentation\OpenApi\Schema\AgentExecutionStep }
+            - { alias: AgentExecution, type: App\Presentation\OpenApi\Schema\AgentExecution }
+            - { alias: AgentRunRequest, type: App\Presentation\OpenApi\Schema\AgentRunRequest }
     areas:
         default:
             path_patterns:

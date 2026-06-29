@@ -456,6 +456,50 @@ Verification: [Sprint27-Verification.md](../reports/Sprint27-Verification.md)
 
 ---
 
+# Platform Sprint 28 — Agent Workflows (2026-06)
+
+Platform Sprint 28 delivers deterministic agent planning, execution trace projection, HTTP API, frontend agent mode, and OpenAPI documentation. Slice 5 changed **OpenAPI documentation, architecture docs, and verification only** — no business logic in backend handlers, frontend, or worker.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P28-SLICE-01 | Agent domain (`AgentTool`, `AgentPlan`, `AgentStep`, collections) | ✅ |
+| P28-SLICE-02 | `DeterministicAgentPlanner`, keyword-based plan expansion | ✅ |
+| P28-SLICE-03 | `RunAgentHandler`, execution trace DTOs (no real tool calls) | ✅ |
+| P28-SLICE-04 | `POST …/agent/run`; `AgentModePanel` + execution trace UI | ✅ |
+| P28-SLICE-05 | OpenAPI + architecture docs + this report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `AgentTool`, `AgentPlan`, `AgentStep`, `AgentExecutionResult`, status enum |
+| Application | `RunAgentHandler`; plan + steps + `finalSummary` DTOs |
+| Infrastructure | `DeterministicAgentPlanner` (comparison/memory keywords) |
+| Backend API | `POST /api/contents/{contentId}/agent/run` |
+| Frontend | `AgentService`, `AgentModePanel`, `AgentExecutionTrace` |
+| OpenAPI | `AgentRunRequest`, `AgentExecution`, `AgentTool`, `AgentExecutionStatus` |
+
+```text
+AgentModePanel
+        │
+        ▼
+AgentService.runAgent()
+        │
+        ▼
+POST /api/contents/{contentId}/agent/run
+        │
+        ▼
+RunAgentHandler → DeterministicAgentPlanner
+        │
+        ▼
+AgentExecution (plan[], steps[], finalSummary)
+        │
+        ▼
+AgentExecutionTrace UI
+```
+
+Verification: [Sprint28-Verification.md](../reports/Sprint28-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

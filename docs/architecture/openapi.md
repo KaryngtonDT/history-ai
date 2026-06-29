@@ -60,6 +60,7 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Graph | GET | `/api/conversations/{conversationId}/graph` |
 | Recommendations | GET | `/api/contents/{contentId}/artifacts/{artifactId}/recommendations` |
 | Semantic | GET | `/api/contents/{contentId}/semantic-search` |
+| Agent | POST | `/api/contents/{contentId}/agent/run` |
 | Chat | POST | `/api/contents/{contentId}/chat` |
 | Chat | POST | `/api/contents/{contentId}/chat/stream` |
 | Chat | POST | `/api/contents/{contentId}/conversations/{conversationId}/chat` |
@@ -235,6 +236,8 @@ Shared OpenAPI schemas:
 **Platform Sprint 26 note:** Conversation streaming adds `ConversationStreamEvent` and `POST /api/contents/{contentId}/conversations/{conversationId}/chat/stream` (`text/event-stream` with `token`, `conversation`, and `done` events).
 
 **Platform Sprint 27 note:** Knowledge Graph Explorer 2.0 adds `GraphNeighborhood`, `GraphNeighborhoodNode`, and documents `GraphEdge.weight` for neighborhood edges. Content-level `KnowledgeGraph` responses omit `weight` on edges. New paths: `GET …/graph/artifacts/{artifactId}/neighborhood` and `GET /api/conversations/{conversationId}/graph`.
+
+**Platform Sprint 28 note:** Agent Workflows adds `POST /api/contents/{contentId}/agent/run` with `AgentRunRequest`, `AgentExecution`, `AgentPlanStep`, `AgentExecutionStep`, `AgentTool`, and `AgentExecutionStatus`. The endpoint returns a deterministic plan and execution trace only — no real tool calls, persistence, or streaming.
 
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 

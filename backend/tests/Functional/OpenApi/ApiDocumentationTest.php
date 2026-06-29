@@ -22,6 +22,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/contents/{contentId}/graph/artifacts/{artifactId}/neighborhood',
         '/api/contents/{contentId}/artifacts/{artifactId}/recommendations',
         '/api/contents/{contentId}/semantic-search',
+        '/api/contents/{contentId}/agent/run',
         '/api/contents/{contentId}/chat',
         '/api/contents/{contentId}/chat/stream',
         '/api/contents/{contentId}/conversations/{conversationId}/chat',
@@ -79,6 +80,7 @@ final class ApiDocumentationTest extends WebTestCase
             $spec['paths']['/api/contents/{contentId}/artifacts/{artifactId}/recommendations'],
         );
         self::assertArrayHasKey('get', $spec['paths']['/api/contents/{contentId}/semantic-search']);
+        self::assertArrayHasKey('post', $spec['paths']['/api/contents/{contentId}/agent/run']);
         self::assertArrayHasKey('post', $spec['paths']['/api/contents/{contentId}/chat']);
         self::assertArrayHasKey('post', $spec['paths']['/api/contents/{contentId}/chat/stream']);
         self::assertArrayHasKey(
@@ -1501,6 +1503,152 @@ final class ApiDocumentationTest extends WebTestCase
         if (isset($responseSchema['required'])) {
             self::assertContains('snapshots', $responseSchema['required']);
         }
+    }
+
+    public function testOpenApiSpecDocumentsRunContentAgentPathParameter(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/contents/{contentId}/agent/run']['post'];
+
+        self::assertSame('runContentAgent', $operation['operationId']);
+
+        $pathParameter = null;
+
+        foreach ($operation['parameters'] as $parameter) {
+            if (($parameter['name'] ?? null) === 'contentId') {
+                $pathParameter = $parameter;
+                break;
+            }
+        }
+
+        self::assertNotNull($pathParameter, 'Missing path parameter: contentId');
+        self::assertSame('path', $pathParameter['in']);
+        self::assertTrue($pathParameter['required']);
+        self::assertSame('string', $pathParameter['schema']['type']);
+        self::assertSame('uuid', $pathParameter['schema']['format']);
+        self::assertSame('550e8400-e29b-41d4-a716-446655440000', $pathParameter['example']);
+    }
+
+    public function testOpenApiSpecDocumentsRunContentAgentRequestBody(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $requestBody = $spec['paths']['/api/contents/{contentId}/agent/run']['post']['requestBody'];
+
+        self::assertTrue($requestBody['required']);
+        self::assertSame(
+            '#/components/schemas/AgentRunRequest',
+            $requestBody['content']['application/json']['schema']['$ref'],
+        );
+
+        $requestSchema = $spec['components']['schemas']['AgentRunRequest'];
+        $questionProperty = $requestSchema['properties']['question'];
+        $conversationIdProperty = $requestSchema['properties']['conversationId'];
+
+        self::assertSame('string', $questionProperty['type']);
+        self::assertSame(1, $questionProperty['minLength']);
+        self::assertSame(2000, $questionProperty['maxLength']);
+        self::assertSame('Compare Rome and Byzantium', $questionProperty['example']);
+        self::assertContains('string', (array) $conversationIdProperty['type']);
+        self::assertSame('uuid', $conversationIdProperty['format']);
+        self::assertContains('question', $requestSchema['required']);
+        self::assertNotContains('conversationId', $requestSchema['required'] ?? []);
+    }
+
+    public function testOpenApiSpecDocumentsRunContentAgentResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/contents/{contentId}/agent/run']['post']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Agent plan and execution trace', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/AgentExecution',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsAgentSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('AgentRunRequest', $spec['components']['schemas']);
+        self::assertArrayHasKey('AgentExecution', $spec['components']['schemas']);
+        self::assertArrayHasKey('AgentPlanStep', $spec['components']['schemas']);
+        self::assertArrayHasKey('AgentExecutionStep', $spec['components']['schemas']);
+        self::assertArrayHasKey('AgentTool', $spec['components']['schemas']);
+        self::assertArrayHasKey('AgentExecutionStatus', $spec['components']['schemas']);
+
+        $executionSchema = $spec['components']['schemas']['AgentExecution'];
+        $planStepSchema = $spec['components']['schemas']['AgentPlanStep'];
+        $executionStepSchema = $spec['components']['schemas']['AgentExecutionStep'];
+        $toolSchema = $spec['components']['schemas']['AgentTool'];
+        $statusSchema = $spec['components']['schemas']['AgentExecutionStatus'];
+
+        self::assertArrayHasKey('plan', $executionSchema['properties']);
+        self::assertArrayHasKey('steps', $executionSchema['properties']);
+        self::assertArrayHasKey('finalSummary', $executionSchema['properties']);
+        self::assertSame('array', $executionSchema['properties']['plan']['type']);
+        self::assertSame('array', $executionSchema['properties']['steps']['type']);
+        self::assertSame(
+            '#/components/schemas/AgentPlanStep',
+            $executionSchema['properties']['plan']['items']['$ref'],
+        );
+        self::assertSame(
+            '#/components/schemas/AgentExecutionStep',
+            $executionSchema['properties']['steps']['items']['$ref'],
+        );
+        self::assertSame('string', $executionSchema['properties']['finalSummary']['type']);
+        self::assertSame('Agent workflow completed.', $executionSchema['properties']['finalSummary']['example']);
+        if (isset($executionSchema['required'])) {
+            self::assertContains('plan', $executionSchema['required']);
+            self::assertContains('steps', $executionSchema['required']);
+            self::assertContains('finalSummary', $executionSchema['required']);
+        }
+
+        self::assertSame(
+            '#/components/schemas/AgentTool',
+            $planStepSchema['properties']['tool']['$ref'],
+        );
+        self::assertSame('string', $planStepSchema['properties']['description']['type']);
+        if (isset($planStepSchema['required'])) {
+            self::assertContains('order', $planStepSchema['required']);
+            self::assertContains('tool', $planStepSchema['required']);
+            self::assertContains('description', $planStepSchema['required']);
+        }
+
+        self::assertSame(
+            '#/components/schemas/AgentTool',
+            $executionStepSchema['properties']['tool']['$ref'],
+        );
+        self::assertSame(
+            '#/components/schemas/AgentExecutionStatus',
+            $executionStepSchema['properties']['status']['$ref'],
+        );
+        self::assertSame('string', $executionStepSchema['properties']['summary']['type']);
+        if (isset($executionStepSchema['required'])) {
+            self::assertContains('order', $executionStepSchema['required']);
+            self::assertContains('tool', $executionStepSchema['required']);
+            self::assertContains('status', $executionStepSchema['required']);
+            self::assertContains('summary', $executionStepSchema['required']);
+        }
+
+        self::assertSame('string', $toolSchema['type']);
+        self::assertSame(
+            ['semantic_search', 'knowledge_graph', 'conversation_memory', 'multi_document_chat'],
+            $toolSchema['enum'],
+        );
+        self::assertSame('semantic_search', $toolSchema['example']);
+
+        self::assertSame('string', $statusSchema['type']);
+        self::assertSame(['completed', 'skipped', 'failed'], $statusSchema['enum']);
+        self::assertSame('completed', $statusSchema['example']);
     }
 
     /**

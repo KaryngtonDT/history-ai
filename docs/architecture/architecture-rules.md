@@ -167,6 +167,7 @@ HttpClient + Repository (Http / Mock)
 | Feature modules must not import Map transport (`HttpMapRepository`, `MapRepositoryFactory`, `MapRepository`) | Map UI uses `MapService` only |
 | Feature modules must not import Relation transport (`HttpRelationRepository`, `RelationRepositoryFactory`, `RelationRepository`) | Relations UI uses `RelationService` only |
 | Feature modules must not import Graph transport (`HttpGraphRepository`, `GraphRepositoryFactory`, `GraphRepository`) | Graph UI uses `GraphService` only |
+| Feature modules must not import Agent transport (`HttpAgentRepository`, `AgentRepositoryFactory`, `AgentRepository`) | Agent UI uses `AgentService` only |
 | Feature modules must not import Recommendation transport (`HttpRecommendationRepository`, `RecommendationRepositoryFactory`, `RecommendationRepository`) | Recommendations UI uses `RecommendationService` only |
 | `InteractiveTimeline` must not import services or repositories | Structured timeline rendering is props-only |
 | `InteractiveMap` must not import services or repositories | Map rendering is props-only |
@@ -175,6 +176,7 @@ HttpClient + Repository (Http / Mock)
 | Map panels may import `MapService` | Service layer owns HTTP/mock wiring |
 | Relation panels may import `RelationService` | Service layer owns HTTP/mock wiring |
 | Graph panels may import `GraphService` | Service layer owns HTTP/mock wiring |
+| Agent panels may import `AgentService` | Service layer owns HTTP/mock wiring |
 | Recommendation panels may import `RecommendationService` | Service layer owns HTTP/mock wiring |
 
 Repository factories and Http repositories live under `services/` and are consumed by service classes only.
@@ -345,10 +347,51 @@ ProcessingArtifacts
         ├── artifact cards (id="artifact-{type}" anchors)
         ├── ArtifactRelationsPanel
         ├── KnowledgeGraphPanel
+        ├── AgentModePanel → AgentExecutionTrace (props-only)
         └── SemanticSearchPanel → SemanticSearchResults (props-only)
 ```
 
 `SemanticSearchResults` is props-only and must not import services or repositories.
+
+### Agent service layer
+
+```text
+features/agent/AgentModePanel
+      │
+      ▼
+AgentService.runAgent(contentId, question, conversationId?)
+      │
+      ▼
+AgentRepositoryFactory → HttpAgentRepository | MockAgentRepository
+      │
+      ▼
+HttpClient (HTTP mode only)
+      │
+      ▼
+POST /api/contents/{contentId}/agent/run
+```
+
+| Component | Rule |
+| --------- | ---- |
+| `AgentModePanel` | Owns question, loading, error, and result state; calls `agentService.runAgent()` only |
+| `AgentExecutionTrace` | Props-only display of `plan[]`, `steps[]`, and `finalSummary` |
+| `AgentService` | Validates UUIDs and question length; returns `EMPTY_AGENT_EXECUTION` on client-side invalid input or HTTP 400 |
+| `HttpAgentRepository` | Only agent repository using `HttpClient.post()`; no direct `fetch()` |
+| `DeterministicAgentPlanner` | Keyword-based plan only; executor does not call real Semantic Search, Graph, Chat, or Memory tools yet |
+
+Processing page agent integration:
+
+```text
+ProcessingArtifacts
+        │
+        ├── artifact cards (id="artifact-{type}" anchors)
+        ├── ArtifactRelationsPanel
+        ├── KnowledgeGraphPanel
+        ├── AgentModePanel
+        └── SemanticSearchPanel
+```
+
+`AgentModePanel` accepts optional `conversationId` for future ChatPanel wiring; omitted on the processing page in Sprint 28 slice 4.
 
 ### Vector store layer (backend)
 

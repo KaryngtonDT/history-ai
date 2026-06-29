@@ -13,6 +13,7 @@ use App\Domain\Content\Exception\InvalidContentIdException;
 use App\Presentation\Http\Request\Agent\Exception\InvalidAgentRequestException;
 use App\Presentation\Http\Request\Agent\RunAgentRequest;
 use App\Presentation\Http\Response\Agent\AgentExecutionResponse;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +22,37 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class RunAgentController extends AbstractController
 {
+    #[OA\Post(
+        operationId: 'runContentAgent',
+        summary: 'Run deterministic agent workflow',
+        description: 'Plans and executes a deterministic agent workflow for a content resource, returning the plan and execution trace without calling real tools.',
+        tags: ['Agent'],
+        parameters: [
+            new OA\Parameter(
+                name: 'contentId',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid'),
+                example: '550e8400-e29b-41d4-a716-446655440000',
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/AgentRunRequest'),
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Agent plan and execution trace',
+                content: new OA\JsonContent(ref: '#/components/schemas/AgentExecution'),
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid request',
+                content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse'),
+            ),
+        ],
+    )]
     #[Route(
         '/api/contents/{contentId}/agent/run',
         name: 'api_contents_agent_run',
