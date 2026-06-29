@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/Button";
 import styles from "./QuickActions.module.css";
 
 const actions = [
-	{ label: "Import PDF" },
-	{ label: "Import Audio" },
-	{ label: "Import Video" },
+	{ label: "Import PDF", path: "/import" },
+	{ label: "Import Audio", path: "/import" },
+	{ label: "Import Video", path: "/video/upload" },
 ] as const;
 
 export function QuickActions() {
@@ -13,12 +13,12 @@ export function QuickActions() {
 
 	return (
 		<div className={styles.root}>
-			{actions.map(({ label }) => (
+			{actions.map(({ label, path }) => (
 				<Button
 					key={label}
 					variant="secondary"
 					size="md"
-					onClick={() => navigate("/import")}
+					onClick={() => navigate(path)}
 				>
 					{label}
 				</Button>

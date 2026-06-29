@@ -1,0 +1,44 @@
+.card {
+	padding: var(--space-5);
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-3);
+}
+
+.title {
+	margin: 0;
+	font-size: var(--font-md);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.fileName {
+	margin: var(--space-2) 0 0;
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
+.message {
+	margin: var(--space-4) 0 0;
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
+.videoId {
+	font-family: var(--font-mono, monospace);
+	color: var(--shell-text);
+}
+
+.hint {
+	margin: var(--space-2) 0 0;
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
+.action {
+	margin-top: var(--space-5);
+}

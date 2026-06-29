@@ -1,5 +1,9 @@
 import { ApiError, NetworkError } from "@/shared/errors";
 
+export interface PostFormDataOptions {
+	onProgress?: (progress: number) => void;
+}
+
 export class HttpClient {
 	private readonly baseUrl: string;
 
@@ -36,6 +40,57 @@ export class HttpClient {
 
 	async put<T>(path: string, body: unknown): Promise<T> {
 		return this.request<T>("PUT", path, body);
+	}
+
+	postFormData<T>(
+		path: string,
+		formData: FormData,
+		options: PostFormDataOptions = {},
+	): Promise<T> {
+		const url = `${this.baseUrl}${path}`;
+
+		return new Promise((resolve, reject) => {
+			const xhr = new XMLHttpRequest();
+			xhr.open("POST", url);
+			xhr.setRequestHeader("Accept", "application/json");
+			xhr.responseType = "text";
+
+			xhr.upload.addEventListener("progress", (event) => {
+				if (!event.lengthComputable || options.onProgress === undefined) {
+					return;
+				}
+
+				const progress = Math.round((event.loaded / event.total) * 100);
+				options.onProgress(progress);
+			});
+
+			xhr.addEventListener("load", () => {
+				if (xhr.status >= 200 && xhr.status < 300) {
+					try {
+						resolve(JSON.parse(xhr.responseText) as T);
+					} catch (error) {
+						reject(new NetworkError(`POST ${path} failed`, error));
+					}
+					return;
+				}
+
+				reject(new ApiError(`POST ${path} failed (${xhr.status})`, xhr.status));
+			});
+
+			xhr.addEventListener("error", () => {
+				reject(new NetworkError(`POST ${path} failed`));
+			});
+
+			xhr.addEventListener("abort", () => {
+				reject(new NetworkError(`POST ${path} aborted`));
+			});
+
+			try {
+				xhr.send(formData);
+			} catch (error) {
+				reject(new NetworkError(`POST ${path} failed`, error));
+			}
+		});
 	}
 
 	private async request<T>(

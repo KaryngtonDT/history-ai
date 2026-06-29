@@ -12,6 +12,8 @@ export const COLLECTIONS_PATH = "/api/collections";
 
 export const SEARCH_LIBRARY_PATH = "/api/search/library";
 
+export const VIDEOS_PATH = "/api/videos";
+
 export function timelinePath(artifactId: string): string {
 	return `/api/timeline/${artifactId}`;
 }

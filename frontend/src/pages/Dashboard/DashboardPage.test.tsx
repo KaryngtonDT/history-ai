@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
 import { ImportPage } from "@/pages/Import/ImportPage";
+import { VideoUploadPage } from "@/pages/VideoUpload/VideoUploadPage";
 import { contentService } from "@/services/content/ContentService";
 
 describe("DashboardPage — S2-SLICE-05 real backend data", () => {
@@ -97,7 +98,7 @@ describe("DashboardPage — S2-SLICE-05 real backend data", () => {
 		logSpy.mockRestore();
 	});
 
-	it("navigates quick actions to import", async () => {
+	it("navigates quick actions to import and video upload", async () => {
 		const user = userEvent.setup();
 
 		render(
@@ -105,6 +106,7 @@ describe("DashboardPage — S2-SLICE-05 real backend data", () => {
 				<Routes>
 					<Route path="/" element={<DashboardPage />} />
 					<Route path="/import" element={<ImportPage />} />
+					<Route path="/video/upload" element={<VideoUploadPage />} />
 				</Routes>
 			</MemoryRouter>,
 		);
@@ -116,6 +118,8 @@ describe("DashboardPage — S2-SLICE-05 real backend data", () => {
 		});
 
 		await user.click(screen.getByRole("button", { name: "Import Video" }));
-		expect(screen.getByRole("heading", { name: "Import" })).toBeInTheDocument();
+		expect(
+			screen.getByRole("heading", { name: "Upload Video" }),
+		).toBeInTheDocument();
 	});
 });
