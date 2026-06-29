@@ -481,7 +481,7 @@ Gemini chat env vars: `GEMINI_API_KEY`, `GEMINI_CHAT_MODEL` (default `gemini-2.5
 ProcessingArtifacts
         │
         ▼
-ChatPanel (only component using ChatService)
+ChatPanel (only component using ConversationService)
         │
         ├── ChatMessageList
         ├── ChatMessage
@@ -491,9 +491,9 @@ ChatPanel (only component using ChatService)
 
 | Component | Rule |
 | --------- | ---- |
-| `ChatPanel` | Calls `chatService.askQuestion()` only |
+| `ChatPanel` | Calls `conversationService.askQuestion()` only |
 | `ChatInput`, `ChatMessage`, `ChatMessageList`, `SourcesPanel` | Props-only; no service imports |
-| `features/chat` | Must not import `HttpChatRepository`, `ChatRepositoryFactory`, or `ChatRepository` |
+| `features/chat` | Must not import `HttpChatRepository`, `ChatRepositoryFactory`, `ChatRepository`, `HttpConversationRepository`, `ConversationRepositoryFactory`, or `ConversationRepository` |
 
 Enforced by `findFeatureChatTransportViolations()` in `frontend/src/architecture/architectureRules.ts`.
 
@@ -502,7 +502,39 @@ Enforced by `findFeatureChatTransportViolations()` in `frontend/src/architecture
 import { HttpChatRepository } from "@/services/chat/HttpChatRepository"; // ❌ forbidden
 ```
 
-**Fix:** import `chatService` from `@/services/chat/ChatService` in `ChatPanel` only.
+**Fix:** import `conversationService` from `@/services/conversation/ConversationService` in `ChatPanel` only.
+
+### Persistent conversations (Platform Sprint 24)
+
+```text
+ChatPanel
+        │
+        ▼
+ConversationService.askQuestion()
+        │
+        ▼
+POST /api/contents/{contentId}/conversations/{conversationId}/chat
+        │
+        ▼
+AskConversationChatHandler
+        │
+        ├── ConversationRepository (load / create / save)
+        └── AskContentChatHandler (RAG delegation)
+        │
+        ▼
+ConversationChatResponse JSON
+        │
+        ▼
+ChatPanel renders conversation.messages (server source of truth)
+```
+
+| Component | Rule |
+| --------- | ---- |
+| `ConversationRepositoryInterface` | Domain port: `save`, `findById`, `findByContentId` |
+| `AskConversationChatHandler` | Appends user message, delegates RAG, appends assistant message, persists |
+| `ConversationService` (frontend) | Only entry point for conversation HTTP from features |
+| `ChatPanel` | Owns `conversationId` + `chatResult`; no local message append |
+| `chatService.streamQuestion()` | Preserved for future conversation streaming; unused in `ChatPanel` |
 
 ### Interactive citations (UX-02)
 
@@ -558,7 +590,7 @@ Assistant bubble grows progressively
 | `POST /chat/stream` | `text/event-stream`; `token` + `done` events |
 | `ChatStreamToken` (OpenAPI) | `index`, `text` — token payload only |
 | `HttpChatRepository` | Only place allowed to use `fetch()` for SSE (exception to HttpClient rule) |
-| `ChatPanel` | Uses `streamQuestion()` only; no repository imports |
+| `ChatPanel` | Uses `streamQuestion()` for legacy single-turn streaming; persistent chat uses `ConversationService` |
 
 Streaming does not yet emit sources/citations — use non-streaming `/chat` for full metadata.
 

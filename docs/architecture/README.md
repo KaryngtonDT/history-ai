@@ -329,6 +329,36 @@ Verification: [Platform23-Verification.md](../reports/Platform23-Verification.md
 
 ---
 
+# Platform Sprint 24 — Conversation Memory (2026-06)
+
+Platform Sprint 24 delivers **persistent multi-turn chat** attached to a content resource: domain model, Doctrine repository, conversation-aware API, frontend integration, and OpenAPI documentation. Slice 5 changed **documentation and OpenAPI only** — no business logic in backend handlers, frontend, or worker.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P24-SLICE-01 | `ConversationId`, `Conversation`, `ConversationCollection`; immutable append | ✅ |
+| P24-SLICE-02 | `ConversationRepositoryInterface`, `DoctrineConversationRepository`, migration | ✅ |
+| P24-SLICE-03 | `AskConversationChatHandler`; `POST …/conversations/{conversationId}/chat` | ✅ |
+| P24-SLICE-04 | Frontend `ConversationService`; `ChatPanel` uses server `conversation.messages` | ✅ |
+| P24-SLICE-05 | OpenAPI `Conversation*` schemas, architecture docs, this report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `ConversationId`, `Conversation`, `ChatConversation`, `ConversationRepositoryInterface` |
+| Application | `AskConversationChatHandler`; `ConversationChatResult`, `ConversationResult` DTOs |
+| Infrastructure | `DoctrineConversationRepository`, `ConversationRecord` (JSON messages) |
+| Presentation | `AskConversationChatController`; OpenAPI schemas `Conversation`, `ConversationMessage`, `ConversationChatResponse` |
+| Frontend | `ConversationService`; `ChatPanel` state from `conversation.messages`; `streamQuestion()` preserved but unused |
+
+```text
+ChatPanel → ConversationService → POST /conversations/{id}/chat
+        → ConversationRepository → AskContentChatHandler (RAG) → ChatProvider
+        → Conversation JSON → frontend renders conversation.messages
+```
+
+Verification: [Sprint24-Verification.md](../reports/Sprint24-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

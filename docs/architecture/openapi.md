@@ -60,6 +60,7 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Semantic | GET | `/api/contents/{contentId}/semantic-search` |
 | Chat | POST | `/api/contents/{contentId}/chat` |
 | Chat | POST | `/api/contents/{contentId}/chat/stream` |
+| Chat | POST | `/api/contents/{contentId}/conversations/{conversationId}/chat` |
 | Platform | GET | `/internal/platform/metrics` |
 
 ---
@@ -167,6 +168,9 @@ Shared OpenAPI schemas:
 | `ChatSource` | `Presentation/OpenApi/Schema/ChatSource.php` |
 | `ChatCitation` | `Presentation/OpenApi/Schema/ChatCitation.php` |
 | `ChatStreamToken` | `Presentation/OpenApi/Schema/ChatStreamToken.php` |
+| `Conversation` | `Presentation/OpenApi/Schema/Conversation.php` |
+| `ConversationMessage` | `Presentation/OpenApi/Schema/ConversationMessage.php` |
+| `ConversationChatResponse` | `Presentation/OpenApi/Schema/ConversationChatResponse.php` |
 | `PerformanceMetric` | `Presentation/OpenApi/Schema/PerformanceMetric.php` |
 | `PerformanceMetricSnapshot` | `Presentation/OpenApi/Schema/PerformanceMetricSnapshot.php` |
 | `PlatformMetricsResponse` | `Presentation/OpenApi/Schema/PlatformMetricsResponse.php` |
@@ -195,9 +199,15 @@ Shared OpenAPI schemas:
 
 **UX-03 note:** The streaming chat endpoint is documented in OpenAPI slice 6. Token payloads use `ChatStreamToken`; sources and citations are not included in the SSE stream (non-streaming `POST /chat` remains available for full answers with metadata).
 
+`POST /api/contents/{contentId}/conversations/{conversationId}/chat` accepts a `ChatRequest` body (`question`, 1–2000 characters) and returns a `ConversationChatResponse` with `conversation` (`id`, `contentId`, `messages[]` of `role` + `text`) and `answer` (`ChatAnswer` with `answer`, `sources[]`, `citations[]`). The client supplies `conversationId` (UUID); the backend creates the conversation on first use and appends user/assistant messages on each call. Invalid UUID, malformed JSON, invalid question, or conversation/content mismatch returns HTTP 400 with `ErrorResponse`.
+
+**Sprint 24 note:** Persistent conversations are synchronous JSON only. `POST /chat/stream` remains documented for single-turn streaming; conversation-aware streaming is planned for Sprint 25.
+
 `GET /internal/platform/metrics` returns a `PlatformMetricsResponse` envelope with `snapshots[]` entries (`correlationId`, `recordedAt`, `metrics[]`). Each metric has `name` and `durationMs` (integer milliseconds). The optional query parameter `limit` accepts 1–100 (default 20). Invalid `limit` returns HTTP 400 with `ErrorResponse`. This endpoint is internal diagnostics only — not consumed by the frontend.
 
 **Platform Sprint 23 note:** Correlation IDs, performance timers, metrics store, and embedding cache are internal platform concerns. Only the metrics read API is documented in OpenAPI slice 5.
+
+**Platform Sprint 24 note:** Conversation memory OpenAPI schemas (`Conversation`, `ConversationMessage`, `ConversationChatResponse`) document the stable HTTP contract only; persistence and RAG orchestration remain internal.
 
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 

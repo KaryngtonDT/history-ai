@@ -38,6 +38,9 @@ nelmio_api_doc:
             - { alias: ChatSource, type: App\Presentation\OpenApi\Schema\ChatSource }
             - { alias: ChatCitation, type: App\Presentation\OpenApi\Schema\ChatCitation }
             - { alias: ChatStreamToken, type: App\Presentation\OpenApi\Schema\ChatStreamToken }
+            - { alias: Conversation, type: App\Presentation\OpenApi\Schema\Conversation }
+            - { alias: ConversationMessage, type: App\Presentation\OpenApi\Schema\ConversationMessage }
+            - { alias: ConversationChatResponse, type: App\Presentation\OpenApi\Schema\ConversationChatResponse }
             - { alias: PerformanceMetric, type: App\Presentation\OpenApi\Schema\PerformanceMetric }
             - { alias: PerformanceMetricSnapshot, type: App\Presentation\OpenApi\Schema\PerformanceMetricSnapshot }
             - { alias: PlatformMetricsResponse, type: App\Presentation\OpenApi\Schema\PlatformMetricsResponse }
