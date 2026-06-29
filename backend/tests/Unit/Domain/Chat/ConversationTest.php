@@ -8,6 +8,7 @@ use App\Domain\Chat\ChatMessage;
 use App\Domain\Chat\ChatMessageRole;
 use App\Domain\Chat\Conversation;
 use App\Domain\Chat\ConversationId;
+use App\Domain\Chat\Exception\InvalidConversationDocumentException;
 use App\Domain\Chat\Exception\InvalidConversationMessageException;
 use App\Domain\Content\ContentId;
 use PHPUnit\Framework\TestCase;
@@ -16,14 +17,61 @@ final class ConversationTest extends TestCase
 {
     private const string CONVERSATION_ID = '550e8400-e29b-41d4-a716-446655440001';
     private const string CONTENT_ID = '550e8400-e29b-41d4-a716-446655440000';
+    private const string OTHER_CONTENT_ID = '550e8400-e29b-41d4-a716-446655440099';
+    private const string THIRD_CONTENT_ID = '550e8400-e29b-41d4-a716-446655440088';
 
-    public function testStartCreatesEmptyConversation(): void
+    public function testStartCreatesConversationWithSingleDocument(): void
     {
         $conversation = $this->createConversation();
 
         self::assertTrue($conversation->id()->equals(new ConversationId(self::CONVERSATION_ID)));
         self::assertTrue($conversation->contentId()->equals(new ContentId(self::CONTENT_ID)));
+        self::assertSame(1, $conversation->documents()->count());
+        self::assertTrue($conversation->containsDocument(new ContentId(self::CONTENT_ID)));
         self::assertSame([], $conversation->messages());
+    }
+
+    public function testAddDocumentAppendsDocumentInOrder(): void
+    {
+        $conversation = $this->createConversation()
+            ->addDocument(new ContentId(self::OTHER_CONTENT_ID))
+            ->addDocument(new ContentId(self::THIRD_CONTENT_ID));
+
+        self::assertSame(3, $conversation->documents()->count());
+        self::assertSame(
+            [self::CONTENT_ID, self::OTHER_CONTENT_ID, self::THIRD_CONTENT_ID],
+            array_map(
+                static fn ($document): string => $document->contentId()->value,
+                $conversation->documents()->all(),
+            ),
+        );
+    }
+
+    public function testAddDocumentIgnoresDuplicate(): void
+    {
+        $conversation = $this->createConversation()
+            ->addDocument(new ContentId(self::OTHER_CONTENT_ID))
+            ->addDocument(new ContentId(self::OTHER_CONTENT_ID));
+
+        self::assertSame(2, $conversation->documents()->count());
+    }
+
+    public function testRemoveDocumentRemovesSelectedDocument(): void
+    {
+        $conversation = $this->createConversation()
+            ->addDocument(new ContentId(self::OTHER_CONTENT_ID))
+            ->removeDocument(new ContentId(self::OTHER_CONTENT_ID));
+
+        self::assertSame(1, $conversation->documents()->count());
+        self::assertTrue($conversation->containsDocument(new ContentId(self::CONTENT_ID)));
+        self::assertFalse($conversation->containsDocument(new ContentId(self::OTHER_CONTENT_ID)));
+    }
+
+    public function testRemoveLastDocumentThrows(): void
+    {
+        $this->expectException(InvalidConversationDocumentException::class);
+
+        $this->createConversation()->removeDocument(new ContentId(self::CONTENT_ID));
     }
 
     public function testAppendUserAddsUserMessage(): void
@@ -89,6 +137,15 @@ final class ConversationTest extends TestCase
 
         self::assertSame([], $original->messages());
         self::assertCount(1, $extended->messages());
+    }
+
+    public function testOriginalConversationIsUnchangedAfterDocumentMutation(): void
+    {
+        $original = $this->createConversation();
+        $extended = $original->addDocument(new ContentId(self::OTHER_CONTENT_ID));
+
+        self::assertSame(1, $original->documents()->count());
+        self::assertSame(2, $extended->documents()->count());
     }
 
     public function testAppendUserRejectsAssistantMessage(): void
