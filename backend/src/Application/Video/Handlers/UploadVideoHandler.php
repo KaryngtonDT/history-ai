@@ -6,16 +6,22 @@ namespace App\Application\Video\Handlers;
 
 use App\Application\Video\Commands\UploadVideoCommand;
 use App\Application\Video\DTO\UploadVideoResult;
+use App\Application\Video\Ports\VideoProcessingQueueInterface;
+use App\Application\Video\Ports\VideoStorageInterface;
 use App\Domain\Video\VideoExtension;
 use App\Domain\Video\VideoId;
 use App\Domain\Video\VideoJob;
 use App\Domain\Video\VideoLanguage;
+use App\Domain\Video\VideoRepositoryInterface;
 use App\Domain\Video\VideoUploadSize;
 
 final class UploadVideoHandler
 {
     public function __construct(
         private readonly int $maxUploadBytes,
+        private readonly VideoStorageInterface $videoStorage,
+        private readonly VideoRepositoryInterface $videoRepository,
+        private readonly VideoProcessingQueueInterface $videoProcessingQueue,
     ) {
     }
 
@@ -24,15 +30,29 @@ final class UploadVideoHandler
         VideoExtension::fromFilename($command->originalFilename);
         VideoUploadSize::assertWithinLimit($command->fileSizeBytes, $this->maxUploadBytes);
 
-        $job = VideoJob::createUploaded(
-            VideoId::generate(),
+        $videoId = VideoId::generate();
+        $uploaded = VideoJob::createUploaded(
+            $videoId,
             $command->originalFilename,
             VideoLanguage::Unknown,
         );
 
+        $storagePath = $this->videoStorage->store(
+            $videoId,
+            $command->temporaryPath,
+            $command->originalFilename,
+        );
+
+        $queued = $uploaded
+            ->withStoragePath($storagePath)
+            ->queue();
+
+        $this->videoRepository->save($queued);
+        $this->videoProcessingQueue->enqueue($queued->id());
+
         return new UploadVideoResult(
-            $job->id(),
-            $job->status(),
+            $queued->id(),
+            $queued->status(),
         );
     }
 }

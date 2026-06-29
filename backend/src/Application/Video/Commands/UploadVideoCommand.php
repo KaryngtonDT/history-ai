@@ -9,6 +9,7 @@ final readonly class UploadVideoCommand
     public function __construct(
         public string $originalFilename,
         public int $fileSizeBytes,
+        public string $temporaryPath,
     ) {
     }
 }

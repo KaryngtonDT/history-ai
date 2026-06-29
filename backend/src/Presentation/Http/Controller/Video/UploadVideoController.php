@@ -30,6 +30,7 @@ final class UploadVideoController extends AbstractController
             $result = $handler(new UploadVideoCommand(
                 originalFilename: (string) $uploadedFile->getClientOriginalName(),
                 fileSizeBytes: (int) $uploadedFile->getSize(),
+                temporaryPath: $uploadedFile->getPathname(),
             ));
         } catch (InvalidVideoJobException) {
             return $this->invalidRequestResponse();

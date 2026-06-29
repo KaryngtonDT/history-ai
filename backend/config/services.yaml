@@ -11,6 +11,7 @@ parameters:
     video.upload_max_bytes_default: 524288000
 
     video.upload_max_bytes: '%env(int:default:video.upload_max_bytes_default:VIDEO_UPLOAD_MAX_BYTES)%'
+    video.storage_dir: '%kernel.project_dir%/var/video-storage'
 
 services:
     _defaults:
@@ -80,6 +81,15 @@ services:
 
     App\Domain\Processing\ProcessingJobRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Processing\DoctrineProcessingJobRepository
+
+    App\Domain\Video\VideoRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Video\DoctrineVideoRepository
+
+    App\Application\Video\Ports\VideoStorageInterface:
+        alias: App\Infrastructure\Video\LocalVideoStorage
+
+    App\Application\Video\Ports\VideoProcessingQueueInterface:
+        alias: App\Infrastructure\Video\MessengerVideoProcessingQueue
 
     App\Domain\Artifact\ArtifactRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Artifact\DoctrineArtifactRepository
@@ -175,3 +185,7 @@ services:
     App\Application\Video\Handlers\UploadVideoHandler:
         arguments:
             $maxUploadBytes: '%video.upload_max_bytes%'
+
+    App\Infrastructure\Video\LocalVideoStorage:
+        arguments:
+            $storageDirectory: '%video.storage_dir%'

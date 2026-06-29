@@ -17,6 +17,7 @@ final readonly class VideoJob
         private VideoLanguage $language,
         private VideoStatus $status,
         private DateTimeImmutable $createdAt,
+        private ?string $storagePath = null,
     ) {
         $this->originalFilename = self::normalizeFilename($originalFilename);
     }
@@ -36,9 +37,51 @@ final readonly class VideoJob
         );
     }
 
+    public static function reconstitute(
+        VideoId $id,
+        string $originalFilename,
+        VideoLanguage $language,
+        VideoStatus $status,
+        DateTimeImmutable $createdAt,
+        string $storagePath,
+    ): self {
+        return new self(
+            $id,
+            $originalFilename,
+            $language,
+            $status,
+            $createdAt,
+            $storagePath,
+        );
+    }
+
+    public function withStoragePath(string $storagePath): self
+    {
+        $this->assertStatus(VideoStatus::Uploaded, 'store');
+
+        $normalized = trim($storagePath);
+
+        if ('' === $normalized) {
+            throw new InvalidVideoJobException('Video storage path cannot be empty.');
+        }
+
+        return new self(
+            $this->id,
+            $this->originalFilename,
+            $this->language,
+            $this->status,
+            $this->createdAt,
+            $normalized,
+        );
+    }
+
     public function queue(): self
     {
         $this->assertStatus(VideoStatus::Uploaded, 'queue');
+
+        if (null === $this->storagePath || '' === trim($this->storagePath)) {
+            throw new InvalidVideoJobException('Video job must be stored before it can be queued.');
+        }
 
         return $this->withStatus(VideoStatus::Queued);
     }
@@ -89,6 +132,11 @@ final readonly class VideoJob
         return $this->createdAt;
     }
 
+    public function storagePath(): ?string
+    {
+        return $this->storagePath;
+    }
+
     private function withStatus(VideoStatus $status): self
     {
         return new self(
@@ -97,6 +145,7 @@ final readonly class VideoJob
             $this->language,
             $status,
             $this->createdAt,
+            $this->storagePath,
         );
     }
 

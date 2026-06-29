@@ -41,15 +41,18 @@ final class VideoJobTest extends TestCase
             VideoLanguage::French,
         );
 
-        $queued = $uploaded->queue();
+        $stored = $uploaded->withStoragePath('/var/video-storage/lecture.mp4');
+        $queued = $stored->queue();
         $processing = $queued->startProcessing();
         $completed = $processing->complete();
 
         self::assertSame(VideoStatus::Uploaded, $uploaded->status());
+        self::assertSame('/var/video-storage/lecture.mp4', $stored->storagePath());
         self::assertSame(VideoStatus::Queued, $queued->status());
         self::assertSame(VideoStatus::Processing, $processing->status());
         self::assertSame(VideoStatus::Completed, $completed->status());
-        self::assertNotSame($uploaded, $queued);
+        self::assertNotSame($uploaded, $stored);
+        self::assertNotSame($stored, $queued);
         self::assertNotSame($queued, $processing);
         self::assertNotSame($processing, $completed);
     }
@@ -61,6 +64,7 @@ final class VideoJobTest extends TestCase
             'lecture.mp4',
             VideoLanguage::German,
         )
+            ->withStoragePath('/var/video-storage/lecture.mp4')
             ->queue()
             ->startProcessing()
             ->fail();
@@ -80,6 +84,20 @@ final class VideoJobTest extends TestCase
         $this->expectExceptionMessage('Cannot start processing a video job in status "uploaded".');
 
         $uploaded->startProcessing();
+    }
+
+    public function testRejectsQueueWithoutStoragePath(): void
+    {
+        $uploaded = VideoJob::createUploaded(
+            new VideoId(self::VIDEO_ID),
+            'lecture.mp4',
+            VideoLanguage::English,
+        );
+
+        $this->expectException(InvalidVideoJobException::class);
+        $this->expectExceptionMessage('Video job must be stored before it can be queued.');
+
+        $uploaded->queue();
     }
 
     public function testRejectsEmptyFilename(): void

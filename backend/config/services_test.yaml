@@ -52,3 +52,14 @@ when@test:
         App\Domain\Chat\ConversationRepositoryInterface:
             alias: App\Infrastructure\Persistence\Doctrine\Chat\DoctrineConversationRepository
             public: true
+
+        App\Domain\Video\VideoRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\Video\DoctrineVideoRepository
+            public: true
+
+        App\Application\Video\Ports\VideoProcessingQueueInterface:
+            class: App\Infrastructure\Video\NoOpVideoProcessingQueue
+            public: true
+
+    parameters:
+        video.storage_dir: '%kernel.cache_dir%/video-storage'
