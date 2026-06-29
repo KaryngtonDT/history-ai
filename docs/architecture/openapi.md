@@ -67,6 +67,7 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Chat | POST | `/api/contents/{contentId}/conversations/{conversationId}/chat/stream` |
 | Chat | PUT | `/api/conversations/{conversationId}/documents` |
 | Video | POST | `/api/videos` |
+| Video | GET | `/api/videos/{videoId}/transcript` |
 | Platform | GET | `/internal/platform/metrics` |
 
 ---
@@ -244,7 +245,9 @@ Shared OpenAPI schemas:
 
 **Platform Sprint 30 note:** Conversation Memory & Metadata Aggregation documents top-level `AgentExecution.metadata` (merged from all executed steps; later tools overwrite duplicate keys). All four agent tools execute real handlers. The frontend `AgentMetadataPanel` surfaces per-step metadata in the agent trace UI.
 
-**Platform Sprint 31 note:** Video Processing Foundation adds `POST /api/videos` with multipart upload (`video` field), `UploadVideoResponse`, and `VideoStatus`. Supported formats: mp4, mov, mkv. Successful uploads return HTTP 201 with `{ videoId, status: "queued" }`. Maximum file size is controlled by `VIDEO_UPLOAD_MAX_BYTES` (default 500 MB). No processing or worker endpoints are documented yet.
+**Platform Sprint 31 note:** Video Processing Foundation adds `POST /api/videos` with multipart upload (`video` field), `UploadVideoResponse`, and `VideoStatus`. Supported formats: mp4, mov, mkv. Successful uploads return HTTP 201 with `{ videoId, status: "queued" }`. Maximum file size is controlled by `VIDEO_UPLOAD_MAX_BYTES` (default 500 MB). Processing and transcript retrieval are documented in Sprint 32.
+
+**Platform Sprint 32 note:** Speech-to-Text Foundation adds `GET /api/videos/{videoId}/transcript` with `Transcript`, `TranscriptSegment`, and `TranscriptLanguage` schemas. The endpoint returns segmented timestamps after the video job completes and a transcript artifact is generated. No translation, TTS, or lip-sync endpoints are documented yet.
 
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 
@@ -297,7 +300,26 @@ Zero-result semantic search returns `{ "resultCount": 0 }`. Empty knowledge grap
 | Max size | `VIDEO_UPLOAD_MAX_BYTES` env (default 524288000) |
 | Field name | `video` |
 
-After upload the backend stores the file locally, persists a `VideoJob`, transitions status to `queued`, and dispatches `ProcessVideoMessage` (noop handler until Sprint 32+). The frontend `VideoUploadPanel` at `/video/upload` performs client-side format validation and reports upload progress.
+After upload the backend stores the file locally, persists a `VideoJob`, transitions status to `queued`, and dispatches `ProcessVideoMessage`. The worker runs Faster-Whisper transcription, persists the transcript, and creates a transcript artifact. The frontend `VideoUploadPanel` at `/video/upload` performs client-side format validation and reports upload progress.
+
+---
+
+# Video transcript
+
+`GET /api/videos/{videoId}/transcript` returns the speech-to-text transcript for a completed video job.
+
+| Response | Body |
+| -------- | ---- |
+| 200 OK | `Transcript` — `{ videoId, transcriptId, language, text, duration, segmentCount, segments[] }` |
+| 400 Bad Request | `{ "error": "Invalid request" }` (invalid UUID or transcript not found) |
+
+| Schema | Fields |
+| ------ | ------ |
+| `TranscriptLanguage` | `english`, `french`, `german`, `unknown` |
+| `TranscriptSegment` | `index`, `startTime`, `endTime`, `text` |
+| `Transcript` | Full transcript with `segments[]` |
+
+The frontend `TranscriptPanel` at `/video/:videoId/transcript` loads the transcript via `TranscriptService` and renders a read-only timeline with timestamps and segment highlighting.
 
 ---
 

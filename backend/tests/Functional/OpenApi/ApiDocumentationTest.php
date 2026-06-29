@@ -30,6 +30,7 @@ final class ApiDocumentationTest extends WebTestCase
         '/api/conversations/{conversationId}/documents',
         '/api/conversations/{conversationId}/graph',
         '/api/videos',
+        '/api/videos/{videoId}/transcript',
         '/internal/platform/metrics',
     ];
 
@@ -95,6 +96,7 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('put', $spec['paths']['/api/conversations/{conversationId}/documents']);
         self::assertArrayHasKey('get', $spec['paths']['/api/conversations/{conversationId}/graph']);
         self::assertArrayHasKey('post', $spec['paths']['/api/videos']);
+        self::assertArrayHasKey('get', $spec['paths']['/api/videos/{videoId}/transcript']);
         self::assertArrayHasKey('get', $spec['paths']['/internal/platform/metrics']);
     }
 
@@ -1737,6 +1739,88 @@ final class ApiDocumentationTest extends WebTestCase
             self::assertContains('videoId', $responseSchema['required']);
             self::assertContains('status', $responseSchema['required']);
         }
+    }
+
+    public function testOpenApiSpecDocumentsGetVideoTranscriptOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/transcript']['get'];
+
+        self::assertSame('getVideoTranscript', $operation['operationId']);
+        self::assertContains('Video', $operation['tags']);
+    }
+
+    public function testOpenApiSpecDocumentsGetVideoTranscriptParameters(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $parameters = $spec['paths']['/api/videos/{videoId}/transcript']['get']['parameters'];
+
+        $videoIdParameter = null;
+
+        foreach ($parameters as $parameter) {
+            if (($parameter['name'] ?? null) === 'videoId') {
+                $videoIdParameter = $parameter;
+                break;
+            }
+        }
+
+        self::assertNotNull($videoIdParameter, 'Missing path parameter: videoId');
+        self::assertSame('path', $videoIdParameter['in']);
+        self::assertTrue($videoIdParameter['required']);
+        self::assertSame('string', $videoIdParameter['schema']['type']);
+        self::assertSame('uuid', $videoIdParameter['schema']['format']);
+    }
+
+    public function testOpenApiSpecDocumentsGetVideoTranscriptResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/videos/{videoId}/transcript']['get']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('Transcript found', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/Transcript',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+
+        self::assertArrayHasKey('400', $responses);
+        self::assertSame('Invalid request or transcript not found', $responses['400']['description']);
+        self::assertSame(
+            '#/components/schemas/ErrorResponse',
+            $responses['400']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsTranscriptSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('TranscriptLanguage', $spec['components']['schemas']);
+        self::assertArrayHasKey('TranscriptSegment', $spec['components']['schemas']);
+        self::assertArrayHasKey('Transcript', $spec['components']['schemas']);
+
+        $languageSchema = $spec['components']['schemas']['TranscriptLanguage'];
+        $segmentSchema = $spec['components']['schemas']['TranscriptSegment'];
+        $transcriptSchema = $spec['components']['schemas']['Transcript'];
+
+        self::assertSame('string', $languageSchema['type']);
+        self::assertSame(['english', 'french', 'german', 'unknown'], $languageSchema['enum']);
+
+        self::assertSame('integer', $segmentSchema['properties']['index']['type']);
+        self::assertSame('number', $segmentSchema['properties']['startTime']['type']);
+        self::assertSame('number', $segmentSchema['properties']['endTime']['type']);
+        self::assertSame('string', $segmentSchema['properties']['text']['type']);
+
+        self::assertSame(
+            '#/components/schemas/TranscriptLanguage',
+            $transcriptSchema['properties']['language']['$ref'],
+        );
+        self::assertSame(
+            '#/components/schemas/TranscriptSegment',
+            $transcriptSchema['properties']['segments']['items']['$ref'],
+        );
+        self::assertContains('videoId', $transcriptSchema['required']);
+        self::assertContains('segments', $transcriptSchema['required']);
     }
 
     /**

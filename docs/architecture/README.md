@@ -641,6 +641,40 @@ Verification: [Sprint31-Verification.md](../reports/Sprint31-Verification.md)
 
 ---
 
+# Platform Sprint 32 — Speech-to-Text Foundation (2026-06)
+
+Platform Sprint 32 delivers the **speech-to-text foundation** for Phase 2: domain model, Faster-Whisper provider, worker integration, transcript artifact pipeline, frontend viewer, and OpenAPI documentation.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P32-SLICE-01 | `Transcript`, `TranscriptSegment`, `TranscriptLanguage`, `SpeechToTextProviderInterface` | ✅ |
+| P32-SLICE-02 | `FasterWhisperProvider`, `SpeechToTextProviderFactory`, output parser | ✅ |
+| P32-SLICE-03 | `ProcessVideoHandler`, transcript persistence, transcript artifact | ✅ |
+| P32-SLICE-04 | `TranscriptPanel`, `TranscriptTimeline`, `TranscriptService` | ✅ |
+| P32-SLICE-05 | OpenAPI transcript schemas, architecture docs, verification report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `Transcript` aggregate, `TranscriptSegment`, `TranscriptLanguage`, STT provider port |
+| Application | `ProcessVideoHandler`, `GetVideoTranscriptHandler`, `TranscriptJsonMapper` |
+| Infrastructure | `FasterWhisperProvider`, `DoctrineTranscriptRepository`, `FixedFasterWhisperProcessRunner` (test) |
+| Presentation | `GetVideoTranscriptController`, OpenAPI `Transcript` / `TranscriptSegment` / `TranscriptLanguage` |
+| Frontend | `TranscriptPanel`, `TranscriptTimeline`, `TranscriptService` at `/video/:videoId/transcript` |
+
+```text
+Video Upload → ProcessVideoMessage → FasterWhisperProvider
+        │
+        ▼
+Transcript persisted + ArtifactType::Transcript
+        │
+        ▼
+GET /api/videos/{videoId}/transcript → TranscriptPanel
+```
+
+Verification: [Sprint32-Verification.md](../reports/Sprint32-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

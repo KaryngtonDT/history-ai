@@ -829,11 +829,48 @@ HTTP 201 { videoId, status: "queued" }
 | `VideoExtension` | Domain rule: mp4, mov, mkv only |
 | `VideoUploadSize` | Domain rule: max bytes from `VIDEO_UPLOAD_MAX_BYTES` |
 | `LocalVideoStorage` | Stores uploaded binary on disk before queue dispatch |
-| `ProcessVideoMessageHandler` | No-op stub until worker pipeline (Sprint 32+) |
+| `ProcessVideoMessageHandler` | Delegates to `ProcessVideoHandler` for STT transcription |
 | `VideoUploadPanel` | Drag-and-drop, progress bar, success/error states |
 | `HttpClient.postFormData()` | XHR-based multipart upload with progress callbacks |
 
 Feature components must use `videoService`, not `HttpVideoRepository` or `HttpClient` directly.
+
+### Speech-to-text foundation (Platform Sprint 32)
+
+```text
+ProcessVideoMessage (Messenger)
+        │
+        ▼
+ProcessVideoHandler
+        ├── VideoJob.startProcessing()
+        ├── SpeechToTextProviderFactory → FasterWhisperProvider
+        ├── TranscriptRepository.save()
+        ├── ArtifactRepository.create(ArtifactType::Transcript)
+        └── VideoJob.complete()
+        │
+        ▼
+GET /api/videos/{videoId}/transcript
+        │
+        ▼
+GetVideoTranscriptHandler → TranscriptRepository.findByVideoId()
+        │
+        ▼
+Frontend TranscriptPanel (/video/:videoId/transcript)
+        │
+        └── TranscriptService → HttpTranscriptRepository
+```
+
+| Component | Role |
+| --------- | ---- |
+| `Transcript` | Immutable domain aggregate with segments, language, duration |
+| `SpeechToTextProviderInterface` | Domain port: `transcribe(VideoJob): Transcript` |
+| `FasterWhisperProvider` | Infrastructure adapter invoking faster-whisper CLI |
+| `SpeechToTextProviderFactory` | Selects provider from `STT_PROVIDER` env |
+| `ProcessVideoHandler` | Application orchestration: STT → persist → artifact |
+| `TranscriptJsonMapper` | Application-layer JSON serialization for persistence |
+| `TranscriptPanel` | Read-only viewer with timestamps and segment highlight |
+
+Feature components must use `transcriptService`, not `HttpTranscriptRepository` or `HttpClient` directly.
 
 ## Enforcement
 

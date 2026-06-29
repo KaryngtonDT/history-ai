@@ -16,6 +16,33 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class GetVideoTranscriptController extends AbstractController
 {
+    #[OA\Get(
+        operationId: 'getVideoTranscript',
+        summary: 'Get video transcript',
+        description: 'Returns the speech-to-text transcript for a processed video, including segmented timestamps. Available after the video job completes and a transcript artifact is generated.',
+        tags: ['Video'],
+        parameters: [
+            new OA\Parameter(
+                name: 'videoId',
+                in: 'path',
+                required: true,
+                description: 'UUID of the uploaded video job.',
+                schema: new OA\Schema(type: 'string', format: 'uuid'),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Transcript found',
+                content: new OA\JsonContent(ref: '#/components/schemas/Transcript'),
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid request or transcript not found',
+                content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse'),
+            ),
+        ],
+    )]
     #[Route('/api/videos/{videoId}/transcript', name: 'api_videos_transcript_get', methods: ['GET'])]
     public function __invoke(string $videoId, GetVideoTranscriptHandler $handler): JsonResponse
     {
