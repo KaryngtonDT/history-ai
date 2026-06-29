@@ -38,6 +38,9 @@ services:
     App\Domain\Agent\AgentToolExecutorInterface:
         alias: App\Infrastructure\Agent\CompositeAgentToolExecutor
 
+    App\Domain\Agent\ConversationMemoryToolExecutorInterface:
+        alias: App\Infrastructure\Agent\NullConversationMemoryToolExecutor
+
     App\Infrastructure\Agent\CompositeAgentToolExecutor:
         arguments:
             $semanticSearchToolExecutor: '@App\Infrastructure\Agent\SemanticSearchToolExecutor'
