@@ -35,6 +35,9 @@ services:
     App\Domain\Agent\AgentPlannerInterface:
         alias: App\Infrastructure\Agent\DeterministicAgentPlanner
 
+    App\Domain\Agent\AgentToolExecutorInterface:
+        alias: App\Infrastructure\Agent\NullAgentToolExecutor
+
     App\Domain\Chat\ChatProviderInterface:
         factory: ['@App\Infrastructure\Chat\ChatProviderFactory', 'create']
 
