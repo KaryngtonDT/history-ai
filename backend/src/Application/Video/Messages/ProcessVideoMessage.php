@@ -13,6 +13,7 @@ final readonly class ProcessVideoMessage
         public string $videoId,
         public ProcessingMode $processingMode = ProcessingMode::Manual,
         public ?ProcessingStrategy $strategy = null,
+        public ?string $batchJobId = null,
     ) {
     }
 }

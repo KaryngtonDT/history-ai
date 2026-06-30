@@ -7,6 +7,7 @@ namespace App\Application\Video\Ports;
 use App\Domain\Orchestrator\ProcessingMode;
 use App\Domain\Orchestrator\ProcessingStrategy;
 use App\Domain\Video\VideoId;
+use App\Domain\Workspace\BatchJobId;
 
 interface VideoProcessingQueueInterface
 {
@@ -14,5 +15,6 @@ interface VideoProcessingQueueInterface
         VideoId $videoId,
         ProcessingMode $processingMode = ProcessingMode::Manual,
         ?ProcessingStrategy $strategy = null,
+        ?BatchJobId $batchJobId = null,
     ): void;
 }

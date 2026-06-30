@@ -8,6 +8,7 @@ use App\Application\Video\Ports\VideoProcessingQueueInterface;
 use App\Domain\Orchestrator\ProcessingMode;
 use App\Domain\Orchestrator\ProcessingStrategy;
 use App\Domain\Video\VideoId;
+use App\Domain\Workspace\BatchJobId;
 
 final class NoOpVideoProcessingQueue implements VideoProcessingQueueInterface
 {
@@ -15,6 +16,7 @@ final class NoOpVideoProcessingQueue implements VideoProcessingQueueInterface
         VideoId $videoId,
         ProcessingMode $processingMode = ProcessingMode::Manual,
         ?ProcessingStrategy $strategy = null,
+        ?BatchJobId $batchJobId = null,
     ): void {
     }
 }
