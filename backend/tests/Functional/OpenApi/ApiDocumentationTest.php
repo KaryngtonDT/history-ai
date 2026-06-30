@@ -2108,6 +2108,45 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertContains('openvoice', $providerSchema['enum']);
     }
 
+    public function testOpenApiSpecDocumentsListVideoLipSyncOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/lip-sync']['get'];
+
+        self::assertSame('listVideoLipSync', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsGenerateVideoLipSyncOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/lip-sync']['post'];
+
+        self::assertSame('generateVideoLipSync', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsGetVideoLipSyncOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/lip-sync/{language}']['get'];
+
+        self::assertSame('getVideoLipSync', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsLipSyncSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('LipSyncProvider', $spec['components']['schemas']);
+        self::assertArrayHasKey('LipSyncArtifact', $spec['components']['schemas']);
+        self::assertArrayHasKey('VideoLipSyncSummary', $spec['components']['schemas']);
+        self::assertArrayHasKey('VideoLipSyncList', $spec['components']['schemas']);
+        self::assertArrayHasKey('GenerateVideoLipSyncRequest', $spec['components']['schemas']);
+
+        $providerSchema = $spec['components']['schemas']['LipSyncProvider'];
+        self::assertSame('string', $providerSchema['type']);
+        self::assertContains('latentsync', $providerSchema['enum']);
+    }
+
     /**
      * @return array<string, mixed>
      */

@@ -991,6 +991,34 @@ GET/POST /api/videos/{videoId}/voice-clone → VoiceClonePanel (/video/:videoId/
 
 Feature components must use `voiceCloneService`, not `HttpVoiceCloneRepository` or `HttpClient` directly.
 
+## Platform Sprint 37 — Lip Sync Foundation
+
+```text
+Original Video + VoiceCloneArtifact
+        │
+        ▼
+AIProviderResolverInterface.resolveLipSync()
+        │
+        ▼
+LatentSyncProvider (Wav2Lip disabled)
+        │
+        ▼
+LipSyncArtifact (ArtifactType::LipSync)
+        │
+        ▼
+GET/POST /api/videos/{videoId}/lip-sync → LipSyncPanel (/video/:videoId/lip-sync)
+```
+
+| Component | Role |
+| --------- | ---- |
+| `LipSyncArtifact` | Immutable aggregate linking source video, cloned audio, synced video |
+| `LipSyncProviderInterface` | Domain port: `synchronize(VideoJob, VoiceCloneArtifact)` |
+| `LatentSyncProvider` | LatentSync process runner and lip sync mapper |
+| `VideoLipSyncGenerator` | Orchestrates voice clone → lip sync → persistence |
+| `LipSyncPreview` | Before/after video comparison, replay, provider badge |
+
+Feature components must use `lipSyncService`, not `HttpLipSyncRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

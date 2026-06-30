@@ -831,6 +831,46 @@ Verification: [Sprint36-Verification.md](../reports/Sprint36-Verification.md)
 
 ---
 
+# Platform Sprint 37 — Lip Sync Foundation (2026-06)
+
+Platform Sprint 37 delivers **lip sync** for Phase 2: dedicated `LipSync` AI capability, LatentSync provider, worker pipeline, frontend video preview with before/after comparison, and OpenAPI documentation. No final MP4 rendering or export.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P37-SLICE-01 | `LipSyncArtifact`, `LipSyncProviderInterface` | ✅ |
+| P37-SLICE-02 | `LatentSyncProvider`, factory, AI Engine integration | ✅ |
+| P37-SLICE-03 | `VideoLipSyncGenerator`, lip sync artifacts, REST endpoints | ✅ |
+| P37-SLICE-04 | `LipSyncPreview`, `LipSyncSettings`, `LipSyncService` | ✅ |
+| P37-SLICE-05 | OpenAPI lip sync schemas, architecture docs, verification report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `LipSyncArtifact`, `LipSyncVideo`, `LipSyncProvider`, `LipSyncProviderInterface` |
+| Application | `VideoLipSyncGenerator`, lip sync handlers, `LipSyncJsonMapper` |
+| Infrastructure | `LatentSyncProvider`, `DoctrineLipSyncRepository`, `LipSyncProviderFactory` |
+| Presentation | `GET/POST /api/videos/{videoId}/lip-sync`, stream endpoint, OpenAPI schemas |
+| Frontend | `LipSyncPanel`, `LipSyncPreview`, `LipSyncSettings` at `/video/:videoId/lip-sync` |
+
+```text
+Original Video + Cloned Audio
+        │
+        ▼
+AIProviderResolver.resolveLipSync()
+        │
+        ▼
+LatentSyncProvider
+        │
+        ▼
+LipSyncArtifact (ArtifactType::LipSync)
+        │
+        ▼
+GET/POST /api/videos/{videoId}/lip-sync → LipSyncPanel (/video/:videoId/lip-sync)
+```
+
+Verification: [Sprint37-Verification.md](../reports/Sprint37-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

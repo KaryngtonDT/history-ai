@@ -508,6 +508,55 @@ The frontend `VoiceClonePanel` at `/video/:videoId/voice-clone` lets users toggl
 
 ---
 
+# Video lip sync (Platform Sprint 37)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/videos/{videoId}/lip-sync` | List lip-synced video artifacts for a video |
+| POST | `/api/videos/{videoId}/lip-sync` | Generate lip-synced video from original video + cloned audio using LatentSync |
+| GET | `/api/videos/{videoId}/lip-sync/{language}` | Get lip sync metadata with original and synced stream URLs |
+| GET | `/api/videos/{videoId}/lip-sync/{language}/stream` | Stream lip-synced MP4 preview file |
+
+## Request body (POST)
+
+```json
+{
+  "targetLanguages": ["french"],
+  "provider": "latentsync"
+}
+```
+
+## Response shape (list)
+
+```json
+{
+  "videoId": "660e8400-e29b-41d4-a716-446655440001",
+  "lipSyncs": [
+    {
+      "artifactId": "550e8400-e29b-41d4-a716-446655440080",
+      "clonedAudioId": "550e8400-e29b-41d4-a716-446655440060",
+      "targetLanguage": "french",
+      "provider": "latentsync",
+      "synchronizedVideoId": "550e8400-e29b-41d4-a716-446655440070",
+      "duration": 120.5,
+      "syncedVideoUrl": "/api/videos/{videoId}/lip-sync/french/stream"
+    }
+  ]
+}
+```
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `LipSyncProvider` | `latentsync`, `wav2lip`, `mock` |
+| `LipSyncArtifact` | `artifactId`, `clonedAudioId`, `provider`, `synchronizedVideoId`, stream URLs |
+| `GenerateVideoLipSyncRequest` | `targetLanguages`, `provider` |
+
+The frontend `LipSyncPanel` at `/video/:videoId/lip-sync` lets users select LatentSync, generate lip-synced previews, and compare original vs synced video via `LipSyncService`.
+
+---
+
 # Production considerations
 
 | Topic | Recommendation |
