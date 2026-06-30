@@ -192,6 +192,9 @@ services:
 
     App\Infrastructure\Scheduler\RuntimeExecutionScheduleContext: ~
 
+    App\Domain\Quality\QualityEvaluatorInterface:
+        alias: App\Infrastructure\Quality\DeterministicQualityEvaluator
+
     App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface:
         alias: App\Infrastructure\VideoIntelligence\VideoJobVideoIntelligenceFactory
 
