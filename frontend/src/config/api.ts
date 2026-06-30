@@ -18,6 +18,9 @@ export const AI_PROVIDERS_PATH = "/api/ai/providers";
 
 export const PIPELINE_PATH = "/api/pipeline";
 
+export const ORCHESTRATOR_RECOMMENDATION_PATH =
+	"/api/orchestrator/recommendation";
+
 export function pipelineResetPath(): string {
 	return `${PIPELINE_PATH}/reset`;
 }

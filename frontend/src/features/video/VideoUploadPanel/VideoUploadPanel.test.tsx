@@ -1,14 +1,27 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { VideoUploadPanel } from "@/features/video/VideoUploadPanel/VideoUploadPanel";
+import { orchestratorService } from "@/services/orchestrator/OrchestratorService";
 import { videoService } from "@/services/video/VideoService";
 import { ValidationError } from "@/shared/errors";
 
 describe("VideoUploadPanel", () => {
 	afterEach(() => {
 		vi.restoreAllMocks();
+	});
+
+	beforeEach(() => {
+		vi.spyOn(orchestratorService, "loadRecommendation").mockResolvedValue({
+			id: "550e8400-e29b-41d4-a716-446655440099",
+			strategy: "balanced",
+			explanation: "Balanced pipeline.",
+			estimatedDurationSeconds: 240,
+			estimatedQuality: 4,
+			estimatedVramGb: 8,
+			stages: [],
+		});
 	});
 
 	it("rejects unsupported files", () => {

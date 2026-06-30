@@ -1,0 +1,30 @@
+.processingModeSelector {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.title {
+	margin: 0;
+	font-size: 0.95rem;
+	font-weight: 600;
+}
+
+.options {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.option {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
+}
+
+.recommended {
+	margin-left: 0.25rem;
+	font-size: 0.75rem;
+	color: var(--color-success, #16a34a);
+}

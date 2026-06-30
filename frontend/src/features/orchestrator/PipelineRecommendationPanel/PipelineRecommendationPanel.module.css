@@ -1,0 +1,60 @@
+.panel {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 1rem;
+	border: 1px solid var(--color-border, #e5e7eb);
+	border-radius: 0.75rem;
+	background: var(--color-surface, #fff);
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+}
+
+.title {
+	margin: 0;
+	font-size: 0.95rem;
+	font-weight: 600;
+}
+
+.badge {
+	font-size: 0.75rem;
+	padding: 0.15rem 0.5rem;
+	border-radius: 999px;
+	background: var(--color-success-soft, #dcfce7);
+	color: var(--color-success, #16a34a);
+}
+
+.metrics {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 0.75rem;
+}
+
+.metricLabel {
+	margin: 0;
+	font-size: 0.75rem;
+	color: var(--color-muted, #6b7280);
+}
+
+.metricValue {
+	margin: 0.15rem 0 0;
+	font-size: 0.9rem;
+	font-weight: 600;
+}
+
+.explanation {
+	margin: 0;
+	font-size: 0.85rem;
+	color: var(--color-muted, #6b7280);
+}
+
+.loading {
+	margin: 0;
+	font-size: 0.85rem;
+	color: var(--color-muted, #6b7280);
+}

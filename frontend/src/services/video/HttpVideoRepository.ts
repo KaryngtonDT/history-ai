@@ -26,6 +26,13 @@ export class HttpVideoRepository implements VideoRepository {
 		const formData = new FormData();
 		formData.append("video", file);
 
+		if (options?.processingMode) {
+			formData.append("processingMode", options.processingMode);
+		}
+		if (options?.strategy) {
+			formData.append("strategy", options.strategy);
+		}
+
 		try {
 			const dto = await this.httpClient.postFormData<VideoUploadApiDto>(
 				VIDEOS_PATH,

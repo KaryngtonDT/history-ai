@@ -1,4 +1,13 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import {
+	PipelineRecommendationPanel,
+	ProcessingModeSelector,
+} from "@/features/orchestrator";
+import { orchestratorService } from "@/services/orchestrator/OrchestratorService";
+import type {
+	PipelineRecommendation,
+	ProcessingMode,
+} from "@/services/orchestrator/types";
 import { videoService } from "@/services/video/VideoService";
 import { ValidationError } from "@/shared/errors";
 import type { VideoUploadPhase } from "../types";
@@ -19,6 +28,31 @@ export function VideoUploadPanel() {
 	const [errorMessage, setErrorMessage] = useState("");
 	const [videoId, setVideoId] = useState("");
 	const [status, setStatus] = useState("");
+	const [processingMode, setProcessingMode] =
+		useState<ProcessingMode>("automatic");
+	const [recommendation, setRecommendation] =
+		useState<PipelineRecommendation | null>(null);
+	const [loadingRecommendation, setLoadingRecommendation] = useState(false);
+
+	const loadRecommendation = useCallback(async () => {
+		if (!orchestratorService.isAutomaticMode(processingMode)) {
+			setRecommendation(null);
+			return;
+		}
+
+		setLoadingRecommendation(true);
+
+		try {
+			const result = await orchestratorService.loadRecommendation();
+			setRecommendation(result);
+		} finally {
+			setLoadingRecommendation(false);
+		}
+	}, [processingMode]);
+
+	useEffect(() => {
+		void loadRecommendation();
+	}, [loadRecommendation]);
 
 	const reset = () => {
 		setPhase("idle");
@@ -45,6 +79,8 @@ export function VideoUploadPanel() {
 		try {
 			const result = await videoService.uploadVideo(file, {
 				onProgress: setProgress,
+				processingMode,
+				strategy: recommendation?.strategy,
 			});
 
 			setVideoId(result.videoId);
@@ -65,7 +101,19 @@ export function VideoUploadPanel() {
 			<VideoUploadHeader />
 			<div className={styles.content}>
 				{phase === "idle" ? (
-					<VideoDropzone onFileSelected={handleFileSelected} />
+					<>
+						<ProcessingModeSelector
+							mode={processingMode}
+							onChange={setProcessingMode}
+						/>
+						{processingMode === "automatic" ? (
+							<PipelineRecommendationPanel
+								recommendation={recommendation}
+								loading={loadingRecommendation}
+							/>
+						) : null}
+						<VideoDropzone onFileSelected={handleFileSelected} />
+					</>
 				) : null}
 				{phase === "uploading" ? (
 					<VideoUploadProgress fileName={fileName} progress={progress} />

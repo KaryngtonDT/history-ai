@@ -21,6 +21,8 @@ export interface VideoUploadApiDto {
 
 export interface VideoUploadOptions {
 	onProgress: (progress: number) => void;
+	processingMode?: "manual" | "automatic";
+	strategy?: "balanced" | "quality" | "speed" | "low_memory";
 }
 
 const VIDEO_STATUSES = new Set<VideoStatus>([
