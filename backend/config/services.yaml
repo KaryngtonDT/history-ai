@@ -173,6 +173,9 @@ services:
     App\Domain\Orchestrator\VideoAnalysisFactoryInterface:
         alias: App\Infrastructure\Orchestrator\VideoJobVideoAnalysisFactory
 
+    App\Domain\VideoIntelligence\VideoAnalyzerInterface:
+        alias: App\Infrastructure\VideoIntelligence\CompositeVideoAnalyzer
+
     App\Infrastructure\Orchestrator\VideoJobVideoAnalysisFactory:
         arguments:
             $gpuAvailable: '%env(bool:default:orchestrator.gpu_available_default:ORCHESTRATOR_GPU_AVAILABLE)%'
