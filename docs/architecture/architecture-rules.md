@@ -1240,6 +1240,24 @@ Compare Versions → Reprocess (clone config + optional overrides)
 
 Feature components must use `historyService`, not `HttpHistoryRepository` or `HttpClient` directly.
 
+## Platform Sprint 47 — AI Review & Feedback Loop
+
+```text
+Quality Assessment → User Review → Preference Profile → AI Director
+```
+
+| Component | Role |
+| --------- | ---- |
+| `Review` | Immutable user rating aggregate per video execution version |
+| `UserPreferenceProfile` | Deterministic preferences derived from averaged review scores |
+| `SaveReviewHandler` | Persists reviews and rebuilds preference profile |
+| `BuildPreferenceProfileHandler` | Aggregates reviews into explainable preferences |
+| `DeterministicPipelinePlanner` | Applies preferences to strategy and provider selection |
+| `ReviewPanel` | Star ratings, comments, and save action in workspace UI |
+| `ReviewService` | Repository-backed review and preference operations |
+
+Feature components must use `reviewService`, not `HttpReviewRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

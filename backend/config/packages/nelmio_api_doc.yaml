@@ -133,6 +133,11 @@ nelmio_api_doc:
             - { alias: ExecutionHistory, type: App\Presentation\OpenApi\Schema\ExecutionHistorySchema }
             - { alias: ExecutionSnapshot, type: App\Presentation\OpenApi\Schema\ExecutionSnapshotSchema }
             - { alias: ComparisonResult, type: App\Presentation\OpenApi\Schema\ComparisonResultSchema }
+            - { alias: Review, type: App\Presentation\OpenApi\Schema\ReviewSchema }
+            - { alias: ReviewScore, type: App\Presentation\OpenApi\Schema\ReviewScoreSchema }
+            - { alias: ReviewComment, type: App\Presentation\OpenApi\Schema\ReviewCommentSchema }
+            - { alias: SaveReviewRequest, type: App\Presentation\OpenApi\Schema\SaveReviewRequestSchema }
+            - { alias: PreferenceProfile, type: App\Presentation\OpenApi\Schema\PreferenceProfileSchema }
     areas:
         default:
             path_patterns:

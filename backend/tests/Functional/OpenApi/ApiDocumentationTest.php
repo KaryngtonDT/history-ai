@@ -2401,6 +2401,25 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('ComparisonResult', $spec['components']['schemas']);
     }
 
+    public function testOpenApiSpecDocumentsReviewOperations(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertSame('getVideoReviews', $spec['paths']['/api/videos/{videoId}/reviews']['get']['operationId']);
+        self::assertSame('saveVideoReview', $spec['paths']['/api/videos/{videoId}/reviews']['post']['operationId']);
+        self::assertSame('getPreferences', $spec['paths']['/api/preferences']['get']['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsReviewSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('Review', $spec['components']['schemas']);
+        self::assertArrayHasKey('ReviewScore', $spec['components']['schemas']);
+        self::assertArrayHasKey('ReviewComment', $spec['components']['schemas']);
+        self::assertArrayHasKey('PreferenceProfile', $spec['components']['schemas']);
+    }
+
     /**
      * @return array<string, mixed>
      */

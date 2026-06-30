@@ -834,6 +834,27 @@ The frontend `ExecutionHistoryPanel` on `/workspace` uses `HistoryService`.
 
 ---
 
+# AI Review & Feedback (Platform Sprint 47)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/videos/{videoId}/reviews` | List reviews for a video |
+| POST | `/api/videos/{videoId}/reviews` | Save a new review |
+| GET | `/api/preferences` | Get the derived user preference profile |
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `Review` | `id`, `videoId`, `executionVersionNumber`, `scores`, `comment`, `createdAt` |
+| `ReviewScore` | Category ratings (`overall`, `translation`, `voice_clone`, `lip_sync`, `rendering`) as integers `1`–`5` |
+| `ReviewComment` | Free-text feedback up to 2000 characters |
+| `PreferenceProfile` | `translationStyle`, `voiceStability`, `renderingPreset`, `lipSyncStrength`, `explanationLines[]` |
+
+The frontend `ReviewPanel` on `/workspace` uses `ReviewService`.
+
+---
+
 # Production considerations
 
 | Topic | Recommendation |

@@ -1137,6 +1137,26 @@ Verification: [Sprint46-Verification.md](../reports/Sprint46-Verification.md)
 
 ---
 
+# Platform Sprint 47 — AI Review & Human Feedback Loop (2026-06)
+
+Platform Sprint 47 adds **user-centered adaptivity**: creators rate generated outputs, the platform derives a deterministic preference profile, and the AI Director adjusts pipeline recommendations accordingly.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P47-SLICE-01 | `Review`, `ReviewScore`, `UserPreferenceProfile` domain | ✅ |
+| P47-SLICE-02 | Feedback engine with profile generation and persistence | ✅ |
+| P47-SLICE-03 | AI Director preference integration | ✅ |
+| P47-SLICE-04 | `ReviewPanel`, `ReviewSummary`, `PreferenceProfileCard` | ✅ |
+| P47-SLICE-05 | OpenAPI review schemas, architecture docs, verification report | ✅ |
+
+```text
+Execution History → User Reviews → Preference Profile → AI Director → Optimized Pipeline
+```
+
+Verification: [Sprint47-Verification.md](../reports/Sprint47-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:
