@@ -207,6 +207,12 @@ services:
     App\Application\History\Ports\ExecutionHistorySnapshotStoreInterface:
         alias: App\Infrastructure\Persistence\Doctrine\History\DoctrineExecutionHistorySnapshotStore
 
+    App\Domain\Review\ReviewRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Review\DoctrineReviewRepository
+
+    App\Domain\Review\UserPreferenceProfileRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Review\DoctrineUserPreferenceProfileRepository
+
     App\Domain\History\ExecutionReplayContextInterface:
         alias: App\Infrastructure\History\ExecutionReplayContext
 
