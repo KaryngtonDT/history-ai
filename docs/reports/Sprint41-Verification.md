@@ -47,7 +47,7 @@ Platform Sprint 41 delivers **AI Director: Smart Video Intelligence** for Phase 
 | P41-SLICE-02 | `a732a49` | feat(intelligence): add composite analyzer |
 | P41-SLICE-03 | `80a4491` | feat(orchestrator): integrate ai director |
 | P41-SLICE-04 | `0606af5` | feat(frontend): add ai director dashboard |
-| P41-SLICE-05 | `TBD` | docs(intelligence): document ai director |
+| P41-SLICE-05 | `b303fff` | docs(intelligence): document ai director |
 
 ---
 
