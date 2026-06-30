@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Video\Handlers;
 
+use App\Application\Quality\VideoQualityAssessmentRunner;
 use App\Application\LipSync\GenerateLipSyncConfiguration;
 use App\Application\LipSync\VideoLipSyncGenerator;
 use App\Application\Speech\TranscriptJsonMapper;
@@ -67,6 +68,7 @@ final class ProcessVideoHandler
         private readonly RuntimePipelineConfigurationContextInterface $runtimePipelineContext,
         private readonly PipelineSchedulerInterface $pipelineScheduler,
         private readonly RuntimeExecutionScheduleContextInterface $runtimeScheduleContext,
+        private readonly VideoQualityAssessmentRunner $qualityAssessmentRunner,
     ) {
     }
 
@@ -138,6 +140,11 @@ final class ProcessVideoHandler
                     fn (): mixed => $this->videoFinalRenderGenerator->generate($videoId),
                 );
             }
+
+            $this->qualityAssessmentRunner->assess(
+                $videoId,
+                $this->runtimeOptimizationContext->get(),
+            );
 
             $this->videoRepository->save($processing->complete());
         } catch (Throwable) {

@@ -15,6 +15,7 @@ enum LibraryItemType: string
     case VoiceClone = 'voice_clone';
     case LipSync = 'lip_sync';
     case FinalVideo = 'final_video';
+    case QualityReport = 'quality_report';
     case Timeline = 'timeline';
     case Podcast = 'podcast';
 }

@@ -33,6 +33,8 @@ use App\Application\VideoRender\GenerateFinalVideoConfiguration;
 use App\Application\VideoRender\VideoFinalRenderGenerator;
 use App\Application\VoiceClone\GenerateVoiceCloneConfiguration;
 use App\Application\VoiceClone\VideoVoiceCloneGenerator;
+use App\Application\Quality\QualityReportJsonMapper;
+use App\Application\Quality\VideoQualityAssessmentRunner;
 use App\Domain\Orchestrator\PipelinePlannerInterface;
 use App\Domain\Optimization\ExecutionOptimizerInterface;
 use App\Domain\Optimization\RuntimeExecutionOptimizationContextInterface;
@@ -59,6 +61,7 @@ use App\Domain\VideoIntelligence\VideoScene;
 use App\Domain\VideoIntelligence\VideoSpeakerCollection;
 use App\Domain\VideoIntelligence\VisualCharacteristics;
 use App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface;
+use App\Domain\VideoRender\FinalVideoRepositoryInterface;
 use App\Domain\Pipeline\RuntimePipelineConfigurationContextInterface;
 use App\Domain\Scheduler\ExecutionSchedule;
 use App\Domain\Scheduler\ExecutionScheduleId;
@@ -72,6 +75,7 @@ use App\Domain\Scheduler\ScheduledStageCollection;
 use App\Domain\Scheduler\SchedulingStrategy;
 use App\Domain\Scheduler\ExecutionResource;
 use App\Domain\Pipeline\PipelineStageType;
+use App\Domain\Quality\QualityEvaluatorInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -99,6 +103,8 @@ final class ProcessVideoHandlerTest extends TestCase
 
     private RuntimeExecutionScheduleContextInterface&MockObject $runtimeScheduleContext;
 
+    private VideoQualityAssessmentRunner $qualityAssessmentRunner;
+
     private ProcessVideoHandler $handler;
 
     protected function setUp(): void
@@ -114,6 +120,19 @@ final class ProcessVideoHandlerTest extends TestCase
         $this->videoLipSyncGenerator = $this->createMock(VideoLipSyncGenerator::class);
         $this->videoFinalRenderGenerator = $this->createMock(VideoFinalRenderGenerator::class);
         $this->runtimeScheduleContext = $this->createMock(RuntimeExecutionScheduleContextInterface::class);
+
+        $qualityVideoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $qualityVideoRepository->method('findById')->willReturn(null);
+
+        $this->qualityAssessmentRunner = new VideoQualityAssessmentRunner(
+            $qualityVideoRepository,
+            $this->createMock(VideoIntelligenceFactoryInterface::class),
+            $this->createMock(ExecutionOptimizerInterface::class),
+            $this->createMock(QualityEvaluatorInterface::class),
+            $this->createMock(FinalVideoRepositoryInterface::class),
+            $this->createMock(ArtifactRepositoryInterface::class),
+            new QualityReportJsonMapper(),
+        );
 
         $intelligenceFactory = $this->createMock(VideoIntelligenceFactoryInterface::class);
         $intelligenceFactory->method('fromVideoJob')->willReturn($this->sampleIntelligence());
@@ -147,6 +166,7 @@ final class ProcessVideoHandlerTest extends TestCase
             $this->createMock(RuntimePipelineConfigurationContextInterface::class),
             $scheduler,
             $this->runtimeScheduleContext,
+            $this->qualityAssessmentRunner,
         );
     }
 
