@@ -176,6 +176,9 @@ services:
     App\Domain\VideoIntelligence\VideoAnalyzerInterface:
         alias: App\Infrastructure\VideoIntelligence\CompositeVideoAnalyzer
 
+    App\Domain\Optimization\ExecutionOptimizerInterface:
+        alias: App\Infrastructure\Optimization\DeterministicExecutionOptimizer
+
     App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface:
         alias: App\Infrastructure\VideoIntelligence\VideoJobVideoIntelligenceFactory
 
