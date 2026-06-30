@@ -6,7 +6,7 @@ Status: Accepted
 
 Date: 2026-06-26
 
-Commit: `TBD`
+Commit: `ce28ce3`
 
 ---
 
@@ -47,7 +47,7 @@ Platform Sprint 43 delivers **Parallel GPU/CPU Orchestration** for Phase 2. The 
 | P43-SLICE-02 | `92dca0c` | feat(scheduler): add deterministic queue scheduler |
 | P43-SLICE-03 | `4ee0b6a` | feat(worker): integrate pipeline scheduler |
 | P43-SLICE-04 | `f34fe90` | feat(frontend): add processing resource monitor |
-| P43-SLICE-05 | `TBD` | docs(scheduler): document resource orchestration |
+| P43-SLICE-05 | `ce28ce3` | docs(scheduler): document resource orchestration |
 
 ---
 
