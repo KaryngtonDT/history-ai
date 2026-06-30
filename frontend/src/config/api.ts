@@ -54,6 +54,12 @@ export const SEARCH_LIBRARY_PATH = "/api/search/library";
 
 export const VIDEOS_PATH = "/api/videos";
 
+export const PREFERENCES_PATH = "/api/preferences";
+
+export function videoReviewsPath(videoId: string): string {
+	return `${VIDEOS_PATH}/${videoId}/reviews`;
+}
+
 export const AI_PROVIDERS_PATH = "/api/ai/providers";
 
 export const PIPELINE_PATH = "/api/pipeline";

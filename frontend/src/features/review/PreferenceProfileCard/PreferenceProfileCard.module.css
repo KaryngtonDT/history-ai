@@ -1,0 +1,43 @@
+.card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 1rem;
+	border: 1px solid var(--color-border);
+	border-radius: 0.75rem;
+	background: var(--color-surface);
+}
+
+.title {
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+.grid {
+	display: grid;
+	gap: 0.5rem;
+}
+
+.row {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+	font-size: 0.95rem;
+}
+
+.label {
+	color: var(--color-text-secondary);
+}
+
+.explanationList {
+	margin: 0;
+	padding-left: 1.25rem;
+	color: var(--color-text-secondary);
+	font-size: 0.9rem;
+}
+
+.empty {
+	margin: 0;
+	color: var(--color-text-secondary);
+}

@@ -1,0 +1,28 @@
+.summary {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.reviewCard {
+	padding: 0.875rem;
+	border: 1px solid var(--color-border);
+	border-radius: 0.5rem;
+	background: var(--color-background);
+}
+
+.reviewMeta {
+	margin: 0 0 0.5rem;
+	font-size: 0.85rem;
+	color: var(--color-text-secondary);
+}
+
+.reviewComment {
+	margin: 0;
+	font-size: 0.95rem;
+}
+
+.empty {
+	margin: 0;
+	color: var(--color-text-secondary);
+}

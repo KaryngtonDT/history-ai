@@ -2,6 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import { ExecutionHistoryPanel } from "@/features/history";
+import {
+	PreferenceProfileCard,
+	ReviewPanel,
+	ReviewSummary,
+} from "@/features/review";
+import { reviewService } from "@/services/review/ReviewService";
+import type { PreferenceProfile, Review } from "@/services/review/types";
 import type { Project } from "@/services/workspace/types";
 import { WORKSPACE_TARGET_LANGUAGES } from "@/services/workspace/types";
 import { workspaceService } from "@/services/workspace/WorkspaceService";
@@ -26,6 +33,27 @@ export function WorkspacePage() {
 	const [processing, setProcessing] = useState(false);
 	const [creating, setCreating] = useState(false);
 	const [newProjectName, setNewProjectName] = useState("");
+	const [reviews, setReviews] = useState<Review[]>([]);
+	const [preferenceProfile, setPreferenceProfile] =
+		useState<PreferenceProfile | null>(null);
+
+	const selectedVideoId = selectedProject?.videos[0]?.videoId ?? null;
+
+	const loadReviewData = useCallback(async (videoId: string | null) => {
+		if (!videoId) {
+			setReviews([]);
+			setPreferenceProfile(null);
+			return;
+		}
+
+		const [loadedReviews, profile] = await Promise.all([
+			reviewService.loadReviews(videoId),
+			reviewService.loadPreferenceProfile(),
+		]);
+
+		setReviews(reviewService.sortedReviews(loadedReviews));
+		setPreferenceProfile(profile);
+	}, []);
 
 	const loadProjects = useCallback(() => {
 		setProjects(null);
@@ -93,6 +121,13 @@ export function WorkspacePage() {
 			clearInterval(timerId);
 		};
 	}, [selectedProject, refreshSelectedProject]);
+
+	useEffect(() => {
+		void loadReviewData(selectedVideoId).catch(() => {
+			setReviews([]);
+			setPreferenceProfile(null);
+		});
+	}, [loadReviewData, selectedVideoId]);
 
 	const toggleLanguage = (language: string): void => {
 		setSelectedLanguages((current) =>
@@ -259,9 +294,22 @@ export function WorkspacePage() {
 								loading={processing}
 							/>
 
-							<ExecutionHistoryPanel
-								videoId={selectedProject.videos[0]?.videoId ?? null}
+							<ExecutionHistoryPanel videoId={selectedVideoId} />
+
+							<ReviewPanel
+								key={selectedVideoId ?? "no-video"}
+								videoId={selectedVideoId}
+								onSaved={() => {
+									void loadReviewData(selectedVideoId);
+								}}
 							/>
+
+							<PreferenceProfileCard profile={preferenceProfile} />
+
+							<div className={styles.section}>
+								<h2 className={styles.sectionTitle}>Review History</h2>
+								<ReviewSummary reviews={reviews} />
+							</div>
 						</>
 					) : (
 						<EmptyState
