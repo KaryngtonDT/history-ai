@@ -5,6 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { VideoUploadPanel } from "@/features/video/VideoUploadPanel/VideoUploadPanel";
 import { MOCK_PREVIEW_INTELLIGENCE } from "@/services/intelligence/MockVideoIntelligenceRepository";
 import { videoIntelligenceService } from "@/services/intelligence/VideoIntelligenceService";
+import { MOCK_PREVIEW_OPTIMIZATION } from "@/services/optimization/MockOptimizationRepository";
+import { optimizationService } from "@/services/optimization/OptimizationService";
 import { orchestratorService } from "@/services/orchestrator/OrchestratorService";
 import { videoService } from "@/services/video/VideoService";
 import { ValidationError } from "@/shared/errors";
@@ -29,6 +31,9 @@ describe("VideoUploadPanel", () => {
 			videoIntelligenceService,
 			"loadPreviewIntelligence",
 		).mockResolvedValue(MOCK_PREVIEW_INTELLIGENCE);
+		vi.spyOn(optimizationService, "loadPreviewOptimization").mockResolvedValue(
+			MOCK_PREVIEW_OPTIMIZATION,
+		);
 	});
 
 	it("rejects unsupported files", () => {

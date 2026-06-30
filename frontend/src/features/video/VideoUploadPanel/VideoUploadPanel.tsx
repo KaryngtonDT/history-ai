@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { VideoIntelligenceDashboard } from "@/features/intelligence";
+import { OptimizationDashboard } from "@/features/optimization";
 import { ProcessingModeSelector } from "@/features/orchestrator";
 import type { VideoIntelligence } from "@/services/intelligence/types";
 import { videoIntelligenceService } from "@/services/intelligence/VideoIntelligenceService";
+import { optimizationService } from "@/services/optimization/OptimizationService";
+import type { ExecutionOptimization } from "@/services/optimization/types";
 import { orchestratorService } from "@/services/orchestrator/OrchestratorService";
 import type {
 	PipelineRecommendation,
@@ -35,24 +38,30 @@ export function VideoUploadPanel() {
 	const [intelligence, setIntelligence] = useState<VideoIntelligence | null>(
 		null,
 	);
+	const [optimization, setOptimization] =
+		useState<ExecutionOptimization | null>(null);
 	const [loadingAutomaticPreview, setLoadingAutomaticPreview] = useState(false);
 
 	const loadAutomaticPreview = useCallback(async () => {
 		if (!orchestratorService.isAutomaticMode(processingMode)) {
 			setRecommendation(null);
 			setIntelligence(null);
+			setOptimization(null);
 			return;
 		}
 
 		setLoadingAutomaticPreview(true);
 
 		try {
-			const [recommendationResult, intelligenceResult] = await Promise.all([
-				orchestratorService.loadRecommendation(),
-				videoIntelligenceService.loadPreviewIntelligence(),
-			]);
+			const [recommendationResult, intelligenceResult, optimizationResult] =
+				await Promise.all([
+					orchestratorService.loadRecommendation(),
+					videoIntelligenceService.loadPreviewIntelligence(),
+					optimizationService.loadPreviewOptimization(),
+				]);
 			setRecommendation(recommendationResult);
 			setIntelligence(intelligenceResult);
+			setOptimization(optimizationResult);
 		} finally {
 			setLoadingAutomaticPreview(false);
 		}
@@ -115,11 +124,17 @@ export function VideoUploadPanel() {
 							onChange={setProcessingMode}
 						/>
 						{processingMode === "automatic" ? (
-							<VideoIntelligenceDashboard
-								intelligence={intelligence}
-								recommendation={recommendation}
-								loading={loadingAutomaticPreview}
-							/>
+							<>
+								<VideoIntelligenceDashboard
+									intelligence={intelligence}
+									recommendation={recommendation}
+									loading={loadingAutomaticPreview}
+								/>
+								<OptimizationDashboard
+									optimization={optimization}
+									loading={loadingAutomaticPreview}
+								/>
+							</>
 						) : null}
 						<VideoDropzone onFileSelected={handleFileSelected} />
 					</>

@@ -25,6 +25,10 @@ export function videoIntelligencePath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/intelligence`;
 }
 
+export function videoOptimizationPath(videoId: string): string {
+	return `${VIDEOS_PATH}/${videoId}/optimization`;
+}
+
 export function pipelineResetPath(): string {
 	return `${PIPELINE_PATH}/reset`;
 }
