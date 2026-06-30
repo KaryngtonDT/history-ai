@@ -21,6 +21,7 @@ use App\Infrastructure\Persistence\Doctrine\Pipeline\PipelineConfigurationRecord
 use App\Infrastructure\Persistence\Doctrine\Speech\TranscriptRecord;
 use App\Infrastructure\Persistence\Doctrine\Translation\TranslationRecord;
 use App\Infrastructure\Persistence\Doctrine\Video\VideoJobRecord;
+use App\Infrastructure\Persistence\Doctrine\VideoRender\FinalVideoRecord;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -54,10 +55,11 @@ final class ProcessVideoTranscriptFlowTest extends WebTestCase
 
         $artifactRepository = static::getContainer()->get(ArtifactRepositoryInterface::class);
         $artifacts = $artifactRepository->findByContentId(new ContentId($videoId->value));
-        self::assertCount(3, $artifacts);
+        self::assertCount(4, $artifacts);
 
         $types = array_map(static fn ($artifact) => $artifact->type(), $artifacts);
         self::assertContains(ArtifactType::Transcript, $types);
+        self::assertContains(ArtifactType::QualityReport, $types);
         self::assertSame(2, count(array_filter($types, static fn ($type) => ArtifactType::Translation === $type)));
 
         $translationRepository = static::getContainer()->get(TranslationRepositoryInterface::class);
@@ -86,6 +88,7 @@ final class ProcessVideoTranscriptFlowTest extends WebTestCase
             $entityManager->getClassMetadata(ArtifactRecord::class),
             $entityManager->getClassMetadata(VideoJobRecord::class),
             $entityManager->getClassMetadata(PipelineConfigurationRecord::class),
+            $entityManager->getClassMetadata(FinalVideoRecord::class),
         ];
         $schemaTool = new SchemaTool($entityManager);
         $schemaTool->dropSchema($metadata);
