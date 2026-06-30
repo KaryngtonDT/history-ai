@@ -399,6 +399,64 @@ The frontend `AIEngineSettings` at `/settings/ai` displays available engines and
 
 ---
 
+# Video audio (Platform Sprint 35)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/videos/{videoId}/audio` | List generated audio artifacts for a video |
+| POST | `/api/videos/{videoId}/audio` | Generate audio for a translation language with selected provider and voice |
+| GET | `/api/videos/{videoId}/audio/{language}` | Get audio metadata for a specific language |
+| GET | `/api/videos/{videoId}/audio/{language}/stream` | Stream WAV audio file for preview/download |
+
+## Request body (POST)
+
+```json
+{
+  "language": "French",
+  "provider": "f5_tts",
+  "voiceId": "f5-female-01"
+}
+```
+
+## Response shape (list)
+
+```json
+{
+  "items": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "videoId": "660e8400-e29b-41d4-a716-446655440001",
+      "translationId": "770e8400-e29b-41d4-a716-446655440002",
+      "language": "French",
+      "provider": "f5_tts",
+      "voice": {
+        "voiceId": "f5-female-01",
+        "displayName": "Female 01",
+        "language": "French",
+        "gender": "female"
+      },
+      "durationSeconds": 201.5,
+      "format": "wav",
+      "downloadUrl": "/api/videos/{videoId}/audio/French/stream"
+    }
+  ]
+}
+```
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `TextToSpeechProvider` | `f5_tts`, `kokoro`, `xtts`, `mock` |
+| `VoiceGender` | `male`, `female`, `neutral` |
+| `VoiceLanguage` | `English`, `French`, `German`, `Spanish`, `Italian` |
+| `AudioArtifact` | `id`, `translationId`, `provider`, `voice`, `durationSeconds`, `format`, `language` |
+| `GenerateVideoAudioRequest` | `language`, `provider`, `voiceId` |
+
+The frontend `AudioPlayerPanel` at `/video/:videoId/audio` lets users select a TTS provider and voice, generate audio, play/pause preview, and download WAV via `AudioService`.
+
+---
+
 # Production considerations
 
 | Topic | Recommendation |

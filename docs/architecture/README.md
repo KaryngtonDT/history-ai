@@ -740,13 +740,54 @@ AIEngineRegistry → enabled provider
         │
         ├── SpeechToTextProvider → FasterWhisper
         ├── TranslationProvider → Ollama
-        └── (future) TTS, VoiceClone, LipSync providers
+        ├── TextToSpeechProvider → F5-TTS (Kokoro, XTTS disabled)
+        └── (future) VoiceClone, LipSync providers
         │
         ▼
 GET /api/ai/providers → AIEngineSettings (/settings/ai)
 ```
 
 Verification: [Sprint34-Verification.md](../reports/Sprint34-Verification.md)
+
+---
+
+# Platform Sprint 35 — Text-to-Speech Foundation (2026-06)
+
+Platform Sprint 35 delivers **translated audio generation and preview** for Phase 2: TTS domain model, F5-TTS provider integration, audio worker pipeline, frontend audio player, and OpenAPI documentation. No voice cloning, lip-sync, or video rendering.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P35-SLICE-01 | `AudioArtifact`, `Voice`, `TextToSpeechProviderInterface` | ✅ |
+| P35-SLICE-02 | `F5TextToSpeechProvider`, factory, AI Engine integration | ✅ |
+| P35-SLICE-03 | `VideoAudioGenerator`, audio artifacts, REST endpoints | ✅ |
+| P35-SLICE-04 | `AudioPlayerPanel`, `VoiceSelector`, `AudioService` | ✅ |
+| P35-SLICE-05 | OpenAPI audio schemas, architecture docs, verification report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `AudioArtifact`, `Voice`, `VoiceCatalog`, `TextToSpeechProvider`, `TextToSpeechProviderInterface` |
+| Application | `VideoAudioGenerator`, `GenerateVideoAudioHandler`, `ListVideoAudioHandler`, `GetVideoAudioHandler` |
+| Infrastructure | `F5TextToSpeechProvider`, `DoctrineAudioRepository`, `TextToSpeechProviderFactory` |
+| Presentation | `GET/POST /api/videos/{videoId}/audio`, stream endpoint, OpenAPI TTS schemas |
+| Frontend | `AudioPlayerPanel`, `VoiceSelector`, `AudioService` at `/video/:videoId/audio` |
+
+```text
+Translation Artifact
+        │
+        ▼
+AIProviderResolver.resolveTextToSpeech()
+        │
+        ▼
+F5TextToSpeechProvider
+        │
+        ▼
+Audio Artifact (ArtifactType::Audio)
+        │
+        ▼
+GET/POST /api/videos/{videoId}/audio → AudioPlayerPanel (/video/:videoId/audio)
+```
+
+Verification: [Sprint35-Verification.md](../reports/Sprint35-Verification.md)
 
 ---
 

@@ -918,7 +918,7 @@ AIProviderResolverInterface (capability)
 AIEngineRegistry → enabled provider
         │
         ▼
-SpeechToTextProvider / TranslationProvider / (future TTS, VoiceClone, LipSync)
+SpeechToTextProvider / TranslationProvider / TextToSpeechProvider / (future VoiceClone, LipSync)
         │
         ▼
 GET /api/ai/providers → AIEngineSettings (/settings/ai)
@@ -933,6 +933,34 @@ GET /api/ai/providers → AIEngineSettings (/settings/ai)
 | `AIEngineSettings` | Read-only frontend overview of available engines |
 
 Feature components must use `aiEngineService`, not `HttpAIEngineRepository` or `HttpClient` directly.
+
+### Text-to-Speech Foundation (Platform Sprint 35)
+
+```text
+Translation Artifact
+        │
+        ▼
+AIProviderResolverInterface.resolveTextToSpeech()
+        │
+        ▼
+F5TextToSpeechProvider
+        │
+        ▼
+Audio Artifact (ArtifactType::Audio)
+        │
+        ▼
+GET/POST /api/videos/{videoId}/audio → AudioPlayerPanel (/video/:videoId/audio)
+```
+
+| Component | Role |
+| --------- | ---- |
+| `AudioArtifact` | Immutable aggregate with voice, duration, format, storage path |
+| `TextToSpeechProviderInterface` | Domain port: `synthesize(Translation, Voice)` |
+| `F5TextToSpeechProvider` | F5-TTS process runner and audio mapper |
+| `VideoAudioGenerator` | Orchestrates translation → TTS → persistence → artifact |
+| `AudioPlayerPanel` | Voice selection, generate, play/pause, download |
+
+Feature components must use `audioService`, not `HttpAudioRepository` or `HttpClient` directly.
 
 ## Enforcement
 

@@ -7,6 +7,7 @@ namespace App\Presentation\Http\Controller\Video;
 use App\Application\TTS\Handlers\GenerateVideoAudioHandler;
 use App\Application\TTS\Commands\GenerateVideoAudioCommand;
 use App\Domain\TTS\Exception\InvalidAudioArtifactException;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,42 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class GenerateVideoAudioController extends AbstractController
 {
+    #[OA\Post(
+        operationId: 'generateVideoAudio',
+        summary: 'Generate video audio',
+        description: 'Synthesizes translated text into audio files using the configured text-to-speech provider. Creates one audio artifact per target language.',
+        tags: ['Video'],
+        parameters: [
+            new OA\Parameter(
+                name: 'videoId',
+                in: 'path',
+                required: true,
+                description: 'UUID of the uploaded video job.',
+                schema: new OA\Schema(type: 'string', format: 'uuid'),
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: false,
+            content: new OA\JsonContent(ref: '#/components/schemas/GenerateVideoAudioRequest'),
+        ),
+        responses: [
+            new OA\Response(
+                response: 202,
+                description: 'Audio generation accepted',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'status', type: 'string', example: 'generated'),
+                    ],
+                    type: 'object',
+                ),
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid request',
+                content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse'),
+            ),
+        ],
+    )]
     #[Route('/api/videos/{videoId}/audio', name: 'api_videos_audio_generate', methods: ['POST'])]
     public function __invoke(string $videoId, Request $request, GenerateVideoAudioHandler $handler): JsonResponse
     {

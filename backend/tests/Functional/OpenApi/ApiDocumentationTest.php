@@ -2024,6 +2024,50 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertContains('engineId', $engineSchema['required']);
     }
 
+    public function testOpenApiSpecDocumentsListVideoAudioOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/audio']['get'];
+
+        self::assertSame('listVideoAudio', $operation['operationId']);
+        self::assertContains('Video', $operation['tags']);
+    }
+
+    public function testOpenApiSpecDocumentsGenerateVideoAudioOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/audio']['post'];
+
+        self::assertSame('generateVideoAudio', $operation['operationId']);
+        self::assertContains('Video', $operation['tags']);
+    }
+
+    public function testOpenApiSpecDocumentsGetVideoAudioOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/audio/{language}']['get'];
+
+        self::assertSame('getVideoAudio', $operation['operationId']);
+        self::assertContains('Video', $operation['tags']);
+    }
+
+    public function testOpenApiSpecDocumentsAudioSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('TextToSpeechProvider', $spec['components']['schemas']);
+        self::assertArrayHasKey('VoiceGender', $spec['components']['schemas']);
+        self::assertArrayHasKey('VoiceLanguage', $spec['components']['schemas']);
+        self::assertArrayHasKey('AudioArtifact', $spec['components']['schemas']);
+        self::assertArrayHasKey('VideoAudioSummary', $spec['components']['schemas']);
+        self::assertArrayHasKey('VideoAudioList', $spec['components']['schemas']);
+        self::assertArrayHasKey('GenerateVideoAudioRequest', $spec['components']['schemas']);
+
+        $providerSchema = $spec['components']['schemas']['TextToSpeechProvider'];
+        self::assertSame('string', $providerSchema['type']);
+        self::assertContains('f5_tts', $providerSchema['enum']);
+    }
+
     /**
      * @return array<string, mixed>
      */

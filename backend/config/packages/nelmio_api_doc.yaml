@@ -72,6 +72,13 @@ nelmio_api_doc:
             - { alias: AIProvider, type: App\Presentation\OpenApi\Schema\AIProviderSchema }
             - { alias: AIEngine, type: App\Presentation\OpenApi\Schema\AIEngineSchema }
             - { alias: AIProvidersList, type: App\Presentation\OpenApi\Schema\AIProvidersListSchema }
+            - { alias: TextToSpeechProvider, type: App\Presentation\OpenApi\Schema\TextToSpeechProviderSchema }
+            - { alias: VoiceGender, type: App\Presentation\OpenApi\Schema\VoiceGenderSchema }
+            - { alias: VoiceLanguage, type: App\Presentation\OpenApi\Schema\VoiceLanguageSchema }
+            - { alias: AudioArtifact, type: App\Presentation\OpenApi\Schema\AudioArtifactSchema }
+            - { alias: VideoAudioSummary, type: App\Presentation\OpenApi\Schema\VideoAudioSummarySchema }
+            - { alias: VideoAudioList, type: App\Presentation\OpenApi\Schema\VideoAudioListSchema }
+            - { alias: GenerateVideoAudioRequest, type: App\Presentation\OpenApi\Schema\GenerateVideoAudioRequestSchema }
     areas:
         default:
             path_patterns:
