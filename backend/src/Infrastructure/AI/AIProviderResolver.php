@@ -26,6 +26,7 @@ use App\Infrastructure\Speech\SpeechToTextProviderFactory;
 use App\Infrastructure\Translation\TranslationProviderFactory;
 use App\Infrastructure\TTS\TextToSpeechProviderFactory;
 use App\Infrastructure\VoiceClone\VoiceCloneProviderFactory;
+use App\Infrastructure\LipSync\LipSyncProviderFactory;
 
 final class AIProviderResolver implements AIProviderResolverInterface
 {
