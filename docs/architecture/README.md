@@ -1013,6 +1013,35 @@ Verification: [Sprint41-Verification.md](../reports/Sprint41-Verification.md)
 
 ---
 
+# Platform Sprint 42 — Adaptive Prompt & Model Optimization (2026-06)
+
+Platform Sprint 42 delivers **execution optimization** for Phase 2: a pure optimization domain, deterministic optimizer driven by `VideoIntelligence`, pipeline integration for manual and automatic modes, frontend optimization dashboard on upload, and OpenAPI documentation.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P42-SLICE-01 | `ExecutionOptimization`, `OptimizationStage`, `OptimizationParameter` aggregates | ✅ |
+| P42-SLICE-02 | `DeterministicExecutionOptimizer` (beam size, chunk size, style, stability, strength, preset) | ✅ |
+| P42-SLICE-03 | Pipeline integration, `GET /api/videos/{videoId}/optimization` | ✅ |
+| P42-SLICE-04 | `OptimizationDashboard`, `OptimizationParameterList`, `OptimizationQualitySummary` on `/video/upload` | ✅ |
+| P42-SLICE-05 | OpenAPI optimization schemas, architecture docs, verification report | ✅ |
+
+```text
+Upload Video (/video/upload)
+        │
+        ▼
+VideoIntelligence
+        │
+        ▼
+DeterministicExecutionOptimizer → ExecutionOptimization
+        │
+        ▼
+OptimizationDashboard + Pipeline Engine → Final MP4
+```
+
+Verification: [Sprint42-Verification.md](../reports/Sprint42-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

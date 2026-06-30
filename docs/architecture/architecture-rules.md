@@ -1130,6 +1130,28 @@ DeterministicPipelinePlanner → PipelineRecommendation.reasons[]
 
 Feature components must use `videoIntelligenceService`, not `HttpVideoIntelligenceRepository` or `HttpClient` directly.
 
+## Platform Sprint 42 — Execution Optimization
+
+```text
+VideoIntelligence
+        │
+        ▼
+DeterministicExecutionOptimizer → ExecutionOptimization
+        │
+        ▼
+RuntimeExecutionOptimizationContext → Pipeline providers
+```
+
+| Component | Role |
+| --------- | ---- |
+| `ExecutionOptimization` | Immutable aggregate of stage parameters and explanations |
+| `DeterministicExecutionOptimizer` | Rule engine (beam size, chunk size, style, stability, strength, preset) |
+| `RuntimeExecutionOptimizationContext` | Holds ephemeral optimization per job |
+| `OptimizationDashboard` | Upload preview with stage parameters and estimated impact |
+| `OptimizationService` | Repository-backed optimization loading |
+
+Feature components must use `optimizationService`, not `HttpOptimizationRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

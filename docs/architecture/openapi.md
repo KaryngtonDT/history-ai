@@ -730,6 +730,25 @@ The frontend `ProcessingModeSelector` and `VideoIntelligenceDashboard` on `/vide
 
 ---
 
+# Execution Optimization (Platform Sprint 42)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/videos/{videoId}/optimization` | Get AI Director execution parameter optimization for a video |
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `ExecutionOptimization` | `id`, `videoId`, `profile`, `summary`, `estimatedImpact`, `stages[]`, `explanations[]` |
+| `OptimizationStage` | `stage`, `parameters[]`, `explanations[]` |
+| `OptimizationParameter` | `key`, `value` |
+| `OptimizationProfile` | `balanced`, `quality`, `speed`, `low_memory` |
+
+The frontend `OptimizationDashboard` on `/video/upload` uses `OptimizationService` alongside `VideoIntelligenceService` and `OrchestratorService`.
+
+---
+
 # Production considerations
 
 | Topic | Recommendation |
