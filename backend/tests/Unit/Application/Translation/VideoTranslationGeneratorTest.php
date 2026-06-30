@@ -18,6 +18,12 @@ use App\Domain\Speech\TranscriptSegmentCollection;
 use App\Domain\Translation\TranslationLanguage;
 use App\Domain\Translation\TranslationRepositoryInterface;
 use App\Domain\Video\VideoId;
+use App\Infrastructure\AI\AIEngineRegistryFactory;
+use App\Infrastructure\AI\AIProviderResolver;
+use App\Infrastructure\Speech\FasterWhisperOutputParser;
+use App\Infrastructure\Speech\FasterWhisperProcessRunnerInterface;
+use App\Infrastructure\Speech\FasterWhisperProvider;
+use App\Infrastructure\Speech\SpeechToTextProviderFactory;
 use App\Infrastructure\Translation\FixedOllamaClient;
 use App\Infrastructure\Translation\MockTranslationProvider;
 use App\Infrastructure\Translation\OllamaTranslationPromptBuilder;
@@ -42,18 +48,32 @@ final class VideoTranslationGeneratorTest extends TestCase
         $this->translationRepository = $this->createMock(TranslationRepositoryInterface::class);
         $this->artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
 
+        $registryFactory = new AIEngineRegistryFactory();
         $ollamaProvider = new OllamaTranslationProvider(
             new FixedOllamaClient(),
             new OllamaTranslationPromptBuilder(),
             'qwen3',
         );
-        $factory = new TranslationProviderFactory('ollama', $ollamaProvider, new MockTranslationProvider());
+        $aiProviderResolver = new AIProviderResolver(
+            $registryFactory->create(),
+            $registryFactory->createConfiguration(),
+            new SpeechToTextProviderFactory(
+                'faster_whisper',
+                new FasterWhisperProvider(
+                    $this->createMock(FasterWhisperProcessRunnerInterface::class),
+                    new FasterWhisperOutputParser(),
+                    'faster-whisper',
+                    'base',
+                ),
+            ),
+            new TranslationProviderFactory('ollama', $ollamaProvider, new MockTranslationProvider()),
+        );
 
         $this->generator = new VideoTranslationGenerator(
             $this->transcriptRepository,
             $this->translationRepository,
             $this->artifactRepository,
-            $factory,
+            $aiProviderResolver,
             new TranslationJsonMapper(),
         );
     }

@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace App\Application\Video\Handlers;
 
 use App\Application\Video\Messages\ProcessVideoMessage;
+use App\Application\Speech\TranscriptJsonMapper;
+use App\Application\Translation\DefaultTranslationLanguagesProvider;
+use App\Application\Translation\VideoTranslationGenerator;
+use App\Domain\AI\AIProviderResolverInterface;
 use App\Domain\Artifact\Artifact;
 use App\Domain\Artifact\ArtifactContent;
 use App\Domain\Artifact\ArtifactId;
@@ -12,20 +16,16 @@ use App\Domain\Artifact\ArtifactRepositoryInterface;
 use App\Domain\Artifact\ArtifactType;
 use App\Domain\Content\ContentId;
 use App\Domain\Processing\ProcessingJobId;
-use App\Domain\Speech\SpeechToTextProviderInterface;
 use App\Domain\Speech\TranscriptRepositoryInterface;
 use App\Domain\Video\VideoId;
 use App\Domain\Video\VideoRepositoryInterface;
-use App\Application\Speech\TranscriptJsonMapper;
-use App\Application\Translation\DefaultTranslationLanguagesProvider;
-use App\Application\Translation\VideoTranslationGenerator;
 use Throwable;
 
 final class ProcessVideoHandler
 {
     public function __construct(
         private readonly VideoRepositoryInterface $videoRepository,
-        private readonly SpeechToTextProviderInterface $speechToTextProvider,
+        private readonly AIProviderResolverInterface $aiProviderResolver,
         private readonly TranscriptRepositoryInterface $transcriptRepository,
         private readonly ArtifactRepositoryInterface $artifactRepository,
         private readonly TranscriptJsonMapper $transcriptJsonMapper,
@@ -47,7 +47,9 @@ final class ProcessVideoHandler
         $this->videoRepository->save($processing);
 
         try {
-            $transcript = $this->speechToTextProvider->transcribe($processing);
+            $transcript = $this->aiProviderResolver
+                ->resolveSpeechToText()
+                ->transcribe($processing);
             $this->transcriptRepository->save($videoId, $transcript);
 
             $artifact = Artifact::create(

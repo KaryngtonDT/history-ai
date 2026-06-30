@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Application\Video;
 
 use App\Application\Video\Handlers\ProcessVideoHandler;
 use App\Application\Video\Messages\ProcessVideoMessage;
+use App\Domain\AI\AIProviderResolverInterface;
 use App\Domain\Artifact\ArtifactRepositoryInterface;
 use App\Domain\Artifact\ArtifactType;
 use App\Domain\Content\ContentId;
@@ -31,6 +32,8 @@ final class ProcessVideoHandlerTest extends TestCase
 {
     private VideoRepositoryInterface&MockObject $videoRepository;
 
+    private AIProviderResolverInterface&MockObject $aiProviderResolver;
+
     private SpeechToTextProviderInterface&MockObject $speechToTextProvider;
 
     private TranscriptRepositoryInterface&MockObject $transcriptRepository;
@@ -44,6 +47,7 @@ final class ProcessVideoHandlerTest extends TestCase
     protected function setUp(): void
     {
         $this->videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $this->aiProviderResolver = $this->createMock(AIProviderResolverInterface::class);
         $this->speechToTextProvider = $this->createMock(SpeechToTextProviderInterface::class);
         $this->transcriptRepository = $this->createMock(TranscriptRepositoryInterface::class);
         $this->artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
@@ -51,7 +55,7 @@ final class ProcessVideoHandlerTest extends TestCase
 
         $this->handler = new ProcessVideoHandler(
             $this->videoRepository,
-            $this->speechToTextProvider,
+            $this->aiProviderResolver,
             $this->transcriptRepository,
             $this->artifactRepository,
             new TranscriptJsonMapper(),
@@ -98,6 +102,11 @@ final class ProcessVideoHandlerTest extends TestCase
             ->with($videoId)
             ->willReturn($queued);
 
+        $this->aiProviderResolver
+            ->expects(self::once())
+            ->method('resolveSpeechToText')
+            ->willReturn($this->speechToTextProvider);
+
         $this->speechToTextProvider
             ->expects(self::once())
             ->method('transcribe')
@@ -131,6 +140,10 @@ final class ProcessVideoHandlerTest extends TestCase
         $this->videoRepository
             ->method('findById')
             ->willReturn($queued);
+
+        $this->aiProviderResolver
+            ->method('resolveSpeechToText')
+            ->willReturn($this->speechToTextProvider);
 
         $this->speechToTextProvider
             ->method('transcribe')

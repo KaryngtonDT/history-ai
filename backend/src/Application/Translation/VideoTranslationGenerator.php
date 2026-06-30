@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Translation;
 
+use App\Domain\AI\AIProviderResolverInterface;
 use App\Domain\Artifact\Artifact;
 use App\Domain\Artifact\ArtifactContent;
 use App\Domain\Artifact\ArtifactId;
@@ -14,7 +15,6 @@ use App\Domain\Processing\ProcessingJobId;
 use App\Domain\Speech\TranscriptRepositoryInterface;
 use App\Domain\Translation\TranslationLanguage;
 use App\Domain\Translation\TranslationProvider;
-use App\Domain\Translation\TranslationProviderResolverInterface;
 use App\Domain\Translation\TranslationRepositoryInterface;
 use App\Domain\Video\VideoId;
 
@@ -24,7 +24,7 @@ class VideoTranslationGenerator
         private readonly TranscriptRepositoryInterface $transcriptRepository,
         private readonly TranslationRepositoryInterface $translationRepository,
         private readonly ArtifactRepositoryInterface $artifactRepository,
-        private readonly TranslationProviderResolverInterface $translationProviderResolver,
+        private readonly AIProviderResolverInterface $aiProviderResolver,
         private readonly TranslationJsonMapper $translationJsonMapper,
     ) {
     }
@@ -43,7 +43,7 @@ class VideoTranslationGenerator
             return;
         }
 
-        $translationProvider = $this->translationProviderResolver->resolve($provider);
+        $translationProvider = $this->aiProviderResolver->resolveTranslation($provider);
 
         foreach ($targetLanguages as $targetLanguage) {
             if ($targetLanguage === TranslationLanguage::Unknown) {
