@@ -790,6 +790,28 @@ The frontend `QualityDashboard` on `/video/upload` uses `QualityService`.
 
 ---
 
+# Project Workspace (Platform Sprint 45)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/projects` | List workspace projects |
+| POST | `/api/projects` | Create a project |
+| GET | `/api/projects/{id}` | Get project details with videos and batch status |
+| POST | `/api/projects/{id}/process` | Start batch processing for all project videos |
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `Project` | `id`, `name`, `createdAt`, `videos[]`, `batchJobId`, `batchStatus`, `batchProgress`, `targetLanguages[]` |
+| `ProjectVideo` | `videoId`, `filename`, `addedAt` |
+| `BatchJob` | `id`, `projectId`, `status`, `progress`, `totalVideos`, `queuedVideos`, `targetLanguages[]`, `failedVideoIds[]` |
+| `BatchJobStatus` | `pending`, `running`, `completed`, `partial_failure`, `failed` |
+
+The frontend `WorkspacePage` on `/workspace` uses `WorkspaceService`.
+
+---
+
 # Production considerations
 
 | Topic | Recommendation |

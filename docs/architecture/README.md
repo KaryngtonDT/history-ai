@@ -1097,6 +1097,26 @@ Verification: [Sprint44-Verification.md](../reports/Sprint44-Verification.md)
 
 ---
 
+# Platform Sprint 45 — Project Workspace & Batch Processing (2026-06)
+
+Platform Sprint 45 transforms the Core AI Platform into a **production workspace**: projects organize multiple videos, batch processing reuses the existing pipeline per video with isolated failures, runtime integration updates aggregate progress, and the frontend workspace exposes project management at `/workspace`.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P45-SLICE-01 | `Project`, `BatchJob`, collections, domain validation | ✅ |
+| P45-SLICE-02 | `RunBatchProcessingHandler` with pipeline reuse | ✅ |
+| P45-SLICE-03 | Doctrine persistence, REST API, worker batch progress | ✅ |
+| P45-SLICE-04 | `WorkspacePage`, `ProjectCard`, `VideoGrid`, `BatchProgress` | ✅ |
+| P45-SLICE-05 | OpenAPI project schemas, architecture docs, verification report | ✅ |
+
+```text
+Workspace → Project → Batch Processing → AI Director → Pipeline → Final Videos
+```
+
+Verification: [Sprint45-Verification.md](../reports/Sprint45-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

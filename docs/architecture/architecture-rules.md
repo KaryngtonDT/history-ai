@@ -1196,6 +1196,29 @@ GET /api/videos/{videoId}/quality → QualityDashboard
 
 Feature components must use `qualityService`, not `HttpQualityRepository` or `HttpClient` directly.
 
+## Platform Sprint 45 — Project Workspace
+
+```text
+Workspace
+        │
+        ▼
+Project → BatchJob → Scheduler → Existing Pipeline
+        │
+        ▼
+Multiple Final Videos + aggregate batch progress
+```
+
+| Component | Role |
+| --------- | ---- |
+| `Project` | Immutable aggregate of project metadata and video collection |
+| `BatchJob` | Immutable batch state with status and aggregate progress |
+| `RunBatchProcessingHandler` | Enqueues one pipeline job per video with failure isolation |
+| `BatchJobProgressUpdater` | Updates batch progress when worker completes each video |
+| `WorkspacePage` | Project list, video grid, language selection, batch progress |
+| `WorkspaceService` | Repository-backed project and batch operations |
+
+Feature components must use `workspaceService`, not `HttpWorkspaceRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

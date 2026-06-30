@@ -2347,6 +2347,37 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('metrics', $report['properties']);
     }
 
+    public function testOpenApiSpecDocumentsProjectOperations(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertSame('listProjects', $spec['paths']['/api/projects']['get']['operationId']);
+        self::assertSame('createProject', $spec['paths']['/api/projects']['post']['operationId']);
+        self::assertSame('getProject', $spec['paths']['/api/projects/{id}']['get']['operationId']);
+        self::assertSame(
+            'processProject',
+            $spec['paths']['/api/projects/{id}/process']['post']['operationId'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsProjectSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('Project', $spec['components']['schemas']);
+        self::assertArrayHasKey('ProjectVideo', $spec['components']['schemas']);
+        self::assertArrayHasKey('BatchJob', $spec['components']['schemas']);
+        self::assertArrayHasKey('BatchJobStatus', $spec['components']['schemas']);
+
+        $project = $spec['components']['schemas']['Project'];
+        self::assertArrayHasKey('videos', $project['properties']);
+        self::assertArrayHasKey('batchProgress', $project['properties']);
+
+        $batchJob = $spec['components']['schemas']['BatchJob'];
+        self::assertArrayHasKey('progress', $batchJob['properties']);
+        self::assertArrayHasKey('failedVideoIds', $batchJob['properties']);
+    }
+
     /**
      * @return array<string, mixed>
      */

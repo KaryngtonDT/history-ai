@@ -125,6 +125,10 @@ nelmio_api_doc:
             - { alias: QualityMetric, type: App\Presentation\OpenApi\Schema\QualityMetricSchema }
             - { alias: PublicationRecommendation, type: App\Presentation\OpenApi\Schema\PublicationRecommendationSchema }
             - { alias: QualityReport, type: App\Presentation\OpenApi\Schema\QualityReportSchema }
+            - { alias: ProjectVideo, type: App\Presentation\OpenApi\Schema\ProjectVideoSchema }
+            - { alias: BatchJobStatus, type: App\Presentation\OpenApi\Schema\BatchJobStatusSchema }
+            - { alias: BatchJob, type: App\Presentation\OpenApi\Schema\BatchJobSchema }
+            - { alias: Project, type: App\Presentation\OpenApi\Schema\ProjectSchema }
     areas:
         default:
             path_patterns:
