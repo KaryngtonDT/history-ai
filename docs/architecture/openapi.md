@@ -812,6 +812,28 @@ The frontend `WorkspacePage` on `/workspace` uses `WorkspaceService`.
 
 ---
 
+# Execution History (Platform Sprint 46)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/videos/{videoId}/history` | Get execution history for a video |
+| GET | `/api/videos/{videoId}/history/{version}` | Get a specific execution version |
+| GET | `/api/videos/{videoId}/history/compare` | Compare two versions (`left`, `right` query params) |
+| POST | `/api/videos/{videoId}/history/{version}/reprocess` | Reprocess from a previous version |
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `ExecutionHistory` | `id`, `videoId`, `versions[]` |
+| `ExecutionVersion` | `versionNumber`, `pipelineConfigurationId`, `optimizationId`, `qualityReportId`, `renderedVideoId`, `createdAt`, `optimizationProfile`, `qualityScore` |
+| `ExecutionSnapshot` | Full persisted snapshot with pipeline, optimization, and quality payloads |
+| `ComparisonResult` | `providerDifferences[]`, `optimizationDifference`, `qualityScoreDifference` |
+
+The frontend `ExecutionHistoryPanel` on `/workspace` uses `HistoryService`.
+
+---
+
 # Production considerations
 
 | Topic | Recommendation |

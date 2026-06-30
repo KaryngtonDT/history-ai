@@ -7,6 +7,7 @@ namespace App\Presentation\Http\Controller\History;
 use App\Application\History\Commands\ReprocessExecutionCommand;
 use App\Application\History\ReprocessExecutionHandler;
 use App\Domain\History\Exception\InvalidExecutionHistoryException;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,32 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class ReprocessVideoHistoryController extends AbstractController
 {
+    #[OA\Post(
+        operationId: 'reprocessVideoHistory',
+        summary: 'Reprocess a video from a previous execution version',
+        tags: ['Execution History'],
+        parameters: [
+            new OA\Parameter(name: 'videoId', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid')),
+            new OA\Parameter(name: 'version', in: 'path', required: true, schema: new OA\Schema(type: 'integer', minimum: 1)),
+        ],
+        requestBody: new OA\RequestBody(
+            required: false,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(
+                        property: 'providerOverrides',
+                        type: 'object',
+                        additionalProperties: new OA\AdditionalProperties(type: 'string'),
+                    ),
+                    new OA\Property(property: 'batchJobId', type: 'string', format: 'uuid', nullable: true),
+                ],
+            ),
+        ),
+        responses: [
+            new OA\Response(response: 202, description: 'Reprocessing queued'),
+            new OA\Response(response: 404, description: 'Version not found', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+        ],
+    )]
     #[Route('/api/videos/{videoId}/history/{version}/reprocess', name: 'api_videos_history_reprocess', methods: ['POST'], requirements: ['version' => '\d+'])]
     public function __invoke(string $videoId, int $version, Request $request, ReprocessExecutionHandler $handler): JsonResponse
     {

@@ -1219,6 +1219,27 @@ Multiple Final Videos + aggregate batch progress
 
 Feature components must use `workspaceService`, not `HttpWorkspaceRepository` or `HttpClient` directly.
 
+## Platform Sprint 46 — Execution History
+
+```text
+Render Finished → Execution Snapshot → Execution History
+        │
+        ▼
+Compare Versions → Reprocess (clone config + optional overrides)
+```
+
+| Component | Role |
+| --------- | ---- |
+| `ExecutionHistory` | Append-only aggregate of immutable execution versions |
+| `ExecutionSnapshot` | Captures pipeline, optimization, quality, and render references |
+| `RecordExecutionHistoryHandler` | Persists a version after successful render |
+| `CompareExecutionHandler` | Diff providers, optimization, and quality scores |
+| `ReprocessExecutionHandler` | Clones version config and re-queues pipeline |
+| `ExecutionHistoryPanel` | Timeline, compare, and replay actions in workspace UI |
+| `HistoryService` | Repository-backed history, compare, and reprocess operations |
+
+Feature components must use `historyService`, not `HttpHistoryRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

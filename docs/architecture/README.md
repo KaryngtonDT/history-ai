@@ -1117,6 +1117,26 @@ Verification: [Sprint45-Verification.md](../reports/Sprint45-Verification.md)
 
 ---
 
+# Platform Sprint 46 — Execution History, Versioning & Reprocessing (2026-06)
+
+Platform Sprint 46 adds **reproducible production workflows**: every completed render is historized with pipeline, optimization, and quality snapshots; versions are comparable; and any previous version can be reprocessed with optional provider overrides.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P46-SLICE-01 | `ExecutionHistory`, `ExecutionVersion`, `ExecutionSnapshot` domain | ✅ |
+| P46-SLICE-02 | `RecordExecutionHistoryHandler`, compare engine, persistence | ✅ |
+| P46-SLICE-03 | Reprocessing integration, REST API, worker history recording | ✅ |
+| P46-SLICE-04 | `ExecutionHistoryPanel`, `VersionTimeline`, `ExecutionComparison` | ✅ |
+| P46-SLICE-05 | OpenAPI history schemas, architecture docs, verification report | ✅ |
+
+```text
+Workspace → Execution History → Compare Versions → Reprocess → Final MP4
+```
+
+Verification: [Sprint46-Verification.md](../reports/Sprint46-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

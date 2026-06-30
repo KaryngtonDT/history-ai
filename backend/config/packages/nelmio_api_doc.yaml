@@ -129,6 +129,10 @@ nelmio_api_doc:
             - { alias: BatchJobStatus, type: App\Presentation\OpenApi\Schema\BatchJobStatusSchema }
             - { alias: BatchJob, type: App\Presentation\OpenApi\Schema\BatchJobSchema }
             - { alias: Project, type: App\Presentation\OpenApi\Schema\ProjectSchema }
+            - { alias: ExecutionVersion, type: App\Presentation\OpenApi\Schema\ExecutionVersionSchema }
+            - { alias: ExecutionHistory, type: App\Presentation\OpenApi\Schema\ExecutionHistorySchema }
+            - { alias: ExecutionSnapshot, type: App\Presentation\OpenApi\Schema\ExecutionSnapshotSchema }
+            - { alias: ComparisonResult, type: App\Presentation\OpenApi\Schema\ComparisonResultSchema }
     areas:
         default:
             path_patterns:

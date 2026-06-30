@@ -2378,6 +2378,29 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('failedVideoIds', $batchJob['properties']);
     }
 
+    public function testOpenApiSpecDocumentsExecutionHistoryOperations(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertSame('getVideoHistory', $spec['paths']['/api/videos/{videoId}/history']['get']['operationId']);
+        self::assertSame('getVideoHistoryVersion', $spec['paths']['/api/videos/{videoId}/history/{version}']['get']['operationId']);
+        self::assertSame('compareVideoHistory', $spec['paths']['/api/videos/{videoId}/history/compare']['get']['operationId']);
+        self::assertSame(
+            'reprocessVideoHistory',
+            $spec['paths']['/api/videos/{videoId}/history/{version}/reprocess']['post']['operationId'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsExecutionHistorySchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('ExecutionHistory', $spec['components']['schemas']);
+        self::assertArrayHasKey('ExecutionVersion', $spec['components']['schemas']);
+        self::assertArrayHasKey('ExecutionSnapshot', $spec['components']['schemas']);
+        self::assertArrayHasKey('ComparisonResult', $spec['components']['schemas']);
+    }
+
     /**
      * @return array<string, mixed>
      */
