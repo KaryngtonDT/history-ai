@@ -1,0 +1,1 @@
+export { VideoIntelligenceDashboard } from "./VideoIntelligenceDashboard";

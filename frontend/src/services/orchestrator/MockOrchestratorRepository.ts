@@ -9,6 +9,11 @@ const MOCK_RECOMMENDATION: PipelineRecommendation = {
 	estimatedDurationSeconds: 240,
 	estimatedQuality: 4,
 	estimatedVramGb: 8,
+	reasons: [
+		"High STT confidence.",
+		"Good lighting detected.",
+		"Balanced strategy selected.",
+	],
 	stages: [
 		{ stage: "speech_to_text", providerId: "faster_whisper" },
 		{ stage: "translation", providerId: "ollama" },

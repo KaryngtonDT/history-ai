@@ -19,6 +19,7 @@ export interface PipelineRecommendation {
 	estimatedQuality: number;
 	estimatedVramGb: number;
 	stages: PipelineRecommendationStage[];
+	reasons?: string[];
 }
 
 export interface VideoAnalysisInput {

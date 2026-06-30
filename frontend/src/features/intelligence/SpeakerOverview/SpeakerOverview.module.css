@@ -1,0 +1,31 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.label {
+	margin: 0;
+	font-size: 0.75rem;
+	color: var(--color-text-muted, #6b7280);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.value {
+	margin: 0;
+	font-size: 1.25rem;
+	font-weight: 600;
+}
+
+.list {
+	margin: 0;
+	padding-left: 1rem;
+	font-size: 0.875rem;
+}
+
+.meta {
+	margin: 0;
+	font-size: 0.875rem;
+	color: var(--color-text-muted, #6b7280);
+}

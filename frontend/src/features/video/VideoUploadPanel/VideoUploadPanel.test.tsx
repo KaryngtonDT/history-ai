@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { VideoUploadPanel } from "@/features/video/VideoUploadPanel/VideoUploadPanel";
+import { MOCK_PREVIEW_INTELLIGENCE } from "@/services/intelligence/MockVideoIntelligenceRepository";
+import { videoIntelligenceService } from "@/services/intelligence/VideoIntelligenceService";
 import { orchestratorService } from "@/services/orchestrator/OrchestratorService";
 import { videoService } from "@/services/video/VideoService";
 import { ValidationError } from "@/shared/errors";
@@ -20,8 +22,13 @@ describe("VideoUploadPanel", () => {
 			estimatedDurationSeconds: 240,
 			estimatedQuality: 4,
 			estimatedVramGb: 8,
+			reasons: ["Balanced strategy selected."],
 			stages: [],
 		});
+		vi.spyOn(
+			videoIntelligenceService,
+			"loadPreviewIntelligence",
+		).mockResolvedValue(MOCK_PREVIEW_INTELLIGENCE);
 	});
 
 	it("rejects unsupported files", () => {

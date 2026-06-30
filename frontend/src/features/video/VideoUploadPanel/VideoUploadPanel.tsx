@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import {
-	PipelineRecommendationPanel,
-	ProcessingModeSelector,
-} from "@/features/orchestrator";
+import { VideoIntelligenceDashboard } from "@/features/intelligence";
+import { ProcessingModeSelector } from "@/features/orchestrator";
+import type { VideoIntelligence } from "@/services/intelligence/types";
+import { videoIntelligenceService } from "@/services/intelligence/VideoIntelligenceService";
 import { orchestratorService } from "@/services/orchestrator/OrchestratorService";
 import type {
 	PipelineRecommendation,
@@ -32,27 +32,35 @@ export function VideoUploadPanel() {
 		useState<ProcessingMode>("automatic");
 	const [recommendation, setRecommendation] =
 		useState<PipelineRecommendation | null>(null);
-	const [loadingRecommendation, setLoadingRecommendation] = useState(false);
+	const [intelligence, setIntelligence] = useState<VideoIntelligence | null>(
+		null,
+	);
+	const [loadingAutomaticPreview, setLoadingAutomaticPreview] = useState(false);
 
-	const loadRecommendation = useCallback(async () => {
+	const loadAutomaticPreview = useCallback(async () => {
 		if (!orchestratorService.isAutomaticMode(processingMode)) {
 			setRecommendation(null);
+			setIntelligence(null);
 			return;
 		}
 
-		setLoadingRecommendation(true);
+		setLoadingAutomaticPreview(true);
 
 		try {
-			const result = await orchestratorService.loadRecommendation();
-			setRecommendation(result);
+			const [recommendationResult, intelligenceResult] = await Promise.all([
+				orchestratorService.loadRecommendation(),
+				videoIntelligenceService.loadPreviewIntelligence(),
+			]);
+			setRecommendation(recommendationResult);
+			setIntelligence(intelligenceResult);
 		} finally {
-			setLoadingRecommendation(false);
+			setLoadingAutomaticPreview(false);
 		}
 	}, [processingMode]);
 
 	useEffect(() => {
-		void loadRecommendation();
-	}, [loadRecommendation]);
+		void loadAutomaticPreview();
+	}, [loadAutomaticPreview]);
 
 	const reset = () => {
 		setPhase("idle");
@@ -107,9 +115,10 @@ export function VideoUploadPanel() {
 							onChange={setProcessingMode}
 						/>
 						{processingMode === "automatic" ? (
-							<PipelineRecommendationPanel
+							<VideoIntelligenceDashboard
+								intelligence={intelligence}
 								recommendation={recommendation}
-								loading={loadingRecommendation}
+								loading={loadingAutomaticPreview}
 							/>
 						) : null}
 						<VideoDropzone onFileSelected={handleFileSelected} />
