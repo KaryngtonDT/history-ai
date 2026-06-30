@@ -251,4 +251,4 @@ docs/
 | 2 | `cbd9b03` | feat(translation): integrate ollama provider |
 | 3 | `54e5e8c` | feat(worker): generate translation artifacts |
 | 4 | `a51fe9e` | feat(frontend): add translation viewer |
-| 5 | *(this commit)* | docs(translation): document multilingual translation |
+| 5 | `4317be5` | docs(translation): document multilingual translation |
