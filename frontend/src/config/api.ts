@@ -28,6 +28,28 @@ export function projectVideoPath(projectId: string, videoId: string): string {
 	return `${PROJECTS_PATH}/${projectId}/videos/${videoId}`;
 }
 
+export function videoHistoryPath(videoId: string): string {
+	return `${VIDEOS_PATH}/${videoId}/history`;
+}
+
+export function videoHistoryVersionPath(
+	videoId: string,
+	version: number,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/history/${version}`;
+}
+
+export function videoHistoryComparePath(videoId: string): string {
+	return `${VIDEOS_PATH}/${videoId}/history/compare`;
+}
+
+export function videoHistoryReprocessPath(
+	videoId: string,
+	version: number,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/history/${version}/reprocess`;
+}
+
 export const SEARCH_LIBRARY_PATH = "/api/search/library";
 
 export const VIDEOS_PATH = "/api/videos";

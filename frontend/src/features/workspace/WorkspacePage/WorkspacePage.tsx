@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { ExecutionHistoryPanel } from "@/features/history";
 import type { Project } from "@/services/workspace/types";
 import { WORKSPACE_TARGET_LANGUAGES } from "@/services/workspace/types";
 import { workspaceService } from "@/services/workspace/WorkspaceService";
@@ -256,6 +257,10 @@ export function WorkspacePage() {
 								progress={selectedProject.batchProgress}
 								status={selectedProject.batchStatus}
 								loading={processing}
+							/>
+
+							<ExecutionHistoryPanel
+								videoId={selectedProject.videos[0]?.videoId ?? null}
 							/>
 						</>
 					) : (
