@@ -69,7 +69,7 @@ final class AIEngineRegistryFactory
                 new AIEngineId('lip-sync'),
                 AIEngineCapability::LipSync,
                 [
-                    AIEngineProvider::create('latentsync', 'LatentSync', AIEngineCapability::LipSync, false),
+                    AIEngineProvider::create('latentsync', 'LatentSync', AIEngineCapability::LipSync),
                     AIEngineProvider::create('wav2lip', 'Wav2Lip', AIEngineCapability::LipSync, false),
                 ],
             ),
@@ -82,6 +82,7 @@ final class AIEngineRegistryFactory
             ->withDefaultProvider(AIEngineCapability::SpeechToText, self::PROVIDER_FASTER_WHISPER)
             ->withDefaultProvider(AIEngineCapability::Translation, self::PROVIDER_OLLAMA)
             ->withDefaultProvider(AIEngineCapability::TextToSpeech, self::PROVIDER_F5_TTS)
-            ->withDefaultProvider(AIEngineCapability::VoiceClone, self::PROVIDER_OPENVOICE);
+            ->withDefaultProvider(AIEngineCapability::VoiceClone, self::PROVIDER_OPENVOICE)
+            ->withDefaultProvider(AIEngineCapability::LipSync, self::PROVIDER_LATENTSYNC);
     }
 }

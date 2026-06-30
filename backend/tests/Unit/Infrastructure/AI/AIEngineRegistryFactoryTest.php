@@ -35,7 +35,11 @@ final class AIEngineRegistryFactoryTest extends TestCase
             'openvoice',
             $registry->enabledProviders(AIEngineCapability::VoiceClone)[0]->providerId(),
         );
-        self::assertCount(0, $registry->enabledProviders(AIEngineCapability::LipSync));
+        self::assertCount(1, $registry->enabledProviders(AIEngineCapability::LipSync));
+        self::assertSame(
+            'latentsync',
+            $registry->enabledProviders(AIEngineCapability::LipSync)[0]->providerId(),
+        );
     }
 
     public function testCreatesDefaultConfiguration(): void
@@ -46,5 +50,6 @@ final class AIEngineRegistryFactoryTest extends TestCase
         self::assertSame('ollama', $configuration->defaultProviderFor(AIEngineCapability::Translation));
         self::assertSame('f5_tts', $configuration->defaultProviderFor(AIEngineCapability::TextToSpeech));
         self::assertSame('openvoice', $configuration->defaultProviderFor(AIEngineCapability::VoiceClone));
+        self::assertSame('latentsync', $configuration->defaultProviderFor(AIEngineCapability::LipSync));
     }
 }

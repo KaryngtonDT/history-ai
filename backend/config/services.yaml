@@ -31,6 +31,12 @@ parameters:
     voice_clone.openvoice.base_path_default: '/models/openvoice'
     voice_clone.output_dir: '%kernel.project_dir%/var/voice-clone-storage'
     voice_clone.generate_default: false
+    lip_sync.provider_default: 'latentsync'
+    lip_sync.latentsync.binary_default: 'latentsync'
+    lip_sync.latentsync.model_default: 'latentsync'
+    lip_sync.latentsync.base_path_default: '/models/latentsync'
+    lip_sync.output_dir: '%kernel.project_dir%/var/lip-sync-storage'
+    lip_sync.generate_default: false
 
 services:
     _defaults:
@@ -312,3 +318,17 @@ services:
     App\Infrastructure\VoiceClone\VoiceCloneProviderFactory:
         arguments:
             $defaultProviderName: '%env(default:voice_clone.provider_default:VOICE_CLONE_PROVIDER)%'
+
+    App\Infrastructure\LipSync\LatentSyncProcessRunner:
+        alias: App\Infrastructure\LipSync\ShellLatentSyncProcessRunner
+
+    App\Infrastructure\LipSync\LatentSyncProvider:
+        arguments:
+            $binary: '%env(default:lip_sync.latentsync.binary_default:LATENTSYNC_BINARY)%'
+            $model: '%env(default:lip_sync.latentsync.model_default:LATENTSYNC_MODEL)%'
+            $basePath: '%env(default:lip_sync.latentsync.base_path_default:LATENTSYNC_PATH)%'
+            $outputDirectory: '%lip_sync.output_dir%'
+
+    App\Infrastructure\LipSync\LipSyncProviderFactory:
+        arguments:
+            $defaultProviderName: '%env(default:lip_sync.provider_default:LIP_SYNC_PROVIDER)%'

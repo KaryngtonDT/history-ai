@@ -89,6 +89,10 @@ when@test:
             class: App\Infrastructure\VoiceClone\FixedOpenVoiceProcessRunner
             public: true
 
+        App\Infrastructure\LipSync\LatentSyncProcessRunner:
+            class: App\Infrastructure\LipSync\FixedLatentSyncProcessRunner
+            public: true
+
         App\Application\Video\Ports\VideoProcessingQueueInterface:
             class: App\Infrastructure\Video\NoOpVideoProcessingQueue
             public: true
@@ -97,3 +101,4 @@ when@test:
         video.storage_dir: '%kernel.cache_dir%/video-storage'
         tts.output_dir: '%kernel.cache_dir%/audio-storage'
         voice_clone.output_dir: '%kernel.cache_dir%/voice-clone-storage'
+        lip_sync.output_dir: '%kernel.cache_dir%/lip-sync-storage'

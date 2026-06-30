@@ -10,6 +10,8 @@ use App\Domain\Translation\TranslationProvider;
 use App\Domain\Translation\TranslationProviderInterface;
 use App\Domain\TTS\TextToSpeechProvider;
 use App\Domain\TTS\TextToSpeechProviderInterface;
+use App\Domain\LipSync\LipSyncProvider;
+use App\Domain\LipSync\LipSyncProviderInterface;
 use App\Domain\VoiceClone\VoiceCloneProvider;
 use App\Domain\VoiceClone\VoiceCloneProviderInterface;
 use App\Infrastructure\AI\AIEngineRegistryFactory;
@@ -28,6 +30,11 @@ use App\Infrastructure\TTS\F5TextToSpeechProvider;
 use App\Infrastructure\TTS\FixedF5ProcessRunner;
 use App\Infrastructure\TTS\MockTextToSpeechProvider;
 use App\Infrastructure\TTS\TextToSpeechProviderFactory;
+use App\Infrastructure\LipSync\FixedLatentSyncProcessRunner;
+use App\Infrastructure\LipSync\LatentSyncProvider;
+use App\Infrastructure\LipSync\LipSyncMapper;
+use App\Infrastructure\LipSync\LipSyncProviderFactory;
+use App\Infrastructure\LipSync\MockLipSyncProvider;
 use App\Infrastructure\VoiceClone\FixedOpenVoiceProcessRunner;
 use App\Infrastructure\VoiceClone\MockVoiceCloneProvider;
 use App\Infrastructure\VoiceClone\OpenVoiceProvider;
@@ -63,6 +70,7 @@ final class AIProviderResolverTest extends TestCase
             new TranslationProviderFactory('ollama', $ollama, $mockTranslation),
             $this->createTextToSpeechProviderFactory(),
             $this->createVoiceCloneProviderFactory(),
+            $this->createLipSyncProviderFactory(),
         );
     }
 
@@ -108,6 +116,28 @@ final class AIProviderResolverTest extends TestCase
                 $outputDirectory,
             ),
             new MockVoiceCloneProvider(),
+        );
+    }
+
+    private function createLipSyncProviderFactory(): LipSyncProviderFactory
+    {
+        $outputDirectory = sys_get_temp_dir().'/history-ai-resolver-lipsync';
+
+        if (!is_dir($outputDirectory)) {
+            mkdir($outputDirectory);
+        }
+
+        return new LipSyncProviderFactory(
+            'latentsync',
+            new LatentSyncProvider(
+                new FixedLatentSyncProcessRunner(),
+                new LipSyncMapper(),
+                'latentsync',
+                'latentsync',
+                '/models/latentsync',
+                $outputDirectory,
+            ),
+            new MockLipSyncProvider(),
         );
     }
 
@@ -200,5 +230,26 @@ final class AIProviderResolverTest extends TestCase
         $this->expectException(InvalidAIEngineConfigurationException::class);
 
         $this->resolver->resolveVoiceClone(VoiceCloneProvider::SeedVC);
+    }
+
+    public function testResolveLipSyncReturnsProvider(): void
+    {
+        $provider = $this->resolver->resolveLipSync();
+
+        self::assertInstanceOf(LipSyncProviderInterface::class, $provider);
+    }
+
+    public function testResolveLipSyncWithExplicitProvider(): void
+    {
+        $provider = $this->resolver->resolveLipSync(LipSyncProvider::LatentSync);
+
+        self::assertInstanceOf(LipSyncProviderInterface::class, $provider);
+    }
+
+    public function testDisabledLipSyncProviderThrows(): void
+    {
+        $this->expectException(InvalidAIEngineConfigurationException::class);
+
+        $this->resolver->resolveLipSync(LipSyncProvider::Wav2Lip);
     }
 }

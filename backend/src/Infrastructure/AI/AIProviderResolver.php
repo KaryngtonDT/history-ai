@@ -14,9 +14,12 @@ use App\Domain\Translation\TranslationProvider;
 use App\Domain\Translation\TranslationProviderInterface;
 use App\Domain\TTS\TextToSpeechProvider;
 use App\Domain\TTS\TextToSpeechProviderInterface;
+use App\Domain\LipSync\LipSyncProvider;
+use App\Domain\LipSync\LipSyncProviderInterface;
 use App\Domain\VoiceClone\VoiceCloneProvider;
 use App\Domain\VoiceClone\VoiceCloneProviderInterface;
 use App\Infrastructure\AI\Exception\InvalidAIEngineConfigurationException;
+use App\Infrastructure\LipSync\LipSyncProviderFactory;
 use App\Infrastructure\Speech\SpeechToTextProviderFactory;
 use App\Infrastructure\Translation\TranslationProviderFactory;
 use App\Infrastructure\TTS\TextToSpeechProviderFactory;
@@ -31,6 +34,7 @@ final class AIProviderResolver implements AIProviderResolverInterface
         private readonly TranslationProviderFactory $translationProviderFactory,
         private readonly TextToSpeechProviderFactory $textToSpeechProviderFactory,
         private readonly VoiceCloneProviderFactory $voiceCloneProviderFactory,
+        private readonly LipSyncProviderFactory $lipSyncProviderFactory,
     ) {
     }
 
@@ -131,6 +135,32 @@ final class AIProviderResolver implements AIProviderResolverInterface
             AIEngineRegistryFactory::PROVIDER_OPENVOICE => $this->voiceCloneProviderFactory->resolve(null),
             default => throw new InvalidAIEngineConfigurationException(sprintf(
                 'Voice clone provider "%s" is not registered.',
+                $resolvedProviderId,
+            )),
+        };
+    }
+
+    public function resolveLipSync(?LipSyncProvider $provider = null): LipSyncProviderInterface
+    {
+        if (null !== $provider) {
+            $providerId = $provider->value;
+            $this->assertProviderEnabled(AIEngineCapability::LipSync, $providerId);
+
+            return $this->lipSyncProviderFactory->resolve($provider);
+        }
+
+        $resolvedProviderId = $this->configuration->defaultProviderFor(AIEngineCapability::LipSync);
+
+        if (null === $resolvedProviderId) {
+            throw new InvalidAIEngineConfigurationException('No lip sync provider configured.');
+        }
+
+        $this->assertProviderEnabled(AIEngineCapability::LipSync, $resolvedProviderId);
+
+        return match ($resolvedProviderId) {
+            AIEngineRegistryFactory::PROVIDER_LATENTSYNC => $this->lipSyncProviderFactory->resolve(null),
+            default => throw new InvalidAIEngineConfigurationException(sprintf(
+                'Lip sync provider "%s" is not registered.',
                 $resolvedProviderId,
             )),
         };

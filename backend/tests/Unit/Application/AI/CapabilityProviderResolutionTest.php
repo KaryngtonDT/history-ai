@@ -22,6 +22,11 @@ use App\Infrastructure\TTS\F5TextToSpeechProvider;
 use App\Infrastructure\TTS\FixedF5ProcessRunner;
 use App\Infrastructure\TTS\MockTextToSpeechProvider;
 use App\Infrastructure\TTS\TextToSpeechProviderFactory;
+use App\Infrastructure\LipSync\FixedLatentSyncProcessRunner;
+use App\Infrastructure\LipSync\LatentSyncProvider;
+use App\Infrastructure\LipSync\LipSyncMapper;
+use App\Infrastructure\LipSync\LipSyncProviderFactory;
+use App\Infrastructure\LipSync\MockLipSyncProvider;
 use App\Infrastructure\VoiceClone\FixedOpenVoiceProcessRunner;
 use App\Infrastructure\VoiceClone\MockVoiceCloneProvider;
 use App\Infrastructure\VoiceClone\OpenVoiceProvider;
@@ -83,6 +88,18 @@ final class CapabilityProviderResolutionTest extends TestCase
                 ),
                 new MockVoiceCloneProvider(),
             ),
+            new LipSyncProviderFactory(
+                'latentsync',
+                new LatentSyncProvider(
+                    new FixedLatentSyncProcessRunner(),
+                    new LipSyncMapper(),
+                    'latentsync',
+                    'latentsync',
+                    '/models/latentsync',
+                    sys_get_temp_dir().'/history-ai-capability-lipsync',
+                ),
+                new MockLipSyncProvider(),
+            ),
         );
     }
 
@@ -116,6 +133,15 @@ final class CapabilityProviderResolutionTest extends TestCase
         self::assertCount(1, $providers);
         self::assertSame('openvoice', $providers[0]->providerId());
         self::assertNotNull($this->resolver->resolveVoiceClone());
+    }
+
+    public function testResolvesLipSyncByCapability(): void
+    {
+        $providers = $this->resolver->registry()->enabledProviders(AIEngineCapability::LipSync);
+
+        self::assertCount(1, $providers);
+        self::assertSame('latentsync', $providers[0]->providerId());
+        self::assertNotNull($this->resolver->resolveLipSync());
     }
 
     public function testDisabledFutureProviderCannotBeResolved(): void
