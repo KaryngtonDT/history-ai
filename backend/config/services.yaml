@@ -201,6 +201,12 @@ services:
     App\Domain\Workspace\BatchJobRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Workspace\DoctrineBatchJobRepository
 
+    App\Domain\History\ExecutionHistoryRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\History\DoctrineExecutionHistoryRepository
+
+    App\Application\History\Ports\ExecutionHistorySnapshotStoreInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\History\DoctrineExecutionHistorySnapshotStore
+
     App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface:
         alias: App\Infrastructure\VideoIntelligence\VideoJobVideoIntelligenceFactory
 
