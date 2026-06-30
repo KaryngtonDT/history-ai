@@ -10,6 +10,8 @@ use App\Domain\Translation\TranslationProvider;
 use App\Domain\Translation\TranslationProviderInterface;
 use App\Domain\TTS\TextToSpeechProvider;
 use App\Domain\TTS\TextToSpeechProviderInterface;
+use App\Domain\VoiceClone\VoiceCloneProvider;
+use App\Domain\VoiceClone\VoiceCloneProviderInterface;
 use App\Infrastructure\AI\AIEngineRegistryFactory;
 use App\Infrastructure\AI\AIProviderResolver;
 use App\Infrastructure\AI\Exception\InvalidAIEngineConfigurationException;
@@ -26,6 +28,12 @@ use App\Infrastructure\TTS\F5TextToSpeechProvider;
 use App\Infrastructure\TTS\FixedF5ProcessRunner;
 use App\Infrastructure\TTS\MockTextToSpeechProvider;
 use App\Infrastructure\TTS\TextToSpeechProviderFactory;
+use App\Infrastructure\VoiceClone\FixedOpenVoiceProcessRunner;
+use App\Infrastructure\VoiceClone\MockVoiceCloneProvider;
+use App\Infrastructure\VoiceClone\OpenVoiceProvider;
+use App\Infrastructure\VoiceClone\VoiceCloneMapper;
+use App\Infrastructure\VoiceClone\VoiceCloneProcessingContext;
+use App\Infrastructure\VoiceClone\VoiceCloneProviderFactory;
 use PHPUnit\Framework\TestCase;
 
 final class AIProviderResolverTest extends TestCase
@@ -54,6 +62,7 @@ final class AIProviderResolverTest extends TestCase
             new SpeechToTextProviderFactory('faster_whisper', $fasterWhisper),
             new TranslationProviderFactory('ollama', $ollama, $mockTranslation),
             $this->createTextToSpeechProviderFactory(),
+            $this->createVoiceCloneProviderFactory(),
         );
     }
 
@@ -76,6 +85,29 @@ final class AIProviderResolverTest extends TestCase
                 $outputDirectory,
             ),
             new MockTextToSpeechProvider(),
+        );
+    }
+
+    private function createVoiceCloneProviderFactory(): VoiceCloneProviderFactory
+    {
+        $outputDirectory = sys_get_temp_dir().'/history-ai-resolver-voice-clone';
+
+        if (!is_dir($outputDirectory)) {
+            mkdir($outputDirectory);
+        }
+
+        return new VoiceCloneProviderFactory(
+            'openvoice',
+            new OpenVoiceProvider(
+                new FixedOpenVoiceProcessRunner(),
+                new VoiceCloneMapper(),
+                new VoiceCloneProcessingContext(),
+                'openvoice',
+                'openvoice_v2',
+                '/models/openvoice',
+                $outputDirectory,
+            ),
+            new MockVoiceCloneProvider(),
         );
     }
 
@@ -147,5 +179,26 @@ final class AIProviderResolverTest extends TestCase
         $this->expectException(InvalidAIEngineConfigurationException::class);
 
         $this->resolver->resolveTextToSpeech(TextToSpeechProvider::Kokoro);
+    }
+
+    public function testResolveVoiceCloneReturnsProvider(): void
+    {
+        $provider = $this->resolver->resolveVoiceClone();
+
+        self::assertInstanceOf(VoiceCloneProviderInterface::class, $provider);
+    }
+
+    public function testResolveVoiceCloneWithExplicitProvider(): void
+    {
+        $provider = $this->resolver->resolveVoiceClone(VoiceCloneProvider::OpenVoice);
+
+        self::assertInstanceOf(VoiceCloneProviderInterface::class, $provider);
+    }
+
+    public function testDisabledVoiceCloneProviderThrows(): void
+    {
+        $this->expectException(InvalidAIEngineConfigurationException::class);
+
+        $this->resolver->resolveVoiceClone(VoiceCloneProvider::SeedVC);
     }
 }

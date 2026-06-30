@@ -81,6 +81,10 @@ when@test:
             class: App\Infrastructure\TTS\FixedF5ProcessRunner
             public: true
 
+        App\Infrastructure\VoiceClone\OpenVoiceProcessRunnerInterface:
+            class: App\Infrastructure\VoiceClone\FixedOpenVoiceProcessRunner
+            public: true
+
         App\Application\Video\Ports\VideoProcessingQueueInterface:
             class: App\Infrastructure\Video\NoOpVideoProcessingQueue
             public: true
@@ -88,3 +92,4 @@ when@test:
     parameters:
         video.storage_dir: '%kernel.cache_dir%/video-storage'
         tts.output_dir: '%kernel.cache_dir%/audio-storage'
+        voice_clone.output_dir: '%kernel.cache_dir%/voice-clone-storage'

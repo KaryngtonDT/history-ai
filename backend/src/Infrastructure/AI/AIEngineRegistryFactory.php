@@ -61,7 +61,7 @@ final class AIEngineRegistryFactory
                 new AIEngineId('voice-clone'),
                 AIEngineCapability::VoiceClone,
                 [
-                    AIEngineProvider::create('openvoice', 'OpenVoice', AIEngineCapability::VoiceClone, false),
+                    AIEngineProvider::create('openvoice', 'OpenVoice V2', AIEngineCapability::VoiceClone),
                     AIEngineProvider::create('seedvc', 'SeedVC', AIEngineCapability::VoiceClone, false),
                 ],
             ),
@@ -81,6 +81,7 @@ final class AIEngineRegistryFactory
         return AIEngineConfiguration::empty()
             ->withDefaultProvider(AIEngineCapability::SpeechToText, self::PROVIDER_FASTER_WHISPER)
             ->withDefaultProvider(AIEngineCapability::Translation, self::PROVIDER_OLLAMA)
-            ->withDefaultProvider(AIEngineCapability::TextToSpeech, self::PROVIDER_F5_TTS);
+            ->withDefaultProvider(AIEngineCapability::TextToSpeech, self::PROVIDER_F5_TTS)
+            ->withDefaultProvider(AIEngineCapability::VoiceClone, self::PROVIDER_OPENVOICE);
     }
 }

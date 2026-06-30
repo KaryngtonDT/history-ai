@@ -14,10 +14,13 @@ use App\Domain\Translation\TranslationProvider;
 use App\Domain\Translation\TranslationProviderInterface;
 use App\Domain\TTS\TextToSpeechProvider;
 use App\Domain\TTS\TextToSpeechProviderInterface;
+use App\Domain\VoiceClone\VoiceCloneProvider;
+use App\Domain\VoiceClone\VoiceCloneProviderInterface;
 use App\Infrastructure\AI\Exception\InvalidAIEngineConfigurationException;
 use App\Infrastructure\Speech\SpeechToTextProviderFactory;
 use App\Infrastructure\Translation\TranslationProviderFactory;
 use App\Infrastructure\TTS\TextToSpeechProviderFactory;
+use App\Infrastructure\VoiceClone\VoiceCloneProviderFactory;
 
 final class AIProviderResolver implements AIProviderResolverInterface
 {
@@ -27,6 +30,7 @@ final class AIProviderResolver implements AIProviderResolverInterface
         private readonly SpeechToTextProviderFactory $speechToTextProviderFactory,
         private readonly TranslationProviderFactory $translationProviderFactory,
         private readonly TextToSpeechProviderFactory $textToSpeechProviderFactory,
+        private readonly VoiceCloneProviderFactory $voiceCloneProviderFactory,
     ) {
     }
 
@@ -101,6 +105,32 @@ final class AIProviderResolver implements AIProviderResolverInterface
             AIEngineRegistryFactory::PROVIDER_F5_TTS => $this->textToSpeechProviderFactory->resolve(null),
             default => throw new InvalidAIEngineConfigurationException(sprintf(
                 'Text-to-speech provider "%s" is not registered.',
+                $resolvedProviderId,
+            )),
+        };
+    }
+
+    public function resolveVoiceClone(?VoiceCloneProvider $provider = null): VoiceCloneProviderInterface
+    {
+        if (null !== $provider) {
+            $providerId = $provider->value;
+            $this->assertProviderEnabled(AIEngineCapability::VoiceClone, $providerId);
+
+            return $this->voiceCloneProviderFactory->resolve($provider);
+        }
+
+        $resolvedProviderId = $this->configuration->defaultProviderFor(AIEngineCapability::VoiceClone);
+
+        if (null === $resolvedProviderId) {
+            throw new InvalidAIEngineConfigurationException('No voice clone provider configured.');
+        }
+
+        $this->assertProviderEnabled(AIEngineCapability::VoiceClone, $resolvedProviderId);
+
+        return match ($resolvedProviderId) {
+            AIEngineRegistryFactory::PROVIDER_OPENVOICE => $this->voiceCloneProviderFactory->resolve(null),
+            default => throw new InvalidAIEngineConfigurationException(sprintf(
+                'Voice clone provider "%s" is not registered.',
                 $resolvedProviderId,
             )),
         };

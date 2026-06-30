@@ -9,6 +9,8 @@ use App\Domain\Translation\TranslationProvider;
 use App\Domain\Translation\TranslationProviderInterface;
 use App\Domain\TTS\TextToSpeechProvider;
 use App\Domain\TTS\TextToSpeechProviderInterface;
+use App\Domain\VoiceClone\VoiceCloneProvider;
+use App\Domain\VoiceClone\VoiceCloneProviderInterface;
 
 interface AIProviderResolverInterface
 {
@@ -19,4 +21,6 @@ interface AIProviderResolverInterface
     public function resolveTranslation(?TranslationProvider $provider = null): TranslationProviderInterface;
 
     public function resolveTextToSpeech(?TextToSpeechProvider $provider = null): TextToSpeechProviderInterface;
+
+    public function resolveVoiceClone(?VoiceCloneProvider $provider = null): VoiceCloneProviderInterface;
 }

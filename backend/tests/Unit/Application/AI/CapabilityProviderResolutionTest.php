@@ -22,6 +22,12 @@ use App\Infrastructure\TTS\F5TextToSpeechProvider;
 use App\Infrastructure\TTS\FixedF5ProcessRunner;
 use App\Infrastructure\TTS\MockTextToSpeechProvider;
 use App\Infrastructure\TTS\TextToSpeechProviderFactory;
+use App\Infrastructure\VoiceClone\FixedOpenVoiceProcessRunner;
+use App\Infrastructure\VoiceClone\MockVoiceCloneProvider;
+use App\Infrastructure\VoiceClone\OpenVoiceProvider;
+use App\Infrastructure\VoiceClone\VoiceCloneMapper;
+use App\Infrastructure\VoiceClone\VoiceCloneProcessingContext;
+use App\Infrastructure\VoiceClone\VoiceCloneProviderFactory;
 use PHPUnit\Framework\TestCase;
 
 final class CapabilityProviderResolutionTest extends TestCase
@@ -64,6 +70,19 @@ final class CapabilityProviderResolutionTest extends TestCase
                 ),
                 new MockTextToSpeechProvider(),
             ),
+            new VoiceCloneProviderFactory(
+                'openvoice',
+                new OpenVoiceProvider(
+                    new FixedOpenVoiceProcessRunner(),
+                    new VoiceCloneMapper(),
+                    new VoiceCloneProcessingContext(),
+                    'openvoice',
+                    'openvoice_v2',
+                    '/models/openvoice',
+                    sys_get_temp_dir().'/history-ai-capability-voice-clone',
+                ),
+                new MockVoiceCloneProvider(),
+            ),
         );
     }
 
@@ -88,6 +107,15 @@ final class CapabilityProviderResolutionTest extends TestCase
         self::assertCount(1, $providers);
         self::assertSame('f5_tts', $providers[0]->providerId());
         self::assertNotNull($this->resolver->resolveTextToSpeech());
+    }
+
+    public function testResolvesVoiceCloneByCapability(): void
+    {
+        $providers = $this->resolver->registry()->enabledProviders(AIEngineCapability::VoiceClone);
+
+        self::assertCount(1, $providers);
+        self::assertSame('openvoice', $providers[0]->providerId());
+        self::assertNotNull($this->resolver->resolveVoiceClone());
     }
 
     public function testDisabledFutureProviderCannotBeResolved(): void

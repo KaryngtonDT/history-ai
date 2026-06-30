@@ -25,6 +25,11 @@ parameters:
     tts.f5.base_path_default: '/models/f5'
     tts.output_dir: '%kernel.project_dir%/var/audio-storage'
     tts.generate_audio_default: false
+    voice_clone.provider_default: 'openvoice'
+    voice_clone.openvoice.binary_default: 'openvoice'
+    voice_clone.openvoice.model_default: 'openvoice_v2'
+    voice_clone.openvoice.base_path_default: '/models/openvoice'
+    voice_clone.output_dir: '%kernel.project_dir%/var/voice-clone-storage'
 
 services:
     _defaults:
@@ -45,6 +50,7 @@ services:
             - '../src/Infrastructure/Speech/SpeechToTextProviderFactory.php'
             - '../src/Infrastructure/Translation/TranslationProviderFactory.php'
             - '../src/Infrastructure/TTS/TextToSpeechProviderFactory.php'
+            - '../src/Infrastructure/VoiceClone/VoiceCloneProviderFactory.php'
             - '../src/Infrastructure/AI/AIEngineRegistryFactory.php'
 
     App\Domain\AI\AIEngineRegistry:
@@ -281,3 +287,17 @@ services:
     App\Infrastructure\TTS\TextToSpeechProviderFactory:
         arguments:
             $defaultProviderName: '%env(default:tts.provider_default:TTS_PROVIDER)%'
+
+    App\Infrastructure\VoiceClone\OpenVoiceProcessRunnerInterface:
+        alias: App\Infrastructure\VoiceClone\ShellOpenVoiceProcessRunner
+
+    App\Infrastructure\VoiceClone\OpenVoiceProvider:
+        arguments:
+            $binary: '%env(default:voice_clone.openvoice.binary_default:OPENVOICE_BINARY)%'
+            $model: '%env(default:voice_clone.openvoice.model_default:OPENVOICE_MODEL)%'
+            $basePath: '%env(default:voice_clone.openvoice.base_path_default:OPENVOICE_PATH)%'
+            $outputDirectory: '%voice_clone.output_dir%'
+
+    App\Infrastructure\VoiceClone\VoiceCloneProviderFactory:
+        arguments:
+            $defaultProviderName: '%env(default:voice_clone.provider_default:VOICE_CLONE_PROVIDER)%'
