@@ -6,7 +6,7 @@ Status: Accepted
 
 Date: 2026-06-26
 
-Commit: `TBD_SLICE05`
+Commit: `1c4b6bd`
 
 ---
 
@@ -47,7 +47,7 @@ Platform Sprint 44 delivers **Automatic Quality Assessment (AI QA)** for Phase 3
 | P44-SLICE-02 | `962ea79` | feat(quality): add deterministic evaluator |
 | P44-SLICE-03 | `bfc8285` | feat(worker): integrate quality assessment |
 | P44-SLICE-04 | `3ab2979` | feat(frontend): add quality dashboard |
-| P44-SLICE-05 | `TBD_SLICE05` | docs(quality): document quality assessment |
+| P44-SLICE-05 | `1c4b6bd` | docs(quality): document quality assessment |
 
 ---
 
