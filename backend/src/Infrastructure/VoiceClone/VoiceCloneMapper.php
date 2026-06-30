@@ -22,6 +22,8 @@ final class VoiceCloneMapper
         VoiceCloneProvider $provider,
         AudioId $clonedAudioId,
         VoiceCloneArtifactId $artifactId,
+        AudioId $sourceAudioId,
+        string $storagePath,
     ): VoiceCloneArtifact {
         /** @var array<string, mixed>|null $payload */
         $payload = json_decode($processOutput, true);
@@ -53,6 +55,9 @@ final class VoiceCloneMapper
             $profile,
             $provider,
             $clonedAudioId,
+            $sourceAudioId,
+            $storagePath,
+            $translation->targetLanguage(),
         );
     }
 

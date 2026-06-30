@@ -29,6 +29,9 @@ final class VoiceCloneArtifactTest extends TestCase
             $profile,
             VoiceCloneProvider::OpenVoice,
             new AudioId('550e8400-e29b-41d4-a716-446655440060'),
+            new AudioId('550e8400-e29b-41d4-a716-446655440030'),
+            '/tmp/cloned.wav',
+            TranslationLanguage::French,
         );
 
         self::assertTrue($artifact->artifactId()->equals(

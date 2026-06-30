@@ -11,6 +11,7 @@ use App\Domain\VoiceClone\VoiceCloneArtifact;
 use App\Domain\VoiceClone\VoiceCloneArtifactId;
 use App\Domain\VoiceClone\VoiceCloneProvider;
 use App\Domain\VoiceClone\VoiceCloneProviderInterface;
+use App\Domain\VoiceClone\VoiceCloneReferenceContextInterface;
 use App\Infrastructure\VoiceClone\Exception\OpenVoiceProviderException;
 
 final class OpenVoiceProvider implements VoiceCloneProviderInterface
@@ -18,7 +19,7 @@ final class OpenVoiceProvider implements VoiceCloneProviderInterface
     public function __construct(
         private readonly OpenVoiceProcessRunnerInterface $processRunner,
         private readonly VoiceCloneMapper $voiceCloneMapper,
-        private readonly VoiceCloneProcessingContext $processingContext,
+        private readonly VoiceCloneReferenceContextInterface $processingContext,
         private readonly string $binary,
         private readonly string $model,
         private readonly string $basePath,
@@ -68,6 +69,8 @@ final class OpenVoiceProvider implements VoiceCloneProviderInterface
             VoiceCloneProvider::OpenVoice,
             $clonedAudioId,
             $artifactId,
+            $source->audioId(),
+            $outputPath,
         );
     }
 }

@@ -34,6 +34,12 @@ use App\Infrastructure\TTS\F5TextToSpeechProvider;
 use App\Infrastructure\TTS\FixedF5ProcessRunner;
 use App\Infrastructure\TTS\MockTextToSpeechProvider;
 use App\Infrastructure\TTS\TextToSpeechProviderFactory;
+use App\Infrastructure\VoiceClone\FixedOpenVoiceProcessRunner;
+use App\Infrastructure\VoiceClone\MockVoiceCloneProvider;
+use App\Infrastructure\VoiceClone\OpenVoiceProvider;
+use App\Infrastructure\VoiceClone\VoiceCloneMapper;
+use App\Infrastructure\VoiceClone\VoiceCloneProcessingContext;
+use App\Infrastructure\VoiceClone\VoiceCloneProviderFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -83,6 +89,19 @@ final class VideoTranslationGeneratorTest extends TestCase
                     sys_get_temp_dir().'/history-ai-translation-tts',
                 ),
                 new MockTextToSpeechProvider(),
+            ),
+            new VoiceCloneProviderFactory(
+                'openvoice',
+                new OpenVoiceProvider(
+                    new FixedOpenVoiceProcessRunner(),
+                    new VoiceCloneMapper(),
+                    new VoiceCloneProcessingContext(),
+                    'openvoice',
+                    'openvoice_v2',
+                    '/models/openvoice',
+                    sys_get_temp_dir().'/history-ai-translation-voice-clone',
+                ),
+                new MockVoiceCloneProvider(),
             ),
         );
 

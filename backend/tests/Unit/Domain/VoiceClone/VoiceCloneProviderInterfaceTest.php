@@ -60,6 +60,9 @@ final class VoiceCloneProviderInterfaceTest extends TestCase
             ),
             VoiceCloneProvider::OpenVoice,
             new AudioId('550e8400-e29b-41d4-a716-446655440060'),
+            $source->audioId(),
+            '/tmp/cloned.wav',
+            TranslationLanguage::French,
         );
 
         $provider = $this->createMock(VoiceCloneProviderInterface::class);

@@ -30,6 +30,9 @@ final class MockVoiceCloneProvider implements VoiceCloneProviderInterface
             ),
             VoiceCloneProvider::Mock,
             AudioId::generate(),
+            $source->audioId(),
+            '/tmp/mock-cloned.wav',
+            $translation->targetLanguage(),
         );
     }
 }

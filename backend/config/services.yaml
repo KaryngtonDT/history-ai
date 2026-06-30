@@ -30,6 +30,7 @@ parameters:
     voice_clone.openvoice.model_default: 'openvoice_v2'
     voice_clone.openvoice.base_path_default: '/models/openvoice'
     voice_clone.output_dir: '%kernel.project_dir%/var/voice-clone-storage'
+    voice_clone.generate_default: false
 
 services:
     _defaults:
@@ -125,12 +126,22 @@ services:
     App\Domain\Translation\TranslationRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Translation\DoctrineTranslationRepository
 
+    App\Domain\VoiceClone\VoiceCloneReferenceContextInterface:
+        alias: App\Infrastructure\VoiceClone\VoiceCloneProcessingContext
+
     App\Domain\TTS\AudioRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\TTS\DoctrineAudioRepository
+
+    App\Domain\VoiceClone\VoiceCloneRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\VoiceClone\DoctrineVoiceCloneRepository
 
     App\Application\TTS\GenerateAudioConfiguration:
         arguments:
             $enabled: '%env(bool:default:tts.generate_audio_default:GENERATE_AUDIO)%'
+
+    App\Application\VoiceClone\GenerateVoiceCloneConfiguration:
+        arguments:
+            $enabled: '%env(bool:default:voice_clone.generate_default:GENERATE_VOICE_CLONE)%'
 
     App\Application\Translation\DefaultTranslationLanguagesProvider:
         arguments:

@@ -86,6 +86,7 @@ final class KnowledgeGraphBuilder
             ArtifactType::Timeline => 'Timeline',
             ArtifactType::Podcast => 'Podcast',
             ArtifactType::Audio => 'Audio',
+            ArtifactType::VoiceClone => 'Voice Clone',
         };
     }
 

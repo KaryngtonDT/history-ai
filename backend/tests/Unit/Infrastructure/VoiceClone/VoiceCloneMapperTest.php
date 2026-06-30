@@ -38,6 +38,8 @@ final class VoiceCloneMapperTest extends TestCase
             VoiceCloneProvider::OpenVoice,
             new AudioId('550e8400-e29b-41d4-a716-446655440060'),
             new VoiceCloneArtifactId('550e8400-e29b-41d4-a716-446655440050'),
+            new AudioId('550e8400-e29b-41d4-a716-446655440030'),
+            '/tmp/cloned.wav',
         );
 
         self::assertSame(VoiceCloneProvider::OpenVoice, $artifact->provider());
@@ -64,6 +66,8 @@ final class VoiceCloneMapperTest extends TestCase
             VoiceCloneProvider::OpenVoice,
             new AudioId('550e8400-e29b-41d4-a716-446655440060'),
             new VoiceCloneArtifactId('550e8400-e29b-41d4-a716-446655440050'),
+            new AudioId('550e8400-e29b-41d4-a716-446655440030'),
+            '/tmp/cloned.wav',
         );
     }
 }

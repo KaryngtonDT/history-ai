@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Domain\VoiceClone;
 
+use App\Domain\Translation\TranslationLanguage;
 use App\Domain\TTS\AudioId;
+use App\Domain\VoiceClone\Exception\InvalidVoiceCloneException;
 
 final readonly class VoiceCloneArtifact
 {
@@ -13,7 +15,13 @@ final readonly class VoiceCloneArtifact
         private VoiceProfile $profile,
         private VoiceCloneProvider $provider,
         private AudioId $clonedAudioId,
+        private AudioId $sourceAudioId,
+        private string $storagePath,
+        private TranslationLanguage $targetLanguage,
     ) {
+        if ('' === trim($this->storagePath)) {
+            throw new InvalidVoiceCloneException('Voice clone storage path cannot be empty.');
+        }
     }
 
     public static function create(
@@ -21,8 +29,19 @@ final readonly class VoiceCloneArtifact
         VoiceProfile $profile,
         VoiceCloneProvider $provider,
         AudioId $clonedAudioId,
+        AudioId $sourceAudioId,
+        string $storagePath,
+        TranslationLanguage $targetLanguage,
     ): self {
-        return new self($artifactId, $profile, $provider, $clonedAudioId);
+        return new self(
+            $artifactId,
+            $profile,
+            $provider,
+            $clonedAudioId,
+            $sourceAudioId,
+            $storagePath,
+            $targetLanguage,
+        );
     }
 
     public function artifactId(): VoiceCloneArtifactId
@@ -43,5 +62,20 @@ final readonly class VoiceCloneArtifact
     public function clonedAudioId(): AudioId
     {
         return $this->clonedAudioId;
+    }
+
+    public function sourceAudioId(): AudioId
+    {
+        return $this->sourceAudioId;
+    }
+
+    public function storagePath(): string
+    {
+        return $this->storagePath;
+    }
+
+    public function targetLanguage(): TranslationLanguage
+    {
+        return $this->targetLanguage;
     }
 }
