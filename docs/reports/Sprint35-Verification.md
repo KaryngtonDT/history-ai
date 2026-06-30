@@ -271,4 +271,4 @@ docs/
 | 2 | `8517647` | feat(tts): integrate f5-tts provider |
 | 3 | `6aa9fbe` | feat(worker): generate audio artifacts |
 | 4 | `e95fc29` | feat(frontend): add audio preview |
-| 5 | *(this commit)* | docs(tts): document text-to-speech foundation |
+| 5 | `190765d` | docs(tts): document text-to-speech foundation |
