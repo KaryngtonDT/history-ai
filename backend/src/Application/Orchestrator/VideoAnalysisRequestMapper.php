@@ -6,11 +6,23 @@ namespace App\Application\Orchestrator;
 
 use App\Domain\Orchestrator\Exception\InvalidPipelineRecommendationException;
 use App\Domain\Orchestrator\ProcessingStrategy;
-use App\Domain\Orchestrator\VideoAnalysis;
+use App\Domain\VideoIntelligence\VideoAnalyzerInput;
+use App\Domain\VideoIntelligence\VideoAnalyzerInterface;
+use App\Domain\VideoIntelligence\VideoIntelligence;
 
 final class VideoAnalysisRequestMapper
 {
-    public function fromArray(array $payload): VideoAnalysis
+    public function __construct(
+        private readonly VideoAnalyzerInterface $analyzer,
+    ) {
+    }
+
+    public function intelligenceFromArray(array $payload): VideoIntelligence
+    {
+        return $this->analyzer->analyze($this->inputFromArray($payload));
+    }
+
+    public function inputFromArray(array $payload): VideoAnalyzerInput
     {
         $detectedLanguage = is_string($payload['detectedLanguage'] ?? null)
             ? $payload['detectedLanguage']
@@ -24,24 +36,34 @@ final class VideoAnalysisRequestMapper
         $fps = is_numeric($payload['fps'] ?? null)
             ? (float) $payload['fps']
             : 30.0;
+        $segmentCount = is_numeric($payload['segmentCount'] ?? null)
+            ? (int) $payload['segmentCount']
+            : 0;
+        $transcriptText = is_string($payload['transcriptText'] ?? null)
+            ? $payload['transcriptText']
+            : '';
         $gpuAvailable = filter_var($payload['gpuAvailable'] ?? true, FILTER_VALIDATE_BOOL);
         $estimatedVramGb = is_numeric($payload['estimatedVramGb'] ?? null)
             ? (float) $payload['estimatedVramGb']
             : 8.0;
+        $hasSlidesHint = filter_var($payload['hasSlidesHint'] ?? false, FILTER_VALIDATE_BOOL);
 
-        return VideoAnalysis::create(
+        return VideoAnalyzerInput::create(
             $detectedLanguage,
             $durationSeconds,
             $resolution,
             $fps,
+            $segmentCount,
+            $transcriptText,
             $gpuAvailable,
             $estimatedVramGb,
+            $hasSlidesHint,
         );
     }
 
-    public function defaultAnalysis(): VideoAnalysis
+    public function defaultIntelligence(): VideoIntelligence
     {
-        return VideoAnalysis::create('english', 120.0, '1920x1080', 30.0, true, 8.0);
+        return $this->analyzer->analyze($this->inputFromArray([]));
     }
 
     public function parseStrategy(mixed $value): ?ProcessingStrategy

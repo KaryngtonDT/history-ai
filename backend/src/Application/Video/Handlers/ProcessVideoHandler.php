@@ -25,7 +25,7 @@ use App\Domain\Artifact\ArtifactType;
 use App\Domain\Content\ContentId;
 use App\Domain\Orchestrator\PipelinePlannerInterface;
 use App\Domain\Orchestrator\ProcessingMode;
-use App\Domain\Orchestrator\VideoAnalysisFactoryInterface;
+use App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface;
 use App\Domain\Pipeline\RuntimePipelineConfigurationContextInterface;
 use App\Domain\Processing\ProcessingJobId;
 use App\Domain\Speech\TranscriptRepositoryInterface;
@@ -53,7 +53,7 @@ final class ProcessVideoHandler
         private readonly VideoFinalRenderGenerator $videoFinalRenderGenerator,
         private readonly GenerateFinalVideoConfiguration $generateFinalVideoConfiguration,
         private readonly PipelinePlannerInterface $pipelinePlanner,
-        private readonly VideoAnalysisFactoryInterface $videoAnalysisFactory,
+        private readonly VideoIntelligenceFactoryInterface $videoIntelligenceFactory,
         private readonly RuntimePipelineConfigurationContextInterface $runtimePipelineContext,
     ) {
     }
@@ -126,10 +126,10 @@ final class ProcessVideoHandler
             return;
         }
 
-        $analysis = $this->videoAnalysisFactory->fromVideoJob($job);
+        $intelligence = $this->videoIntelligenceFactory->fromVideoJob($job);
         $recommendation = null !== $message->strategy
-            ? $this->pipelinePlanner->recommendWithStrategy($analysis, $message->strategy)
-            : $this->pipelinePlanner->recommend($analysis);
+            ? $this->pipelinePlanner->recommendWithStrategy($intelligence, $message->strategy)
+            : $this->pipelinePlanner->recommend($intelligence);
 
         $this->runtimePipelineContext->set($recommendation->pipelineConfiguration());
     }

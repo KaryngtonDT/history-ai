@@ -10,6 +10,7 @@ final readonly class PipelineRecommendationResult
 {
     /**
      * @param list<array{stage: string, providerId: string}> $stages
+     * @param list<string> $reasons
      */
     public function __construct(
         public string $id,
@@ -19,6 +20,7 @@ final readonly class PipelineRecommendationResult
         public int $estimatedQuality,
         public float $estimatedVramGb,
         public array $stages,
+        public array $reasons = [],
     ) {
     }
 
@@ -41,6 +43,7 @@ final readonly class PipelineRecommendationResult
             $recommendation->estimatedQuality(),
             $recommendation->estimatedVramGb(),
             $stages,
+            $recommendation->reasons(),
         );
     }
 }

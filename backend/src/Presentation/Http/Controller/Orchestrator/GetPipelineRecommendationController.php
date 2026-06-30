@@ -51,20 +51,23 @@ final class GetPipelineRecommendationController extends AbstractController
         VideoAnalysisRequestMapper $mapper,
     ): JsonResponse {
         try {
-            $analysis = $mapper->fromArray([
+            $intelligence = $mapper->intelligenceFromArray([
                 'detectedLanguage' => $request->query->get('detectedLanguage'),
                 'durationSeconds' => $request->query->get('durationSeconds'),
                 'resolution' => $request->query->get('resolution'),
                 'fps' => $request->query->get('fps'),
+                'segmentCount' => $request->query->get('segmentCount'),
+                'transcriptText' => $request->query->get('transcriptText'),
                 'gpuAvailable' => $request->query->get('gpuAvailable'),
                 'estimatedVramGb' => $request->query->get('estimatedVramGb'),
+                'hasSlidesHint' => $request->query->get('hasSlidesHint'),
             ]);
             $strategy = $mapper->parseStrategy($request->query->get('strategy'));
         } catch (InvalidPipelineRecommendationException) {
             return $this->json(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
         }
 
-        $result = $handler(new RecommendPipelineConfigurationQuery($analysis, $strategy));
+        $result = $handler(new RecommendPipelineConfigurationQuery($intelligence, $strategy));
 
         return $this->json([
             'id' => $result->id,
@@ -74,6 +77,7 @@ final class GetPipelineRecommendationController extends AbstractController
             'estimatedQuality' => $result->estimatedQuality,
             'estimatedVramGb' => $result->estimatedVramGb,
             'stages' => $result->stages,
+            'reasons' => $result->reasons,
         ]);
     }
 }

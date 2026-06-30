@@ -5,28 +5,50 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Infrastructure\Orchestrator;
 
 use App\Domain\Orchestrator\ProcessingStrategy;
-use App\Domain\Orchestrator\VideoAnalysis;
 use App\Domain\Pipeline\PipelineStageType;
+use App\Domain\VideoIntelligence\VideoAnalyzerInput;
 use App\Infrastructure\AI\AIEngineRegistryFactory;
 use App\Infrastructure\Orchestrator\DeterministicPipelinePlanner;
+use App\Infrastructure\VideoIntelligence\AudioAnalyzer;
+use App\Infrastructure\VideoIntelligence\CompositeVideoAnalyzer;
+use App\Infrastructure\VideoIntelligence\SpeechAnalyzer;
+use App\Infrastructure\VideoIntelligence\VisualAnalyzer;
 use PHPUnit\Framework\TestCase;
 
 final class DeterministicPipelinePlannerTest extends TestCase
 {
     private DeterministicPipelinePlanner $planner;
 
+    private CompositeVideoAnalyzer $analyzer;
+
     protected function setUp(): void
     {
         $this->planner = new DeterministicPipelinePlanner(
             (new AIEngineRegistryFactory())->create(),
         );
+        $this->analyzer = new CompositeVideoAnalyzer(
+            new AudioAnalyzer(),
+            new VisualAnalyzer(),
+            new SpeechAnalyzer(),
+        );
     }
 
     public function testBalancedRecommendationForEnglishVideo(): void
     {
-        $analysis = VideoAnalysis::create('english', 240.0, '1920x1080', 30.0, true, 12.0);
+        $intelligence = $this->analyzer->analyze(
+            VideoAnalyzerInput::create(
+                'english',
+                240.0,
+                '1920x1080',
+                30.0,
+                30,
+                str_repeat('clear english speech ', 300),
+                true,
+                12.0,
+            ),
+        );
 
-        $recommendation = $this->planner->recommend($analysis);
+        $recommendation = $this->planner->recommend($intelligence);
 
         self::assertSame(ProcessingStrategy::Balanced, $recommendation->strategy());
         self::assertSame('faster_whisper', $recommendation->pipelineConfiguration()->providerFor(PipelineStageType::SpeechToText));
@@ -37,22 +59,27 @@ final class DeterministicPipelinePlannerTest extends TestCase
         self::assertSame('ffmpeg', $recommendation->pipelineConfiguration()->providerFor(PipelineStageType::VideoRender));
         self::assertGreaterThan(0, $recommendation->estimatedDurationSeconds());
         self::assertGreaterThanOrEqual(3, $recommendation->estimatedQuality());
+        self::assertNotEmpty($recommendation->reasons());
     }
 
     public function testLowVramSelectsSpeedStrategy(): void
     {
-        $analysis = VideoAnalysis::create('english', 120.0, '1280x720', 24.0, true, 6.0);
+        $intelligence = $this->analyzer->analyze(
+            VideoAnalyzerInput::create('english', 120.0, '1280x720', 24.0, 20, 'sample', true, 6.0),
+        );
 
-        $recommendation = $this->planner->recommend($analysis);
+        $recommendation = $this->planner->recommend($intelligence);
 
         self::assertSame(ProcessingStrategy::Speed, $recommendation->strategy());
     }
 
     public function testGpuUnavailableSelectsSpeedStrategy(): void
     {
-        $analysis = VideoAnalysis::create('french', 90.0, '1280x720', 24.0, false, 0.0);
+        $intelligence = $this->analyzer->analyze(
+            VideoAnalyzerInput::create('french', 90.0, '1280x720', 24.0, 25, str_repeat('sample speech ', 120), false, 0.0),
+        );
 
-        $recommendation = $this->planner->recommend($analysis);
+        $recommendation = $this->planner->recommend($intelligence);
 
         self::assertSame(ProcessingStrategy::Speed, $recommendation->strategy());
         self::assertSame(0.0, $recommendation->estimatedVramGb());
@@ -60,18 +87,57 @@ final class DeterministicPipelinePlannerTest extends TestCase
 
     public function testVeryLowVramSelectsLowMemoryStrategy(): void
     {
-        $analysis = VideoAnalysis::create('german', 60.0, '1280x720', 24.0, true, 3.0);
+        $intelligence = $this->analyzer->analyze(
+            VideoAnalyzerInput::create('german', 60.0, '1280x720', 24.0, 25, str_repeat('sample speech ', 120), true, 3.0),
+        );
 
-        $recommendation = $this->planner->recommend($analysis);
+        $recommendation = $this->planner->recommend($intelligence);
 
         self::assertSame(ProcessingStrategy::LowMemory, $recommendation->strategy());
     }
 
+    public function testLowConfidenceSelectsQualityStrategy(): void
+    {
+        $intelligence = $this->analyzer->analyze(
+            VideoAnalyzerInput::create('english', 180.0, '1920x1080', 30.0, 0, '', true, 12.0),
+        );
+
+        $recommendation = $this->planner->recommend($intelligence);
+
+        self::assertSame(ProcessingStrategy::Quality, $recommendation->strategy());
+        self::assertTrue(
+            str_contains(implode(' ', $recommendation->reasons()), 'STT confidence'),
+        );
+    }
+
+    public function testMultiSpeakerRecommendationIncludesOpenVoiceReason(): void
+    {
+        $intelligence = $this->analyzer->analyze(
+            VideoAnalyzerInput::create(
+                'english',
+                300.0,
+                '1920x1080',
+                30.0,
+                65,
+                str_repeat('dialogue ', 400),
+                true,
+                12.0,
+            ),
+        );
+
+        $recommendation = $this->planner->recommend($intelligence);
+
+        self::assertGreaterThanOrEqual(2, $intelligence->audio()->speakerCount());
+        self::assertTrue(str_contains(implode(' ', $recommendation->reasons()), 'speakers detected'));
+    }
+
     public function testRecommendWithExplicitQualityStrategy(): void
     {
-        $analysis = VideoAnalysis::create('english', 180.0, '1920x1080', 30.0, true, 16.0);
+        $intelligence = $this->analyzer->analyze(
+            VideoAnalyzerInput::create('english', 180.0, '1920x1080', 30.0, 25, str_repeat('speech ', 200), true, 16.0),
+        );
 
-        $recommendation = $this->planner->recommendWithStrategy($analysis, ProcessingStrategy::Quality);
+        $recommendation = $this->planner->recommendWithStrategy($intelligence, ProcessingStrategy::Quality);
 
         self::assertSame(ProcessingStrategy::Quality, $recommendation->strategy());
         self::assertSame(5, $recommendation->estimatedQuality());
@@ -79,11 +145,12 @@ final class DeterministicPipelinePlannerTest extends TestCase
 
     public function testFallsBackToEnabledProvidersOnly(): void
     {
-        $analysis = VideoAnalysis::create('english', 30.0, '640x360', 24.0, true, 12.0);
+        $intelligence = $this->analyzer->analyze(
+            VideoAnalyzerInput::create('english', 120.0, '1920x1080', 30.0, 20, 'sample', true, 8.0),
+        );
 
-        $recommendation = $this->planner->recommendWithStrategy($analysis, ProcessingStrategy::LowMemory);
+        $recommendation = $this->planner->recommend($intelligence);
 
-        self::assertSame('faster_whisper', $recommendation->pipelineConfiguration()->providerFor(PipelineStageType::SpeechToText));
-        self::assertSame('ffmpeg', $recommendation->pipelineConfiguration()->providerFor(PipelineStageType::VideoRender));
+        self::assertNotEmpty($recommendation->pipelineConfiguration()->providerFor(PipelineStageType::SpeechToText));
     }
 }

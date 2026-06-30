@@ -10,12 +10,15 @@ use App\Domain\Orchestrator\PipelinePlannerInterface;
 use App\Domain\Orchestrator\PipelineRecommendation;
 use App\Domain\Orchestrator\PipelineRecommendationId;
 use App\Domain\Orchestrator\ProcessingStrategy;
-use App\Domain\Orchestrator\VideoAnalysis;
 use App\Domain\Pipeline\PipelineConfiguration;
 use App\Domain\Pipeline\PipelineConfigurationId;
 use App\Domain\Pipeline\PipelineDefaultProviders;
 use App\Domain\Pipeline\PipelineStage;
 use App\Domain\Pipeline\PipelineStageType;
+use App\Domain\VideoIntelligence\BackgroundMusic;
+use App\Domain\VideoIntelligence\LipVisibility;
+use App\Domain\VideoIntelligence\LightingCondition;
+use App\Domain\VideoIntelligence\VideoIntelligence;
 
 final class DeterministicPipelinePlanner implements PipelinePlannerInterface
 {
@@ -23,18 +26,20 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
 
     private const float MEDIUM_VRAM_THRESHOLD_GB = 8.0;
 
+    private const float LONG_DURATION_SECONDS = 1800.0;
+
     public function __construct(
         private readonly AIEngineRegistry $registry,
     ) {
     }
 
-    public function recommend(VideoAnalysis $analysis): PipelineRecommendation
+    public function recommend(VideoIntelligence $intelligence): PipelineRecommendation
     {
-        return $this->recommendWithStrategy($analysis, $this->resolveStrategy($analysis));
+        return $this->recommendWithStrategy($intelligence, $this->resolveStrategy($intelligence));
     }
 
     public function recommendWithStrategy(
-        VideoAnalysis $analysis,
+        VideoIntelligence $intelligence,
         ProcessingStrategy $strategy,
     ): PipelineRecommendation {
         $stages = [
@@ -43,7 +48,7 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
                 $this->selectProvider(
                     AIEngineCapability::SpeechToText,
                     $strategy,
-                    [PipelineDefaultProviders::SPEECH_TO_TEXT],
+                    $this->speechToTextPreferences($intelligence, $strategy),
                 ),
             ),
             PipelineStage::create(
@@ -59,7 +64,7 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
                 $this->selectProvider(
                     AIEngineCapability::TextToSpeech,
                     $strategy,
-                    $this->textToSpeechPreferences($strategy),
+                    $this->textToSpeechPreferences($intelligence, $strategy),
                 ),
             ),
             PipelineStage::create(
@@ -67,7 +72,7 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
                 $this->selectProvider(
                     AIEngineCapability::VoiceClone,
                     $strategy,
-                    $this->voiceClonePreferences($strategy),
+                    $this->voiceClonePreferences($intelligence, $strategy),
                 ),
             ),
             PipelineStage::create(
@@ -75,7 +80,7 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
                 $this->selectProvider(
                     AIEngineCapability::LipSync,
                     $strategy,
-                    $this->lipSyncPreferences($strategy),
+                    $this->lipSyncPreferences($intelligence, $strategy),
                 ),
             ),
             PipelineStage::create(
@@ -93,29 +98,48 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
             $stages,
         );
 
+        $reasons = $this->buildReasons($intelligence, $strategy, $configuration);
+
         return PipelineRecommendation::create(
             PipelineRecommendationId::generate(),
             $strategy,
             $configuration,
-            $this->buildExplanation($analysis, $strategy),
-            $this->estimateDurationSeconds($analysis, $strategy),
-            $this->estimateQuality($strategy),
-            $this->estimateVramGb($analysis, $strategy),
+            $this->buildExplanation($intelligence, $strategy),
+            $this->estimateDurationSeconds($intelligence, $strategy),
+            $this->estimateQuality($strategy, $intelligence),
+            $this->estimateVramGb($intelligence, $strategy),
+            $reasons,
         );
     }
 
-    private function resolveStrategy(VideoAnalysis $analysis): ProcessingStrategy
+    private function resolveStrategy(VideoIntelligence $intelligence): ProcessingStrategy
     {
-        if (!$analysis->gpuAvailable()) {
+        if (!$intelligence->gpuAvailable()) {
             return ProcessingStrategy::Speed;
         }
 
-        if ($analysis->estimatedVramGb() < self::LOW_VRAM_THRESHOLD_GB) {
+        if ($intelligence->estimatedVramGb() < self::LOW_VRAM_THRESHOLD_GB) {
             return ProcessingStrategy::LowMemory;
         }
 
-        if ($analysis->estimatedVramGb() < self::MEDIUM_VRAM_THRESHOLD_GB) {
+        if ($intelligence->audio()->confidence()->isLow()) {
+            return ProcessingStrategy::Quality;
+        }
+
+        if ($intelligence->durationSeconds() > self::LONG_DURATION_SECONDS) {
             return ProcessingStrategy::Speed;
+        }
+
+        if ($intelligence->visual()->lighting() === LightingCondition::Poor) {
+            return ProcessingStrategy::Quality;
+        }
+
+        if ($intelligence->estimatedVramGb() < self::MEDIUM_VRAM_THRESHOLD_GB) {
+            return ProcessingStrategy::Speed;
+        }
+
+        if ($intelligence->audio()->backgroundMusic() === BackgroundMusic::Detected) {
+            return ProcessingStrategy::Quality;
         }
 
         return ProcessingStrategy::Balanced;
@@ -157,8 +181,28 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
     /**
      * @return list<string>
      */
-    private function textToSpeechPreferences(ProcessingStrategy $strategy): array
+    private function speechToTextPreferences(VideoIntelligence $intelligence, ProcessingStrategy $strategy): array
     {
+        if ($intelligence->audio()->confidence()->isLow()) {
+            return ['faster_whisper'];
+        }
+
+        return match ($strategy) {
+            ProcessingStrategy::Quality => ['faster_whisper'],
+            ProcessingStrategy::Speed, ProcessingStrategy::LowMemory => ['faster_whisper'],
+            ProcessingStrategy::Balanced => ['faster_whisper'],
+        };
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function textToSpeechPreferences(VideoIntelligence $intelligence, ProcessingStrategy $strategy): array
+    {
+        if ($intelligence->speech()->pauseCount() > 20) {
+            return ['f5_tts', 'kokoro'];
+        }
+
         return match ($strategy) {
             ProcessingStrategy::Quality => ['f5_tts'],
             ProcessingStrategy::Speed, ProcessingStrategy::LowMemory => ['kokoro', 'f5_tts'],
@@ -169,8 +213,12 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
     /**
      * @return list<string>
      */
-    private function voiceClonePreferences(ProcessingStrategy $strategy): array
+    private function voiceClonePreferences(VideoIntelligence $intelligence, ProcessingStrategy $strategy): array
     {
+        if ($intelligence->audio()->speakerCount() >= 2 || $intelligence->audio()->backgroundMusic() === BackgroundMusic::Detected) {
+            return ['openvoice', 'seedvc'];
+        }
+
         return match ($strategy) {
             ProcessingStrategy::Quality, ProcessingStrategy::Balanced => ['openvoice', 'seedvc'],
             ProcessingStrategy::Speed, ProcessingStrategy::LowMemory => ['seedvc', 'openvoice'],
@@ -180,42 +228,97 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
     /**
      * @return list<string>
      */
-    private function lipSyncPreferences(ProcessingStrategy $strategy): array
+    private function lipSyncPreferences(VideoIntelligence $intelligence, ProcessingStrategy $strategy): array
     {
+        if (in_array($intelligence->visual()->lipVisibility(), [LipVisibility::Poor, LipVisibility::Partial], true)) {
+            return ['wav2lip', 'latentsync'];
+        }
+
         return match ($strategy) {
             ProcessingStrategy::Quality, ProcessingStrategy::Balanced => ['latentsync', 'wav2lip'],
             ProcessingStrategy::Speed, ProcessingStrategy::LowMemory => ['wav2lip', 'latentsync'],
         };
     }
 
-    private function buildExplanation(VideoAnalysis $analysis, ProcessingStrategy $strategy): string
+    private function buildExplanation(VideoIntelligence $intelligence, ProcessingStrategy $strategy): string
     {
-        $language = $analysis->detectedLanguage();
+        $language = $intelligence->audio()->language();
 
         return match ($strategy) {
             ProcessingStrategy::Quality => sprintf(
-                'Quality-first pipeline for %s content with %.0f seconds of video.',
+                'Quality-first pipeline for %s content with %d%% STT confidence.',
                 $language,
-                $analysis->durationSeconds(),
+                $intelligence->audio()->confidence()->percentage(),
             ),
             ProcessingStrategy::Speed => sprintf(
                 'Speed-optimized pipeline for %s content (GPU %s).',
                 $language,
-                $analysis->gpuAvailable() ? 'available' : 'unavailable',
+                $intelligence->gpuAvailable() ? 'available' : 'unavailable',
             ),
             ProcessingStrategy::LowMemory => sprintf(
                 'Low-memory pipeline for %s content with %.1f GB estimated VRAM.',
                 $language,
-                $analysis->estimatedVramGb(),
+                $intelligence->estimatedVramGb(),
             ),
             ProcessingStrategy::Balanced => sprintf(
-                'Balanced pipeline for %s content targeting French and German translations.',
+                'Balanced pipeline for %s %s scene with %d speaker(s).',
                 $language,
+                $intelligence->scene()->value,
+                $intelligence->audio()->speakerCount(),
             ),
         };
     }
 
-    private function estimateDurationSeconds(VideoAnalysis $analysis, ProcessingStrategy $strategy): int
+    /**
+     * @return list<string>
+     */
+    private function buildReasons(
+        VideoIntelligence $intelligence,
+        ProcessingStrategy $strategy,
+        PipelineConfiguration $configuration,
+    ): array {
+        $reasons = [];
+
+        if ($intelligence->audio()->speakerCount() >= 2) {
+            $reasons[] = sprintf(
+                '%d speakers detected.',
+                $intelligence->audio()->speakerCount(),
+            );
+        }
+
+        if ($intelligence->audio()->confidence()->isHigh()) {
+            $reasons[] = 'High STT confidence.';
+        } elseif ($intelligence->audio()->confidence()->isLow()) {
+            $reasons[] = sprintf(
+                'STT confidence is %d%%; a more robust pass is recommended.',
+                $intelligence->audio()->confidence()->percentage(),
+            );
+        }
+
+        if ($intelligence->audio()->backgroundMusic() === BackgroundMusic::Detected) {
+            $reasons[] = 'Background music detected; stronger voice clone recommended.';
+        }
+
+        if ($intelligence->visual()->lighting() === LightingCondition::Good
+            || $intelligence->visual()->lighting() === LightingCondition::Excellent) {
+            $reasons[] = 'Good lighting detected.';
+        }
+
+        if ($intelligence->visual()->lipVisibility() === LipVisibility::Excellent) {
+            $reasons[] = 'Excellent lip visibility; LatentSync preferred.';
+        }
+
+        $voiceCloneProvider = $configuration->providerFor(PipelineStageType::VoiceClone);
+        if ('openvoice' === $voiceCloneProvider) {
+            $reasons[] = 'OpenVoice recommended for multi-speaker or music-heavy content.';
+        }
+
+        $reasons[] = sprintf('%s strategy selected.', ucfirst($strategy->value));
+
+        return $reasons;
+    }
+
+    private function estimateDurationSeconds(VideoIntelligence $intelligence, ProcessingStrategy $strategy): int
     {
         $multiplier = match ($strategy) {
             ProcessingStrategy::Quality => 2.5,
@@ -224,30 +327,36 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
             ProcessingStrategy::Balanced => 1.8,
         };
 
-        return (int) max(60, round($analysis->durationSeconds() * $multiplier));
+        return (int) max(60, round($intelligence->durationSeconds() * $multiplier));
     }
 
-    private function estimateQuality(ProcessingStrategy $strategy): int
+    private function estimateQuality(ProcessingStrategy $strategy, VideoIntelligence $intelligence): int
     {
-        return match ($strategy) {
+        $base = match ($strategy) {
             ProcessingStrategy::Quality => 5,
             ProcessingStrategy::Balanced => 4,
             ProcessingStrategy::Speed => 3,
             ProcessingStrategy::LowMemory => 3,
         };
+
+        if ($intelligence->audio()->confidence()->isHigh() && $base < 5) {
+            return min(5, $base + 1);
+        }
+
+        return $base;
     }
 
-    private function estimateVramGb(VideoAnalysis $analysis, ProcessingStrategy $strategy): float
+    private function estimateVramGb(VideoIntelligence $intelligence, ProcessingStrategy $strategy): float
     {
-        if (!$analysis->gpuAvailable()) {
+        if (!$intelligence->gpuAvailable()) {
             return 0.0;
         }
 
         return match ($strategy) {
-            ProcessingStrategy::Quality => max($analysis->estimatedVramGb(), 12.0),
-            ProcessingStrategy::Balanced => max($analysis->estimatedVramGb(), 8.0),
-            ProcessingStrategy::Speed => min($analysis->estimatedVramGb(), 6.0),
-            ProcessingStrategy::LowMemory => min($analysis->estimatedVramGb(), 4.0),
+            ProcessingStrategy::Quality => max($intelligence->estimatedVramGb(), 12.0),
+            ProcessingStrategy::Balanced => max($intelligence->estimatedVramGb(), 8.0),
+            ProcessingStrategy::Speed => min($intelligence->estimatedVramGb(), 6.0),
+            ProcessingStrategy::LowMemory => min($intelligence->estimatedVramGb(), 4.0),
         };
     }
 }

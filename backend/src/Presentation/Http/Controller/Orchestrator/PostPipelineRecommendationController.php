@@ -53,13 +53,13 @@ final class PostPipelineRecommendationController extends AbstractController
         }
 
         try {
-            $analysis = $mapper->fromArray($payload);
+            $intelligence = $mapper->intelligenceFromArray($payload);
             $strategy = $mapper->parseStrategy($payload['strategy'] ?? null);
         } catch (InvalidPipelineRecommendationException) {
             return $this->json(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
         }
 
-        $result = $handler(new RecommendPipelineConfigurationQuery($analysis, $strategy));
+        $result = $handler(new RecommendPipelineConfigurationQuery($intelligence, $strategy));
 
         return $this->json([
             'id' => $result->id,
@@ -69,6 +69,7 @@ final class PostPipelineRecommendationController extends AbstractController
             'estimatedQuality' => $result->estimatedQuality,
             'estimatedVramGb' => $result->estimatedVramGb,
             'stages' => $result->stages,
+            'reasons' => $result->reasons,
         ]);
     }
 }

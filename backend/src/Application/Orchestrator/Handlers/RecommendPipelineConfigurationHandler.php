@@ -18,8 +18,8 @@ final class RecommendPipelineConfigurationHandler
     public function __invoke(RecommendPipelineConfigurationQuery $query): PipelineRecommendationResult
     {
         $recommendation = null !== $query->strategy
-            ? $this->planner->recommendWithStrategy($query->analysis, $query->strategy)
-            : $this->planner->recommend($query->analysis);
+            ? $this->planner->recommendWithStrategy($query->intelligence, $query->strategy)
+            : $this->planner->recommend($query->intelligence);
 
         return PipelineRecommendationResult::fromRecommendation($recommendation);
     }

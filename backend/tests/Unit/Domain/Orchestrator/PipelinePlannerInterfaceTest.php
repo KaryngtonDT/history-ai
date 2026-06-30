@@ -8,11 +8,24 @@ use App\Domain\Orchestrator\PipelinePlannerInterface;
 use App\Domain\Orchestrator\PipelineRecommendation;
 use App\Domain\Orchestrator\PipelineRecommendationId;
 use App\Domain\Orchestrator\ProcessingStrategy;
-use App\Domain\Orchestrator\VideoAnalysis;
 use App\Domain\Pipeline\PipelineConfiguration;
 use App\Domain\Pipeline\PipelineConfigurationId;
 use App\Domain\Pipeline\PipelineStage;
 use App\Domain\Pipeline\PipelineStageType;
+use App\Domain\VideoIntelligence\AudioCharacteristics;
+use App\Domain\VideoIntelligence\AudioNoiseLevel;
+use App\Domain\VideoIntelligence\BackgroundMusic;
+use App\Domain\VideoIntelligence\LightingCondition;
+use App\Domain\VideoIntelligence\LipVisibility;
+use App\Domain\VideoIntelligence\SpeechCharacteristics;
+use App\Domain\VideoIntelligence\SpeechConfidence;
+use App\Domain\VideoIntelligence\SpeechSpeed;
+use App\Domain\VideoIntelligence\VideoEmotion;
+use App\Domain\VideoIntelligence\VideoIntelligence;
+use App\Domain\VideoIntelligence\VideoIntelligenceId;
+use App\Domain\VideoIntelligence\VideoScene;
+use App\Domain\VideoIntelligence\VideoSpeakerCollection;
+use App\Domain\VideoIntelligence\VisualCharacteristics;
 use PHPUnit\Framework\TestCase;
 
 final class PipelinePlannerInterfaceTest extends TestCase
@@ -31,7 +44,17 @@ final class PipelinePlannerInterfaceTest extends TestCase
             ],
         );
 
-        $analysis = VideoAnalysis::create('english', 120.0, '1920x1080', 30.0, true, 8.0);
+        $intelligence = VideoIntelligence::create(
+            VideoIntelligenceId::generate(),
+            120.0,
+            VideoScene::Interview,
+            AudioCharacteristics::create('english', 1, AudioNoiseLevel::Low, BackgroundMusic::NotDetected, SpeechSpeed::Normal, SpeechConfidence::create(90)),
+            VisualCharacteristics::create('1920x1080', 30.0, LightingCondition::Good, LipVisibility::Excellent, 1),
+            SpeechCharacteristics::create(VideoEmotion::Neutral, 140.0, 5, false),
+            VideoSpeakerCollection::empty(),
+            true,
+            8.0,
+        );
 
         $recommendation = PipelineRecommendation::create(
             PipelineRecommendationId::generate(),
@@ -41,6 +64,7 @@ final class PipelinePlannerInterfaceTest extends TestCase
             180,
             4,
             8.0,
+            ['Balanced strategy selected.'],
         );
 
         $planner = $this->createMock(PipelinePlannerInterface::class);
@@ -48,19 +72,19 @@ final class PipelinePlannerInterfaceTest extends TestCase
         $planner
             ->expects(self::once())
             ->method('recommend')
-            ->with($analysis)
+            ->with($intelligence)
             ->willReturn($recommendation);
 
         $planner
             ->expects(self::once())
             ->method('recommendWithStrategy')
-            ->with($analysis, ProcessingStrategy::Quality)
+            ->with($intelligence, ProcessingStrategy::Quality)
             ->willReturn($recommendation);
 
-        self::assertSame($recommendation, $planner->recommend($analysis));
+        self::assertSame($recommendation, $planner->recommend($intelligence));
         self::assertSame(
             $recommendation,
-            $planner->recommendWithStrategy($analysis, ProcessingStrategy::Quality),
+            $planner->recommendWithStrategy($intelligence, ProcessingStrategy::Quality),
         );
     }
 }

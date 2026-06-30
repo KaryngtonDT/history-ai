@@ -9,6 +9,9 @@ use App\Domain\Pipeline\PipelineConfiguration;
 
 final readonly class PipelineRecommendation
 {
+    /**
+     * @param list<string> $reasons
+     */
     public function __construct(
         private PipelineRecommendationId $id,
         private ProcessingStrategy $strategy,
@@ -17,6 +20,7 @@ final readonly class PipelineRecommendation
         private int $estimatedDurationSeconds,
         private int $estimatedQuality,
         private float $estimatedVramGb,
+        private array $reasons = [],
     ) {
         if ('' === trim($this->explanation)) {
             throw new InvalidPipelineRecommendationException('Recommendation explanation must not be empty.');
@@ -35,6 +39,9 @@ final readonly class PipelineRecommendation
         }
     }
 
+    /**
+     * @param list<string> $reasons
+     */
     public static function create(
         PipelineRecommendationId $id,
         ProcessingStrategy $strategy,
@@ -43,6 +50,7 @@ final readonly class PipelineRecommendation
         int $estimatedDurationSeconds,
         int $estimatedQuality,
         float $estimatedVramGb,
+        array $reasons = [],
     ): self {
         return new self(
             $id,
@@ -52,6 +60,7 @@ final readonly class PipelineRecommendation
             $estimatedDurationSeconds,
             $estimatedQuality,
             $estimatedVramGb,
+            array_values($reasons),
         );
     }
 
@@ -88,5 +97,13 @@ final readonly class PipelineRecommendation
     public function estimatedVramGb(): float
     {
         return $this->estimatedVramGb;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function reasons(): array
+    {
+        return $this->reasons;
     }
 }

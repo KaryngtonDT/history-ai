@@ -176,6 +176,15 @@ services:
     App\Domain\VideoIntelligence\VideoAnalyzerInterface:
         alias: App\Infrastructure\VideoIntelligence\CompositeVideoAnalyzer
 
+    App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface:
+        alias: App\Infrastructure\VideoIntelligence\VideoJobVideoIntelligenceFactory
+
+    App\Infrastructure\VideoIntelligence\VideoJobVideoIntelligenceFactory:
+        arguments:
+            $gpuAvailable: '%env(bool:default:orchestrator.gpu_available_default:ORCHESTRATOR_GPU_AVAILABLE)%'
+            $estimatedVramGb: '%env(float:default:orchestrator.vram_gb_default:ORCHESTRATOR_VRAM_GB)%'
+            $defaultDurationSeconds: '%env(float:default:orchestrator.duration_seconds_default:ORCHESTRATOR_DEFAULT_DURATION_SECONDS)%'
+
     App\Infrastructure\Orchestrator\VideoJobVideoAnalysisFactory:
         arguments:
             $gpuAvailable: '%env(bool:default:orchestrator.gpu_available_default:ORCHESTRATOR_GPU_AVAILABLE)%'
