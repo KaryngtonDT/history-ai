@@ -90,6 +90,13 @@ nelmio_api_doc:
             - { alias: VideoLipSyncSummary, type: App\Presentation\OpenApi\Schema\VideoLipSyncSummarySchema }
             - { alias: VideoLipSyncList, type: App\Presentation\OpenApi\Schema\VideoLipSyncListSchema }
             - { alias: GenerateVideoLipSyncRequest, type: App\Presentation\OpenApi\Schema\GenerateVideoLipSyncRequestSchema }
+            - { alias: VideoRenderProvider, type: App\Presentation\OpenApi\Schema\VideoRenderProviderSchema }
+            - { alias: VideoRenderFormat, type: App\Presentation\OpenApi\Schema\VideoRenderFormatSchema }
+            - { alias: VideoRenderQuality, type: App\Presentation\OpenApi\Schema\VideoRenderQualitySchema }
+            - { alias: FinalVideoArtifact, type: App\Presentation\OpenApi\Schema\FinalVideoArtifactSchema }
+            - { alias: VideoRenderSummary, type: App\Presentation\OpenApi\Schema\VideoRenderSummarySchema }
+            - { alias: VideoRenderList, type: App\Presentation\OpenApi\Schema\VideoRenderListSchema }
+            - { alias: GenerateVideoRenderRequest, type: App\Presentation\OpenApi\Schema\GenerateVideoRenderRequestSchema }
     areas:
         default:
             path_patterns:

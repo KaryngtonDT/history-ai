@@ -871,6 +871,46 @@ Verification: [Sprint37-Verification.md](../reports/Sprint37-Verification.md)
 
 ---
 
+# Platform Sprint 38 — Final Video Rendering (2026-06)
+
+Platform Sprint 38 delivers **final MP4 rendering and download** for Phase 2: dedicated `VideoRender` AI capability, FFmpeg provider, worker pipeline, frontend final video player with download, and OpenAPI documentation. This completes the first end-to-end demonstrable localization pipeline.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P38-SLICE-01 | `FinalVideoArtifact`, `VideoRenderProviderInterface` | ✅ |
+| P38-SLICE-02 | `FFmpegVideoRenderProvider`, factory, AI Engine integration | ✅ |
+| P38-SLICE-03 | `VideoFinalRenderGenerator`, final video artifacts, REST endpoints | ✅ |
+| P38-SLICE-04 | `FinalVideoPanel`, `FinalVideoPlayer`, `RenderSettings` at `/video/:videoId/render` | ✅ |
+| P38-SLICE-05 | OpenAPI render schemas, architecture docs, verification report | ✅ |
+
+| Layer | Components |
+| ----- | ---------- |
+| Domain | `FinalVideoArtifact`, `VideoRenderProvider`, `VideoRenderFormat`, `VideoRenderQuality` |
+| Application | `VideoFinalRenderGenerator`, render handlers, `VideoRenderJsonMapper` |
+| Infrastructure | `FFmpegVideoRenderProvider`, `DoctrineFinalVideoRepository` |
+| Presentation | `GET/POST /api/videos/{videoId}/render`, stream endpoint, OpenAPI schemas |
+| Frontend | `FinalVideoPanel`, `FinalVideoPlayer`, `RenderSettings` at `/video/:videoId/render` |
+
+```text
+LipSyncArtifact
+        │
+        ▼
+AIProviderResolverInterface.resolveVideoRender()
+        │
+        ▼
+FFmpegVideoRenderProvider
+        │
+        ▼
+FinalVideoArtifact (ArtifactType::FinalVideo)
+        │
+        ▼
+GET/POST /api/videos/{videoId}/render → FinalVideoPanel (/video/:videoId/render)
+```
+
+Verification: [Sprint38-Verification.md](../reports/Sprint38-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

@@ -391,7 +391,7 @@ The frontend `TranslationPanel` at `/video/:videoId/translations` lets users sel
 
 | Schema | Values / fields |
 | ------ | ---------------- |
-| `AIEngineCapability` | `speech_to_text`, `translation`, `text_to_speech`, `voice_clone`, `lip_sync` |
+| `AIEngineCapability` | `speech_to_text`, `translation`, `text_to_speech`, `voice_clone`, `lip_sync`, `video_render` |
 | `AIProvider` | `providerId`, `displayName`, `capability`, `enabled` |
 | `AIEngine` | `id`, `capability`, `displayName`, `providers[]` |
 
@@ -554,6 +554,60 @@ The frontend `VoiceClonePanel` at `/video/:videoId/voice-clone` lets users toggl
 | `GenerateVideoLipSyncRequest` | `targetLanguages`, `provider` |
 
 The frontend `LipSyncPanel` at `/video/:videoId/lip-sync` lets users select LatentSync, generate lip-synced previews, and compare original vs synced video via `LipSyncService`.
+
+---
+
+# Video final render (Platform Sprint 38)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/videos/{videoId}/render` | List final rendered MP4 artifacts for a video |
+| POST | `/api/videos/{videoId}/render` | Render lip-synced preview into downloadable MP4 using FFmpeg |
+| GET | `/api/videos/{videoId}/render/{language}` | Get final render metadata with stream and download URLs |
+| GET | `/api/videos/{videoId}/render/{language}/stream` | Stream or download final MP4 file |
+
+## Request body (POST)
+
+```json
+{
+  "targetLanguages": ["french"],
+  "provider": "ffmpeg",
+  "format": "mp4",
+  "quality": "standard"
+}
+```
+
+## Response shape (list)
+
+```json
+{
+  "videoId": "660e8400-e29b-41d4-a716-446655440001",
+  "renders": [
+    {
+      "finalVideoId": "550e8400-e29b-41d4-a716-446655440091",
+      "targetLanguage": "french",
+      "provider": "ffmpeg",
+      "format": "mp4",
+      "quality": "standard",
+      "duration": 120.5,
+      "fileSizeBytes": 1048576,
+      "streamUrl": "/api/videos/{videoId}/render/french/stream"
+    }
+  ]
+}
+```
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `VideoRenderProvider` | `ffmpeg`, `mock` |
+| `VideoRenderFormat` | `mp4`, `webm` |
+| `VideoRenderQuality` | `preview`, `standard`, `high` |
+| `FinalVideoArtifact` | `finalVideoId`, `provider`, `format`, `quality`, stream/download URLs |
+| `GenerateVideoRenderRequest` | `targetLanguages`, `provider`, `format`, `quality` |
+
+The frontend `FinalVideoPanel` at `/video/:videoId/render` lets users render final MP4s, preview the result, and download via `VideoRenderService`.
 
 ---
 

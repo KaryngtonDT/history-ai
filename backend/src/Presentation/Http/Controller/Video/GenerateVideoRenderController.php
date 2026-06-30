@@ -7,6 +7,7 @@ namespace App\Presentation\Http\Controller\Video;
 use App\Application\VideoRender\Commands\GenerateVideoRenderCommand;
 use App\Application\VideoRender\Handlers\GenerateVideoRenderHandler;
 use App\Domain\VideoRender\Exception\InvalidVideoRenderException;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,41 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class GenerateVideoRenderController extends AbstractController
 {
+    #[OA\Post(
+        operationId: 'generateVideoRender',
+        summary: 'Generate final rendered video',
+        description: 'Renders a lip-synced preview into a downloadable MP4 using FFmpeg.',
+        tags: ['Video'],
+        parameters: [
+            new OA\Parameter(
+                name: 'videoId',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid'),
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: false,
+            content: new OA\JsonContent(ref: '#/components/schemas/GenerateVideoRenderRequest'),
+        ),
+        responses: [
+            new OA\Response(
+                response: 202,
+                description: 'Final render accepted',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'status', type: 'string', example: 'rendered'),
+                    ],
+                    type: 'object',
+                ),
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid request',
+                content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse'),
+            ),
+        ],
+    )]
     #[Route('/api/videos/{videoId}/render', name: 'api_videos_render_generate', methods: ['POST'])]
     public function __invoke(string $videoId, Request $request, GenerateVideoRenderHandler $handler): JsonResponse
     {

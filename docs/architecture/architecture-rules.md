@@ -1019,6 +1019,34 @@ GET/POST /api/videos/{videoId}/lip-sync → LipSyncPanel (/video/:videoId/lip-sy
 
 Feature components must use `lipSyncService`, not `HttpLipSyncRepository` or `HttpClient` directly.
 
+## Platform Sprint 38 — Final Video Rendering
+
+```text
+LipSyncArtifact
+        │
+        ▼
+AIProviderResolverInterface.resolveVideoRender()
+        │
+        ▼
+FFmpegVideoRenderProvider
+        │
+        ▼
+FinalVideoArtifact (ArtifactType::FinalVideo)
+        │
+        ▼
+GET/POST /api/videos/{videoId}/render → FinalVideoPanel (/video/:videoId/render)
+```
+
+| Component | Role |
+| --------- | ---- |
+| `FinalVideoArtifact` | Immutable aggregate: finalVideoId, lipSyncArtifactId, provider, format, quality |
+| `VideoRenderProviderInterface` | Domain port: `render(LipSyncArtifact, format, quality)` |
+| `FFmpegVideoRenderProvider` | FFmpeg process runner and render mapper |
+| `VideoFinalRenderGenerator` | Orchestrates lip sync → FFmpeg render → persistence |
+| `FinalVideoPlayer` | Video preview, provider/quality badge, MP4 download |
+
+Feature components must use `videoRenderService`, not `HttpVideoRenderRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

@@ -2147,6 +2147,55 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertContains('latentsync', $providerSchema['enum']);
     }
 
+    public function testOpenApiSpecDocumentsListVideoRenderOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/render']['get'];
+
+        self::assertSame('listVideoRender', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsGenerateVideoRenderOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/render']['post'];
+
+        self::assertSame('generateVideoRender', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsGetVideoRenderOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/render/{language}']['get'];
+
+        self::assertSame('getVideoRender', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsStreamVideoRenderOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/render/{language}/stream']['get'];
+
+        self::assertSame('streamVideoRender', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsVideoRenderSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('VideoRenderProvider', $spec['components']['schemas']);
+        self::assertArrayHasKey('VideoRenderFormat', $spec['components']['schemas']);
+        self::assertArrayHasKey('VideoRenderQuality', $spec['components']['schemas']);
+        self::assertArrayHasKey('FinalVideoArtifact', $spec['components']['schemas']);
+        self::assertArrayHasKey('VideoRenderSummary', $spec['components']['schemas']);
+        self::assertArrayHasKey('VideoRenderList', $spec['components']['schemas']);
+        self::assertArrayHasKey('GenerateVideoRenderRequest', $spec['components']['schemas']);
+
+        $providerSchema = $spec['components']['schemas']['VideoRenderProvider'];
+        self::assertSame('string', $providerSchema['type']);
+        self::assertContains('ffmpeg', $providerSchema['enum']);
+    }
+
     /**
      * @return array<string, mixed>
      */
