@@ -1,0 +1,40 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.heading {
+	margin: 0;
+	font-size: 1.125rem;
+}
+
+.sectionLabel {
+	display: block;
+	margin-bottom: 0.25rem;
+	font-weight: 600;
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+}
+
+.select {
+	width: 100%;
+	padding: 0.5rem 0.75rem;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-sm);
+	background: var(--color-surface);
+	color: var(--color-text);
+}
+
+.sourceStatus {
+	margin: 0;
+	color: var(--color-text-muted);
+}
+
+.error {
+	margin: 0;
+	color: var(--color-danger);
+}

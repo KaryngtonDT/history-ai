@@ -1,0 +1,22 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 1rem;
+}
+
+.title {
+	margin: 0;
+	font-size: 1.5rem;
+}
+
+.meta {
+	margin: 0.25rem 0 0;
+	color: var(--color-text-muted);
+}

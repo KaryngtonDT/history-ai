@@ -76,6 +76,21 @@ export function videoLipSyncStreamPath(
 	return `${VIDEOS_PATH}/${videoId}/lip-sync/${language}/stream`;
 }
 
+export function videoRenderListPath(videoId: string): string {
+	return `${VIDEOS_PATH}/${videoId}/render`;
+}
+
+export function videoRenderPath(videoId: string, language: string): string {
+	return `${VIDEOS_PATH}/${videoId}/render/${language}`;
+}
+
+export function videoRenderStreamPath(
+	videoId: string,
+	language: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/render/${language}/stream`;
+}
+
 export function timelinePath(artifactId: string): string {
 	return `/api/timeline/${artifactId}`;
 }
