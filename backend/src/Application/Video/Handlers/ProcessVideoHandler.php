@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Application\Video\Handlers;
 
-use App\Application\Video\Messages\ProcessVideoMessage;
+use App\Application\LipSync\GenerateLipSyncConfiguration;
+use App\Application\LipSync\VideoLipSyncGenerator;
 use App\Application\Speech\TranscriptJsonMapper;
 use App\Application\Translation\DefaultTranslationLanguagesProvider;
 use App\Application\Translation\VideoTranslationGenerator;
 use App\Application\TTS\GenerateAudioConfiguration;
 use App\Application\TTS\VideoAudioGenerator;
-use App\Application\LipSync\GenerateLipSyncConfiguration;
-use App\Application\LipSync\VideoLipSyncGenerator;
+use App\Application\Video\Messages\ProcessVideoMessage;
 use App\Application\VideoRender\GenerateFinalVideoConfiguration;
 use App\Application\VideoRender\VideoFinalRenderGenerator;
 use App\Application\VoiceClone\GenerateVoiceCloneConfiguration;
@@ -23,9 +23,14 @@ use App\Domain\Artifact\ArtifactId;
 use App\Domain\Artifact\ArtifactRepositoryInterface;
 use App\Domain\Artifact\ArtifactType;
 use App\Domain\Content\ContentId;
+use App\Domain\Orchestrator\PipelinePlannerInterface;
+use App\Domain\Orchestrator\ProcessingMode;
+use App\Domain\Orchestrator\VideoAnalysisFactoryInterface;
+use App\Domain\Pipeline\RuntimePipelineConfigurationContextInterface;
 use App\Domain\Processing\ProcessingJobId;
 use App\Domain\Speech\TranscriptRepositoryInterface;
 use App\Domain\Video\VideoId;
+use App\Domain\Video\VideoJob;
 use App\Domain\Video\VideoRepositoryInterface;
 use Throwable;
 
@@ -47,6 +52,9 @@ final class ProcessVideoHandler
         private readonly GenerateLipSyncConfiguration $generateLipSyncConfiguration,
         private readonly VideoFinalRenderGenerator $videoFinalRenderGenerator,
         private readonly GenerateFinalVideoConfiguration $generateFinalVideoConfiguration,
+        private readonly PipelinePlannerInterface $pipelinePlanner,
+        private readonly VideoAnalysisFactoryInterface $videoAnalysisFactory,
+        private readonly RuntimePipelineConfigurationContextInterface $runtimePipelineContext,
     ) {
     }
 
@@ -63,6 +71,8 @@ final class ProcessVideoHandler
         $this->videoRepository->save($processing);
 
         try {
+            $this->configurePipelineForMessage($message, $processing);
+
             $transcript = $this->aiProviderResolver
                 ->resolveSpeechToText()
                 ->transcribe($processing);
@@ -103,6 +113,24 @@ final class ProcessVideoHandler
             $this->videoRepository->save($processing->complete());
         } catch (Throwable) {
             $this->videoRepository->save($processing->fail());
+        } finally {
+            $this->runtimePipelineContext->clear();
         }
+    }
+
+    private function configurePipelineForMessage(ProcessVideoMessage $message, VideoJob $job): void
+    {
+        if (ProcessingMode::Manual === $message->processingMode) {
+            $this->runtimePipelineContext->clear();
+
+            return;
+        }
+
+        $analysis = $this->videoAnalysisFactory->fromVideoJob($job);
+        $recommendation = null !== $message->strategy
+            ? $this->pipelinePlanner->recommendWithStrategy($analysis, $message->strategy)
+            : $this->pipelinePlanner->recommend($analysis);
+
+        $this->runtimePipelineContext->set($recommendation->pipelineConfiguration());
     }
 }

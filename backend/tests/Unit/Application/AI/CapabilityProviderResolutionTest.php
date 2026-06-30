@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Application\AI;
 
 use App\Domain\AI\AIEngineCapability;
-use App\Domain\Pipeline\PipelineConfigurationRepositoryInterface;
+use App\Domain\Pipeline\PipelineConfigurationResolverInterface;
 use App\Infrastructure\AI\AIEngineRegistryFactory;
 use App\Infrastructure\AI\AIProviderResolver;
 use App\Infrastructure\AI\Exception\InvalidAIEngineConfigurationException;
@@ -48,8 +48,8 @@ final class CapabilityProviderResolutionTest extends TestCase
     protected function setUp(): void
     {
         $registryFactory = new AIEngineRegistryFactory();
-        $pipelineConfigurationRepository = $this->createMock(PipelineConfigurationRepositoryInterface::class);
-        $pipelineConfigurationRepository->method('findLatest')->willReturn(null);
+        $pipelineConfigurationResolver = $this->createMock(PipelineConfigurationResolverInterface::class);
+        $pipelineConfigurationResolver->method('resolve')->willReturn(null);
         $this->resolver = new AIProviderResolver(
             $registryFactory->create(),
             $registryFactory->createConfiguration(),
@@ -118,7 +118,7 @@ final class CapabilityProviderResolutionTest extends TestCase
                 ),
                 new MockVideoRenderProvider(),
             ),
-            $pipelineConfigurationRepository,
+            $pipelineConfigurationResolver,
         );
     }
 

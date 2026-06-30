@@ -6,6 +6,8 @@ namespace App\Infrastructure\Video;
 
 use App\Application\Video\Messages\ProcessVideoMessage;
 use App\Application\Video\Ports\VideoProcessingQueueInterface;
+use App\Domain\Orchestrator\ProcessingMode;
+use App\Domain\Orchestrator\ProcessingStrategy;
 use App\Domain\Video\VideoId;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -16,8 +18,15 @@ final class MessengerVideoProcessingQueue implements VideoProcessingQueueInterfa
     ) {
     }
 
-    public function enqueue(VideoId $videoId): void
-    {
-        $this->messageBus->dispatch(new ProcessVideoMessage($videoId->value));
+    public function enqueue(
+        VideoId $videoId,
+        ProcessingMode $processingMode = ProcessingMode::Manual,
+        ?ProcessingStrategy $strategy = null,
+    ): void {
+        $this->messageBus->dispatch(new ProcessVideoMessage(
+            $videoId->value,
+            $processingMode,
+            $strategy,
+        ));
     }
 }

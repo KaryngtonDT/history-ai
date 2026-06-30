@@ -6,6 +6,8 @@ namespace App\Presentation\Http\Controller\Video;
 
 use App\Application\Video\Commands\UploadVideoCommand;
 use App\Application\Video\Handlers\UploadVideoHandler;
+use App\Domain\Orchestrator\ProcessingMode;
+use App\Domain\Orchestrator\ProcessingStrategy;
 use App\Domain\Video\Exception\InvalidVideoJobException;
 use App\Presentation\Http\Response\Video\UploadVideoResponse;
 use OpenApi\Attributes as OA;
@@ -67,6 +69,8 @@ final class UploadVideoController extends AbstractController
                 originalFilename: (string) $uploadedFile->getClientOriginalName(),
                 fileSizeBytes: (int) $uploadedFile->getSize(),
                 temporaryPath: $uploadedFile->getPathname(),
+                processingMode: $this->parseProcessingMode($request->request->get('processingMode')),
+                strategy: $this->parseStrategy($request->request->get('strategy')),
             ));
         } catch (InvalidVideoJobException) {
             return $this->invalidRequestResponse();
@@ -81,5 +85,23 @@ final class UploadVideoController extends AbstractController
     private function invalidRequestResponse(): JsonResponse
     {
         return $this->json(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
+    }
+
+    private function parseProcessingMode(mixed $value): ProcessingMode
+    {
+        if (!is_string($value)) {
+            return ProcessingMode::Manual;
+        }
+
+        return ProcessingMode::tryFrom($value) ?? ProcessingMode::Manual;
+    }
+
+    private function parseStrategy(mixed $value): ?ProcessingStrategy
+    {
+        if (!is_string($value) || '' === trim($value)) {
+            return null;
+        }
+
+        return ProcessingStrategy::tryFrom($value);
     }
 }

@@ -43,6 +43,9 @@ parameters:
     video_render.quality_default: 'standard'
     video_render.output_dir: '%kernel.project_dir%/var/final-video-storage'
     video_render.generate_default: false
+    orchestrator.gpu_available_default: true
+    orchestrator.vram_gb_default: 8.0
+    orchestrator.duration_seconds_default: 120.0
 
 services:
     _defaults:
@@ -157,6 +160,26 @@ services:
 
     App\Domain\Pipeline\PipelineConfigurationRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Pipeline\DoctrinePipelineConfigurationRepository
+
+    App\Domain\Pipeline\PipelineConfigurationResolverInterface:
+        alias: App\Infrastructure\Pipeline\ResolvingPipelineConfiguration
+
+    App\Domain\Pipeline\RuntimePipelineConfigurationContextInterface:
+        alias: App\Infrastructure\Pipeline\RuntimePipelineConfigurationContext
+
+    App\Domain\Orchestrator\PipelinePlannerInterface:
+        alias: App\Infrastructure\Orchestrator\DeterministicPipelinePlanner
+
+    App\Domain\Orchestrator\VideoAnalysisFactoryInterface:
+        alias: App\Infrastructure\Orchestrator\VideoJobVideoAnalysisFactory
+
+    App\Infrastructure\Orchestrator\VideoJobVideoAnalysisFactory:
+        arguments:
+            $gpuAvailable: '%env(bool:default:orchestrator.gpu_available_default:ORCHESTRATOR_GPU_AVAILABLE)%'
+            $estimatedVramGb: '%env(float:default:orchestrator.vram_gb_default:ORCHESTRATOR_VRAM_GB)%'
+            $defaultDurationSeconds: '%env(float:default:orchestrator.duration_seconds_default:ORCHESTRATOR_DEFAULT_DURATION_SECONDS)%'
+
+    App\Infrastructure\Pipeline\RuntimePipelineConfigurationContext: ~
 
     App\Application\TTS\GenerateAudioConfiguration:
         arguments:

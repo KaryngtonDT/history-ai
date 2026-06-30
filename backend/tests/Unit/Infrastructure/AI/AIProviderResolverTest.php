@@ -48,7 +48,7 @@ use App\Infrastructure\VoiceClone\OpenVoiceProvider;
 use App\Infrastructure\VoiceClone\VoiceCloneMapper;
 use App\Infrastructure\VoiceClone\VoiceCloneProcessingContext;
 use App\Infrastructure\VoiceClone\VoiceCloneProviderFactory;
-use App\Domain\Pipeline\PipelineConfigurationRepositoryInterface;
+use App\Domain\Pipeline\PipelineConfigurationResolverInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -56,13 +56,13 @@ final class AIProviderResolverTest extends TestCase
 {
     private AIProviderResolver $resolver;
 
-    private PipelineConfigurationRepositoryInterface&MockObject $pipelineConfigurationRepository;
+    private PipelineConfigurationResolverInterface&MockObject $pipelineConfigurationResolver;
 
     protected function setUp(): void
     {
         $registryFactory = new AIEngineRegistryFactory();
-        $this->pipelineConfigurationRepository = $this->createMock(PipelineConfigurationRepositoryInterface::class);
-        $this->pipelineConfigurationRepository->method('findLatest')->willReturn(null);
+        $this->pipelineConfigurationResolver = $this->createMock(PipelineConfigurationResolverInterface::class);
+        $this->pipelineConfigurationResolver->method('resolve')->willReturn(null);
         $fasterWhisper = new FasterWhisperProvider(
             $this->createMock(FasterWhisperProcessRunnerInterface::class),
             new FasterWhisperOutputParser(),
@@ -85,7 +85,7 @@ final class AIProviderResolverTest extends TestCase
             $this->createVoiceCloneProviderFactory(),
             $this->createLipSyncProviderFactory(),
             $this->createVideoRenderProviderFactory(),
-            $this->pipelineConfigurationRepository,
+            $this->pipelineConfigurationResolver,
         );
     }
 
@@ -316,8 +316,8 @@ final class AIProviderResolverTest extends TestCase
             ],
         );
 
-        $this->pipelineConfigurationRepository
-            ->method('findLatest')
+        $this->pipelineConfigurationResolver
+            ->method('resolve')
             ->willReturn($pipelineConfiguration);
 
         self::assertNotNull($this->resolver->resolveTranslation());

@@ -48,7 +48,11 @@ final class UploadVideoHandler
             ->queue();
 
         $this->videoRepository->save($queued);
-        $this->videoProcessingQueue->enqueue($queued->id());
+        $this->videoProcessingQueue->enqueue(
+            $queued->id(),
+            $command->processingMode,
+            $command->strategy,
+        );
 
         return new UploadVideoResult(
             $queued->id(),

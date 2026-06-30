@@ -33,6 +33,9 @@ use App\Application\VideoRender\GenerateFinalVideoConfiguration;
 use App\Application\VideoRender\VideoFinalRenderGenerator;
 use App\Application\VoiceClone\GenerateVoiceCloneConfiguration;
 use App\Application\VoiceClone\VideoVoiceCloneGenerator;
+use App\Domain\Orchestrator\PipelinePlannerInterface;
+use App\Domain\Orchestrator\VideoAnalysisFactoryInterface;
+use App\Domain\Pipeline\RuntimePipelineConfigurationContextInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -89,6 +92,9 @@ final class ProcessVideoHandlerTest extends TestCase
             new GenerateLipSyncConfiguration(false),
             $this->videoFinalRenderGenerator,
             new GenerateFinalVideoConfiguration(false),
+            $this->createMock(PipelinePlannerInterface::class),
+            $this->createMock(VideoAnalysisFactoryInterface::class),
+            $this->createMock(RuntimePipelineConfigurationContextInterface::class),
         );
     }
 

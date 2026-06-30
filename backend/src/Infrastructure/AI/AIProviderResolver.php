@@ -40,7 +40,7 @@ final class AIProviderResolver implements AIProviderResolverInterface
         private readonly VoiceCloneProviderFactory $voiceCloneProviderFactory,
         private readonly LipSyncProviderFactory $lipSyncProviderFactory,
         private readonly VideoRenderProviderFactory $videoRenderProviderFactory,
-        private readonly \App\Domain\Pipeline\PipelineConfigurationRepositoryInterface $pipelineConfigurationRepository,
+        private readonly \App\Domain\Pipeline\PipelineConfigurationResolverInterface $pipelineConfigurationResolver,
     ) {
     }
 
@@ -220,7 +220,7 @@ final class AIProviderResolver implements AIProviderResolverInterface
         PipelineStageType $stageType,
         AIEngineCapability $capability,
     ): string {
-        $pipelineConfiguration = $this->pipelineConfigurationRepository->findLatest();
+        $pipelineConfiguration = $this->pipelineConfigurationResolver->resolve();
 
         if (null !== $pipelineConfiguration) {
             return $pipelineConfiguration->providerFor($stageType);
