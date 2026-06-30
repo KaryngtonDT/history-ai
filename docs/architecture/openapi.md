@@ -77,6 +77,7 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Pipeline | POST | `/api/pipeline/reset` |
 | Orchestrator | GET | `/api/orchestrator/recommendation` |
 | Orchestrator | POST | `/api/orchestrator/recommendation` |
+| Video Intelligence | GET | `/api/videos/{videoId}/intelligence` |
 | Platform | GET | `/internal/platform/metrics` |
 
 ---
@@ -687,6 +688,11 @@ At runtime, `AIProviderResolver` reads the latest saved configuration and falls 
   "estimatedVramGb": 8.0,
   "stages": [
     { "stage": "speech_to_text", "providerId": "faster_whisper" }
+  ],
+  "reasons": [
+    "Two speakers detected.",
+    "High STT confidence.",
+    "Balanced strategy selected."
   ]
 }
 ```
@@ -697,12 +703,30 @@ At runtime, `AIProviderResolver` reads the latest saved configuration and falls 
 | ------ | ---------------- |
 | `ProcessingMode` | `manual`, `automatic` |
 | `ProcessingStrategy` | `balanced`, `quality`, `speed`, `low_memory` |
-| `VideoAnalysis` | `detectedLanguage`, `durationSeconds`, `resolution`, `fps`, `gpuAvailable`, `estimatedVramGb`, `strategy` |
-| `PipelineRecommendation` | `id`, `strategy`, `explanation`, estimates, `stages[]` |
+| `VideoAnalysis` | `detectedLanguage`, `durationSeconds`, `resolution`, `fps`, `segmentCount`, `transcriptText`, `gpuAvailable`, `estimatedVramGb`, `hasSlidesHint`, `strategy` |
+| `PipelineRecommendation` | `id`, `strategy`, `explanation`, estimates, `stages[]`, `reasons[]` |
 
 Video upload (`POST /api/videos`) accepts optional `processingMode` and `strategy` form fields. Automatic mode generates an ephemeral `PipelineConfiguration` at runtime without overwriting saved pipeline settings.
 
-The frontend `ProcessingModeSelector` and `PipelineRecommendationPanel` on `/video/upload` use `OrchestratorService`.
+The frontend `ProcessingModeSelector` and `VideoIntelligenceDashboard` on `/video/upload` use `OrchestratorService` and `VideoIntelligenceService`.
+
+---
+
+# AI Director — Video Intelligence (Platform Sprint 41)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/videos/{videoId}/intelligence` | Get AI Director video intelligence report for a video |
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `VideoIntelligence` | `id`, `videoId`, `durationSeconds`, `scene`, `audio`, `visual`, `speech`, `speakers[]`, `gpuAvailable`, `estimatedVramGb` |
+| `AudioCharacteristics` | `language`, `speakerCount`, `backgroundNoise`, `backgroundMusic`, `speechSpeed`, `confidence` |
+| `VisualCharacteristics` | `resolution`, `fps`, `lighting`, `lipVisibility`, `faceCount` |
+| `SpeechCharacteristics` | `dominantEmotion`, `averageSpeakingRate`, `pauseCount`, `hasOverlaps` |
+| `VideoSpeaker` | `index`, `label` |
 
 ---
 

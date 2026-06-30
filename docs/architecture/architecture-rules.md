@@ -1104,6 +1104,32 @@ Video Upload (/video/upload)
 
 Feature components must use `orchestratorService`, not `HttpOrchestratorRepository` or `HttpClient` directly.
 
+## Platform Sprint 41 — AI Director
+
+```text
+Video
+        │
+        ▼
+CompositeVideoAnalyzer (Audio + Visual + Speech)
+        │
+        ▼
+VideoIntelligence
+        │
+        ▼
+DeterministicPipelinePlanner → PipelineRecommendation.reasons[]
+```
+
+| Component | Role |
+| --------- | ---- |
+| `VideoIntelligence` | Immutable aggregate describing audio, visual, and speech characteristics |
+| `CompositeVideoAnalyzer` | Deterministic multi-analyzer engine (no LLM) |
+| `VideoJobVideoIntelligenceFactory` | Builds intelligence from video job and optional transcript |
+| `DeterministicPipelinePlanner` | Uses intelligence signals (speakers, confidence, music, lighting, lip visibility) |
+| `VideoIntelligenceDashboard` | Upload preview with intelligence metrics and recommendation reasons |
+| `VideoIntelligenceService` | Repository-backed intelligence loading |
+
+Feature components must use `videoIntelligenceService`, not `HttpVideoIntelligenceRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

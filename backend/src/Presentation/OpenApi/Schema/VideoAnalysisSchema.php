@@ -15,6 +15,9 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'fps', type: 'number', format: 'float', example: 30.0),
         new OA\Property(property: 'gpuAvailable', type: 'boolean', example: true),
         new OA\Property(property: 'estimatedVramGb', type: 'number', format: 'float', example: 8.0),
+        new OA\Property(property: 'segmentCount', type: 'integer', example: 25),
+        new OA\Property(property: 'transcriptText', type: 'string'),
+        new OA\Property(property: 'hasSlidesHint', type: 'boolean', example: false),
         new OA\Property(property: 'strategy', ref: '#/components/schemas/ProcessingStrategy'),
     ],
 )]

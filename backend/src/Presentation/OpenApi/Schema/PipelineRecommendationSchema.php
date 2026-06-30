@@ -29,6 +29,12 @@ use OpenApi\Attributes as OA;
             type: 'array',
             items: new OA\Items(ref: '#/components/schemas/PipelineStage'),
         ),
+        new OA\Property(
+            property: 'reasons',
+            type: 'array',
+            items: new OA\Items(type: 'string'),
+            example: ['Two speakers detected.', 'High STT confidence.'],
+        ),
     ],
 )]
 final class PipelineRecommendationSchema

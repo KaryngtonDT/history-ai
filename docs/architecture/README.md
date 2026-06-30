@@ -984,6 +984,35 @@ Verification: [Sprint40-Verification.md](../reports/Sprint40-Verification.md)
 
 ---
 
+# Platform Sprint 41 — AI Director: Smart Video Intelligence (2026-06)
+
+Platform Sprint 41 delivers **smart video intelligence** for Phase 2: composite deterministic analyzer (audio, visual, speech), AI Director integration with the orchestrator, structured recommendation reasons, frontend intelligence dashboard on upload, and OpenAPI documentation.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P41-SLICE-01 | `VideoIntelligence`, characteristics aggregates, enums | ✅ |
+| P41-SLICE-02 | `AudioAnalyzer`, `VisualAnalyzer`, `SpeechAnalyzer`, `CompositeVideoAnalyzer` | ✅ |
+| P41-SLICE-03 | Orchestrator uses `VideoIntelligence`, explanation reasons, `GET /api/videos/{videoId}/intelligence` | ✅ |
+| P41-SLICE-04 | `VideoIntelligenceDashboard`, `RecommendationReasons`, `QualityIndicators` on `/video/upload` | ✅ |
+| P41-SLICE-05 | OpenAPI intelligence schemas, architecture docs, verification report | ✅ |
+
+```text
+Upload Video (/video/upload)
+        │
+        ▼
+CompositeVideoAnalyzer → VideoIntelligence
+        │
+        ▼
+DeterministicPipelinePlanner → PipelineRecommendation (with reasons)
+        │
+        ▼
+VideoIntelligenceDashboard + Pipeline Engine → Final MP4
+```
+
+Verification: [Sprint41-Verification.md](../reports/Sprint41-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

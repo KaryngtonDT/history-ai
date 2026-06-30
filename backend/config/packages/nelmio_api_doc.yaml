@@ -105,6 +105,11 @@ nelmio_api_doc:
             - { alias: ProcessingStrategy, type: App\Presentation\OpenApi\Schema\ProcessingStrategySchema }
             - { alias: VideoAnalysis, type: App\Presentation\OpenApi\Schema\VideoAnalysisSchema }
             - { alias: PipelineRecommendation, type: App\Presentation\OpenApi\Schema\PipelineRecommendationSchema }
+            - { alias: VideoIntelligence, type: App\Presentation\OpenApi\Schema\VideoIntelligenceSchema }
+            - { alias: AudioCharacteristics, type: App\Presentation\OpenApi\Schema\AudioCharacteristicsSchema }
+            - { alias: VisualCharacteristics, type: App\Presentation\OpenApi\Schema\VisualCharacteristicsSchema }
+            - { alias: SpeechCharacteristics, type: App\Presentation\OpenApi\Schema\SpeechCharacteristicsSchema }
+            - { alias: VideoSpeaker, type: App\Presentation\OpenApi\Schema\VideoSpeakerSchema }
     areas:
         default:
             path_patterns:
