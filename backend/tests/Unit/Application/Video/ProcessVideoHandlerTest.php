@@ -27,6 +27,8 @@ use App\Application\Translation\DefaultTranslationLanguagesProvider;
 use App\Application\Translation\VideoTranslationGenerator;
 use App\Application\TTS\GenerateAudioConfiguration;
 use App\Application\TTS\VideoAudioGenerator;
+use App\Application\LipSync\GenerateLipSyncConfiguration;
+use App\Application\LipSync\VideoLipSyncGenerator;
 use App\Application\VoiceClone\GenerateVoiceCloneConfiguration;
 use App\Application\VoiceClone\VideoVoiceCloneGenerator;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -50,6 +52,8 @@ final class ProcessVideoHandlerTest extends TestCase
 
     private VideoVoiceCloneGenerator&MockObject $videoVoiceCloneGenerator;
 
+    private VideoLipSyncGenerator&MockObject $videoLipSyncGenerator;
+
     private ProcessVideoHandler $handler;
 
     protected function setUp(): void
@@ -62,6 +66,7 @@ final class ProcessVideoHandlerTest extends TestCase
         $this->videoTranslationGenerator = $this->createMock(VideoTranslationGenerator::class);
         $this->videoAudioGenerator = $this->createMock(VideoAudioGenerator::class);
         $this->videoVoiceCloneGenerator = $this->createMock(VideoVoiceCloneGenerator::class);
+        $this->videoLipSyncGenerator = $this->createMock(VideoLipSyncGenerator::class);
 
         $this->handler = new ProcessVideoHandler(
             $this->videoRepository,
@@ -75,6 +80,8 @@ final class ProcessVideoHandlerTest extends TestCase
             new GenerateAudioConfiguration(false),
             $this->videoVoiceCloneGenerator,
             new GenerateVoiceCloneConfiguration(false),
+            $this->videoLipSyncGenerator,
+            new GenerateLipSyncConfiguration(false),
         );
     }
 

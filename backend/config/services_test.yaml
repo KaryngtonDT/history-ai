@@ -73,6 +73,10 @@ when@test:
             alias: App\Infrastructure\Persistence\Doctrine\VoiceClone\DoctrineVoiceCloneRepository
             public: true
 
+        App\Domain\LipSync\LipSyncRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\LipSync\DoctrineLipSyncRepository
+            public: true
+
         App\Infrastructure\Speech\FasterWhisperProcessRunnerInterface:
             class: App\Infrastructure\Speech\FixedFasterWhisperProcessRunner
             public: true

@@ -141,6 +141,9 @@ services:
     App\Domain\VoiceClone\VoiceCloneRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\VoiceClone\DoctrineVoiceCloneRepository
 
+    App\Domain\LipSync\LipSyncRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\LipSync\DoctrineLipSyncRepository
+
     App\Application\TTS\GenerateAudioConfiguration:
         arguments:
             $enabled: '%env(bool:default:tts.generate_audio_default:GENERATE_AUDIO)%'
@@ -148,6 +151,10 @@ services:
     App\Application\VoiceClone\GenerateVoiceCloneConfiguration:
         arguments:
             $enabled: '%env(bool:default:voice_clone.generate_default:GENERATE_VOICE_CLONE)%'
+
+    App\Application\LipSync\GenerateLipSyncConfiguration:
+        arguments:
+            $enabled: '%env(bool:default:lip_sync.generate_default:GENERATE_LIP_SYNC)%'
 
     App\Application\Translation\DefaultTranslationLanguagesProvider:
         arguments:

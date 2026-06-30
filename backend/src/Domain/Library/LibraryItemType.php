@@ -13,6 +13,7 @@ enum LibraryItemType: string
     case Translation = 'translation';
     case Audio = 'audio';
     case VoiceClone = 'voice_clone';
+    case LipSync = 'lip_sync';
     case Timeline = 'timeline';
     case Podcast = 'podcast';
 }

@@ -15,4 +15,5 @@ enum ArtifactType: string
     case Translation = 'translation';
     case Audio = 'audio';
     case VoiceClone = 'voice_clone';
+    case LipSync = 'lip_sync';
 }

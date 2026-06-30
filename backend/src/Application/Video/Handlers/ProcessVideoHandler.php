@@ -10,6 +10,8 @@ use App\Application\Translation\DefaultTranslationLanguagesProvider;
 use App\Application\Translation\VideoTranslationGenerator;
 use App\Application\TTS\GenerateAudioConfiguration;
 use App\Application\TTS\VideoAudioGenerator;
+use App\Application\LipSync\GenerateLipSyncConfiguration;
+use App\Application\LipSync\VideoLipSyncGenerator;
 use App\Application\VoiceClone\GenerateVoiceCloneConfiguration;
 use App\Application\VoiceClone\VideoVoiceCloneGenerator;
 use App\Domain\AI\AIProviderResolverInterface;
@@ -39,6 +41,8 @@ final class ProcessVideoHandler
         private readonly GenerateAudioConfiguration $generateAudioConfiguration,
         private readonly VideoVoiceCloneGenerator $videoVoiceCloneGenerator,
         private readonly GenerateVoiceCloneConfiguration $generateVoiceCloneConfiguration,
+        private readonly VideoLipSyncGenerator $videoLipSyncGenerator,
+        private readonly GenerateLipSyncConfiguration $generateLipSyncConfiguration,
     ) {
     }
 
@@ -82,6 +86,10 @@ final class ProcessVideoHandler
 
             if ($this->generateVoiceCloneConfiguration->isEnabled()) {
                 $this->videoVoiceCloneGenerator->generate($videoId);
+            }
+
+            if ($this->generateLipSyncConfiguration->isEnabled()) {
+                $this->videoLipSyncGenerator->generate($videoId);
             }
 
             $this->videoRepository->save($processing->complete());
