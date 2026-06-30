@@ -6,7 +6,7 @@ Status: Accepted
 
 Date: 2026-06-26
 
-Commit: `pending`
+Commit: `5480457`
 
 ---
 
@@ -47,7 +47,7 @@ Platform Sprint 45 delivers **Project Workspace & Batch Processing**, moving His
 | P45-SLICE-02 | `d03f083` | feat(workspace): add batch processing |
 | P45-SLICE-03 | `238063c` | feat(worker): integrate project batches |
 | P45-SLICE-04 | `e89e477` | feat(frontend): add project workspace |
-| P45-SLICE-05 | `pending` | docs(workspace): document project workspace |
+| P45-SLICE-05 | `5480457` | docs(workspace): document project workspace |
 
 ---
 
