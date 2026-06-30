@@ -6,7 +6,7 @@ Status: Accepted
 
 Date: 2026-06-26
 
-Commit: _(set after final push)_
+Commit: `2b0c19b`
 
 ---
 
@@ -188,7 +188,7 @@ docker compose exec worker ruff check .
 | P37-SLICE-02 | `905a30a` | feat(lipsync): integrate latentsync provider |
 | P37-SLICE-03 | `2d4761a` | feat(worker): generate lip synced videos |
 | P37-SLICE-04 | `f1a351e` | feat(frontend): add lip sync preview |
-| P37-SLICE-05 | _(this commit)_ | docs(lipsync): document lip sync foundation |
+| P37-SLICE-05 | `2b0c19b` | docs(lipsync): document lip sync foundation |
 
 ---
 
