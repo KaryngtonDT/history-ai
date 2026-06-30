@@ -22,6 +22,7 @@ final class AIEngineRegistryFactory
     public const string PROVIDER_SEEDVC = 'seedvc';
     public const string PROVIDER_LATENTSYNC = 'latentsync';
     public const string PROVIDER_WAV2LIP = 'wav2lip';
+    public const string PROVIDER_FFMPEG = 'ffmpeg';
 
     public function create(): AIEngineRegistry
     {
@@ -73,6 +74,13 @@ final class AIEngineRegistryFactory
                     AIEngineProvider::create('wav2lip', 'Wav2Lip', AIEngineCapability::LipSync, false),
                 ],
             ),
+            AIEngine::create(
+                new AIEngineId('video-render'),
+                AIEngineCapability::VideoRender,
+                [
+                    AIEngineProvider::create(self::PROVIDER_FFMPEG, 'FFmpeg', AIEngineCapability::VideoRender),
+                ],
+            ),
         ]);
     }
 
@@ -83,6 +91,7 @@ final class AIEngineRegistryFactory
             ->withDefaultProvider(AIEngineCapability::Translation, self::PROVIDER_OLLAMA)
             ->withDefaultProvider(AIEngineCapability::TextToSpeech, self::PROVIDER_F5_TTS)
             ->withDefaultProvider(AIEngineCapability::VoiceClone, self::PROVIDER_OPENVOICE)
-            ->withDefaultProvider(AIEngineCapability::LipSync, self::PROVIDER_LATENTSYNC);
+            ->withDefaultProvider(AIEngineCapability::LipSync, self::PROVIDER_LATENTSYNC)
+            ->withDefaultProvider(AIEngineCapability::VideoRender, self::PROVIDER_FFMPEG);
     }
 }

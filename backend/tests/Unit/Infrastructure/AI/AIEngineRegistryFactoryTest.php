@@ -40,6 +40,11 @@ final class AIEngineRegistryFactoryTest extends TestCase
             'latentsync',
             $registry->enabledProviders(AIEngineCapability::LipSync)[0]->providerId(),
         );
+        self::assertCount(1, $registry->enabledProviders(AIEngineCapability::VideoRender));
+        self::assertSame(
+            'ffmpeg',
+            $registry->enabledProviders(AIEngineCapability::VideoRender)[0]->providerId(),
+        );
     }
 
     public function testCreatesDefaultConfiguration(): void
@@ -51,5 +56,6 @@ final class AIEngineRegistryFactoryTest extends TestCase
         self::assertSame('f5_tts', $configuration->defaultProviderFor(AIEngineCapability::TextToSpeech));
         self::assertSame('openvoice', $configuration->defaultProviderFor(AIEngineCapability::VoiceClone));
         self::assertSame('latentsync', $configuration->defaultProviderFor(AIEngineCapability::LipSync));
+        self::assertSame('ffmpeg', $configuration->defaultProviderFor(AIEngineCapability::VideoRender));
     }
 }

@@ -11,4 +11,5 @@ enum AIEngineCapability: string
     case TextToSpeech = 'text_to_speech';
     case VoiceClone = 'voice_clone';
     case LipSync = 'lip_sync';
+    case VideoRender = 'video_render';
 }
