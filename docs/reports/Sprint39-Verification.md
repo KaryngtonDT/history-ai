@@ -6,7 +6,7 @@ Status: Accepted
 
 Date: 2026-06-26
 
----
+Commit: `2254ba8`
 
 # Executive summary
 
