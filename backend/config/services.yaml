@@ -207,6 +207,9 @@ services:
     App\Application\History\Ports\ExecutionHistorySnapshotStoreInterface:
         alias: App\Infrastructure\Persistence\Doctrine\History\DoctrineExecutionHistorySnapshotStore
 
+    App\Domain\History\ExecutionReplayContextInterface:
+        alias: App\Infrastructure\History\ExecutionReplayContext
+
     App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface:
         alias: App\Infrastructure\VideoIntelligence\VideoJobVideoIntelligenceFactory
 

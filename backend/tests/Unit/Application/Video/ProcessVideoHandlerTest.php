@@ -34,10 +34,18 @@ use App\Application\VideoRender\VideoFinalRenderGenerator;
 use App\Application\VoiceClone\GenerateVoiceCloneConfiguration;
 use App\Application\VoiceClone\VideoVoiceCloneGenerator;
 use App\Application\Quality\QualityReportJsonMapper;
+use App\Application\History\ExecutionHistoryRecorder;
+use App\Application\History\RecordExecutionHistoryHandler;
+use App\Tests\Unit\Application\History\InMemoryExecutionHistoryRepository;
+use App\Tests\Unit\Application\History\InMemoryExecutionHistoryStore;
+use App\Application\History\ExecutionOptimizationSnapshotMapper;
+use App\Application\Pipeline\PipelineConfigurationJsonMapper;
 use App\Application\Quality\VideoQualityAssessmentRunner;
 use App\Application\Workspace\BatchJobProgressUpdater;
 use App\Domain\Workspace\BatchJobRepositoryInterface;
 use App\Domain\Orchestrator\PipelinePlannerInterface;
+use App\Domain\Pipeline\RuntimePipelineConfigurationContextInterface;
+use App\Infrastructure\History\ExecutionReplayContext;
 use App\Domain\Optimization\ExecutionOptimizerInterface;
 use App\Domain\Optimization\RuntimeExecutionOptimizationContextInterface;
 use App\Domain\Optimization\ExecutionOptimization;
@@ -64,7 +72,7 @@ use App\Domain\VideoIntelligence\VideoSpeakerCollection;
 use App\Domain\VideoIntelligence\VisualCharacteristics;
 use App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface;
 use App\Domain\VideoRender\FinalVideoRepositoryInterface;
-use App\Domain\Pipeline\RuntimePipelineConfigurationContextInterface;
+use App\Domain\Pipeline\PipelineConfigurationResolverInterface;
 use App\Domain\Scheduler\ExecutionSchedule;
 use App\Domain\Scheduler\ExecutionScheduleId;
 use App\Domain\Scheduler\PipelineSchedulerInterface;
@@ -149,6 +157,23 @@ final class ProcessVideoHandlerTest extends TestCase
         $scheduler = $this->createMock(PipelineSchedulerInterface::class);
         $scheduler->method('schedule')->willReturn($this->sampleSchedule());
 
+        $historyStore = new InMemoryExecutionHistoryStore();
+        $recordHandler = new RecordExecutionHistoryHandler(
+            new InMemoryExecutionHistoryRepository($historyStore),
+            $historyStore,
+            new PipelineConfigurationJsonMapper(),
+            new ExecutionOptimizationSnapshotMapper(),
+            new QualityReportJsonMapper(),
+        );
+
+        $executionHistoryRecorder = new ExecutionHistoryRecorder(
+            $recordHandler,
+            $this->createMock(RuntimePipelineConfigurationContextInterface::class),
+            $this->createMock(RuntimeExecutionOptimizationContextInterface::class),
+            $this->createMock(PipelineConfigurationResolverInterface::class),
+            $this->createMock(FinalVideoRepositoryInterface::class),
+        );
+
         $this->handler = new ProcessVideoHandler(
             $this->videoRepository,
             $this->aiProviderResolver,
@@ -174,6 +199,8 @@ final class ProcessVideoHandlerTest extends TestCase
             $this->runtimeScheduleContext,
             $this->qualityAssessmentRunner,
             $batchJobProgressUpdater,
+            $executionHistoryRecorder,
+            new ExecutionReplayContext(),
         );
     }
 

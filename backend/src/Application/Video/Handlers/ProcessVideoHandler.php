@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Video\Handlers;
 
+use App\Application\History\ExecutionHistoryRecorder;
 use App\Application\Quality\VideoQualityAssessmentRunner;
 use App\Application\Workspace\BatchJobProgressUpdater;
 use App\Application\LipSync\GenerateLipSyncConfiguration;
@@ -26,6 +27,7 @@ use App\Domain\Artifact\ArtifactRepositoryInterface;
 use App\Domain\Artifact\ArtifactType;
 use App\Domain\Content\ContentId;
 use App\Domain\Orchestrator\PipelinePlannerInterface;
+use App\Domain\History\ExecutionReplayContextInterface;
 use App\Domain\Orchestrator\ProcessingMode;
 use App\Domain\Optimization\ExecutionOptimization;
 use App\Domain\Optimization\ExecutionOptimizerInterface;
@@ -71,6 +73,8 @@ final class ProcessVideoHandler
         private readonly RuntimeExecutionScheduleContextInterface $runtimeScheduleContext,
         private readonly VideoQualityAssessmentRunner $qualityAssessmentRunner,
         private readonly BatchJobProgressUpdater $batchJobProgressUpdater,
+        private readonly ExecutionHistoryRecorder $executionHistoryRecorder,
+        private readonly ExecutionReplayContextInterface $executionReplayContext,
     ) {
     }
 
@@ -145,10 +149,12 @@ final class ProcessVideoHandler
                 );
             }
 
-            $this->qualityAssessmentRunner->assess(
+            $report = $this->qualityAssessmentRunner->assess(
                 $videoId,
                 $this->runtimeOptimizationContext->get(),
             );
+
+            $this->executionHistoryRecorder->recordCompletedExecution($videoId, $report);
 
             $this->videoRepository->save($processing->complete());
             $succeeded = true;
@@ -156,6 +162,7 @@ final class ProcessVideoHandler
             $this->videoRepository->save($processing->fail());
         } finally {
             $this->batchJobProgressUpdater->recordOutcome($message->batchJobId, $videoId, $succeeded);
+            $this->executionReplayContext->clear($videoId);
             $this->runtimePipelineContext->clear();
             $this->runtimeOptimizationContext->clear();
             $this->runtimeScheduleContext->clear();
@@ -168,6 +175,14 @@ final class ProcessVideoHandler
         $optimization = $this->executionOptimizer->optimize($intelligence);
         $this->runtimeOptimizationContext->set($optimization);
         $this->configureSchedule($intelligence, $optimization);
+
+        $replayConfiguration = $this->executionReplayContext->consume(new VideoId($message->videoId));
+
+        if (null !== $replayConfiguration) {
+            $this->runtimePipelineContext->set($replayConfiguration);
+
+            return;
+        }
 
         if (ProcessingMode::Manual === $message->processingMode) {
             $this->runtimePipelineContext->clear();
