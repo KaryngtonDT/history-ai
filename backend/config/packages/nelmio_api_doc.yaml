@@ -120,6 +120,11 @@ nelmio_api_doc:
             - { alias: ExecutionResource, type: App\Presentation\OpenApi\Schema\ExecutionResourceSchema }
             - { alias: ScheduledStage, type: App\Presentation\OpenApi\Schema\ScheduledStageSchema }
             - { alias: ExecutionSchedule, type: App\Presentation\OpenApi\Schema\ExecutionScheduleSchema }
+            - { alias: QualityCategory, type: App\Presentation\OpenApi\Schema\QualityCategorySchema }
+            - { alias: QualityScore, type: App\Presentation\OpenApi\Schema\QualityScoreSchema }
+            - { alias: QualityMetric, type: App\Presentation\OpenApi\Schema\QualityMetricSchema }
+            - { alias: PublicationRecommendation, type: App\Presentation\OpenApi\Schema\PublicationRecommendationSchema }
+            - { alias: QualityReport, type: App\Presentation\OpenApi\Schema\QualityReportSchema }
     areas:
         default:
             path_patterns:

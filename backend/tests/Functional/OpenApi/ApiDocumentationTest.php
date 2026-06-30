@@ -2324,6 +2324,29 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('resources', $schedule['properties']);
     }
 
+    public function testOpenApiSpecDocumentsGetVideoQualityOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/quality']['get'];
+
+        self::assertSame('getVideoQuality', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsQualityReportSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('QualityReport', $spec['components']['schemas']);
+        self::assertArrayHasKey('QualityMetric', $spec['components']['schemas']);
+        self::assertArrayHasKey('QualityScore', $spec['components']['schemas']);
+        self::assertArrayHasKey('PublicationRecommendation', $spec['components']['schemas']);
+
+        $report = $spec['components']['schemas']['QualityReport'];
+        self::assertArrayHasKey('overallScore', $report['properties']);
+        self::assertArrayHasKey('recommendation', $report['properties']);
+        self::assertArrayHasKey('metrics', $report['properties']);
+    }
+
     /**
      * @return array<string, mixed>
      */

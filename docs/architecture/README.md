@@ -1071,6 +1071,32 @@ Verification: [Sprint43-Verification.md](../reports/Sprint43-Verification.md)
 
 ---
 
+# Platform Sprint 44 — Automatic Quality Assessment (2026-06)
+
+Platform Sprint 44 delivers **deterministic AI quality assessment** for Phase 3: quality domain with per-category scores and publication recommendations, deterministic evaluator driven by `VideoIntelligence` and render artifacts, pipeline integration after final render, frontend quality dashboard on upload, and OpenAPI documentation.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P44-SLICE-01 | `QualityReport`, `QualityScore`, `QualityMetric`, `PublicationRecommendation` | ✅ |
+| P44-SLICE-02 | `DeterministicQualityEvaluator` with explainable rules | ✅ |
+| P44-SLICE-03 | Pipeline integration, `GET /api/videos/{videoId}/quality` | ✅ |
+| P44-SLICE-04 | `QualityDashboard`, `QualityScoreCard`, `QualityRecommendation` | ✅ |
+| P44-SLICE-05 | OpenAPI quality schemas, architecture docs, verification report | ✅ |
+
+```text
+Final MP4
+        │
+        ▼
+DeterministicQualityEvaluator → QualityReport artifact
+        │
+        ▼
+QualityDashboard + GET /api/videos/{videoId}/quality
+```
+
+Verification: [Sprint44-Verification.md](../reports/Sprint44-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

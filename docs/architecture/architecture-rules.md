@@ -1174,6 +1174,28 @@ RuntimeExecutionScheduleContext → ProcessVideoHandler progress
 
 Feature components must use `schedulerService`, not `HttpSchedulerRepository` or `HttpClient` directly.
 
+## Platform Sprint 44 — Quality Assessment
+
+```text
+Final Render
+        │
+        ▼
+VideoQualityAssessmentRunner → QualityReport artifact
+        │
+        ▼
+GET /api/videos/{videoId}/quality → QualityDashboard
+```
+
+| Component | Role |
+| --------- | ---- |
+| `QualityReport` | Immutable aggregate of category scores, overall score, and recommendation |
+| `DeterministicQualityEvaluator` | Rule-based scoring from intelligence, optimization, and final video |
+| `VideoQualityAssessmentRunner` | Post-render assessment with non-blocking artifact persistence |
+| `QualityDashboard` | Upload preview with per-category scores and publication recommendation |
+| `QualityService` | Repository-backed quality report loading |
+
+Feature components must use `qualityService`, not `HttpQualityRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

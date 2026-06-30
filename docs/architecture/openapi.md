@@ -770,6 +770,26 @@ The frontend `ProcessingResourceMonitor` on `/video/upload` uses `SchedulerServi
 
 ---
 
+# Quality Assessment (Platform Sprint 44)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/videos/{videoId}/quality` | Get AI quality assessment report for a video |
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `QualityReport` | `id`, `videoId`, `overallScore`, `recommendation`, `metrics[]`, `explanations[]` |
+| `QualityMetric` | `category`, `score`, `explanation` |
+| `QualityScore` | Integer `0`–`100` |
+| `QualityCategory` | `audio`, `translation`, `voice_clone`, `lip_sync`, `rendering` |
+| `PublicationRecommendation` | `ready`, `review_recommended`, `regenerate_required` |
+
+The frontend `QualityDashboard` on `/video/upload` uses `QualityService`.
+
+---
+
 # Production considerations
 
 | Topic | Recommendation |

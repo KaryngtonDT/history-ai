@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
     schema: 'ArtifactType',
     type: 'string',
     description: 'Kind of generated learning artifact produced by the processing pipeline.',
-    enum: ['transcript', 'translation', 'audio', 'voice_clone', 'lip_sync', 'summary', 'quiz', 'flashcards', 'timeline', 'podcast'],
+    enum: ['transcript', 'translation', 'audio', 'voice_clone', 'lip_sync', 'final_video', 'quality_report', 'summary', 'quiz', 'flashcards', 'timeline', 'podcast'],
     example: 'timeline',
 )]
 final class ArtifactTypeSchema
