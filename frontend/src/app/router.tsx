@@ -12,6 +12,7 @@ import { VideoAudioPage } from "@/pages/VideoAudio/VideoAudioPage";
 import { VideoTranscriptPage } from "@/pages/VideoTranscript/VideoTranscriptPage";
 import { VideoTranslationsPage } from "@/pages/VideoTranslations/VideoTranslationsPage";
 import { VideoUploadPage } from "@/pages/VideoUpload/VideoUploadPage";
+import { VideoVoiceClonePage } from "@/pages/VideoVoiceClone/VideoVoiceClonePage";
 
 export function AppRouter() {
 	return (
@@ -29,6 +30,10 @@ export function AppRouter() {
 					element={<VideoTranslationsPage />}
 				/>
 				<Route path="/video/:videoId/audio" element={<VideoAudioPage />} />
+				<Route
+					path="/video/:videoId/voice-clone"
+					element={<VideoVoiceClonePage />}
+				/>
 				<Route path="/library" element={<LibraryPage />} />
 				<Route path="/library/:libraryItemId" element={<LibraryItemPage />} />
 				<Route path="/collections" element={<CollectionsPage />} />

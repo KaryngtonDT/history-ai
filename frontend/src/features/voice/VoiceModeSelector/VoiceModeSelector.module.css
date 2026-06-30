@@ -1,0 +1,19 @@
+.fieldset {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.legend {
+	font-weight: 600;
+	margin-bottom: 0.25rem;
+}
+
+.option {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
