@@ -193,7 +193,7 @@ All commands passed on 2026-06-26.
 | 2 | `b057ebe` | feat(voice): integrate openvoice provider |
 | 3 | `26088e6` | feat(worker): generate cloned audio |
 | 4 | `8ae7e67` | feat(frontend): add voice cloning |
-| 5 | *(this commit)* | docs(voice): document voice cloning foundation |
+| 5 | `17c1fec` | docs(voice): document voice cloning foundation |
 
 ---
 
