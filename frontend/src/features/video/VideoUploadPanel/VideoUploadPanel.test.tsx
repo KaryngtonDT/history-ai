@@ -8,6 +8,8 @@ import { videoIntelligenceService } from "@/services/intelligence/VideoIntellige
 import { MOCK_PREVIEW_OPTIMIZATION } from "@/services/optimization/MockOptimizationRepository";
 import { optimizationService } from "@/services/optimization/OptimizationService";
 import { orchestratorService } from "@/services/orchestrator/OrchestratorService";
+import { MOCK_PREVIEW_SCHEDULE } from "@/services/scheduler/MockSchedulerRepository";
+import { schedulerService } from "@/services/scheduler/SchedulerService";
 import { videoService } from "@/services/video/VideoService";
 import { ValidationError } from "@/shared/errors";
 
@@ -33,6 +35,9 @@ describe("VideoUploadPanel", () => {
 		).mockResolvedValue(MOCK_PREVIEW_INTELLIGENCE);
 		vi.spyOn(optimizationService, "loadPreviewOptimization").mockResolvedValue(
 			MOCK_PREVIEW_OPTIMIZATION,
+		);
+		vi.spyOn(schedulerService, "loadPreviewSchedule").mockResolvedValue(
+			MOCK_PREVIEW_SCHEDULE,
 		);
 	});
 

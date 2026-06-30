@@ -1,0 +1,1 @@
+export { ResourceQueueBadge } from "./ResourceQueueBadge";

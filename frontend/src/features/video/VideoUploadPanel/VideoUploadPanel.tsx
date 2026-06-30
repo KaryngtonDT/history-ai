@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { VideoIntelligenceDashboard } from "@/features/intelligence";
 import { OptimizationDashboard } from "@/features/optimization";
 import { ProcessingModeSelector } from "@/features/orchestrator";
+import { ProcessingResourceMonitor } from "@/features/scheduler";
 import type { VideoIntelligence } from "@/services/intelligence/types";
 import { videoIntelligenceService } from "@/services/intelligence/VideoIntelligenceService";
 import { optimizationService } from "@/services/optimization/OptimizationService";
@@ -11,6 +12,8 @@ import type {
 	PipelineRecommendation,
 	ProcessingMode,
 } from "@/services/orchestrator/types";
+import { schedulerService } from "@/services/scheduler/SchedulerService";
+import type { ExecutionSchedule } from "@/services/scheduler/types";
 import { videoService } from "@/services/video/VideoService";
 import { ValidationError } from "@/shared/errors";
 import type { VideoUploadPhase } from "../types";
@@ -40,6 +43,7 @@ export function VideoUploadPanel() {
 	);
 	const [optimization, setOptimization] =
 		useState<ExecutionOptimization | null>(null);
+	const [schedule, setSchedule] = useState<ExecutionSchedule | null>(null);
 	const [loadingAutomaticPreview, setLoadingAutomaticPreview] = useState(false);
 
 	const loadAutomaticPreview = useCallback(async () => {
@@ -47,21 +51,28 @@ export function VideoUploadPanel() {
 			setRecommendation(null);
 			setIntelligence(null);
 			setOptimization(null);
+			setSchedule(null);
 			return;
 		}
 
 		setLoadingAutomaticPreview(true);
 
 		try {
-			const [recommendationResult, intelligenceResult, optimizationResult] =
-				await Promise.all([
-					orchestratorService.loadRecommendation(),
-					videoIntelligenceService.loadPreviewIntelligence(),
-					optimizationService.loadPreviewOptimization(),
-				]);
+			const [
+				recommendationResult,
+				intelligenceResult,
+				optimizationResult,
+				scheduleResult,
+			] = await Promise.all([
+				orchestratorService.loadRecommendation(),
+				videoIntelligenceService.loadPreviewIntelligence(),
+				optimizationService.loadPreviewOptimization(),
+				schedulerService.loadPreviewSchedule(),
+			]);
 			setRecommendation(recommendationResult);
 			setIntelligence(intelligenceResult);
 			setOptimization(optimizationResult);
+			setSchedule(scheduleResult);
 		} finally {
 			setLoadingAutomaticPreview(false);
 		}
@@ -132,6 +143,10 @@ export function VideoUploadPanel() {
 								/>
 								<OptimizationDashboard
 									optimization={optimization}
+									loading={loadingAutomaticPreview}
+								/>
+								<ProcessingResourceMonitor
+									schedule={schedule}
 									loading={loadingAutomaticPreview}
 								/>
 							</>
