@@ -6,7 +6,7 @@ Status: Accepted
 
 Date: 2026-06-26
 
-Commit: `a9c4d50`
+Commit: `f6ff3ae`
 
 ---
 
@@ -47,7 +47,7 @@ Platform Sprint 46 delivers **Execution History, Versioning & Reprocessing**, en
 | P46-SLICE-02 | `1274f41` | feat(history): add execution history engine |
 | P46-SLICE-03 | `3b5a507` | feat(worker): integrate execution reprocessing |
 | P46-SLICE-04 | `abec1ab` | feat(frontend): add execution history |
-| P46-SLICE-05 | `a9c4d50` | docs(history): document execution history |
+| P46-SLICE-05 | `f6ff3ae` | docs(history): document execution history |
 
 ---
 
