@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Video\Handlers;
 
 use App\Application\Quality\VideoQualityAssessmentRunner;
+use App\Application\Workspace\BatchJobProgressUpdater;
 use App\Application\LipSync\GenerateLipSyncConfiguration;
 use App\Application\LipSync\VideoLipSyncGenerator;
 use App\Application\Speech\TranscriptJsonMapper;
@@ -69,6 +70,7 @@ final class ProcessVideoHandler
         private readonly PipelineSchedulerInterface $pipelineScheduler,
         private readonly RuntimeExecutionScheduleContextInterface $runtimeScheduleContext,
         private readonly VideoQualityAssessmentRunner $qualityAssessmentRunner,
+        private readonly BatchJobProgressUpdater $batchJobProgressUpdater,
     ) {
     }
 
@@ -83,6 +85,8 @@ final class ProcessVideoHandler
 
         $processing = $job->startProcessing();
         $this->videoRepository->save($processing);
+
+        $succeeded = false;
 
         try {
             $this->configurePipelineForMessage($message, $processing);
@@ -147,9 +151,11 @@ final class ProcessVideoHandler
             );
 
             $this->videoRepository->save($processing->complete());
+            $succeeded = true;
         } catch (Throwable) {
             $this->videoRepository->save($processing->fail());
         } finally {
+            $this->batchJobProgressUpdater->recordOutcome($message->batchJobId, $videoId, $succeeded);
             $this->runtimePipelineContext->clear();
             $this->runtimeOptimizationContext->clear();
             $this->runtimeScheduleContext->clear();

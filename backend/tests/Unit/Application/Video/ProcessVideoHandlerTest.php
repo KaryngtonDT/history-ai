@@ -35,6 +35,8 @@ use App\Application\VoiceClone\GenerateVoiceCloneConfiguration;
 use App\Application\VoiceClone\VideoVoiceCloneGenerator;
 use App\Application\Quality\QualityReportJsonMapper;
 use App\Application\Quality\VideoQualityAssessmentRunner;
+use App\Application\Workspace\BatchJobProgressUpdater;
+use App\Domain\Workspace\BatchJobRepositoryInterface;
 use App\Domain\Orchestrator\PipelinePlannerInterface;
 use App\Domain\Optimization\ExecutionOptimizerInterface;
 use App\Domain\Optimization\RuntimeExecutionOptimizationContextInterface;
@@ -134,6 +136,10 @@ final class ProcessVideoHandlerTest extends TestCase
             new QualityReportJsonMapper(),
         );
 
+        $batchJobProgressUpdater = new BatchJobProgressUpdater(
+            $this->createMock(BatchJobRepositoryInterface::class),
+        );
+
         $intelligenceFactory = $this->createMock(VideoIntelligenceFactoryInterface::class);
         $intelligenceFactory->method('fromVideoJob')->willReturn($this->sampleIntelligence());
 
@@ -167,6 +173,7 @@ final class ProcessVideoHandlerTest extends TestCase
             $scheduler,
             $this->runtimeScheduleContext,
             $this->qualityAssessmentRunner,
+            $batchJobProgressUpdater,
         );
     }
 

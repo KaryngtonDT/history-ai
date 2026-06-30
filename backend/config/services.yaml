@@ -195,6 +195,12 @@ services:
     App\Domain\Quality\QualityEvaluatorInterface:
         alias: App\Infrastructure\Quality\DeterministicQualityEvaluator
 
+    App\Domain\Workspace\ProjectRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Workspace\DoctrineProjectRepository
+
+    App\Domain\Workspace\BatchJobRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Workspace\DoctrineBatchJobRepository
+
     App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface:
         alias: App\Infrastructure\VideoIntelligence\VideoJobVideoIntelligenceFactory
 
