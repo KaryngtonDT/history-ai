@@ -749,6 +749,27 @@ The frontend `OptimizationDashboard` on `/video/upload` uses `OptimizationServic
 
 ---
 
+# Resource Scheduling (Platform Sprint 43)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/videos/{videoId}/schedule` | Get resource-aware execution schedule for a video |
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `ExecutionSchedule` | `id`, `videoId`, `strategy`, `estimatedCompletionSeconds`, `currentStage`, `currentResource`, `stages[]`, `resources[]` |
+| `ScheduledStage` | `stage`, `order`, `status`, `estimatedDurationSeconds`, `parallelGroup`, `requirements[]` |
+| `ExecutionResource` | `type`, `running`, `pending`, `maxConcurrency` |
+| `ResourceRequirement` | `type`, `weight` |
+| `ResourceType` | `cpu`, `gpu`, `io` |
+| `SchedulingStrategy` | `balanced`, `quality`, `speed`, `low_memory` |
+
+The frontend `ProcessingResourceMonitor` on `/video/upload` uses `SchedulerService`.
+
+---
+
 # Production considerations
 
 | Topic | Recommendation |

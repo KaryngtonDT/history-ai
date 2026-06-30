@@ -2300,6 +2300,30 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('explanations', $optimization['properties']);
     }
 
+    public function testOpenApiSpecDocumentsGetVideoScheduleOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/schedule']['get'];
+
+        self::assertSame('getVideoSchedule', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsExecutionScheduleSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('ExecutionSchedule', $spec['components']['schemas']);
+        self::assertArrayHasKey('ScheduledStage', $spec['components']['schemas']);
+        self::assertArrayHasKey('ExecutionResource', $spec['components']['schemas']);
+        self::assertArrayHasKey('ResourceRequirement', $spec['components']['schemas']);
+        self::assertArrayHasKey('ResourceType', $spec['components']['schemas']);
+        self::assertArrayHasKey('SchedulingStrategy', $spec['components']['schemas']);
+
+        $schedule = $spec['components']['schemas']['ExecutionSchedule'];
+        self::assertArrayHasKey('currentStage', $schedule['properties']);
+        self::assertArrayHasKey('resources', $schedule['properties']);
+    }
+
     /**
      * @return array<string, mixed>
      */

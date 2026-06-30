@@ -1042,6 +1042,35 @@ Verification: [Sprint42-Verification.md](../reports/Sprint42-Verification.md)
 
 ---
 
+# Platform Sprint 43 — Parallel GPU/CPU Orchestration (2026-06)
+
+Platform Sprint 43 delivers **resource-aware pipeline scheduling** for Phase 2: scheduling domain with CPU/GPU/IO requirements, deterministic queue scheduler, runtime progress tracking in `ProcessVideoHandler`, frontend processing monitor, and OpenAPI documentation.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P43-SLICE-01 | `ExecutionSchedule`, `ScheduledStage`, `ExecutionResource` aggregates | ✅ |
+| P43-SLICE-02 | `DeterministicPipelineScheduler` with strategy-aware concurrency | ✅ |
+| P43-SLICE-03 | Pipeline integration, `GET /api/videos/{videoId}/schedule` | ✅ |
+| P43-SLICE-04 | `ProcessingResourceMonitor`, `StageProgressTimeline`, `ResourceQueueBadge` | ✅ |
+| P43-SLICE-05 | OpenAPI schedule schemas, architecture docs, verification report | ✅ |
+
+```text
+Upload Video (/video/upload)
+        │
+        ▼
+Execution Optimization
+        │
+        ▼
+DeterministicPipelineScheduler → ExecutionSchedule
+        │
+        ▼
+ProcessingResourceMonitor + Pipeline Engine → Final MP4
+```
+
+Verification: [Sprint43-Verification.md](../reports/Sprint43-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

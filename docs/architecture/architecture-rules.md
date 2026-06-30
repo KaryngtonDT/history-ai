@@ -1152,6 +1152,28 @@ RuntimeExecutionOptimizationContext → Pipeline providers
 
 Feature components must use `optimizationService`, not `HttpOptimizationRepository` or `HttpClient` directly.
 
+## Platform Sprint 43 — Resource Scheduling
+
+```text
+ExecutionOptimization
+        │
+        ▼
+DeterministicPipelineScheduler → ExecutionSchedule
+        │
+        ▼
+RuntimeExecutionScheduleContext → ProcessVideoHandler progress
+```
+
+| Component | Role |
+| --------- | ---- |
+| `ExecutionSchedule` | Immutable aggregate of scheduled stages and queue metrics |
+| `DeterministicPipelineScheduler` | Assigns CPU/GPU/IO queues with strategy-aware concurrency |
+| `RuntimeExecutionScheduleContext` | Holds ephemeral schedule and progress per job |
+| `ProcessingResourceMonitor` | Upload preview with queue badges and stage timeline |
+| `SchedulerService` | Repository-backed schedule loading |
+
+Feature components must use `schedulerService`, not `HttpSchedulerRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

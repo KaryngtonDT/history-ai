@@ -114,6 +114,12 @@ nelmio_api_doc:
             - { alias: OptimizationParameter, type: App\Presentation\OpenApi\Schema\OptimizationParameterSchema }
             - { alias: OptimizationStage, type: App\Presentation\OpenApi\Schema\OptimizationStageSchema }
             - { alias: ExecutionOptimization, type: App\Presentation\OpenApi\Schema\ExecutionOptimizationSchema }
+            - { alias: ResourceType, type: App\Presentation\OpenApi\Schema\ResourceTypeSchema }
+            - { alias: SchedulingStrategy, type: App\Presentation\OpenApi\Schema\SchedulingStrategySchema }
+            - { alias: ResourceRequirement, type: App\Presentation\OpenApi\Schema\ResourceRequirementSchema }
+            - { alias: ExecutionResource, type: App\Presentation\OpenApi\Schema\ExecutionResourceSchema }
+            - { alias: ScheduledStage, type: App\Presentation\OpenApi\Schema\ScheduledStageSchema }
+            - { alias: ExecutionSchedule, type: App\Presentation\OpenApi\Schema\ExecutionScheduleSchema }
     areas:
         default:
             path_patterns:
