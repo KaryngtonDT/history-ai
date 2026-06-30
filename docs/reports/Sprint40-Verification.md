@@ -6,7 +6,7 @@ Status: Accepted
 
 Date: 2026-06-26
 
-Commit: `227bfb8`
+Commit: `0783273`
 
 ---
 
@@ -47,7 +47,7 @@ Platform Sprint 40 delivers **AI Orchestrator Foundation** for Phase 2. Users ca
 | P40-SLICE-02 | `97803a5` | feat(orchestrator): add deterministic planner |
 | P40-SLICE-03 | `0b0030b` | feat(orchestrator): integrate automatic planning |
 | P40-SLICE-04 | `2e2be19` | feat(frontend): add automatic processing mode |
-| P40-SLICE-05 | `TBD` | docs(orchestrator): document automatic ai orchestration |
+| P40-SLICE-05 | `0783273` | docs(orchestrator): document automatic ai orchestration |
 
 ---
 
