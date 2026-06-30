@@ -6,7 +6,7 @@ Status: Accepted
 
 Date: 2026-06-26
 
-Commit: `pending`
+Commit: `5c450a0`
 
 ---
 
@@ -47,7 +47,7 @@ Platform Sprint 47 delivers **AI Review & Human Feedback Loop**, enabling user r
 | P47-SLICE-02 | `991e0bb` | feat(review): add feedback engine |
 | P47-SLICE-03 | `65bd035` | feat(orchestrator): integrate user feedback |
 | P47-SLICE-04 | `4ccbe97` | feat(frontend): add review center |
-| P47-SLICE-05 | `pending` | docs(review): document feedback loop |
+| P47-SLICE-05 | `5c450a0` | docs(review): document feedback loop |
 
 ---
 
