@@ -72,6 +72,9 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Video | GET | `/api/videos/{videoId}/translations/{language}` |
 | Video | POST | `/api/videos/{videoId}/translations` |
 | AI | GET | `/api/ai/providers` |
+| Pipeline | GET | `/api/pipeline` |
+| Pipeline | PUT | `/api/pipeline` |
+| Pipeline | POST | `/api/pipeline/reset` |
 | Platform | GET | `/internal/platform/metrics` |
 
 ---
@@ -608,6 +611,58 @@ The frontend `LipSyncPanel` at `/video/:videoId/lip-sync` lets users select Late
 | `GenerateVideoRenderRequest` | `targetLanguages`, `provider`, `format`, `quality` |
 
 The frontend `FinalVideoPanel` at `/video/:videoId/render` lets users render final MP4s, preview the result, and download via `VideoRenderService`.
+
+---
+
+# Pipeline configuration (Platform Sprint 39)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/pipeline` | Get latest saved pipeline configuration or platform defaults |
+| PUT | `/api/pipeline` | Save selected AI provider for each pipeline stage |
+| POST | `/api/pipeline/reset` | Delete saved configuration and restore defaults |
+
+## Request body (PUT)
+
+```json
+{
+  "stages": [
+    { "stage": "speech_to_text", "providerId": "faster_whisper" },
+    { "stage": "translation", "providerId": "ollama" },
+    { "stage": "text_to_speech", "providerId": "f5" },
+    { "stage": "voice_clone", "providerId": "openvoice" },
+    { "stage": "lip_sync", "providerId": "latentsync" },
+    { "stage": "video_render", "providerId": "ffmpeg" }
+  ]
+}
+```
+
+## Response shape
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440001",
+  "version": 1,
+  "createdAt": "2026-06-26T12:00:00+00:00",
+  "updatedAt": "2026-06-26T12:00:00+00:00",
+  "stages": [
+    { "stage": "speech_to_text", "providerId": "faster_whisper" }
+  ]
+}
+```
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `PipelineStageType` | `speech_to_text`, `translation`, `text_to_speech`, `voice_clone`, `lip_sync`, `video_render` |
+| `PipelineStage` | `stage`, `providerId` |
+| `PipelineConfiguration` | `id`, `version`, `createdAt`, `updatedAt`, `stages[]` |
+| `SavePipelineConfigurationRequest` | `stages[]` |
+
+The frontend `PipelineBuilder` at `/settings/pipeline` loads enabled providers from the AI engine registry, lets users pick one provider per stage, save configuration, and reset to defaults via `PipelineService`.
+
+At runtime, `AIProviderResolver` reads the latest saved configuration and falls back to platform defaults when none is stored.
 
 ---
 

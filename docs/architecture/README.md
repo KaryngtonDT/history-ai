@@ -911,6 +911,49 @@ Verification: [Sprint38-Verification.md](../reports/Sprint38-Verification.md)
 
 ---
 
+# Platform Sprint 39 — AI Engine Selector & Pipeline Configuration (2026-06)
+
+Platform Sprint 39 delivers **user-configurable AI pipeline selection** for Phase 2: domain model for pipeline stages, persistence, runtime provider resolution via `AIProviderResolver`, frontend pipeline builder, and OpenAPI documentation. Users choose the AI engine for each processing step before running localization.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P39-SLICE-01 | `PipelineConfiguration`, `PipelineStage`, `PipelineStageType` domain | ✅ |
+| P39-SLICE-02 | Doctrine persistence, save/load/reset handlers, REST endpoints | ✅ |
+| P39-SLICE-03 | `AIProviderResolver` reads pipeline config with registry fallback | ✅ |
+| P39-SLICE-04 | `PipelineBuilder`, `PipelineStageSelector` at `/settings/pipeline` | ✅ |
+| P39-SLICE-05 | OpenAPI pipeline schemas, architecture docs, verification report | ✅ |
+
+| Layer | Components |
+| ----- | ---------- |
+| Domain | `PipelineConfiguration`, `PipelineStage`, `PipelineStageType`, repository port |
+| Application | `SavePipelineConfigurationHandler`, `LoadPipelineConfigurationHandler`, `ResetPipelineConfigurationHandler` |
+| Infrastructure | `DoctrinePipelineConfigurationRepository`, `AIProviderResolver` integration |
+| Presentation | `GET/PUT /api/pipeline`, `POST /api/pipeline/reset`, OpenAPI schemas |
+| Frontend | `PipelineBuilder`, `PipelineStageSelector`, `PipelineService` at `/settings/pipeline` |
+
+```text
+PipelineBuilder (/settings/pipeline)
+        │
+        ▼
+PUT /api/pipeline → PipelineConfiguration (persisted)
+        │
+        ▼
+ProcessVideoHandler → AIProviderResolver
+        ├── resolveSpeechToText()     ← configured provider
+        ├── resolveTranslation()
+        ├── resolveTextToSpeech()
+        ├── resolveVoiceClone()
+        ├── resolveLipSync()
+        └── resolveVideoRender()
+        │
+        ▼
+Final MP4
+```
+
+Verification: [Sprint39-Verification.md](../reports/Sprint39-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

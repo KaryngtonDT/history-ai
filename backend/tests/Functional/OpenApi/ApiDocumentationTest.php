@@ -2196,6 +2196,40 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertContains('ffmpeg', $providerSchema['enum']);
     }
 
+    public function testOpenApiSpecDocumentsGetPipelineConfigurationOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/pipeline']['get'];
+
+        self::assertSame('getPipelineConfiguration', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsSavePipelineConfigurationOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/pipeline']['put'];
+
+        self::assertSame('savePipelineConfiguration', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsResetPipelineConfigurationOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/pipeline/reset']['post'];
+
+        self::assertSame('resetPipelineConfiguration', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsPipelineSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('PipelineConfiguration', $spec['components']['schemas']);
+        self::assertArrayHasKey('PipelineStage', $spec['components']['schemas']);
+        self::assertArrayHasKey('PipelineStageType', $spec['components']['schemas']);
+        self::assertArrayHasKey('SavePipelineConfigurationRequest', $spec['components']['schemas']);
+    }
+
     /**
      * @return array<string, mixed>
      */

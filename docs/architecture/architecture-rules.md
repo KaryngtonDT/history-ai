@@ -1047,6 +1047,35 @@ GET/POST /api/videos/{videoId}/render → FinalVideoPanel (/video/:videoId/rende
 
 Feature components must use `videoRenderService`, not `HttpVideoRenderRepository` or `HttpClient` directly.
 
+## Platform Sprint 39 — Pipeline Configuration
+
+```text
+PipelineBuilder (/settings/pipeline)
+        │
+        ▼
+PipelineService → HttpPipelineRepository
+        │
+        ▼
+GET/PUT /api/pipeline, POST /api/pipeline/reset
+        │
+        ▼
+PipelineConfiguration (Doctrine)
+        │
+        ▼
+AIProviderResolver.resolve*() → configured provider or registry default
+```
+
+| Component | Role |
+| --------- | ---- |
+| `PipelineConfiguration` | Immutable aggregate: one enabled provider per `PipelineStageType` |
+| `PipelineConfigurationRepositoryInterface` | Port: save, findLatest, deleteAll |
+| `SavePipelineConfigurationHandler` | Validates enabled providers and persists configuration |
+| `AIProviderResolver` | Resolves runtime providers from saved pipeline config with fallback |
+| `PipelineBuilder` | Stage dropdowns, save, reset defaults at `/settings/pipeline` |
+| `PipelineStageSelector` | Single-stage provider dropdown (enabled providers only) |
+
+Feature components must use `pipelineService`, not `HttpPipelineRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |
