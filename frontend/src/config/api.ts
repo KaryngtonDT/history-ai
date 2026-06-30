@@ -31,6 +31,21 @@ export function videoTranslationPath(
 	return `${VIDEOS_PATH}/${videoId}/translations/${language}`;
 }
 
+export function videoAudioListPath(videoId: string): string {
+	return `${VIDEOS_PATH}/${videoId}/audio`;
+}
+
+export function videoAudioPath(videoId: string, language: string): string {
+	return `${VIDEOS_PATH}/${videoId}/audio/${language}`;
+}
+
+export function videoAudioStreamPath(
+	videoId: string,
+	language: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/audio/${language}/stream`;
+}
+
 export function timelinePath(artifactId: string): string {
 	return `/api/timeline/${artifactId}`;
 }

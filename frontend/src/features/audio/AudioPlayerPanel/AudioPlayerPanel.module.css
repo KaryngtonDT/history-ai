@@ -1,0 +1,117 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 1rem;
+}
+
+.title {
+	margin: 0;
+	font-size: 1.5rem;
+}
+
+.meta {
+	margin: 0.25rem 0 0;
+	color: var(--color-text-muted);
+}
+
+.controls {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.sectionLabel {
+	margin: 0;
+	font-weight: 600;
+}
+
+.checkboxGroup {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	gap: 0.5rem;
+}
+
+.checkboxLabel {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.field {
+	font-weight: 600;
+}
+
+.select {
+	width: 100%;
+	padding: 0.5rem 0.75rem;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-sm);
+	background: var(--color-surface);
+	color: var(--color-text);
+}
+
+.error {
+	margin: 0;
+	color: var(--color-danger);
+}
+
+.languageTabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.tab,
+.activeTab {
+	padding: 0.4rem 0.75rem;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-sm);
+	background: var(--color-surface);
+	cursor: pointer;
+}
+
+.activeTab {
+	border-color: var(--color-primary);
+	background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+.preview {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.previewHeader {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1rem;
+}
+
+.voiceMeta {
+	margin: 0;
+	color: var(--color-text-muted);
+}
+
+.playerControls {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 1rem;
+}
+
+.downloadLink {
+	color: var(--color-primary);
+	text-decoration: none;
+}
+
+.downloadLink:hover {
+	text-decoration: underline;
+}
