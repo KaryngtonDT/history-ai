@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router";
 import { AppLayout } from "@/app/AppLayout";
+import { AIEngineSettingsPage } from "@/pages/AIEngineSettings/AIEngineSettingsPage";
 import { CollectionsPage } from "@/pages/Collections/CollectionsPage";
 import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
 import { ImportPage } from "@/pages/Import/ImportPage";
@@ -31,6 +32,7 @@ export function AppRouter() {
 				<Route path="/collections" element={<CollectionsPage />} />
 				<Route path="/processing/:id" element={<ProcessingPage />} />
 				<Route path="/settings" element={<SettingsPage />} />
+				<Route path="/settings/ai" element={<AIEngineSettingsPage />} />
 			</Route>
 		</Routes>
 	);

@@ -14,6 +14,8 @@ export const SEARCH_LIBRARY_PATH = "/api/search/library";
 
 export const VIDEOS_PATH = "/api/videos";
 
+export const AI_PROVIDERS_PATH = "/api/ai/providers";
+
 export function videoTranscriptPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/transcript`;
 }
