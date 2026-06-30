@@ -34,6 +34,30 @@ use App\Application\VideoRender\VideoFinalRenderGenerator;
 use App\Application\VoiceClone\GenerateVoiceCloneConfiguration;
 use App\Application\VoiceClone\VideoVoiceCloneGenerator;
 use App\Domain\Orchestrator\PipelinePlannerInterface;
+use App\Domain\Optimization\ExecutionOptimizerInterface;
+use App\Domain\Optimization\RuntimeExecutionOptimizationContextInterface;
+use App\Domain\Optimization\ExecutionOptimization;
+use App\Domain\Optimization\ExecutionOptimizationId;
+use App\Domain\Optimization\OptimizationParameter;
+use App\Domain\Optimization\OptimizationParameterCollection;
+use App\Domain\Optimization\OptimizationProfile;
+use App\Domain\Optimization\OptimizationStage;
+use App\Domain\Optimization\OptimizationStageCollection;
+use App\Domain\Optimization\OptimizationStageConfiguration;
+use App\Domain\VideoIntelligence\AudioCharacteristics;
+use App\Domain\VideoIntelligence\AudioNoiseLevel;
+use App\Domain\VideoIntelligence\BackgroundMusic;
+use App\Domain\VideoIntelligence\LightingCondition;
+use App\Domain\VideoIntelligence\LipVisibility;
+use App\Domain\VideoIntelligence\SpeechCharacteristics;
+use App\Domain\VideoIntelligence\SpeechConfidence;
+use App\Domain\VideoIntelligence\SpeechSpeed;
+use App\Domain\VideoIntelligence\VideoEmotion;
+use App\Domain\VideoIntelligence\VideoIntelligence;
+use App\Domain\VideoIntelligence\VideoIntelligenceId;
+use App\Domain\VideoIntelligence\VideoScene;
+use App\Domain\VideoIntelligence\VideoSpeakerCollection;
+use App\Domain\VideoIntelligence\VisualCharacteristics;
 use App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface;
 use App\Domain\Pipeline\RuntimePipelineConfigurationContextInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -76,6 +100,12 @@ final class ProcessVideoHandlerTest extends TestCase
         $this->videoLipSyncGenerator = $this->createMock(VideoLipSyncGenerator::class);
         $this->videoFinalRenderGenerator = $this->createMock(VideoFinalRenderGenerator::class);
 
+        $intelligenceFactory = $this->createMock(VideoIntelligenceFactoryInterface::class);
+        $intelligenceFactory->method('fromVideoJob')->willReturn($this->sampleIntelligence());
+
+        $optimizer = $this->createMock(ExecutionOptimizerInterface::class);
+        $optimizer->method('optimize')->willReturn($this->sampleOptimization());
+
         $this->handler = new ProcessVideoHandler(
             $this->videoRepository,
             $this->aiProviderResolver,
@@ -93,8 +123,43 @@ final class ProcessVideoHandlerTest extends TestCase
             $this->videoFinalRenderGenerator,
             new GenerateFinalVideoConfiguration(false),
             $this->createMock(PipelinePlannerInterface::class),
-            $this->createMock(VideoIntelligenceFactoryInterface::class),
+            $intelligenceFactory,
+            $optimizer,
+            $this->createMock(RuntimeExecutionOptimizationContextInterface::class),
             $this->createMock(RuntimePipelineConfigurationContextInterface::class),
+        );
+    }
+
+    private function sampleIntelligence(): VideoIntelligence
+    {
+        return VideoIntelligence::create(
+            VideoIntelligenceId::generate(),
+            120.0,
+            VideoScene::Interview,
+            AudioCharacteristics::create('english', 1, AudioNoiseLevel::Low, BackgroundMusic::NotDetected, SpeechSpeed::Normal, SpeechConfidence::create(90)),
+            VisualCharacteristics::create('1920x1080', 30.0, LightingCondition::Good, LipVisibility::Excellent, 1),
+            SpeechCharacteristics::create(VideoEmotion::Neutral, 140.0, 5, false),
+            VideoSpeakerCollection::empty(),
+            true,
+            8.0,
+        );
+    }
+
+    private function sampleOptimization(): ExecutionOptimization
+    {
+        return ExecutionOptimization::create(
+            ExecutionOptimizationId::generate(),
+            OptimizationProfile::Balanced,
+            new OptimizationStageCollection([
+                OptimizationStageConfiguration::create(
+                    OptimizationStage::SpeechToText,
+                    new OptimizationParameterCollection([
+                        OptimizationParameter::create('beamSize', '3'),
+                    ]),
+                ),
+            ]),
+            'Balanced optimization.',
+            4,
         );
     }
 

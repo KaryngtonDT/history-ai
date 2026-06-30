@@ -25,6 +25,8 @@ use App\Domain\Artifact\ArtifactType;
 use App\Domain\Content\ContentId;
 use App\Domain\Orchestrator\PipelinePlannerInterface;
 use App\Domain\Orchestrator\ProcessingMode;
+use App\Domain\Optimization\ExecutionOptimizerInterface;
+use App\Domain\Optimization\RuntimeExecutionOptimizationContextInterface;
 use App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface;
 use App\Domain\Pipeline\RuntimePipelineConfigurationContextInterface;
 use App\Domain\Processing\ProcessingJobId;
@@ -54,6 +56,8 @@ final class ProcessVideoHandler
         private readonly GenerateFinalVideoConfiguration $generateFinalVideoConfiguration,
         private readonly PipelinePlannerInterface $pipelinePlanner,
         private readonly VideoIntelligenceFactoryInterface $videoIntelligenceFactory,
+        private readonly ExecutionOptimizerInterface $executionOptimizer,
+        private readonly RuntimeExecutionOptimizationContextInterface $runtimeOptimizationContext,
         private readonly RuntimePipelineConfigurationContextInterface $runtimePipelineContext,
     ) {
     }
@@ -115,18 +119,22 @@ final class ProcessVideoHandler
             $this->videoRepository->save($processing->fail());
         } finally {
             $this->runtimePipelineContext->clear();
+            $this->runtimeOptimizationContext->clear();
         }
     }
 
     private function configurePipelineForMessage(ProcessVideoMessage $message, VideoJob $job): void
     {
+        $intelligence = $this->videoIntelligenceFactory->fromVideoJob($job);
+        $optimization = $this->executionOptimizer->optimize($intelligence);
+        $this->runtimeOptimizationContext->set($optimization);
+
         if (ProcessingMode::Manual === $message->processingMode) {
             $this->runtimePipelineContext->clear();
 
             return;
         }
 
-        $intelligence = $this->videoIntelligenceFactory->fromVideoJob($job);
         $recommendation = null !== $message->strategy
             ? $this->pipelinePlanner->recommendWithStrategy($intelligence, $message->strategy)
             : $this->pipelinePlanner->recommend($intelligence);
