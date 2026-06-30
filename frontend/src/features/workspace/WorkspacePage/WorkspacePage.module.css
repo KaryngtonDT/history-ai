@@ -1,0 +1,138 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.eyebrow {
+	margin: 0 0 0.25rem;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	color: #2563eb;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.title {
+	margin: 0;
+	font-size: 1.75rem;
+	font-weight: 700;
+}
+
+.createForm {
+	display: flex;
+	gap: 0.5rem;
+}
+
+.input {
+	min-width: 14rem;
+	padding: 0.55rem 0.75rem;
+	border: 1px solid var(--color-border, #e5e7eb);
+	border-radius: 0.5rem;
+}
+
+.layout {
+	display: grid;
+	grid-template-columns: minmax(14rem, 18rem) 1fr;
+	gap: 1.5rem;
+}
+
+.sidebar,
+.main {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.sectionTitle {
+	margin: 0;
+	font-size: 0.9375rem;
+	font-weight: 600;
+}
+
+.projectList {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.languageList {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.languageOption {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.45rem 0.75rem;
+	border: 1px solid var(--color-border, #e5e7eb);
+	border-radius: 999px;
+	font-size: 0.875rem;
+	cursor: pointer;
+}
+
+.primaryButton,
+.secondaryButton {
+	padding: 0.65rem 1rem;
+	border-radius: 0.5rem;
+	font-size: 0.9375rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.primaryButton {
+	border: none;
+	background: #2563eb;
+	color: #ffffff;
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+.secondaryButton {
+	border: 1px solid var(--color-border, #e5e7eb);
+	background: #ffffff;
+}
+
+.loading {
+	display: flex;
+	justify-content: center;
+	padding: 3rem 0;
+}
+
+.empty {
+	margin: 0;
+	font-size: 0.875rem;
+	color: var(--color-text-muted, #4b5563);
+}
+
+@media (max-width: 900px) {
+	.layout {
+		grid-template-columns: 1fr;
+	}
+
+	.header {
+		flex-direction: column;
+	}
+}

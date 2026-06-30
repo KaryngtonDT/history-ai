@@ -10,6 +10,24 @@ export const LIBRARY_ITEMS_PATH = "/api/library/items";
 
 export const COLLECTIONS_PATH = "/api/collections";
 
+export const PROJECTS_PATH = "/api/projects";
+
+export function projectPath(projectId: string): string {
+	return `${PROJECTS_PATH}/${projectId}`;
+}
+
+export function projectProcessPath(projectId: string): string {
+	return `${PROJECTS_PATH}/${projectId}/process`;
+}
+
+export function projectVideosPath(projectId: string): string {
+	return `${PROJECTS_PATH}/${projectId}/videos`;
+}
+
+export function projectVideoPath(projectId: string, videoId: string): string {
+	return `${PROJECTS_PATH}/${projectId}/videos/${videoId}`;
+}
+
 export const SEARCH_LIBRARY_PATH = "/api/search/library";
 
 export const VIDEOS_PATH = "/api/videos";

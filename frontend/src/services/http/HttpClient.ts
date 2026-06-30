@@ -42,6 +42,51 @@ export class HttpClient {
 		return this.request<T>("PUT", path, body);
 	}
 
+	async patch<T>(path: string, body: unknown): Promise<T> {
+		return this.request<T>("PATCH", path, body);
+	}
+
+	async delete(path: string): Promise<void> {
+		await this.deleteRequest(path, false);
+	}
+
+	async deleteJson<T>(path: string): Promise<T> {
+		const response = await this.deleteRequest(path, true);
+
+		return (await response.json()) as T;
+	}
+
+	private async deleteRequest(
+		path: string,
+		expectBody: boolean,
+	): Promise<Response> {
+		try {
+			const response = await fetch(`${this.baseUrl}${path}`, {
+				method: "DELETE",
+				headers: { Accept: "application/json" },
+			});
+
+			if (!response.ok) {
+				throw new ApiError(
+					`DELETE ${path} failed (${response.status})`,
+					response.status,
+				);
+			}
+
+			if (!expectBody && response.status === 204) {
+				return response;
+			}
+
+			return response;
+		} catch (error) {
+			if (error instanceof ApiError) {
+				throw error;
+			}
+
+			throw new NetworkError(`DELETE ${path} failed`, error);
+		}
+	}
+
 	postFormData<T>(
 		path: string,
 		formData: FormData,
@@ -94,7 +139,7 @@ export class HttpClient {
 	}
 
 	private async request<T>(
-		method: "POST" | "PUT",
+		method: "POST" | "PUT" | "PATCH",
 		path: string,
 		body: unknown,
 	): Promise<T> {

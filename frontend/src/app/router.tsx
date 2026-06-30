@@ -16,6 +16,7 @@ import { VideoTranscriptPage } from "@/pages/VideoTranscript/VideoTranscriptPage
 import { VideoTranslationsPage } from "@/pages/VideoTranslations/VideoTranslationsPage";
 import { VideoUploadPage } from "@/pages/VideoUpload/VideoUploadPage";
 import { VideoVoiceClonePage } from "@/pages/VideoVoiceClone/VideoVoiceClonePage";
+import { WorkspacePage } from "@/pages/Workspace/WorkspacePage";
 
 export function AppRouter() {
 	return (
@@ -42,6 +43,7 @@ export function AppRouter() {
 				<Route path="/library" element={<LibraryPage />} />
 				<Route path="/library/:libraryItemId" element={<LibraryItemPage />} />
 				<Route path="/collections" element={<CollectionsPage />} />
+				<Route path="/workspace" element={<WorkspacePage />} />
 				<Route path="/processing/:id" element={<ProcessingPage />} />
 				<Route path="/settings" element={<SettingsPage />} />
 				<Route path="/settings/ai" element={<AIEngineSettingsPage />} />
