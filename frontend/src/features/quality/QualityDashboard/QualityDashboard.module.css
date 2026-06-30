@@ -1,0 +1,88 @@
+.panel {
+	margin-bottom: 1.5rem;
+	padding: 1.25rem;
+	border: 1px solid var(--color-border, #e5e7eb);
+	border-radius: 0.75rem;
+	background: var(--color-surface, #ffffff);
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 0.75rem;
+}
+
+.title {
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+.badge {
+	padding: 0.2rem 0.55rem;
+	border-radius: 999px;
+	background: #eff6ff;
+	color: #1d4ed8;
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+.loading {
+	margin: 0;
+	font-size: 0.875rem;
+	color: var(--color-text-muted, #4b5563);
+}
+
+.overall {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+}
+
+.overallLabel {
+	margin: 0;
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+.overallScore {
+	margin: 0;
+	font-size: 2rem;
+	font-weight: 700;
+	color: #047857;
+}
+
+.overallMax {
+	margin-left: 0.25rem;
+	font-size: 1rem;
+	font-weight: 500;
+	color: var(--color-text-muted, #4b5563);
+}
+
+.divider {
+	margin: 1rem 0;
+	border-top: 1px solid var(--color-border, #e5e7eb);
+}
+
+.metrics {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.explanations {
+	margin-top: 1rem;
+}
+
+.explanationTitle {
+	margin: 0 0 0.5rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+.explanations ul {
+	margin: 0;
+	padding-left: 1.25rem;
+	font-size: 0.875rem;
+	color: var(--color-text-muted, #4b5563);
+}

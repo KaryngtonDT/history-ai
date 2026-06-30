@@ -1,0 +1,1 @@
+export { QualityScoreCard } from "./QualityScoreCard";

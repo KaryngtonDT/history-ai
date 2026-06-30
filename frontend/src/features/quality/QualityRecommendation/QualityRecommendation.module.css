@@ -1,0 +1,45 @@
+.root {
+	margin-top: 1rem;
+	padding: 0.85rem 1rem;
+	border-radius: 0.65rem;
+	background: #f3f4f6;
+}
+
+.ready {
+	background: #ecfdf5;
+}
+
+.review {
+	background: #fffbeb;
+}
+
+.regenerate {
+	background: #fef2f2;
+}
+
+.label {
+	margin: 0 0 0.25rem;
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--color-text-muted, #4b5563);
+}
+
+.value {
+	margin: 0;
+	font-size: 0.9375rem;
+	font-weight: 600;
+}
+
+.ready .value {
+	color: #047857;
+}
+
+.review .value {
+	color: #b45309;
+}
+
+.regenerate .value {
+	color: #b91c1c;
+}

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { VideoIntelligenceDashboard } from "@/features/intelligence";
 import { OptimizationDashboard } from "@/features/optimization";
 import { ProcessingModeSelector } from "@/features/orchestrator";
+import { QualityDashboard } from "@/features/quality";
 import { ProcessingResourceMonitor } from "@/features/scheduler";
 import type { VideoIntelligence } from "@/services/intelligence/types";
 import { videoIntelligenceService } from "@/services/intelligence/VideoIntelligenceService";
@@ -12,6 +13,8 @@ import type {
 	PipelineRecommendation,
 	ProcessingMode,
 } from "@/services/orchestrator/types";
+import { qualityService } from "@/services/quality/QualityService";
+import type { QualityReport } from "@/services/quality/types";
 import { schedulerService } from "@/services/scheduler/SchedulerService";
 import type { ExecutionSchedule } from "@/services/scheduler/types";
 import { videoService } from "@/services/video/VideoService";
@@ -44,6 +47,9 @@ export function VideoUploadPanel() {
 	const [optimization, setOptimization] =
 		useState<ExecutionOptimization | null>(null);
 	const [schedule, setSchedule] = useState<ExecutionSchedule | null>(null);
+	const [qualityReport, setQualityReport] = useState<QualityReport | null>(
+		null,
+	);
 	const [loadingAutomaticPreview, setLoadingAutomaticPreview] = useState(false);
 
 	const loadAutomaticPreview = useCallback(async () => {
@@ -52,6 +58,7 @@ export function VideoUploadPanel() {
 			setIntelligence(null);
 			setOptimization(null);
 			setSchedule(null);
+			setQualityReport(null);
 			return;
 		}
 
@@ -63,16 +70,19 @@ export function VideoUploadPanel() {
 				intelligenceResult,
 				optimizationResult,
 				scheduleResult,
+				qualityResult,
 			] = await Promise.all([
 				orchestratorService.loadRecommendation(),
 				videoIntelligenceService.loadPreviewIntelligence(),
 				optimizationService.loadPreviewOptimization(),
 				schedulerService.loadPreviewSchedule(),
+				qualityService.loadPreviewQuality(),
 			]);
 			setRecommendation(recommendationResult);
 			setIntelligence(intelligenceResult);
 			setOptimization(optimizationResult);
 			setSchedule(scheduleResult);
+			setQualityReport(qualityResult);
 		} finally {
 			setLoadingAutomaticPreview(false);
 		}
@@ -147,6 +157,10 @@ export function VideoUploadPanel() {
 								/>
 								<ProcessingResourceMonitor
 									schedule={schedule}
+									loading={loadingAutomaticPreview}
+								/>
+								<QualityDashboard
+									report={qualityReport}
 									loading={loadingAutomaticPreview}
 								/>
 							</>

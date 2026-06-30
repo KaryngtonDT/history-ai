@@ -1,0 +1,32 @@
+.card {
+	padding: 0.85rem 1rem;
+	border: 1px solid var(--color-border, #e5e7eb);
+	border-radius: 0.65rem;
+	background: var(--color-surface-muted, #f9fafb);
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 0.35rem;
+}
+
+.label {
+	margin: 0;
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+.score {
+	margin: 0;
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: #047857;
+}
+
+.explanation {
+	margin: 0;
+	font-size: 0.8125rem;
+	color: var(--color-text-muted, #4b5563);
+}
