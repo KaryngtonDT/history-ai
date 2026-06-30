@@ -101,6 +101,10 @@ nelmio_api_doc:
             - { alias: PipelineStage, type: App\Presentation\OpenApi\Schema\PipelineStageSchema }
             - { alias: PipelineConfiguration, type: App\Presentation\OpenApi\Schema\PipelineConfigurationSchema }
             - { alias: SavePipelineConfigurationRequest, type: App\Presentation\OpenApi\Schema\SavePipelineConfigurationRequestSchema }
+            - { alias: ProcessingMode, type: App\Presentation\OpenApi\Schema\ProcessingModeSchema }
+            - { alias: ProcessingStrategy, type: App\Presentation\OpenApi\Schema\ProcessingStrategySchema }
+            - { alias: VideoAnalysis, type: App\Presentation\OpenApi\Schema\VideoAnalysisSchema }
+            - { alias: PipelineRecommendation, type: App\Presentation\OpenApi\Schema\PipelineRecommendationSchema }
     areas:
         default:
             path_patterns:

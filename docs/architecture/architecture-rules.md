@@ -1076,6 +1076,34 @@ AIProviderResolver.resolve*() → configured provider or registry default
 
 Feature components must use `pipelineService`, not `HttpPipelineRepository` or `HttpClient` directly.
 
+## Platform Sprint 40 — AI Orchestrator
+
+```text
+Video Upload (/video/upload)
+        │
+        ├── Manual → saved PipelineConfiguration
+        │
+        └── Automatic → DeterministicPipelinePlanner
+                │
+                ▼
+        RuntimePipelineConfigurationContext (ephemeral)
+                │
+                ▼
+        AIProviderResolver → processing pipeline
+```
+
+| Component | Role |
+| --------- | ---- |
+| `ProcessingMode` | Enum: manual or automatic processing |
+| `ProcessingStrategy` | Enum: balanced, quality, speed, low_memory |
+| `PipelineRecommendation` | Immutable aggregate with pipeline config and estimates |
+| `DeterministicPipelinePlanner` | Selects enabled providers from AI registry based on video analysis |
+| `RuntimePipelineConfigurationContext` | Holds ephemeral automatic configuration per job |
+| `ProcessingModeSelector` | Manual/automatic toggle on video upload |
+| `PipelineRecommendationPanel` | Strategy, duration, quality, VRAM preview |
+
+Feature components must use `orchestratorService`, not `HttpOrchestratorRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

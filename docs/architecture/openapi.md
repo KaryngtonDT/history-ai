@@ -75,6 +75,8 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Pipeline | GET | `/api/pipeline` |
 | Pipeline | PUT | `/api/pipeline` |
 | Pipeline | POST | `/api/pipeline/reset` |
+| Orchestrator | GET | `/api/orchestrator/recommendation` |
+| Orchestrator | POST | `/api/orchestrator/recommendation` |
 | Platform | GET | `/internal/platform/metrics` |
 
 ---
@@ -663,6 +665,44 @@ The frontend `FinalVideoPanel` at `/video/:videoId/render` lets users render fin
 The frontend `PipelineBuilder` at `/settings/pipeline` loads enabled providers from the AI engine registry, lets users pick one provider per stage, save configuration, and reset to defaults via `PipelineService`.
 
 At runtime, `AIProviderResolver` reads the latest saved configuration and falls back to platform defaults when none is stored.
+
+---
+
+# AI Orchestrator (Platform Sprint 40)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/orchestrator/recommendation` | Get pipeline recommendation from optional query parameters |
+| POST | `/api/orchestrator/recommendation` | Request pipeline recommendation from video analysis payload |
+
+## Response shape
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440001",
+  "strategy": "balanced",
+  "explanation": "Balanced pipeline for English content targeting French and German translations.",
+  "estimatedDurationSeconds": 240,
+  "estimatedQuality": 4,
+  "estimatedVramGb": 8.0,
+  "stages": [
+    { "stage": "speech_to_text", "providerId": "faster_whisper" }
+  ]
+}
+```
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `ProcessingMode` | `manual`, `automatic` |
+| `ProcessingStrategy` | `balanced`, `quality`, `speed`, `low_memory` |
+| `VideoAnalysis` | `detectedLanguage`, `durationSeconds`, `resolution`, `fps`, `gpuAvailable`, `estimatedVramGb`, `strategy` |
+| `PipelineRecommendation` | `id`, `strategy`, `explanation`, estimates, `stages[]` |
+
+Video upload (`POST /api/videos`) accepts optional `processingMode` and `strategy` form fields. Automatic mode generates an ephemeral `PipelineConfiguration` at runtime without overwriting saved pipeline settings.
+
+The frontend `ProcessingModeSelector` and `PipelineRecommendationPanel` on `/video/upload` use `OrchestratorService`.
 
 ---
 

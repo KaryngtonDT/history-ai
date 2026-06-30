@@ -954,6 +954,36 @@ Verification: [Sprint39-Verification.md](../reports/Sprint39-Verification.md)
 
 ---
 
+# Platform Sprint 40 — AI Orchestrator Foundation (2026-06)
+
+Platform Sprint 40 delivers **automatic AI pipeline orchestration** for Phase 2: orchestrator domain, deterministic planner, runtime integration with ephemeral pipeline configuration, frontend processing mode selector, and OpenAPI documentation. Users choose manual or automatic mode on video upload.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P40-SLICE-01 | `ProcessingMode`, `ProcessingStrategy`, `PipelineRecommendation`, `VideoAnalysis` domain | ✅ |
+| P40-SLICE-02 | `DeterministicPipelinePlanner` with registry-based provider selection | ✅ |
+| P40-SLICE-03 | Runtime pipeline context, `ProcessVideoHandler` automatic mode integration | ✅ |
+| P40-SLICE-04 | `ProcessingModeSelector`, `PipelineRecommendationPanel` on `/video/upload` | ✅ |
+| P40-SLICE-05 | OpenAPI orchestrator schemas, architecture docs, verification report | ✅ |
+
+```text
+Upload Video (/video/upload)
+        │
+        ├── Manual → saved PipelineConfiguration (Sprint 39)
+        │
+        └── Automatic → AI Orchestrator → PipelineRecommendation
+                │
+                ▼
+        RuntimePipelineConfigurationContext (ephemeral)
+                │
+                ▼
+        AIProviderResolver → Pipeline Engine → Final MP4
+```
+
+Verification: [Sprint40-Verification.md](../reports/Sprint40-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

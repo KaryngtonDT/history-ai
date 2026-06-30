@@ -2230,6 +2230,32 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('SavePipelineConfigurationRequest', $spec['components']['schemas']);
     }
 
+    public function testOpenApiSpecDocumentsGetPipelineRecommendationOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/orchestrator/recommendation']['get'];
+
+        self::assertSame('getPipelineRecommendation', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsPostPipelineRecommendationOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/orchestrator/recommendation']['post'];
+
+        self::assertSame('postPipelineRecommendation', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsOrchestratorSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('PipelineRecommendation', $spec['components']['schemas']);
+        self::assertArrayHasKey('VideoAnalysis', $spec['components']['schemas']);
+        self::assertArrayHasKey('ProcessingMode', $spec['components']['schemas']);
+        self::assertArrayHasKey('ProcessingStrategy', $spec['components']['schemas']);
+    }
+
     /**
      * @return array<string, mixed>
      */
