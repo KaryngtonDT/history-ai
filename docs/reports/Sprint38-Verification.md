@@ -6,7 +6,7 @@ Status: Accepted
 
 Date: 2026-06-26
 
-Commit: `pending`
+Commit: `449397f`
 
 ---
 
