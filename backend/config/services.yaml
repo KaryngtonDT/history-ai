@@ -38,6 +38,18 @@ services:
             - '../src/Infrastructure/Chat/ChatProviderFactory.php'
             - '../src/Infrastructure/Speech/SpeechToTextProviderFactory.php'
             - '../src/Infrastructure/Translation/TranslationProviderFactory.php'
+            - '../src/Infrastructure/AI/AIEngineRegistryFactory.php'
+
+    App\Domain\AI\AIEngineRegistry:
+        factory: ['@App\Infrastructure\AI\AIEngineRegistryFactory', 'create']
+
+    App\Domain\AI\AIEngineConfiguration:
+        factory: ['@App\Infrastructure\AI\AIEngineRegistryFactory', 'createConfiguration']
+
+    App\Domain\AI\AIProviderResolverInterface:
+        alias: App\Infrastructure\AI\AIProviderResolver
+
+    App\Infrastructure\AI\AIEngineRegistryFactory: ~
 
     App\Domain\Recommendation\RecommendationEngine: ~
     App\Domain\Recommendation\RecommendationScoringEngine: ~
