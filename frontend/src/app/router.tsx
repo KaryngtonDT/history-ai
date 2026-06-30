@@ -6,6 +6,7 @@ import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
 import { ImportPage } from "@/pages/Import/ImportPage";
 import { LibraryItemPage } from "@/pages/Library/LibraryItemPage";
 import { LibraryPage } from "@/pages/Library/LibraryPage";
+import { PipelineSettingsPage } from "@/pages/PipelineSettings/PipelineSettingsPage";
 import { ProcessingPage } from "@/pages/Processing/ProcessingPage";
 import { SettingsPage } from "@/pages/Settings/SettingsPage";
 import { VideoAudioPage } from "@/pages/VideoAudio/VideoAudioPage";
@@ -44,6 +45,7 @@ export function AppRouter() {
 				<Route path="/processing/:id" element={<ProcessingPage />} />
 				<Route path="/settings" element={<SettingsPage />} />
 				<Route path="/settings/ai" element={<AIEngineSettingsPage />} />
+				<Route path="/settings/pipeline" element={<PipelineSettingsPage />} />
 			</Route>
 		</Routes>
 	);

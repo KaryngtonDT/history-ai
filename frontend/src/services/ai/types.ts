@@ -3,7 +3,8 @@ export type AIEngineCapability =
 	| "translation"
 	| "text_to_speech"
 	| "voice_clone"
-	| "lip_sync";
+	| "lip_sync"
+	| "video_render";
 
 export interface AIProvider {
 	providerId: string;
@@ -29,6 +30,7 @@ export const AI_CAPABILITY_LABELS: Record<AIEngineCapability, string> = {
 	text_to_speech: "Voice",
 	voice_clone: "Voice Clone",
 	lip_sync: "Lip Sync",
+	video_render: "Video Render",
 };
 
 export function mapAIEngineCapability(value: string): AIEngineCapability {
@@ -38,6 +40,7 @@ export function mapAIEngineCapability(value: string): AIEngineCapability {
 		case "text_to_speech":
 		case "voice_clone":
 		case "lip_sync":
+		case "video_render":
 			return value;
 		default:
 			return "speech_to_text";
