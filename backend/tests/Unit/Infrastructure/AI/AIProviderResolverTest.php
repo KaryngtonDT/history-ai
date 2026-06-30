@@ -30,6 +30,13 @@ use App\Infrastructure\TTS\F5TextToSpeechProvider;
 use App\Infrastructure\TTS\FixedF5ProcessRunner;
 use App\Infrastructure\TTS\MockTextToSpeechProvider;
 use App\Infrastructure\TTS\TextToSpeechProviderFactory;
+use App\Domain\VideoRender\VideoRenderProvider;
+use App\Domain\VideoRender\VideoRenderProviderInterface;
+use App\Infrastructure\VideoRender\FFmpegVideoRenderProvider;
+use App\Infrastructure\VideoRender\FixedFFmpegProcessRunner;
+use App\Infrastructure\VideoRender\MockVideoRenderProvider;
+use App\Infrastructure\VideoRender\VideoRenderMapper;
+use App\Infrastructure\VideoRender\VideoRenderProviderFactory;
 use App\Infrastructure\LipSync\FixedLatentSyncProcessRunner;
 use App\Infrastructure\LipSync\LatentSyncProvider;
 use App\Infrastructure\LipSync\LipSyncMapper;
@@ -71,6 +78,7 @@ final class AIProviderResolverTest extends TestCase
             $this->createTextToSpeechProviderFactory(),
             $this->createVoiceCloneProviderFactory(),
             $this->createLipSyncProviderFactory(),
+            $this->createVideoRenderProviderFactory(),
         );
     }
 
@@ -141,9 +149,29 @@ final class AIProviderResolverTest extends TestCase
         );
     }
 
+    private function createVideoRenderProviderFactory(): VideoRenderProviderFactory
+    {
+        $outputDirectory = sys_get_temp_dir().'/history-ai-resolver-render';
+
+        if (!is_dir($outputDirectory)) {
+            mkdir($outputDirectory);
+        }
+
+        return new VideoRenderProviderFactory(
+            'ffmpeg',
+            new FFmpegVideoRenderProvider(
+                new FixedFFmpegProcessRunner(),
+                new VideoRenderMapper(),
+                'ffmpeg',
+                $outputDirectory,
+            ),
+            new MockVideoRenderProvider(),
+        );
+    }
+
     public function testRegistryExposesRegisteredProviders(): void
     {
-        self::assertGreaterThanOrEqual(7, count($this->resolver->registry()->allProviders()));
+        self::assertGreaterThanOrEqual(8, count($this->resolver->registry()->allProviders()));
     }
 
     public function testResolveSpeechToTextReturnsProvider(): void
@@ -251,5 +279,19 @@ final class AIProviderResolverTest extends TestCase
         $this->expectException(InvalidAIEngineConfigurationException::class);
 
         $this->resolver->resolveLipSync(LipSyncProvider::Wav2Lip);
+    }
+
+    public function testResolveVideoRenderReturnsProvider(): void
+    {
+        $provider = $this->resolver->resolveVideoRender();
+
+        self::assertInstanceOf(VideoRenderProviderInterface::class, $provider);
+    }
+
+    public function testResolveVideoRenderWithExplicitProvider(): void
+    {
+        $provider = $this->resolver->resolveVideoRender(VideoRenderProvider::FFmpeg);
+
+        self::assertInstanceOf(VideoRenderProviderInterface::class, $provider);
     }
 }

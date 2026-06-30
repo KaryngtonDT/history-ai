@@ -34,6 +34,11 @@ use App\Infrastructure\TTS\F5TextToSpeechProvider;
 use App\Infrastructure\TTS\FixedF5ProcessRunner;
 use App\Infrastructure\TTS\MockTextToSpeechProvider;
 use App\Infrastructure\TTS\TextToSpeechProviderFactory;
+use App\Infrastructure\VideoRender\FFmpegVideoRenderProvider;
+use App\Infrastructure\VideoRender\FixedFFmpegProcessRunner;
+use App\Infrastructure\VideoRender\MockVideoRenderProvider;
+use App\Infrastructure\VideoRender\VideoRenderMapper;
+use App\Infrastructure\VideoRender\VideoRenderProviderFactory;
 use App\Infrastructure\LipSync\FixedLatentSyncProcessRunner;
 use App\Infrastructure\LipSync\LatentSyncProvider;
 use App\Infrastructure\LipSync\LipSyncMapper;
@@ -119,6 +124,16 @@ final class VideoTranslationGeneratorTest extends TestCase
                     sys_get_temp_dir().'/history-ai-translation-lipsync',
                 ),
                 new MockLipSyncProvider(),
+            ),
+            new VideoRenderProviderFactory(
+                'ffmpeg',
+                new FFmpegVideoRenderProvider(
+                    new FixedFFmpegProcessRunner(),
+                    new VideoRenderMapper(),
+                    'ffmpeg',
+                    sys_get_temp_dir().'/history-ai-translation-render',
+                ),
+                new MockVideoRenderProvider(),
             ),
         );
 

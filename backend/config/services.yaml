@@ -37,6 +37,11 @@ parameters:
     lip_sync.latentsync.base_path_default: '/models/latentsync'
     lip_sync.output_dir: '%kernel.project_dir%/var/lip-sync-storage'
     lip_sync.generate_default: false
+    video_render.provider_default: 'ffmpeg'
+    video_render.ffmpeg.binary_default: 'ffmpeg'
+    video_render.format_default: 'mp4'
+    video_render.quality_default: 'standard'
+    video_render.output_dir: '%kernel.project_dir%/var/final-video-storage'
 
 services:
     _defaults:
@@ -58,6 +63,8 @@ services:
             - '../src/Infrastructure/Translation/TranslationProviderFactory.php'
             - '../src/Infrastructure/TTS/TextToSpeechProviderFactory.php'
             - '../src/Infrastructure/VoiceClone/VoiceCloneProviderFactory.php'
+            - '../src/Infrastructure/LipSync/LipSyncProviderFactory.php'
+            - '../src/Infrastructure/VideoRender/VideoRenderProviderFactory.php'
             - '../src/Infrastructure/AI/AIEngineRegistryFactory.php'
 
     App\Domain\AI\AIEngineRegistry:
@@ -339,3 +346,15 @@ services:
     App\Infrastructure\LipSync\LipSyncProviderFactory:
         arguments:
             $defaultProviderName: '%env(default:lip_sync.provider_default:LIP_SYNC_PROVIDER)%'
+
+    App\Infrastructure\VideoRender\FFmpegProcessRunner:
+        alias: App\Infrastructure\VideoRender\ShellFFmpegProcessRunner
+
+    App\Infrastructure\VideoRender\FFmpegVideoRenderProvider:
+        arguments:
+            $binary: '%env(default:video_render.ffmpeg.binary_default:FFMPEG_PATH)%'
+            $outputDirectory: '%video_render.output_dir%'
+
+    App\Infrastructure\VideoRender\VideoRenderProviderFactory:
+        arguments:
+            $defaultProviderName: '%env(default:video_render.provider_default:VIDEO_RENDER_PROVIDER)%'

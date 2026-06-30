@@ -19,7 +19,9 @@ use App\Domain\LipSync\LipSyncProviderInterface;
 use App\Domain\VoiceClone\VoiceCloneProvider;
 use App\Domain\VoiceClone\VoiceCloneProviderInterface;
 use App\Infrastructure\AI\Exception\InvalidAIEngineConfigurationException;
-use App\Infrastructure\LipSync\LipSyncProviderFactory;
+use App\Domain\VideoRender\VideoRenderProvider;
+use App\Domain\VideoRender\VideoRenderProviderInterface;
+use App\Infrastructure\VideoRender\VideoRenderProviderFactory;
 use App\Infrastructure\Speech\SpeechToTextProviderFactory;
 use App\Infrastructure\Translation\TranslationProviderFactory;
 use App\Infrastructure\TTS\TextToSpeechProviderFactory;
@@ -35,6 +37,7 @@ final class AIProviderResolver implements AIProviderResolverInterface
         private readonly TextToSpeechProviderFactory $textToSpeechProviderFactory,
         private readonly VoiceCloneProviderFactory $voiceCloneProviderFactory,
         private readonly LipSyncProviderFactory $lipSyncProviderFactory,
+        private readonly VideoRenderProviderFactory $videoRenderProviderFactory,
     ) {
     }
 
@@ -161,6 +164,32 @@ final class AIProviderResolver implements AIProviderResolverInterface
             AIEngineRegistryFactory::PROVIDER_LATENTSYNC => $this->lipSyncProviderFactory->resolve(null),
             default => throw new InvalidAIEngineConfigurationException(sprintf(
                 'Lip sync provider "%s" is not registered.',
+                $resolvedProviderId,
+            )),
+        };
+    }
+
+    public function resolveVideoRender(?VideoRenderProvider $provider = null): VideoRenderProviderInterface
+    {
+        if (null !== $provider) {
+            $providerId = $provider->value;
+            $this->assertProviderEnabled(AIEngineCapability::VideoRender, $providerId);
+
+            return $this->videoRenderProviderFactory->resolve($provider);
+        }
+
+        $resolvedProviderId = $this->configuration->defaultProviderFor(AIEngineCapability::VideoRender);
+
+        if (null === $resolvedProviderId) {
+            throw new InvalidAIEngineConfigurationException('No video render provider configured.');
+        }
+
+        $this->assertProviderEnabled(AIEngineCapability::VideoRender, $resolvedProviderId);
+
+        return match ($resolvedProviderId) {
+            AIEngineRegistryFactory::PROVIDER_FFMPEG => $this->videoRenderProviderFactory->resolve(null),
+            default => throw new InvalidAIEngineConfigurationException(sprintf(
+                'Video render provider "%s" is not registered.',
                 $resolvedProviderId,
             )),
         };

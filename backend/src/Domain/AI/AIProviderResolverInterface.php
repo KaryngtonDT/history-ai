@@ -11,6 +11,8 @@ use App\Domain\TTS\TextToSpeechProvider;
 use App\Domain\TTS\TextToSpeechProviderInterface;
 use App\Domain\LipSync\LipSyncProvider;
 use App\Domain\LipSync\LipSyncProviderInterface;
+use App\Domain\VideoRender\VideoRenderProvider;
+use App\Domain\VideoRender\VideoRenderProviderInterface;
 use App\Domain\VoiceClone\VoiceCloneProvider;
 use App\Domain\VoiceClone\VoiceCloneProviderInterface;
 
@@ -27,4 +29,6 @@ interface AIProviderResolverInterface
     public function resolveVoiceClone(?VoiceCloneProvider $provider = null): VoiceCloneProviderInterface;
 
     public function resolveLipSync(?LipSyncProvider $provider = null): LipSyncProviderInterface;
+
+    public function resolveVideoRender(?VideoRenderProvider $provider = null): VideoRenderProviderInterface;
 }

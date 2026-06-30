@@ -22,6 +22,11 @@ use App\Infrastructure\TTS\F5TextToSpeechProvider;
 use App\Infrastructure\TTS\FixedF5ProcessRunner;
 use App\Infrastructure\TTS\MockTextToSpeechProvider;
 use App\Infrastructure\TTS\TextToSpeechProviderFactory;
+use App\Infrastructure\VideoRender\FFmpegVideoRenderProvider;
+use App\Infrastructure\VideoRender\FixedFFmpegProcessRunner;
+use App\Infrastructure\VideoRender\MockVideoRenderProvider;
+use App\Infrastructure\VideoRender\VideoRenderMapper;
+use App\Infrastructure\VideoRender\VideoRenderProviderFactory;
 use App\Infrastructure\LipSync\FixedLatentSyncProcessRunner;
 use App\Infrastructure\LipSync\LatentSyncProvider;
 use App\Infrastructure\LipSync\LipSyncMapper;
@@ -100,6 +105,16 @@ final class CapabilityProviderResolutionTest extends TestCase
                 ),
                 new MockLipSyncProvider(),
             ),
+            new VideoRenderProviderFactory(
+                'ffmpeg',
+                new FFmpegVideoRenderProvider(
+                    new FixedFFmpegProcessRunner(),
+                    new VideoRenderMapper(),
+                    'ffmpeg',
+                    sys_get_temp_dir().'/history-ai-capability-render',
+                ),
+                new MockVideoRenderProvider(),
+            ),
         );
     }
 
@@ -142,6 +157,15 @@ final class CapabilityProviderResolutionTest extends TestCase
         self::assertCount(1, $providers);
         self::assertSame('latentsync', $providers[0]->providerId());
         self::assertNotNull($this->resolver->resolveLipSync());
+    }
+
+    public function testResolvesVideoRenderByCapability(): void
+    {
+        $providers = $this->resolver->registry()->enabledProviders(AIEngineCapability::VideoRender);
+
+        self::assertCount(1, $providers);
+        self::assertSame('ffmpeg', $providers[0]->providerId());
+        self::assertNotNull($this->resolver->resolveVideoRender());
     }
 
     public function testDisabledFutureProviderCannotBeResolved(): void
