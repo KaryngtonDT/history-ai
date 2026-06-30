@@ -12,6 +12,8 @@ use App\Application\TTS\GenerateAudioConfiguration;
 use App\Application\TTS\VideoAudioGenerator;
 use App\Application\LipSync\GenerateLipSyncConfiguration;
 use App\Application\LipSync\VideoLipSyncGenerator;
+use App\Application\VideoRender\GenerateFinalVideoConfiguration;
+use App\Application\VideoRender\VideoFinalRenderGenerator;
 use App\Application\VoiceClone\GenerateVoiceCloneConfiguration;
 use App\Application\VoiceClone\VideoVoiceCloneGenerator;
 use App\Domain\AI\AIProviderResolverInterface;
@@ -43,6 +45,8 @@ final class ProcessVideoHandler
         private readonly GenerateVoiceCloneConfiguration $generateVoiceCloneConfiguration,
         private readonly VideoLipSyncGenerator $videoLipSyncGenerator,
         private readonly GenerateLipSyncConfiguration $generateLipSyncConfiguration,
+        private readonly VideoFinalRenderGenerator $videoFinalRenderGenerator,
+        private readonly GenerateFinalVideoConfiguration $generateFinalVideoConfiguration,
     ) {
     }
 
@@ -90,6 +94,10 @@ final class ProcessVideoHandler
 
             if ($this->generateLipSyncConfiguration->isEnabled()) {
                 $this->videoLipSyncGenerator->generate($videoId);
+            }
+
+            if ($this->generateFinalVideoConfiguration->isEnabled()) {
+                $this->videoFinalRenderGenerator->generate($videoId);
             }
 
             $this->videoRepository->save($processing->complete());

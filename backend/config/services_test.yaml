@@ -77,6 +77,10 @@ when@test:
             alias: App\Infrastructure\Persistence\Doctrine\LipSync\DoctrineLipSyncRepository
             public: true
 
+        App\Domain\VideoRender\FinalVideoRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\VideoRender\DoctrineFinalVideoRepository
+            public: true
+
         App\Infrastructure\Speech\FasterWhisperProcessRunnerInterface:
             class: App\Infrastructure\Speech\FixedFasterWhisperProcessRunner
             public: true

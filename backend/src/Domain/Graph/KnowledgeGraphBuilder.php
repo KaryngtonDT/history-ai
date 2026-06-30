@@ -88,6 +88,8 @@ final class KnowledgeGraphBuilder
             ArtifactType::Audio => 'Audio',
             ArtifactType::VoiceClone => 'Voice Clone',
             ArtifactType::LipSync => 'Lip Sync',
+            ArtifactType::FinalVideo => 'Final Video',
+            ArtifactType::Translation => 'Translation',
         };
     }
 

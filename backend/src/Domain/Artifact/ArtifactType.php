@@ -16,4 +16,5 @@ enum ArtifactType: string
     case Audio = 'audio';
     case VoiceClone = 'voice_clone';
     case LipSync = 'lip_sync';
+    case FinalVideo = 'final_video';
 }

@@ -42,6 +42,7 @@ parameters:
     video_render.format_default: 'mp4'
     video_render.quality_default: 'standard'
     video_render.output_dir: '%kernel.project_dir%/var/final-video-storage'
+    video_render.generate_default: false
 
 services:
     _defaults:
@@ -151,6 +152,9 @@ services:
     App\Domain\LipSync\LipSyncRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\LipSync\DoctrineLipSyncRepository
 
+    App\Domain\VideoRender\FinalVideoRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\VideoRender\DoctrineFinalVideoRepository
+
     App\Application\TTS\GenerateAudioConfiguration:
         arguments:
             $enabled: '%env(bool:default:tts.generate_audio_default:GENERATE_AUDIO)%'
@@ -162,6 +166,16 @@ services:
     App\Application\LipSync\GenerateLipSyncConfiguration:
         arguments:
             $enabled: '%env(bool:default:lip_sync.generate_default:GENERATE_LIP_SYNC)%'
+
+    App\Application\VideoRender\GenerateFinalVideoConfiguration:
+        arguments:
+            $enabled: '%env(bool:default:video_render.generate_default:GENERATE_FINAL_VIDEO)%'
+
+    App\Application\VideoRender\VideoFinalRenderGenerator:
+        arguments:
+            $outputDirectory: '%video_render.output_dir%'
+            $defaultFormat: !php/enum App\Domain\VideoRender\VideoRenderFormat::MP4
+            $defaultQuality: !php/enum App\Domain\VideoRender\VideoRenderQuality::Standard
 
     App\Application\Translation\DefaultTranslationLanguagesProvider:
         arguments:
