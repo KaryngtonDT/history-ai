@@ -248,4 +248,4 @@ docs/
 | 2 | `2b8480c` | feat(ai): add provider registry |
 | 3 | `1d02954` | refactor(ai): resolve providers by capability |
 | 4 | `43162f4` | feat(frontend): add ai engine settings |
-| 5 | *(this commit)* | docs(ai): document ai engine platform |
+| 5 | `d40c556` | docs(ai): document ai engine platform |
