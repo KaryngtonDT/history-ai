@@ -2,16 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\TTS;
+namespace App\Domain\TTS;
 
-use App\Domain\TTS\Voice;
-use App\Domain\TTS\VoiceCollection;
-use App\Domain\TTS\VoiceGender;
-use App\Domain\TTS\VoiceLanguage;
-
-final class F5VoiceCatalog
+final class VoiceCatalog
 {
-    public static function all(): VoiceCollection
+    public static function defaultVoices(): VoiceCollection
     {
         return new VoiceCollection([
             Voice::create('female_01', 'Female 01', VoiceLanguage::French, VoiceGender::Female),

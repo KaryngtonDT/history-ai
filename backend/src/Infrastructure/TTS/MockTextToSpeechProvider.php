@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\TTS;
 
 use App\Domain\Translation\Translation;
+use App\Domain\Translation\TranslationLanguage;
 use App\Domain\TTS\AudioArtifact;
 use App\Domain\TTS\AudioId;
 use App\Domain\TTS\FileFormat;
@@ -25,6 +26,8 @@ final class MockTextToSpeechProvider implements TextToSpeechProviderInterface
             $voice,
             $duration,
             FileFormat::Wav,
+            '/tmp/mock-audio.wav',
+            $translation->targetLanguage(),
         );
     }
 }

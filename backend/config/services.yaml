@@ -24,6 +24,7 @@ parameters:
     tts.f5.model_default: 'F5-TTS'
     tts.f5.base_path_default: '/models/f5'
     tts.output_dir: '%kernel.project_dir%/var/audio-storage'
+    tts.generate_audio_default: false
 
 services:
     _defaults:
@@ -117,6 +118,13 @@ services:
 
     App\Domain\Translation\TranslationRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Translation\DoctrineTranslationRepository
+
+    App\Domain\TTS\AudioRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\TTS\DoctrineAudioRepository
+
+    App\Application\TTS\GenerateAudioConfiguration:
+        arguments:
+            $enabled: '%env(bool:default:tts.generate_audio_default:GENERATE_AUDIO)%'
 
     App\Application\Translation\DefaultTranslationLanguagesProvider:
         arguments:

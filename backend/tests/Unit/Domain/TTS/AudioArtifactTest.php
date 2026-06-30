@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Domain\TTS;
 
 use App\Domain\Translation\TranslationId;
+use App\Domain\Translation\TranslationLanguage;
 use App\Domain\TTS\AudioArtifact;
 use App\Domain\TTS\AudioId;
 use App\Domain\TTS\Exception\InvalidAudioArtifactException;
@@ -30,6 +31,8 @@ final class AudioArtifactTest extends TestCase
             $voice,
             201.5,
             FileFormat::Wav,
+            '/tmp/test-audio.wav',
+            TranslationLanguage::French,
         );
 
         self::assertTrue($artifact->audioId()->equals(new AudioId(self::AUDIO_ID)));
@@ -51,6 +54,8 @@ final class AudioArtifactTest extends TestCase
             Voice::create('neutral_01', 'Neutral 01', VoiceLanguage::English, VoiceGender::Neutral),
             -1.0,
             FileFormat::Wav,
+            '/tmp/test.wav',
+            TranslationLanguage::English,
         );
     }
 }

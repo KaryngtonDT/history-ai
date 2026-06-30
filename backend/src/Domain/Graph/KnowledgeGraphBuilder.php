@@ -85,6 +85,7 @@ final class KnowledgeGraphBuilder
             ArtifactType::Flashcards => 'Flashcards',
             ArtifactType::Timeline => 'Timeline',
             ArtifactType::Podcast => 'Podcast',
+            ArtifactType::Audio => 'Audio',
         };
     }
 

@@ -43,6 +43,8 @@ final class TextToSpeechProviderInterfaceTest extends TestCase
             $voice,
             3.5,
             FileFormat::Wav,
+            '/tmp/mock.wav',
+            TranslationLanguage::French,
         );
 
         $provider = $this->createMock(TextToSpeechProviderInterface::class);

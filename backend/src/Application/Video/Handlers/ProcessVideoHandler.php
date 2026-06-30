@@ -8,6 +8,8 @@ use App\Application\Video\Messages\ProcessVideoMessage;
 use App\Application\Speech\TranscriptJsonMapper;
 use App\Application\Translation\DefaultTranslationLanguagesProvider;
 use App\Application\Translation\VideoTranslationGenerator;
+use App\Application\TTS\GenerateAudioConfiguration;
+use App\Application\TTS\VideoAudioGenerator;
 use App\Domain\AI\AIProviderResolverInterface;
 use App\Domain\Artifact\Artifact;
 use App\Domain\Artifact\ArtifactContent;
@@ -31,6 +33,8 @@ final class ProcessVideoHandler
         private readonly TranscriptJsonMapper $transcriptJsonMapper,
         private readonly VideoTranslationGenerator $videoTranslationGenerator,
         private readonly DefaultTranslationLanguagesProvider $defaultTranslationLanguages,
+        private readonly VideoAudioGenerator $videoAudioGenerator,
+        private readonly GenerateAudioConfiguration $generateAudioConfiguration,
     ) {
     }
 
@@ -66,6 +70,10 @@ final class ProcessVideoHandler
                     $videoId,
                     $this->defaultTranslationLanguages->all(),
                 );
+            }
+
+            if ($this->generateAudioConfiguration->isEnabled()) {
+                $this->videoAudioGenerator->generate($videoId);
             }
 
             $this->videoRepository->save($processing->complete());

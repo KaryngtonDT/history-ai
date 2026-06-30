@@ -6,6 +6,7 @@ namespace App\Domain\TTS;
 
 use App\Domain\Translation\Translation;
 use App\Domain\Translation\TranslationId;
+use App\Domain\Translation\TranslationLanguage;
 use App\Domain\TTS\Exception\InvalidAudioArtifactException;
 
 final readonly class AudioArtifact
@@ -17,9 +18,15 @@ final readonly class AudioArtifact
         private Voice $voice,
         private float $duration,
         private FileFormat $format,
+        private string $storagePath,
+        private TranslationLanguage $targetLanguage,
     ) {
         if ($this->duration < 0) {
             throw new InvalidAudioArtifactException('Audio duration cannot be negative.');
+        }
+
+        if ('' === trim($this->storagePath)) {
+            throw new InvalidAudioArtifactException('Audio storage path cannot be empty.');
         }
     }
 
@@ -30,8 +37,19 @@ final readonly class AudioArtifact
         Voice $voice,
         float $duration,
         FileFormat $format,
+        string $storagePath,
+        TranslationLanguage $targetLanguage,
     ): self {
-        return new self($audioId, $translationId, $provider, $voice, $duration, $format);
+        return new self(
+            $audioId,
+            $translationId,
+            $provider,
+            $voice,
+            $duration,
+            $format,
+            $storagePath,
+            $targetLanguage,
+        );
     }
 
     public function audioId(): AudioId
@@ -62,5 +80,15 @@ final readonly class AudioArtifact
     public function format(): FileFormat
     {
         return $this->format;
+    }
+
+    public function storagePath(): string
+    {
+        return $this->storagePath;
+    }
+
+    public function targetLanguage(): TranslationLanguage
+    {
+        return $this->targetLanguage;
     }
 }

@@ -11,6 +11,7 @@ enum LibraryItemType: string
     case Flashcards = 'flashcards';
     case Transcript = 'transcript';
     case Translation = 'translation';
+    case Audio = 'audio';
     case Timeline = 'timeline';
     case Podcast = 'podcast';
 }

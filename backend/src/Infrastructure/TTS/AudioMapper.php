@@ -6,6 +6,7 @@ namespace App\Infrastructure\TTS;
 
 use App\Domain\Translation\Translation;
 use App\Domain\Translation\TranslationId;
+use App\Domain\Translation\TranslationLanguage;
 use App\Domain\TTS\AudioArtifact;
 use App\Domain\TTS\AudioId;
 use App\Domain\TTS\FileFormat;
@@ -21,6 +22,8 @@ final class AudioMapper
         TextToSpeechProvider $provider,
         Voice $voice,
         AudioId $audioId,
+        string $storagePath,
+        TranslationLanguage $targetLanguage,
     ): AudioArtifact {
         /** @var array<string, mixed>|null $payload */
         $payload = json_decode($processOutput, true);
@@ -52,7 +55,14 @@ final class AudioMapper
             $voice,
             (float) $duration,
             $fileFormat,
+            $storagePath,
+            $targetLanguage,
         );
+    }
+
+    public function targetLanguageFrom(Translation $translation): TranslationLanguage
+    {
+        return $translation->targetLanguage();
     }
 
     public function translationIdFrom(Translation $translation): TranslationId

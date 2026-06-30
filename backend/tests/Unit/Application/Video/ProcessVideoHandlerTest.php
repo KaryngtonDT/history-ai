@@ -25,6 +25,8 @@ use App\Domain\Video\VideoStatus;
 use App\Application\Speech\TranscriptJsonMapper;
 use App\Application\Translation\DefaultTranslationLanguagesProvider;
 use App\Application\Translation\VideoTranslationGenerator;
+use App\Application\TTS\GenerateAudioConfiguration;
+use App\Application\TTS\VideoAudioGenerator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -42,6 +44,8 @@ final class ProcessVideoHandlerTest extends TestCase
 
     private VideoTranslationGenerator&MockObject $videoTranslationGenerator;
 
+    private VideoAudioGenerator&MockObject $videoAudioGenerator;
+
     private ProcessVideoHandler $handler;
 
     protected function setUp(): void
@@ -52,6 +56,7 @@ final class ProcessVideoHandlerTest extends TestCase
         $this->transcriptRepository = $this->createMock(TranscriptRepositoryInterface::class);
         $this->artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
         $this->videoTranslationGenerator = $this->createMock(VideoTranslationGenerator::class);
+        $this->videoAudioGenerator = $this->createMock(VideoAudioGenerator::class);
 
         $this->handler = new ProcessVideoHandler(
             $this->videoRepository,
@@ -61,6 +66,8 @@ final class ProcessVideoHandlerTest extends TestCase
             new TranscriptJsonMapper(),
             $this->videoTranslationGenerator,
             new DefaultTranslationLanguagesProvider(''),
+            $this->videoAudioGenerator,
+            new GenerateAudioConfiguration(false),
         );
     }
 
@@ -126,6 +133,7 @@ final class ProcessVideoHandlerTest extends TestCase
             }));
 
         $this->videoTranslationGenerator->expects(self::never())->method('generate');
+        $this->videoAudioGenerator->expects(self::never())->method('generate');
 
         ($this->handler)(new ProcessVideoMessage($videoId->value));
     }

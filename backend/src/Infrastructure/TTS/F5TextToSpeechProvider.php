@@ -10,6 +10,7 @@ use App\Domain\TTS\AudioId;
 use App\Domain\TTS\TextToSpeechProvider;
 use App\Domain\TTS\TextToSpeechProviderInterface;
 use App\Domain\TTS\Voice;
+use App\Domain\TTS\VoiceCatalog;
 use App\Domain\TTS\VoiceCollection;
 use App\Infrastructure\TTS\Exception\F5TextToSpeechProviderException;
 
@@ -58,11 +59,13 @@ final class F5TextToSpeechProvider implements TextToSpeechProviderInterface
             TextToSpeechProvider::F5TTS,
             $voice,
             $audioId,
+            $outputPath,
+            $translation->targetLanguage(),
         );
     }
 
     public function availableVoices(): VoiceCollection
     {
-        return F5VoiceCatalog::all();
+        return VoiceCatalog::defaultVoices();
     }
 }

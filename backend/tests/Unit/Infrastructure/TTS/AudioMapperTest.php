@@ -38,6 +38,8 @@ final class AudioMapperTest extends TestCase
             TextToSpeechProvider::F5TTS,
             $voice,
             new AudioId('550e8400-e29b-41d4-a716-446655440030'),
+            '/tmp/test.wav',
+            TranslationLanguage::French,
         );
 
         self::assertSame(201.5, $artifact->duration());
@@ -56,6 +58,8 @@ final class AudioMapperTest extends TestCase
             TextToSpeechProvider::F5TTS,
             Voice::create('female_01', 'Female 01', VoiceLanguage::French, VoiceGender::Female),
             new AudioId('550e8400-e29b-41d4-a716-446655440030'),
+            '/tmp/test.wav',
+            TranslationLanguage::French,
         );
     }
 

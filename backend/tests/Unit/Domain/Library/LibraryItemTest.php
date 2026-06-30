@@ -66,6 +66,7 @@ final class LibraryItemTest extends TestCase
         yield 'flashcards' => [LibraryItemType::Flashcards];
         yield 'transcript' => [LibraryItemType::Transcript];
         yield 'translation' => [LibraryItemType::Translation];
+        yield 'audio' => [LibraryItemType::Audio];
         yield 'timeline' => [LibraryItemType::Timeline];
         yield 'podcast' => [LibraryItemType::Podcast];
     }

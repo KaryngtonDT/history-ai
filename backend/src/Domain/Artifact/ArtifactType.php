@@ -13,4 +13,5 @@ enum ArtifactType: string
     case Timeline = 'timeline';
     case Transcript = 'transcript';
     case Translation = 'translation';
+    case Audio = 'audio';
 }
