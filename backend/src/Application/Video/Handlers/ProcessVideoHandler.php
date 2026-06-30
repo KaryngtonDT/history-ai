@@ -25,15 +25,21 @@ use App\Domain\Artifact\ArtifactType;
 use App\Domain\Content\ContentId;
 use App\Domain\Orchestrator\PipelinePlannerInterface;
 use App\Domain\Orchestrator\ProcessingMode;
+use App\Domain\Optimization\ExecutionOptimization;
 use App\Domain\Optimization\ExecutionOptimizerInterface;
 use App\Domain\Optimization\RuntimeExecutionOptimizationContextInterface;
-use App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface;
+use App\Domain\Pipeline\PipelineStageType;
 use App\Domain\Pipeline\RuntimePipelineConfigurationContextInterface;
 use App\Domain\Processing\ProcessingJobId;
+use App\Domain\Scheduler\PipelineSchedulerInterface;
+use App\Domain\Scheduler\RuntimeExecutionScheduleContextInterface;
+use App\Domain\Scheduler\ScheduledStageStatus;
 use App\Domain\Speech\TranscriptRepositoryInterface;
 use App\Domain\Video\VideoId;
 use App\Domain\Video\VideoJob;
 use App\Domain\Video\VideoRepositoryInterface;
+use App\Domain\VideoIntelligence\VideoIntelligence;
+use App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface;
 use Throwable;
 
 final class ProcessVideoHandler
@@ -59,6 +65,8 @@ final class ProcessVideoHandler
         private readonly ExecutionOptimizerInterface $executionOptimizer,
         private readonly RuntimeExecutionOptimizationContextInterface $runtimeOptimizationContext,
         private readonly RuntimePipelineConfigurationContextInterface $runtimePipelineContext,
+        private readonly PipelineSchedulerInterface $pipelineScheduler,
+        private readonly RuntimeExecutionScheduleContextInterface $runtimeScheduleContext,
     ) {
     }
 
@@ -77,41 +85,58 @@ final class ProcessVideoHandler
         try {
             $this->configurePipelineForMessage($message, $processing);
 
-            $transcript = $this->aiProviderResolver
-                ->resolveSpeechToText()
-                ->transcribe($processing);
-            $this->transcriptRepository->save($videoId, $transcript);
+            $this->runScheduledStage(PipelineStageType::SpeechToText, function () use ($processing, $videoId): void {
+                $transcript = $this->aiProviderResolver
+                    ->resolveSpeechToText()
+                    ->transcribe($processing);
+                $this->transcriptRepository->save($videoId, $transcript);
 
-            $artifact = Artifact::create(
-                ArtifactId::generate(),
-                new ContentId($videoId->value),
-                new ProcessingJobId($videoId->value),
-                ArtifactType::Transcript,
-                ArtifactContent::fromString($this->transcriptJsonMapper->toJson($transcript)),
-            );
-            $this->artifactRepository->save($artifact);
+                $artifact = Artifact::create(
+                    ArtifactId::generate(),
+                    new ContentId($videoId->value),
+                    new ProcessingJobId($videoId->value),
+                    ArtifactType::Transcript,
+                    ArtifactContent::fromString($this->transcriptJsonMapper->toJson($transcript)),
+                );
+                $this->artifactRepository->save($artifact);
+            });
 
             if ([] !== $this->defaultTranslationLanguages->all()) {
-                $this->videoTranslationGenerator->generate(
-                    $videoId,
-                    $this->defaultTranslationLanguages->all(),
+                $this->runScheduledStage(
+                    PipelineStageType::Translation,
+                    fn (): mixed => $this->videoTranslationGenerator->generate(
+                        $videoId,
+                        $this->defaultTranslationLanguages->all(),
+                    ),
                 );
             }
 
             if ($this->generateAudioConfiguration->isEnabled()) {
-                $this->videoAudioGenerator->generate($videoId);
+                $this->runScheduledStage(
+                    PipelineStageType::TextToSpeech,
+                    fn (): mixed => $this->videoAudioGenerator->generate($videoId),
+                );
             }
 
             if ($this->generateVoiceCloneConfiguration->isEnabled()) {
-                $this->videoVoiceCloneGenerator->generate($videoId);
+                $this->runScheduledStage(
+                    PipelineStageType::VoiceClone,
+                    fn (): mixed => $this->videoVoiceCloneGenerator->generate($videoId),
+                );
             }
 
             if ($this->generateLipSyncConfiguration->isEnabled()) {
-                $this->videoLipSyncGenerator->generate($videoId);
+                $this->runScheduledStage(
+                    PipelineStageType::LipSync,
+                    fn (): mixed => $this->videoLipSyncGenerator->generate($videoId),
+                );
             }
 
             if ($this->generateFinalVideoConfiguration->isEnabled()) {
-                $this->videoFinalRenderGenerator->generate($videoId);
+                $this->runScheduledStage(
+                    PipelineStageType::VideoRender,
+                    fn (): mixed => $this->videoFinalRenderGenerator->generate($videoId),
+                );
             }
 
             $this->videoRepository->save($processing->complete());
@@ -120,6 +145,7 @@ final class ProcessVideoHandler
         } finally {
             $this->runtimePipelineContext->clear();
             $this->runtimeOptimizationContext->clear();
+            $this->runtimeScheduleContext->clear();
         }
     }
 
@@ -128,6 +154,7 @@ final class ProcessVideoHandler
         $intelligence = $this->videoIntelligenceFactory->fromVideoJob($job);
         $optimization = $this->executionOptimizer->optimize($intelligence);
         $this->runtimeOptimizationContext->set($optimization);
+        $this->configureSchedule($intelligence, $optimization);
 
         if (ProcessingMode::Manual === $message->processingMode) {
             $this->runtimePipelineContext->clear();
@@ -140,5 +167,32 @@ final class ProcessVideoHandler
             : $this->pipelinePlanner->recommend($intelligence);
 
         $this->runtimePipelineContext->set($recommendation->pipelineConfiguration());
+    }
+
+    private function configureSchedule(VideoIntelligence $intelligence, ExecutionOptimization $optimization): void
+    {
+        try {
+            $this->runtimeScheduleContext->set(
+                $this->pipelineScheduler->schedule($intelligence, $optimization),
+            );
+        } catch (Throwable) {
+            $this->runtimeScheduleContext->clear();
+        }
+    }
+
+    /**
+     * @param callable(): mixed $callback
+     */
+    private function runScheduledStage(PipelineStageType $stage, callable $callback): void
+    {
+        $this->runtimeScheduleContext->updateStage($stage, ScheduledStageStatus::Running);
+
+        try {
+            $callback();
+            $this->runtimeScheduleContext->updateStage($stage, ScheduledStageStatus::Completed);
+        } catch (Throwable $throwable) {
+            $this->runtimeScheduleContext->updateStage($stage, ScheduledStageStatus::Failed);
+            throw $throwable;
+        }
     }
 }

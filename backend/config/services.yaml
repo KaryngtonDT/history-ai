@@ -187,6 +187,11 @@ services:
     App\Domain\Scheduler\PipelineSchedulerInterface:
         alias: App\Infrastructure\Scheduler\DeterministicPipelineScheduler
 
+    App\Domain\Scheduler\RuntimeExecutionScheduleContextInterface:
+        alias: App\Infrastructure\Scheduler\RuntimeExecutionScheduleContext
+
+    App\Infrastructure\Scheduler\RuntimeExecutionScheduleContext: ~
+
     App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface:
         alias: App\Infrastructure\VideoIntelligence\VideoJobVideoIntelligenceFactory
 

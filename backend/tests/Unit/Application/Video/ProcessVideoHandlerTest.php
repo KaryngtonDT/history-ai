@@ -60,6 +60,18 @@ use App\Domain\VideoIntelligence\VideoSpeakerCollection;
 use App\Domain\VideoIntelligence\VisualCharacteristics;
 use App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface;
 use App\Domain\Pipeline\RuntimePipelineConfigurationContextInterface;
+use App\Domain\Scheduler\ExecutionSchedule;
+use App\Domain\Scheduler\ExecutionScheduleId;
+use App\Domain\Scheduler\PipelineSchedulerInterface;
+use App\Domain\Scheduler\ResourceRequirement;
+use App\Domain\Scheduler\ResourceRequirementCollection;
+use App\Domain\Scheduler\ResourceType;
+use App\Domain\Scheduler\RuntimeExecutionScheduleContextInterface;
+use App\Domain\Scheduler\ScheduledStage;
+use App\Domain\Scheduler\ScheduledStageCollection;
+use App\Domain\Scheduler\SchedulingStrategy;
+use App\Domain\Scheduler\ExecutionResource;
+use App\Domain\Pipeline\PipelineStageType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -85,6 +97,8 @@ final class ProcessVideoHandlerTest extends TestCase
 
     private VideoFinalRenderGenerator&MockObject $videoFinalRenderGenerator;
 
+    private RuntimeExecutionScheduleContextInterface&MockObject $runtimeScheduleContext;
+
     private ProcessVideoHandler $handler;
 
     protected function setUp(): void
@@ -99,12 +113,16 @@ final class ProcessVideoHandlerTest extends TestCase
         $this->videoVoiceCloneGenerator = $this->createMock(VideoVoiceCloneGenerator::class);
         $this->videoLipSyncGenerator = $this->createMock(VideoLipSyncGenerator::class);
         $this->videoFinalRenderGenerator = $this->createMock(VideoFinalRenderGenerator::class);
+        $this->runtimeScheduleContext = $this->createMock(RuntimeExecutionScheduleContextInterface::class);
 
         $intelligenceFactory = $this->createMock(VideoIntelligenceFactoryInterface::class);
         $intelligenceFactory->method('fromVideoJob')->willReturn($this->sampleIntelligence());
 
         $optimizer = $this->createMock(ExecutionOptimizerInterface::class);
         $optimizer->method('optimize')->willReturn($this->sampleOptimization());
+
+        $scheduler = $this->createMock(PipelineSchedulerInterface::class);
+        $scheduler->method('schedule')->willReturn($this->sampleSchedule());
 
         $this->handler = new ProcessVideoHandler(
             $this->videoRepository,
@@ -127,6 +145,31 @@ final class ProcessVideoHandlerTest extends TestCase
             $optimizer,
             $this->createMock(RuntimeExecutionOptimizationContextInterface::class),
             $this->createMock(RuntimePipelineConfigurationContextInterface::class),
+            $scheduler,
+            $this->runtimeScheduleContext,
+        );
+    }
+
+    private function sampleSchedule(): ExecutionSchedule
+    {
+        return ExecutionSchedule::create(
+            ExecutionScheduleId::generate(),
+            SchedulingStrategy::Balanced,
+            new ScheduledStageCollection([
+                ScheduledStage::create(
+                    PipelineStageType::SpeechToText,
+                    1,
+                    new ResourceRequirementCollection([
+                        ResourceRequirement::create(ResourceType::Gpu),
+                    ]),
+                    60,
+                    1,
+                ),
+            ]),
+            [
+                ExecutionResource::create(ResourceType::Gpu, 0, 1, 1),
+            ],
+            60,
         );
     }
 
@@ -226,6 +269,10 @@ final class ProcessVideoHandlerTest extends TestCase
 
         $this->videoTranslationGenerator->expects(self::never())->method('generate');
         $this->videoAudioGenerator->expects(self::never())->method('generate');
+
+        $this->runtimeScheduleContext
+            ->expects(self::atLeastOnce())
+            ->method('updateStage');
 
         ($this->handler)(new ProcessVideoMessage($videoId->value));
     }
