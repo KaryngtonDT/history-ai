@@ -1,0 +1,1 @@
+export { LipSyncPanel } from "./LipSyncPanel";

@@ -61,6 +61,21 @@ export function videoVoiceCloneStreamPath(
 	return `${VIDEOS_PATH}/${videoId}/voice-clone/${language}/stream`;
 }
 
+export function videoLipSyncListPath(videoId: string): string {
+	return `${VIDEOS_PATH}/${videoId}/lip-sync`;
+}
+
+export function videoLipSyncPath(videoId: string, language: string): string {
+	return `${VIDEOS_PATH}/${videoId}/lip-sync/${language}`;
+}
+
+export function videoLipSyncStreamPath(
+	videoId: string,
+	language: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/lip-sync/${language}/stream`;
+}
+
 export function timelinePath(artifactId: string): string {
 	return `/api/timeline/${artifactId}`;
 }

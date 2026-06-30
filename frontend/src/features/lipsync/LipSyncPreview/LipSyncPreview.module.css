@@ -1,0 +1,105 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 1rem;
+}
+
+.title {
+	margin: 0;
+	font-size: 1.5rem;
+}
+
+.meta {
+	margin: 0.25rem 0 0;
+	color: var(--color-text-muted);
+}
+
+.languageTabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.tab,
+.activeTab {
+	padding: 0.4rem 0.75rem;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-sm);
+	background: var(--color-surface);
+	cursor: pointer;
+}
+
+.activeTab {
+	border-color: var(--color-primary);
+	background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+.preview {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.previewHeader {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1rem;
+}
+
+.sectionLabel {
+	margin: 0;
+	font-weight: 600;
+}
+
+.compareToggle {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.compareGrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 1rem;
+}
+
+.singleColumn {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.playerBlock {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.playerLabel {
+	margin: 0;
+	font-weight: 600;
+}
+
+.video {
+	width: 100%;
+	border-radius: var(--radius-sm);
+	background: #000;
+}
+
+.durationMeta {
+	margin: 0;
+	color: var(--color-text-muted);
+}
+
+.actions {
+	display: flex;
+	gap: 0.5rem;
+}

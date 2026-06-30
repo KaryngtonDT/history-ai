@@ -9,6 +9,7 @@ import { LibraryPage } from "@/pages/Library/LibraryPage";
 import { ProcessingPage } from "@/pages/Processing/ProcessingPage";
 import { SettingsPage } from "@/pages/Settings/SettingsPage";
 import { VideoAudioPage } from "@/pages/VideoAudio/VideoAudioPage";
+import { VideoLipSyncPage } from "@/pages/VideoLipSync/VideoLipSyncPage";
 import { VideoTranscriptPage } from "@/pages/VideoTranscript/VideoTranscriptPage";
 import { VideoTranslationsPage } from "@/pages/VideoTranslations/VideoTranslationsPage";
 import { VideoUploadPage } from "@/pages/VideoUpload/VideoUploadPage";
@@ -34,6 +35,7 @@ export function AppRouter() {
 					path="/video/:videoId/voice-clone"
 					element={<VideoVoiceClonePage />}
 				/>
+				<Route path="/video/:videoId/lip-sync" element={<VideoLipSyncPage />} />
 				<Route path="/library" element={<LibraryPage />} />
 				<Route path="/library/:libraryItemId" element={<LibraryItemPage />} />
 				<Route path="/collections" element={<CollectionsPage />} />
