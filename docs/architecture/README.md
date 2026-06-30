@@ -791,6 +791,46 @@ Verification: [Sprint35-Verification.md](../reports/Sprint35-Verification.md)
 
 ---
 
+# Platform Sprint 36 — Voice Cloning Foundation (2026-06)
+
+Platform Sprint 36 delivers **voice cloning** for Phase 2: dedicated `VoiceClone` AI capability (separate from TTS), OpenVoice V2 provider, worker pipeline, frontend compare mode, and OpenAPI documentation. No lip-sync or video rendering.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P36-SLICE-01 | `VoiceProfile`, `VoiceCloneArtifact`, `VoiceCloneProviderInterface` | ✅ |
+| P36-SLICE-02 | `OpenVoiceProvider`, factory, AI Engine integration | ✅ |
+| P36-SLICE-03 | `VideoVoiceCloneGenerator`, voice clone artifacts, REST endpoints | ✅ |
+| P36-SLICE-04 | `VoiceClonePanel`, `VoiceModeSelector`, `VoiceCloneService` | ✅ |
+| P36-SLICE-05 | OpenAPI voice clone schemas, architecture docs, verification report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `VoiceProfile`, `VoiceCloneArtifact`, `VoiceCloneProvider`, `VoiceCloneProviderInterface` |
+| Application | `VideoVoiceCloneGenerator`, voice clone handlers, `VoiceCloneJsonMapper` |
+| Infrastructure | `OpenVoiceProvider`, `DoctrineVoiceCloneRepository`, `VoiceCloneProviderFactory` |
+| Presentation | `GET/POST /api/videos/{videoId}/voice-clone`, stream endpoint, OpenAPI schemas |
+| Frontend | `VoiceClonePanel`, `VoiceModeSelector`, `VoiceCloneService` at `/video/:videoId/voice-clone` |
+
+```text
+Generic Audio (F5-TTS)
+        │
+        ▼
+AIProviderResolver.resolveVoiceClone()
+        │
+        ▼
+OpenVoiceProvider
+        │
+        ▼
+VoiceCloneArtifact (ArtifactType::VoiceClone)
+        │
+        ▼
+GET/POST /api/videos/{videoId}/voice-clone → VoiceClonePanel (/video/:videoId/voice-clone)
+```
+
+Verification: [Sprint36-Verification.md](../reports/Sprint36-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

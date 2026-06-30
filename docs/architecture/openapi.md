@@ -457,6 +457,57 @@ The frontend `AudioPlayerPanel` at `/video/:videoId/audio` lets users select a T
 
 ---
 
+# Video voice clone (Platform Sprint 36)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/videos/{videoId}/voice-clone` | List cloned voice artifacts for a video |
+| POST | `/api/videos/{videoId}/voice-clone` | Generate cloned audio from generic F5 audio using OpenVoice V2 |
+| GET | `/api/videos/{videoId}/voice-clone/{language}` | Get voice clone metadata with original and cloned stream URLs |
+| GET | `/api/videos/{videoId}/voice-clone/{language}/stream` | Stream cloned WAV audio file |
+
+## Request body (POST)
+
+```json
+{
+  "targetLanguages": ["french"],
+  "provider": "openvoice",
+  "voiceMode": "clone"
+}
+```
+
+## Response shape (list)
+
+```json
+{
+  "videoId": "660e8400-e29b-41d4-a716-446655440001",
+  "voiceClones": [
+    {
+      "artifactId": "550e8400-e29b-41d4-a716-446655440050",
+      "sourceAudioId": "550e8400-e29b-41d4-a716-446655440030",
+      "clonedAudioId": "550e8400-e29b-41d4-a716-446655440060",
+      "targetLanguage": "french",
+      "provider": "openvoice",
+      "duration": 201.5,
+      "sampleRate": 44100
+    }
+  ]
+}
+```
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `VoiceCloneProvider` | `openvoice`, `seedvc`, `mock` |
+| `VoiceProfile` | `profileId`, `sourceLanguage`, `duration`, `sampleRate` |
+| `VoiceCloneArtifact` | `artifactId`, `sourceAudioId`, `clonedAudioId`, `provider`, stream URLs |
+| `GenerateVideoVoiceCloneRequest` | `targetLanguages`, `provider`, `voiceMode` |
+
+The frontend `VoiceClonePanel` at `/video/:videoId/voice-clone` lets users toggle generic vs cloned voice, generate cloned audio, and compare original vs cloned playback via `VoiceCloneService`.
+
+---
+
 # Production considerations
 
 | Topic | Recommendation |

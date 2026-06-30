@@ -2068,6 +2068,46 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertContains('f5_tts', $providerSchema['enum']);
     }
 
+    public function testOpenApiSpecDocumentsListVideoVoiceCloneOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/voice-clone']['get'];
+
+        self::assertSame('listVideoVoiceClone', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsGenerateVideoVoiceCloneOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/voice-clone']['post'];
+
+        self::assertSame('generateVideoVoiceClone', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsGetVideoVoiceCloneOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/videos/{videoId}/voice-clone/{language}']['get'];
+
+        self::assertSame('getVideoVoiceClone', $operation['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsVoiceCloneSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('VoiceCloneProvider', $spec['components']['schemas']);
+        self::assertArrayHasKey('VoiceProfile', $spec['components']['schemas']);
+        self::assertArrayHasKey('VoiceCloneArtifact', $spec['components']['schemas']);
+        self::assertArrayHasKey('VideoVoiceCloneSummary', $spec['components']['schemas']);
+        self::assertArrayHasKey('VideoVoiceCloneList', $spec['components']['schemas']);
+        self::assertArrayHasKey('GenerateVideoVoiceCloneRequest', $spec['components']['schemas']);
+
+        $providerSchema = $spec['components']['schemas']['VoiceCloneProvider'];
+        self::assertSame('string', $providerSchema['type']);
+        self::assertContains('openvoice', $providerSchema['enum']);
+    }
+
     /**
      * @return array<string, mixed>
      */

@@ -79,6 +79,12 @@ nelmio_api_doc:
             - { alias: VideoAudioSummary, type: App\Presentation\OpenApi\Schema\VideoAudioSummarySchema }
             - { alias: VideoAudioList, type: App\Presentation\OpenApi\Schema\VideoAudioListSchema }
             - { alias: GenerateVideoAudioRequest, type: App\Presentation\OpenApi\Schema\GenerateVideoAudioRequestSchema }
+            - { alias: VoiceCloneProvider, type: App\Presentation\OpenApi\Schema\VoiceCloneProviderSchema }
+            - { alias: VoiceProfile, type: App\Presentation\OpenApi\Schema\VoiceProfileSchema }
+            - { alias: VoiceCloneArtifact, type: App\Presentation\OpenApi\Schema\VoiceCloneArtifactSchema }
+            - { alias: VideoVoiceCloneSummary, type: App\Presentation\OpenApi\Schema\VideoVoiceCloneSummarySchema }
+            - { alias: VideoVoiceCloneList, type: App\Presentation\OpenApi\Schema\VideoVoiceCloneListSchema }
+            - { alias: GenerateVideoVoiceCloneRequest, type: App\Presentation\OpenApi\Schema\GenerateVideoVoiceCloneRequestSchema }
     areas:
         default:
             path_patterns:

@@ -962,6 +962,35 @@ GET/POST /api/videos/{videoId}/audio → AudioPlayerPanel (/video/:videoId/audio
 
 Feature components must use `audioService`, not `HttpAudioRepository` or `HttpClient` directly.
 
+### Voice Cloning Foundation (Platform Sprint 36)
+
+```text
+Generic Audio (F5-TTS)
+        │
+        ▼
+AIProviderResolverInterface.resolveVoiceClone()
+        │
+        ▼
+OpenVoiceProvider (SeedVC disabled)
+        │
+        ▼
+VoiceCloneArtifact (ArtifactType::VoiceClone)
+        │
+        ▼
+GET/POST /api/videos/{videoId}/voice-clone → VoiceClonePanel (/video/:videoId/voice-clone)
+```
+
+| Component | Role |
+| --------- | ---- |
+| `VoiceProfile` | Immutable reference voice metadata (language, duration, sample rate) |
+| `VoiceCloneArtifact` | Immutable aggregate linking source and cloned audio |
+| `VoiceCloneProviderInterface` | Domain port: `cloneVoice(AudioArtifact, Translation)` — separate from TTS |
+| `OpenVoiceProvider` | OpenVoice V2 process runner and voice clone mapper |
+| `VideoVoiceCloneGenerator` | Orchestrates generic audio → voice clone → persistence |
+| `VoiceClonePanel` | Generic/clone toggle, compare mode, dual preview players |
+
+Feature components must use `voiceCloneService`, not `HttpVoiceCloneRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |
