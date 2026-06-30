@@ -71,6 +71,7 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Video | GET | `/api/videos/{videoId}/translations` |
 | Video | GET | `/api/videos/{videoId}/translations/{language}` |
 | Video | POST | `/api/videos/{videoId}/translations` |
+| AI | GET | `/api/ai/providers` |
 | Platform | GET | `/internal/platform/metrics` |
 
 ---
@@ -255,6 +256,8 @@ Shared OpenAPI schemas:
 
 **Platform Sprint 33 note:** Multilingual Translation Foundation adds `GET /api/videos/{videoId}/translations`, `GET /api/videos/{videoId}/translations/{language}`, and `POST /api/videos/{videoId}/translations` with `Translation`, `TranslationSegment`, `TranslationLanguage`, and `TranslationProvider` schemas. The worker auto-translates configured languages (`TRANSLATION_LANGUAGES`, default `fr,de`) after transcription. No TTS, lip-sync, or video rendering endpoints are documented yet.
 
+**Platform Sprint 34 note:** AI Engine Platform adds `GET /api/ai/providers` with `AIEngine`, `AIProvider`, and `AIEngineCapability` schemas. Application handlers resolve providers by capability through `AIProviderResolverInterface`. Future providers (F5-TTS, Kokoro, OpenVoice, LatentSync) are registered but disabled.
+
 Library save (`POST /api/library/items`) accepts any `LibraryItemType`, including `timeline`.
 
 ---
@@ -353,6 +356,46 @@ The frontend `TranscriptPanel` at `/video/:videoId/transcript` loads the transcr
 | `Translation` | Full translation with side-by-side segments |
 
 The frontend `TranslationPanel` at `/video/:videoId/translations` lets users select target languages and a translation engine, generate translations, and view source vs translated text side by side via `TranslationService`.
+
+---
+
+# AI engine providers (Platform Sprint 34)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/ai/providers` | List AI engines grouped by capability with provider metadata |
+
+## Response shape
+
+```json
+{
+  "engines": [
+    {
+      "id": "speech_to_text",
+      "capability": "speech_to_text",
+      "displayName": "Speech Recognition",
+      "providers": [
+        {
+          "providerId": "faster_whisper",
+          "displayName": "Faster Whisper",
+          "capability": "speech_to_text",
+          "enabled": true
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `AIEngineCapability` | `speech_to_text`, `translation`, `text_to_speech`, `voice_clone`, `lip_sync` |
+| `AIProvider` | `providerId`, `displayName`, `capability`, `enabled` |
+| `AIEngine` | `id`, `capability`, `displayName`, `providers[]` |
+
+The frontend `AIEngineSettings` at `/settings/ai` displays available engines and providers (read-only) via `AIEngineService`.
 
 ---
 

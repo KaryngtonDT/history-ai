@@ -709,6 +709,47 @@ Verification: [Sprint33-Verification.md](../reports/Sprint33-Verification.md)
 
 ---
 
+# Platform Sprint 34 — AI Engine Platform (2026-06)
+
+Platform Sprint 34 delivers the **AI Engine Platform** abstraction layer for Phase 2: unified domain model, provider registry, capability resolution, read-only frontend settings, and OpenAPI documentation. No new user-facing video features — infrastructure only.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P34-SLICE-01 | `AIEngine`, `AIEngineCapability`, `AIEngineProvider`, `AIEngineRegistry` | ✅ |
+| P34-SLICE-02 | `AIEngineRegistryFactory`, `AIProviderResolver`, provider registration | ✅ |
+| P34-SLICE-03 | Capability resolution in `ProcessVideoHandler`, `VideoTranslationGenerator` | ✅ |
+| P34-SLICE-04 | `AIEngineSettings`, `AIProviderList`, `AIEngineService` at `/settings/ai` | ✅ |
+| P34-SLICE-05 | OpenAPI AI engine schemas, architecture docs, verification report | ✅ |
+
+| Layer | Addition |
+| ----- | -------- |
+| Domain | `AIEngine` aggregate, `AIEngineCapability`, `AIEngineProvider`, `AIEngineRegistry`, `AIProviderResolverInterface` |
+| Application | `ListAIProvidersHandler`; handlers resolve providers by capability |
+| Infrastructure | `AIEngineRegistryFactory`, `AIProviderResolver`; registers FasterWhisper, Ollama, future disabled providers |
+| Presentation | `GET /api/ai/providers`, OpenAPI `AIEngine` / `AIProvider` / `AIEngineCapability` |
+| Frontend | `AIEngineSettings`, `AIProviderList`, `AIEngineService` at `/settings/ai` |
+
+```text
+Application Handler
+        │
+        ▼
+AIProviderResolverInterface (capability)
+        │
+        ▼
+AIEngineRegistry → enabled provider
+        │
+        ├── SpeechToTextProvider → FasterWhisper
+        ├── TranslationProvider → Ollama
+        └── (future) TTS, VoiceClone, LipSync providers
+        │
+        ▼
+GET /api/ai/providers → AIEngineSettings (/settings/ai)
+```
+
+Verification: [Sprint34-Verification.md](../reports/Sprint34-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

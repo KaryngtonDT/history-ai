@@ -1972,6 +1972,58 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertContains('translation', $artifactTypeSchema['enum']);
     }
 
+    public function testOpenApiSpecDocumentsListAIProvidersOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $operation = $spec['paths']['/api/ai/providers']['get'];
+
+        self::assertSame('listAIProviders', $operation['operationId']);
+        self::assertContains('AI', $operation['tags']);
+    }
+
+    public function testOpenApiSpecDocumentsListAIProvidersResponses(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+        $responses = $spec['paths']['/api/ai/providers']['get']['responses'];
+
+        self::assertArrayHasKey('200', $responses);
+        self::assertSame('AI providers found', $responses['200']['description']);
+        self::assertSame(
+            '#/components/schemas/AIProvidersList',
+            $responses['200']['content']['application/json']['schema']['$ref'],
+        );
+    }
+
+    public function testOpenApiSpecDocumentsAIEngineSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('AIEngineCapability', $spec['components']['schemas']);
+        self::assertArrayHasKey('AIProvider', $spec['components']['schemas']);
+        self::assertArrayHasKey('AIEngine', $spec['components']['schemas']);
+        self::assertArrayHasKey('AIProvidersList', $spec['components']['schemas']);
+
+        $capabilitySchema = $spec['components']['schemas']['AIEngineCapability'];
+        $providerSchema = $spec['components']['schemas']['AIProvider'];
+        $engineSchema = $spec['components']['schemas']['AIEngine'];
+
+        self::assertSame('string', $capabilitySchema['type']);
+        self::assertContains('speech_to_text', $capabilitySchema['enum']);
+        self::assertContains('text_to_speech', $capabilitySchema['enum']);
+
+        self::assertSame(
+            '#/components/schemas/AIEngineCapability',
+            $providerSchema['properties']['capability']['$ref'],
+        );
+        self::assertSame('boolean', $providerSchema['properties']['enabled']['type']);
+
+        self::assertSame(
+            '#/components/schemas/AIProvider',
+            $engineSchema['properties']['providers']['items']['$ref'],
+        );
+        self::assertContains('engineId', $engineSchema['required']);
+    }
+
     /**
      * @return array<string, mixed>
      */

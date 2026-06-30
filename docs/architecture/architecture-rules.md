@@ -906,6 +906,34 @@ Frontend TranslationPanel (/video/:videoId/translations)
 
 Feature components must use `translationService`, not `HttpTranslationRepository` or `HttpClient` directly.
 
+### AI Engine Platform (Platform Sprint 34)
+
+```text
+Application Handler
+        │
+        ▼
+AIProviderResolverInterface (capability)
+        │
+        ▼
+AIEngineRegistry → enabled provider
+        │
+        ▼
+SpeechToTextProvider / TranslationProvider / (future TTS, VoiceClone, LipSync)
+        │
+        ▼
+GET /api/ai/providers → AIEngineSettings (/settings/ai)
+```
+
+| Component | Role |
+| --------- | ---- |
+| `AIEngine` | Immutable aggregate per capability with provider list |
+| `AIEngineRegistry` | Central registry of engines and providers |
+| `AIProviderResolverInterface` | Domain port: resolve provider by capability |
+| `AIEngineRegistryFactory` | Registers FasterWhisper, Ollama, and future disabled providers |
+| `AIEngineSettings` | Read-only frontend overview of available engines |
+
+Feature components must use `aiEngineService`, not `HttpAIEngineRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

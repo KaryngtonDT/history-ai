@@ -68,6 +68,10 @@ nelmio_api_doc:
             - { alias: VideoTranslationSummary, type: App\Presentation\OpenApi\Schema\VideoTranslationSummarySchema }
             - { alias: VideoTranslationsList, type: App\Presentation\OpenApi\Schema\VideoTranslationsListSchema }
             - { alias: GenerateVideoTranslationsRequest, type: App\Presentation\OpenApi\Schema\GenerateVideoTranslationsRequestSchema }
+            - { alias: AIEngineCapability, type: App\Presentation\OpenApi\Schema\AIEngineCapabilitySchema }
+            - { alias: AIProvider, type: App\Presentation\OpenApi\Schema\AIProviderSchema }
+            - { alias: AIEngine, type: App\Presentation\OpenApi\Schema\AIEngineSchema }
+            - { alias: AIProvidersList, type: App\Presentation\OpenApi\Schema\AIProvidersListSchema }
     areas:
         default:
             path_patterns:
