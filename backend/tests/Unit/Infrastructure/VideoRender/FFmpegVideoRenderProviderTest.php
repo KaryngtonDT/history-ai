@@ -14,7 +14,7 @@ use App\Domain\Video\VideoId;
 use App\Domain\VideoRender\VideoRenderFormat;
 use App\Domain\VideoRender\VideoRenderProvider;
 use App\Domain\VideoRender\VideoRenderQuality;
-use App\Infrastructure\VideoRender\Exception\FFmpegProviderException;
+use App\Domain\LipSync\Exception\InvalidLipSyncException;
 use App\Infrastructure\VideoRender\FFmpegVideoRenderProvider;
 use App\Infrastructure\VideoRender\FixedFFmpegProcessRunner;
 use App\Infrastructure\VideoRender\VideoRenderMapper;
@@ -63,14 +63,9 @@ final class FFmpegVideoRenderProviderTest extends TestCase
 
     public function testEmptyInputPathThrows(): void
     {
-        $provider = new FFmpegVideoRenderProvider(
-            new FixedFFmpegProcessRunner(),
-            new VideoRenderMapper(),
-            'ffmpeg',
-            $this->outputDirectory,
-        );
+        $this->expectException(InvalidLipSyncException::class);
 
-        $lipSync = LipSyncArtifact::create(
+        LipSyncArtifact::create(
             new LipSyncArtifactId('550e8400-e29b-41d4-a716-446655440080'),
             new VideoId('550e8400-e29b-41d4-a716-446655440099'),
             new AudioId('550e8400-e29b-41d4-a716-446655440060'),
@@ -81,10 +76,6 @@ final class FFmpegVideoRenderProviderTest extends TestCase
                 3.0,
             ),
         );
-
-        $this->expectException(FFmpegProviderException::class);
-
-        $provider->render($lipSync, VideoRenderFormat::MP4, VideoRenderQuality::Standard);
     }
 
     private function createLipSyncArtifact(): LipSyncArtifact

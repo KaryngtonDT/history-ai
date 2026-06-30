@@ -21,6 +21,7 @@ use App\Domain\VoiceClone\VoiceCloneProviderInterface;
 use App\Infrastructure\AI\Exception\InvalidAIEngineConfigurationException;
 use App\Domain\VideoRender\VideoRenderProvider;
 use App\Domain\VideoRender\VideoRenderProviderInterface;
+use App\Domain\Pipeline\PipelineStageType;
 use App\Infrastructure\VideoRender\VideoRenderProviderFactory;
 use App\Infrastructure\Speech\SpeechToTextProviderFactory;
 use App\Infrastructure\Translation\TranslationProviderFactory;
@@ -39,6 +40,7 @@ final class AIProviderResolver implements AIProviderResolverInterface
         private readonly VoiceCloneProviderFactory $voiceCloneProviderFactory,
         private readonly LipSyncProviderFactory $lipSyncProviderFactory,
         private readonly VideoRenderProviderFactory $videoRenderProviderFactory,
+        private readonly \App\Domain\Pipeline\PipelineConfigurationRepositoryInterface $pipelineConfigurationRepository,
     ) {
     }
 
@@ -49,7 +51,10 @@ final class AIProviderResolver implements AIProviderResolverInterface
 
     public function resolveSpeechToText(?string $providerId = null): SpeechToTextProviderInterface
     {
-        $resolvedProviderId = $providerId ?? $this->configuration->defaultProviderFor(AIEngineCapability::SpeechToText);
+        $resolvedProviderId = $providerId ?? $this->resolveConfiguredProviderId(
+            PipelineStageType::SpeechToText,
+            AIEngineCapability::SpeechToText,
+        );
 
         if (null === $resolvedProviderId) {
             throw new InvalidAIEngineConfigurationException('No speech-to-text provider configured.');
@@ -75,7 +80,10 @@ final class AIProviderResolver implements AIProviderResolverInterface
             return $this->translationProviderFactory->resolve($provider);
         }
 
-        $resolvedProviderId = $this->configuration->defaultProviderFor(AIEngineCapability::Translation);
+        $resolvedProviderId = $this->resolveConfiguredProviderId(
+            PipelineStageType::Translation,
+            AIEngineCapability::Translation,
+        );
 
         if (null === $resolvedProviderId) {
             throw new InvalidAIEngineConfigurationException('No translation provider configured.');
@@ -101,7 +109,10 @@ final class AIProviderResolver implements AIProviderResolverInterface
             return $this->textToSpeechProviderFactory->resolve($provider);
         }
 
-        $resolvedProviderId = $this->configuration->defaultProviderFor(AIEngineCapability::TextToSpeech);
+        $resolvedProviderId = $this->resolveConfiguredProviderId(
+            PipelineStageType::TextToSpeech,
+            AIEngineCapability::TextToSpeech,
+        );
 
         if (null === $resolvedProviderId) {
             throw new InvalidAIEngineConfigurationException('No text-to-speech provider configured.');
@@ -127,7 +138,10 @@ final class AIProviderResolver implements AIProviderResolverInterface
             return $this->voiceCloneProviderFactory->resolve($provider);
         }
 
-        $resolvedProviderId = $this->configuration->defaultProviderFor(AIEngineCapability::VoiceClone);
+        $resolvedProviderId = $this->resolveConfiguredProviderId(
+            PipelineStageType::VoiceClone,
+            AIEngineCapability::VoiceClone,
+        );
 
         if (null === $resolvedProviderId) {
             throw new InvalidAIEngineConfigurationException('No voice clone provider configured.');
@@ -153,7 +167,10 @@ final class AIProviderResolver implements AIProviderResolverInterface
             return $this->lipSyncProviderFactory->resolve($provider);
         }
 
-        $resolvedProviderId = $this->configuration->defaultProviderFor(AIEngineCapability::LipSync);
+        $resolvedProviderId = $this->resolveConfiguredProviderId(
+            PipelineStageType::LipSync,
+            AIEngineCapability::LipSync,
+        );
 
         if (null === $resolvedProviderId) {
             throw new InvalidAIEngineConfigurationException('No lip sync provider configured.');
@@ -179,7 +196,10 @@ final class AIProviderResolver implements AIProviderResolverInterface
             return $this->videoRenderProviderFactory->resolve($provider);
         }
 
-        $resolvedProviderId = $this->configuration->defaultProviderFor(AIEngineCapability::VideoRender);
+        $resolvedProviderId = $this->resolveConfiguredProviderId(
+            PipelineStageType::VideoRender,
+            AIEngineCapability::VideoRender,
+        );
 
         if (null === $resolvedProviderId) {
             throw new InvalidAIEngineConfigurationException('No video render provider configured.');
@@ -194,6 +214,28 @@ final class AIProviderResolver implements AIProviderResolverInterface
                 $resolvedProviderId,
             )),
         };
+    }
+
+    private function resolveConfiguredProviderId(
+        PipelineStageType $stageType,
+        AIEngineCapability $capability,
+    ): string {
+        $pipelineConfiguration = $this->pipelineConfigurationRepository->findLatest();
+
+        if (null !== $pipelineConfiguration) {
+            return $pipelineConfiguration->providerFor($stageType);
+        }
+
+        $resolvedProviderId = $this->configuration->defaultProviderFor($capability);
+
+        if (null === $resolvedProviderId) {
+            throw new InvalidAIEngineConfigurationException(sprintf(
+                'No provider configured for capability "%s".',
+                $capability->value,
+            ));
+        }
+
+        return $resolvedProviderId;
     }
 
     private function assertProviderEnabled(AIEngineCapability $capability, string $providerId): void

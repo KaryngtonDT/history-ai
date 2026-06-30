@@ -18,6 +18,7 @@ use App\Domain\Speech\TranscriptSegmentCollection;
 use App\Domain\Translation\TranslationLanguage;
 use App\Domain\Translation\TranslationRepositoryInterface;
 use App\Domain\Video\VideoId;
+use App\Domain\Pipeline\PipelineConfigurationRepositoryInterface;
 use App\Infrastructure\AI\AIEngineRegistryFactory;
 use App\Infrastructure\AI\AIProviderResolver;
 use App\Infrastructure\Speech\FasterWhisperOutputParser;
@@ -75,6 +76,8 @@ final class VideoTranslationGeneratorTest extends TestCase
             new OllamaTranslationPromptBuilder(),
             'qwen3',
         );
+        $pipelineConfigurationRepository = $this->createMock(PipelineConfigurationRepositoryInterface::class);
+        $pipelineConfigurationRepository->method('findLatest')->willReturn(null);
         $aiProviderResolver = new AIProviderResolver(
             $registryFactory->create(),
             $registryFactory->createConfiguration(),
@@ -135,6 +138,7 @@ final class VideoTranslationGeneratorTest extends TestCase
                 ),
                 new MockVideoRenderProvider(),
             ),
+            $pipelineConfigurationRepository,
         );
 
         $this->generator = new VideoTranslationGenerator(

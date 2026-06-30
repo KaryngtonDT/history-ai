@@ -17,6 +17,7 @@ use App\Domain\Video\VideoLanguage;
 use App\Domain\Video\VideoRepositoryInterface;
 use App\Domain\Video\VideoStatus;
 use App\Infrastructure\Persistence\Doctrine\Artifact\ArtifactRecord;
+use App\Infrastructure\Persistence\Doctrine\Pipeline\PipelineConfigurationRecord;
 use App\Infrastructure\Persistence\Doctrine\Speech\TranscriptRecord;
 use App\Infrastructure\Persistence\Doctrine\Translation\TranslationRecord;
 use App\Infrastructure\Persistence\Doctrine\Video\VideoJobRecord;
@@ -84,6 +85,7 @@ final class ProcessVideoTranscriptFlowTest extends WebTestCase
             $entityManager->getClassMetadata(TranslationRecord::class),
             $entityManager->getClassMetadata(ArtifactRecord::class),
             $entityManager->getClassMetadata(VideoJobRecord::class),
+            $entityManager->getClassMetadata(PipelineConfigurationRecord::class),
         ];
         $schemaTool = new SchemaTool($entityManager);
         $schemaTool->dropSchema($metadata);

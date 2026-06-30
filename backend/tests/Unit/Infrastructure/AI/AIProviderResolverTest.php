@@ -48,15 +48,21 @@ use App\Infrastructure\VoiceClone\OpenVoiceProvider;
 use App\Infrastructure\VoiceClone\VoiceCloneMapper;
 use App\Infrastructure\VoiceClone\VoiceCloneProcessingContext;
 use App\Infrastructure\VoiceClone\VoiceCloneProviderFactory;
+use App\Domain\Pipeline\PipelineConfigurationRepositoryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class AIProviderResolverTest extends TestCase
 {
     private AIProviderResolver $resolver;
 
+    private PipelineConfigurationRepositoryInterface&MockObject $pipelineConfigurationRepository;
+
     protected function setUp(): void
     {
         $registryFactory = new AIEngineRegistryFactory();
+        $this->pipelineConfigurationRepository = $this->createMock(PipelineConfigurationRepositoryInterface::class);
+        $this->pipelineConfigurationRepository->method('findLatest')->willReturn(null);
         $fasterWhisper = new FasterWhisperProvider(
             $this->createMock(FasterWhisperProcessRunnerInterface::class),
             new FasterWhisperOutputParser(),
@@ -79,6 +85,7 @@ final class AIProviderResolverTest extends TestCase
             $this->createVoiceCloneProviderFactory(),
             $this->createLipSyncProviderFactory(),
             $this->createVideoRenderProviderFactory(),
+            $this->pipelineConfigurationRepository,
         );
     }
 
@@ -293,5 +300,26 @@ final class AIProviderResolverTest extends TestCase
         $provider = $this->resolver->resolveVideoRender(VideoRenderProvider::FFmpeg);
 
         self::assertInstanceOf(VideoRenderProviderInterface::class, $provider);
+    }
+
+    public function testUsesPipelineConfigurationWhenPresent(): void
+    {
+        $pipelineConfiguration = \App\Domain\Pipeline\PipelineConfiguration::create(
+            new \App\Domain\Pipeline\PipelineConfigurationId('550e8400-e29b-41d4-a716-446655440010'),
+            [
+                \App\Domain\Pipeline\PipelineStage::create(\App\Domain\Pipeline\PipelineStageType::SpeechToText, 'faster_whisper'),
+                \App\Domain\Pipeline\PipelineStage::create(\App\Domain\Pipeline\PipelineStageType::Translation, 'ollama'),
+                \App\Domain\Pipeline\PipelineStage::create(\App\Domain\Pipeline\PipelineStageType::TextToSpeech, 'f5_tts'),
+                \App\Domain\Pipeline\PipelineStage::create(\App\Domain\Pipeline\PipelineStageType::VoiceClone, 'openvoice'),
+                \App\Domain\Pipeline\PipelineStage::create(\App\Domain\Pipeline\PipelineStageType::LipSync, 'latentsync'),
+                \App\Domain\Pipeline\PipelineStage::create(\App\Domain\Pipeline\PipelineStageType::VideoRender, 'ffmpeg'),
+            ],
+        );
+
+        $this->pipelineConfigurationRepository
+            ->method('findLatest')
+            ->willReturn($pipelineConfiguration);
+
+        self::assertNotNull($this->resolver->resolveTranslation());
     }
 }
