@@ -19,6 +19,11 @@ parameters:
     translation.languages_default: 'fr,de'
     ollama.base_url_default: 'http://ollama:11434'
     ollama.model_default: 'qwen3'
+    tts.provider_default: 'f5'
+    tts.f5.binary_default: 'f5-tts'
+    tts.f5.model_default: 'F5-TTS'
+    tts.f5.base_path_default: '/models/f5'
+    tts.output_dir: '%kernel.project_dir%/var/audio-storage'
 
 services:
     _defaults:
@@ -38,6 +43,7 @@ services:
             - '../src/Infrastructure/Chat/ChatProviderFactory.php'
             - '../src/Infrastructure/Speech/SpeechToTextProviderFactory.php'
             - '../src/Infrastructure/Translation/TranslationProviderFactory.php'
+            - '../src/Infrastructure/TTS/TextToSpeechProviderFactory.php'
             - '../src/Infrastructure/AI/AIEngineRegistryFactory.php'
 
     App\Domain\AI\AIEngineRegistry:
@@ -253,3 +259,17 @@ services:
     App\Infrastructure\Translation\TranslationProviderFactory:
         arguments:
             $defaultProviderName: '%env(default:translation.provider_default:TRANSLATION_PROVIDER)%'
+
+    App\Infrastructure\TTS\F5ProcessRunnerInterface:
+        alias: App\Infrastructure\TTS\ShellF5ProcessRunner
+
+    App\Infrastructure\TTS\F5TextToSpeechProvider:
+        arguments:
+            $binary: '%env(default:tts.f5.binary_default:TTS_F5_BINARY)%'
+            $model: '%env(default:tts.f5.model_default:F5_MODEL)%'
+            $basePath: '%env(default:tts.f5.base_path_default:F5_BASE_PATH)%'
+            $outputDirectory: '%tts.output_dir%'
+
+    App\Infrastructure\TTS\TextToSpeechProviderFactory:
+        arguments:
+            $defaultProviderName: '%env(default:tts.provider_default:TTS_PROVIDER)%'

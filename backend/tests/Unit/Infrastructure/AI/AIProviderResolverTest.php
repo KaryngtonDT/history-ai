@@ -8,6 +8,8 @@ use App\Domain\AI\AIEngineCapability;
 use App\Domain\Speech\SpeechToTextProviderInterface;
 use App\Domain\Translation\TranslationProvider;
 use App\Domain\Translation\TranslationProviderInterface;
+use App\Domain\TTS\TextToSpeechProvider;
+use App\Domain\TTS\TextToSpeechProviderInterface;
 use App\Infrastructure\AI\AIEngineRegistryFactory;
 use App\Infrastructure\AI\AIProviderResolver;
 use App\Infrastructure\AI\Exception\InvalidAIEngineConfigurationException;
@@ -19,6 +21,11 @@ use App\Infrastructure\Translation\MockTranslationProvider;
 use App\Infrastructure\Translation\OllamaTranslationPromptBuilder;
 use App\Infrastructure\Translation\OllamaTranslationProvider;
 use App\Infrastructure\Translation\TranslationProviderFactory;
+use App\Infrastructure\TTS\AudioMapper;
+use App\Infrastructure\TTS\F5TextToSpeechProvider;
+use App\Infrastructure\TTS\FixedF5ProcessRunner;
+use App\Infrastructure\TTS\MockTextToSpeechProvider;
+use App\Infrastructure\TTS\TextToSpeechProviderFactory;
 use PHPUnit\Framework\TestCase;
 
 final class AIProviderResolverTest extends TestCase
@@ -46,6 +53,29 @@ final class AIProviderResolverTest extends TestCase
             $registryFactory->createConfiguration(),
             new SpeechToTextProviderFactory('faster_whisper', $fasterWhisper),
             new TranslationProviderFactory('ollama', $ollama, $mockTranslation),
+            $this->createTextToSpeechProviderFactory(),
+        );
+    }
+
+    private function createTextToSpeechProviderFactory(): TextToSpeechProviderFactory
+    {
+        $outputDirectory = sys_get_temp_dir().'/history-ai-resolver-tts';
+
+        if (!is_dir($outputDirectory)) {
+            mkdir($outputDirectory);
+        }
+
+        return new TextToSpeechProviderFactory(
+            'f5',
+            new F5TextToSpeechProvider(
+                new FixedF5ProcessRunner(),
+                new AudioMapper(),
+                'f5-tts',
+                'F5-TTS',
+                '/models/f5',
+                $outputDirectory,
+            ),
+            new MockTextToSpeechProvider(),
         );
     }
 
@@ -89,8 +119,33 @@ final class AIProviderResolverTest extends TestCase
         $this->resolver->resolveSpeechToText('unknown');
     }
 
-    public function testEnabledProvidersForFutureCapabilitiesAreEmpty(): void
+    public function testEnabledProvidersForTextToSpeech(): void
     {
-        self::assertSame([], $this->resolver->registry()->enabledProviders(AIEngineCapability::TextToSpeech));
+        self::assertCount(1, $this->resolver->registry()->enabledProviders(AIEngineCapability::TextToSpeech));
+        self::assertSame(
+            'f5_tts',
+            $this->resolver->registry()->enabledProviders(AIEngineCapability::TextToSpeech)[0]->providerId(),
+        );
+    }
+
+    public function testResolveTextToSpeechReturnsProvider(): void
+    {
+        $provider = $this->resolver->resolveTextToSpeech();
+
+        self::assertInstanceOf(TextToSpeechProviderInterface::class, $provider);
+    }
+
+    public function testResolveTextToSpeechWithExplicitProvider(): void
+    {
+        $provider = $this->resolver->resolveTextToSpeech(TextToSpeechProvider::F5TTS);
+
+        self::assertInstanceOf(TextToSpeechProviderInterface::class, $provider);
+    }
+
+    public function testDisabledTextToSpeechProviderThrows(): void
+    {
+        $this->expectException(InvalidAIEngineConfigurationException::class);
+
+        $this->resolver->resolveTextToSpeech(TextToSpeechProvider::Kokoro);
     }
 }

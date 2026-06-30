@@ -73,9 +73,14 @@ when@test:
             class: App\Infrastructure\Translation\FixedOllamaClient
             public: true
 
+        App\Infrastructure\TTS\F5ProcessRunnerInterface:
+            class: App\Infrastructure\TTS\FixedF5ProcessRunner
+            public: true
+
         App\Application\Video\Ports\VideoProcessingQueueInterface:
             class: App\Infrastructure\Video\NoOpVideoProcessingQueue
             public: true
 
     parameters:
         video.storage_dir: '%kernel.cache_dir%/video-storage'
+        tts.output_dir: '%kernel.cache_dir%/audio-storage'

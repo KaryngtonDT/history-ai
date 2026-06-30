@@ -25,7 +25,11 @@ final class AIEngineRegistryFactoryTest extends TestCase
             $registry->enabledProviders(AIEngineCapability::SpeechToText)[0]->providerId(),
         );
         self::assertCount(1, $registry->enabledProviders(AIEngineCapability::Translation));
-        self::assertCount(0, $registry->enabledProviders(AIEngineCapability::TextToSpeech));
+        self::assertCount(1, $registry->enabledProviders(AIEngineCapability::TextToSpeech));
+        self::assertSame(
+            'f5_tts',
+            $registry->enabledProviders(AIEngineCapability::TextToSpeech)[0]->providerId(),
+        );
         self::assertCount(0, $registry->enabledProviders(AIEngineCapability::VoiceClone));
         self::assertCount(0, $registry->enabledProviders(AIEngineCapability::LipSync));
     }
@@ -36,5 +40,6 @@ final class AIEngineRegistryFactoryTest extends TestCase
 
         self::assertSame('faster_whisper', $configuration->defaultProviderFor(AIEngineCapability::SpeechToText));
         self::assertSame('ollama', $configuration->defaultProviderFor(AIEngineCapability::Translation));
+        self::assertSame('f5_tts', $configuration->defaultProviderFor(AIEngineCapability::TextToSpeech));
     }
 }

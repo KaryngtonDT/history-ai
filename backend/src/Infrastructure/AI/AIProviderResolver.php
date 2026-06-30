@@ -12,9 +12,12 @@ use App\Domain\AI\AIProviderResolverInterface;
 use App\Domain\Speech\SpeechToTextProviderInterface;
 use App\Domain\Translation\TranslationProvider;
 use App\Domain\Translation\TranslationProviderInterface;
+use App\Domain\TTS\TextToSpeechProvider;
+use App\Domain\TTS\TextToSpeechProviderInterface;
 use App\Infrastructure\AI\Exception\InvalidAIEngineConfigurationException;
 use App\Infrastructure\Speech\SpeechToTextProviderFactory;
 use App\Infrastructure\Translation\TranslationProviderFactory;
+use App\Infrastructure\TTS\TextToSpeechProviderFactory;
 
 final class AIProviderResolver implements AIProviderResolverInterface
 {
@@ -23,6 +26,7 @@ final class AIProviderResolver implements AIProviderResolverInterface
         private readonly AIEngineConfiguration $configuration,
         private readonly SpeechToTextProviderFactory $speechToTextProviderFactory,
         private readonly TranslationProviderFactory $translationProviderFactory,
+        private readonly TextToSpeechProviderFactory $textToSpeechProviderFactory,
     ) {
     }
 
@@ -71,6 +75,32 @@ final class AIProviderResolver implements AIProviderResolverInterface
             AIEngineRegistryFactory::PROVIDER_OLLAMA => $this->translationProviderFactory->resolve(null),
             default => throw new InvalidAIEngineConfigurationException(sprintf(
                 'Translation provider "%s" is not registered.',
+                $resolvedProviderId,
+            )),
+        };
+    }
+
+    public function resolveTextToSpeech(?TextToSpeechProvider $provider = null): TextToSpeechProviderInterface
+    {
+        if (null !== $provider) {
+            $providerId = $provider->value;
+            $this->assertProviderEnabled(AIEngineCapability::TextToSpeech, $providerId);
+
+            return $this->textToSpeechProviderFactory->resolve($provider);
+        }
+
+        $resolvedProviderId = $this->configuration->defaultProviderFor(AIEngineCapability::TextToSpeech);
+
+        if (null === $resolvedProviderId) {
+            throw new InvalidAIEngineConfigurationException('No text-to-speech provider configured.');
+        }
+
+        $this->assertProviderEnabled(AIEngineCapability::TextToSpeech, $resolvedProviderId);
+
+        return match ($resolvedProviderId) {
+            AIEngineRegistryFactory::PROVIDER_F5_TTS => $this->textToSpeechProviderFactory->resolve(null),
+            default => throw new InvalidAIEngineConfigurationException(sprintf(
+                'Text-to-speech provider "%s" is not registered.',
                 $resolvedProviderId,
             )),
         };

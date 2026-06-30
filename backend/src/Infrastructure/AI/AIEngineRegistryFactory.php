@@ -52,7 +52,7 @@ final class AIEngineRegistryFactory
                 new AIEngineId('text-to-speech'),
                 AIEngineCapability::TextToSpeech,
                 [
-                    AIEngineProvider::create('f5_tts', 'F5-TTS', AIEngineCapability::TextToSpeech, false),
+                    AIEngineProvider::create('f5_tts', 'F5-TTS', AIEngineCapability::TextToSpeech),
                     AIEngineProvider::create('kokoro', 'Kokoro', AIEngineCapability::TextToSpeech, false),
                     AIEngineProvider::create('xtts', 'XTTS', AIEngineCapability::TextToSpeech, false),
                 ],
@@ -80,6 +80,7 @@ final class AIEngineRegistryFactory
     {
         return AIEngineConfiguration::empty()
             ->withDefaultProvider(AIEngineCapability::SpeechToText, self::PROVIDER_FASTER_WHISPER)
-            ->withDefaultProvider(AIEngineCapability::Translation, self::PROVIDER_OLLAMA);
+            ->withDefaultProvider(AIEngineCapability::Translation, self::PROVIDER_OLLAMA)
+            ->withDefaultProvider(AIEngineCapability::TextToSpeech, self::PROVIDER_F5_TTS);
     }
 }

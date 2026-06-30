@@ -1,0 +1,68 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Infrastructure\TTS;
+
+final class FixedF5ProcessRunner implements F5ProcessRunnerInterface
+{
+    /**
+     * @param list<string> $command
+     */
+    public function run(array $command): string
+    {
+        $outputPath = $this->extractOutputPath($command);
+        $text = $this->extractText($command);
+
+        if (null !== $outputPath) {
+            $directory = dirname($outputPath);
+
+            if (!is_dir($directory)) {
+                mkdir($directory, 0777, true);
+            }
+
+            file_put_contents($outputPath, $this->minimalWavHeader());
+        }
+
+        $duration = max(1.0, strlen($text) / 20.0);
+
+        return json_encode([
+            'duration' => $duration,
+            'format' => 'wav',
+            'output' => $outputPath,
+        ], JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * @param list<string> $command
+     */
+    private function extractOutputPath(array $command): ?string
+    {
+        foreach ($command as $index => $part) {
+            if ('--output' === $part && isset($command[$index + 1])) {
+                return $command[$index + 1];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param list<string> $command
+     */
+    private function extractText(array $command): string
+    {
+        foreach ($command as $index => $part) {
+            if ('--text' === $part && isset($command[$index + 1])) {
+                return $command[$index + 1];
+            }
+        }
+
+        return '';
+    }
+
+    private function minimalWavHeader(): string
+    {
+        return "RIFF\x24\x08\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00\x44\xAC\x00\x00\x88\x58\x01\x00\x02\x00\x10\x00data\x00\x08\x00\x00";
+    }
+}

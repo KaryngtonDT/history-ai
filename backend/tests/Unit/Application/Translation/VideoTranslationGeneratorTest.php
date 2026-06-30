@@ -29,6 +29,11 @@ use App\Infrastructure\Translation\MockTranslationProvider;
 use App\Infrastructure\Translation\OllamaTranslationPromptBuilder;
 use App\Infrastructure\Translation\OllamaTranslationProvider;
 use App\Infrastructure\Translation\TranslationProviderFactory;
+use App\Infrastructure\TTS\AudioMapper;
+use App\Infrastructure\TTS\F5TextToSpeechProvider;
+use App\Infrastructure\TTS\FixedF5ProcessRunner;
+use App\Infrastructure\TTS\MockTextToSpeechProvider;
+use App\Infrastructure\TTS\TextToSpeechProviderFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -67,6 +72,18 @@ final class VideoTranslationGeneratorTest extends TestCase
                 ),
             ),
             new TranslationProviderFactory('ollama', $ollamaProvider, new MockTranslationProvider()),
+            new TextToSpeechProviderFactory(
+                'f5',
+                new F5TextToSpeechProvider(
+                    new FixedF5ProcessRunner(),
+                    new AudioMapper(),
+                    'f5-tts',
+                    'F5-TTS',
+                    '/models/f5',
+                    sys_get_temp_dir().'/history-ai-translation-tts',
+                ),
+                new MockTextToSpeechProvider(),
+            ),
         );
 
         $this->generator = new VideoTranslationGenerator(

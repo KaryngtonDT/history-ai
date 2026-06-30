@@ -7,6 +7,8 @@ namespace App\Domain\AI;
 use App\Domain\Speech\SpeechToTextProviderInterface;
 use App\Domain\Translation\TranslationProvider;
 use App\Domain\Translation\TranslationProviderInterface;
+use App\Domain\TTS\TextToSpeechProvider;
+use App\Domain\TTS\TextToSpeechProviderInterface;
 
 interface AIProviderResolverInterface
 {
@@ -15,4 +17,6 @@ interface AIProviderResolverInterface
     public function resolveSpeechToText(?string $providerId = null): SpeechToTextProviderInterface;
 
     public function resolveTranslation(?TranslationProvider $provider = null): TranslationProviderInterface;
+
+    public function resolveTextToSpeech(?TextToSpeechProvider $provider = null): TextToSpeechProviderInterface;
 }
