@@ -8,6 +8,7 @@ use App\Application\Orchestrator\Handlers\RecommendPipelineConfigurationHandler;
 use App\Application\Orchestrator\Queries\RecommendPipelineConfigurationQuery;
 use App\Domain\Orchestrator\PipelinePlannerInterface;
 use App\Domain\Orchestrator\PipelineRecommendation;
+use App\Domain\Review\UserPreferenceProfileRepositoryInterface;
 use App\Domain\Orchestrator\PipelineRecommendationId;
 use App\Domain\Orchestrator\ProcessingStrategy;
 use App\Domain\Pipeline\PipelineConfiguration;
@@ -70,9 +71,12 @@ final class RecommendPipelineConfigurationHandlerTest extends TestCase
         );
 
         $planner = $this->createMock(PipelinePlannerInterface::class);
-        $planner->method('recommend')->with($intelligence)->willReturn($recommendation);
+        $planner->method('recommend')->willReturn($recommendation);
 
-        $handler = new RecommendPipelineConfigurationHandler($planner);
+        $profileRepository = $this->createMock(UserPreferenceProfileRepositoryInterface::class);
+        $profileRepository->method('findCurrent')->willReturn(null);
+
+        $handler = new RecommendPipelineConfigurationHandler($planner, $profileRepository);
         $result = $handler(new RecommendPipelineConfigurationQuery($intelligence));
 
         self::assertSame('balanced', $result->strategy);

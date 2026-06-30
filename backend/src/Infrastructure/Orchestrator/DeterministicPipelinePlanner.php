@@ -15,6 +15,10 @@ use App\Domain\Pipeline\PipelineConfigurationId;
 use App\Domain\Pipeline\PipelineDefaultProviders;
 use App\Domain\Pipeline\PipelineStage;
 use App\Domain\Pipeline\PipelineStageType;
+use App\Domain\Review\LipSyncStrengthPreference;
+use App\Domain\Review\RenderingPresetPreference;
+use App\Domain\Review\UserPreferenceProfile;
+use App\Domain\Review\VoiceStabilityPreference;
 use App\Domain\VideoIntelligence\BackgroundMusic;
 use App\Domain\VideoIntelligence\LipVisibility;
 use App\Domain\VideoIntelligence\LightingCondition;
@@ -33,14 +37,21 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
     ) {
     }
 
-    public function recommend(VideoIntelligence $intelligence): PipelineRecommendation
-    {
-        return $this->recommendWithStrategy($intelligence, $this->resolveStrategy($intelligence));
+    public function recommend(
+        VideoIntelligence $intelligence,
+        ?UserPreferenceProfile $preferences = null,
+    ): PipelineRecommendation {
+        return $this->recommendWithStrategy(
+            $intelligence,
+            $this->resolveStrategy($intelligence, $preferences),
+            $preferences,
+        );
     }
 
     public function recommendWithStrategy(
         VideoIntelligence $intelligence,
         ProcessingStrategy $strategy,
+        ?UserPreferenceProfile $preferences = null,
     ): PipelineRecommendation {
         $stages = [
             PipelineStage::create(
@@ -72,7 +83,7 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
                 $this->selectProvider(
                     AIEngineCapability::VoiceClone,
                     $strategy,
-                    $this->voiceClonePreferences($intelligence, $strategy),
+                    $this->voiceClonePreferences($intelligence, $strategy, $preferences),
                 ),
             ),
             PipelineStage::create(
@@ -80,7 +91,7 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
                 $this->selectProvider(
                     AIEngineCapability::LipSync,
                     $strategy,
-                    $this->lipSyncPreferences($intelligence, $strategy),
+                    $this->lipSyncPreferences($intelligence, $strategy, $preferences),
                 ),
             ),
             PipelineStage::create(
@@ -98,13 +109,13 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
             $stages,
         );
 
-        $reasons = $this->buildReasons($intelligence, $strategy, $configuration);
+        $reasons = $this->buildReasons($intelligence, $strategy, $configuration, $preferences);
 
         return PipelineRecommendation::create(
             PipelineRecommendationId::generate(),
             $strategy,
             $configuration,
-            $this->buildExplanation($intelligence, $strategy),
+            $this->buildExplanation($intelligence, $strategy, $preferences),
             $this->estimateDurationSeconds($intelligence, $strategy),
             $this->estimateQuality($strategy, $intelligence),
             $this->estimateVramGb($intelligence, $strategy),
@@ -112,7 +123,24 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
         );
     }
 
-    private function resolveStrategy(VideoIntelligence $intelligence): ProcessingStrategy
+    private function resolveStrategy(
+        VideoIntelligence $intelligence,
+        ?UserPreferenceProfile $preferences = null,
+    ): ProcessingStrategy {
+        $baseStrategy = $this->resolveBaseStrategy($intelligence);
+
+        if (null === $preferences || !$intelligence->gpuAvailable()) {
+            return $baseStrategy;
+        }
+
+        return match ($preferences->renderingPreset()) {
+            RenderingPresetPreference::Quality => ProcessingStrategy::Quality,
+            RenderingPresetPreference::Speed => $this->preferSpeedWhenCompatible($intelligence, $baseStrategy),
+            RenderingPresetPreference::Balanced => $baseStrategy,
+        };
+    }
+
+    private function resolveBaseStrategy(VideoIntelligence $intelligence): ProcessingStrategy
     {
         if (!$intelligence->gpuAvailable()) {
             return ProcessingStrategy::Speed;
@@ -213,8 +241,19 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
     /**
      * @return list<string>
      */
-    private function voiceClonePreferences(VideoIntelligence $intelligence, ProcessingStrategy $strategy): array
-    {
+    private function voiceClonePreferences(
+        VideoIntelligence $intelligence,
+        ProcessingStrategy $strategy,
+        ?UserPreferenceProfile $preferences = null,
+    ): array {
+        if (null !== $preferences) {
+            return match ($preferences->voiceStability()) {
+                VoiceStabilityPreference::High => ['openvoice', 'seedvc'],
+                VoiceStabilityPreference::Low => ['seedvc', 'openvoice'],
+                VoiceStabilityPreference::Medium => ['openvoice', 'seedvc'],
+            };
+        }
+
         if ($intelligence->audio()->speakerCount() >= 2 || $intelligence->audio()->backgroundMusic() === BackgroundMusic::Detected) {
             return ['openvoice', 'seedvc'];
         }
@@ -228,8 +267,19 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
     /**
      * @return list<string>
      */
-    private function lipSyncPreferences(VideoIntelligence $intelligence, ProcessingStrategy $strategy): array
-    {
+    private function lipSyncPreferences(
+        VideoIntelligence $intelligence,
+        ProcessingStrategy $strategy,
+        ?UserPreferenceProfile $preferences = null,
+    ): array {
+        if (null !== $preferences) {
+            return match ($preferences->lipSyncStrength()) {
+                LipSyncStrengthPreference::Subtle => ['wav2lip', 'latentsync'],
+                LipSyncStrengthPreference::Strong => ['latentsync', 'wav2lip'],
+                LipSyncStrengthPreference::Moderate => ['latentsync', 'wav2lip'],
+            };
+        }
+
         if (in_array($intelligence->visual()->lipVisibility(), [LipVisibility::Poor, LipVisibility::Partial], true)) {
             return ['wav2lip', 'latentsync'];
         }
@@ -240,8 +290,30 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
         };
     }
 
-    private function buildExplanation(VideoIntelligence $intelligence, ProcessingStrategy $strategy): string
-    {
+    private function preferSpeedWhenCompatible(
+        VideoIntelligence $intelligence,
+        ProcessingStrategy $fallback,
+    ): ProcessingStrategy {
+        if ($intelligence->estimatedVramGb() < self::LOW_VRAM_THRESHOLD_GB) {
+            return ProcessingStrategy::LowMemory;
+        }
+
+        if ($intelligence->audio()->confidence()->isLow()) {
+            return $fallback;
+        }
+
+        return ProcessingStrategy::Speed;
+    }
+
+    private function buildExplanation(
+        VideoIntelligence $intelligence,
+        ProcessingStrategy $strategy,
+        ?UserPreferenceProfile $preferences = null,
+    ): string {
+        if (null !== $preferences) {
+            return $preferences->explanationLines()[0];
+        }
+
         $language = $intelligence->audio()->language();
 
         return match ($strategy) {
@@ -276,8 +348,15 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
         VideoIntelligence $intelligence,
         ProcessingStrategy $strategy,
         PipelineConfiguration $configuration,
+        ?UserPreferenceProfile $preferences = null,
     ): array {
         $reasons = [];
+
+        if (null !== $preferences) {
+            foreach ($preferences->explanationLines() as $line) {
+                $reasons[] = $line;
+            }
+        }
 
         if ($intelligence->audio()->speakerCount() >= 2) {
             $reasons[] = sprintf(
