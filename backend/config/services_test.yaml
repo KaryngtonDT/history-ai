@@ -81,6 +81,10 @@ when@test:
             alias: App\Infrastructure\Persistence\Doctrine\VideoRender\DoctrineFinalVideoRepository
             public: true
 
+        App\Domain\Pipeline\PipelineConfigurationRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\Pipeline\DoctrinePipelineConfigurationRepository
+            public: true
+
         App\Infrastructure\Speech\FasterWhisperProcessRunnerInterface:
             class: App\Infrastructure\Speech\FixedFasterWhisperProcessRunner
             public: true

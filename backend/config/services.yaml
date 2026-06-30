@@ -155,6 +155,9 @@ services:
     App\Domain\VideoRender\FinalVideoRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\VideoRender\DoctrineFinalVideoRepository
 
+    App\Domain\Pipeline\PipelineConfigurationRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Pipeline\DoctrinePipelineConfigurationRepository
+
     App\Application\TTS\GenerateAudioConfiguration:
         arguments:
             $enabled: '%env(bool:default:tts.generate_audio_default:GENERATE_AUDIO)%'

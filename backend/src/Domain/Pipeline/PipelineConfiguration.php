@@ -12,6 +12,8 @@ final readonly class PipelineConfiguration
         private PipelineConfigurationId $id,
         private PipelineStageCollection $stages,
         private int $version = 1,
+        private ?\DateTimeImmutable $createdAt = null,
+        private ?\DateTimeImmutable $updatedAt = null,
     ) {
         if ($this->version < 1) {
             throw new InvalidPipelineConfigurationException('Pipeline configuration version must be at least 1.');
@@ -23,9 +25,14 @@ final readonly class PipelineConfiguration
     /**
      * @param list<PipelineStage> $stages
      */
-    public static function create(PipelineConfigurationId $id, array $stages, int $version = 1): self
-    {
-        return new self($id, PipelineStageCollection::fromStages($stages), $version);
+    public static function create(
+        PipelineConfigurationId $id,
+        array $stages,
+        int $version = 1,
+        ?\DateTimeImmutable $createdAt = null,
+        ?\DateTimeImmutable $updatedAt = null,
+    ): self {
+        return new self($id, PipelineStageCollection::fromStages($stages), $version, $createdAt, $updatedAt);
     }
 
     public function id(): PipelineConfigurationId
@@ -36,6 +43,16 @@ final readonly class PipelineConfiguration
     public function version(): int
     {
         return $this->version;
+    }
+
+    public function createdAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function updatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
     }
 
     public function stages(): PipelineStageCollection
@@ -73,7 +90,12 @@ final readonly class PipelineConfiguration
 
     public function withVersion(int $version): self
     {
-        return new self($this->id, $this->stages, $version);
+        return new self($this->id, $this->stages, $version, $this->createdAt, $this->updatedAt);
+    }
+
+    public function withTimestamps(\DateTimeImmutable $createdAt, \DateTimeImmutable $updatedAt): self
+    {
+        return new self($this->id, $this->stages, $this->version, $createdAt, $updatedAt);
     }
 
     public function validate(): void
