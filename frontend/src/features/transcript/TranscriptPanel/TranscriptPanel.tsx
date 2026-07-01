@@ -11,7 +11,8 @@ import { TranscriptTimeline } from "../TranscriptTimeline";
 import styles from "./TranscriptPanel.module.css";
 
 export function TranscriptPanel() {
-	const { videoId = "" } = useParams();
+	const { videoId = "", audioId = "" } = useParams();
+	const resourceId = videoId || audioId;
 	const [transcript, setTranscript] = useState<VideoTranscript | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [activeIndex, setActiveIndex] = useState(0);
@@ -23,7 +24,7 @@ export function TranscriptPanel() {
 		setTranscript(null);
 		setActiveIndex(0);
 
-		transcriptService.getTranscript(videoId).then((result) => {
+		transcriptService.getTranscript(resourceId).then((result) => {
 			if (!cancelled) {
 				setTranscript(result);
 				setLoading(false);
@@ -33,7 +34,7 @@ export function TranscriptPanel() {
 		return () => {
 			cancelled = true;
 		};
-	}, [videoId]);
+	}, [resourceId]);
 
 	if (loading) {
 		return (

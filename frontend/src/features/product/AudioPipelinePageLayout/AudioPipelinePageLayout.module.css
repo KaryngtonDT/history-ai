@@ -1,0 +1,9 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4);
+}
+
+.content {
+	min-height: 12rem;
+}

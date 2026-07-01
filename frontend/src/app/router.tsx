@@ -1,6 +1,10 @@
 import { Route, Routes } from "react-router";
 import { ProductShell } from "@/features/product";
 import { AIEngineSettingsPage } from "@/pages/AIEngineSettings/AIEngineSettingsPage";
+import { AudioOverviewPage } from "@/pages/AudioOverview/AudioOverviewPage";
+import { AudioTranscriptPage } from "@/pages/AudioTranscript/AudioTranscriptPage";
+import { AudioTranslationsPage } from "@/pages/AudioTranslations/AudioTranslationsPage";
+import { AudioUploadPage } from "@/pages/AudioUpload/AudioUploadPage";
 import { CollectionsPage } from "@/pages/Collections/CollectionsPage";
 import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
 import { ImportPage } from "@/pages/Import/ImportPage";
@@ -26,6 +30,16 @@ export function AppRouter() {
 				<Route path="/" element={<DashboardPage />} />
 				<Route path="/import" element={<ImportPage />} />
 				<Route path="/video/upload" element={<VideoUploadPage />} />
+				<Route path="/audio/upload" element={<AudioUploadPage />} />
+				<Route path="/audio/:audioId" element={<AudioOverviewPage />} />
+				<Route
+					path="/audio/:audioId/transcript"
+					element={<AudioTranscriptPage />}
+				/>
+				<Route
+					path="/audio/:audioId/translations"
+					element={<AudioTranslationsPage />}
+				/>
 				<Route path="/video/:videoId" element={<VideoOverviewPage />} />
 				<Route
 					path="/video/:videoId/transcript"

@@ -5,8 +5,9 @@ export function resolveWorkItemRoute(type: WorkItemType, id: string): string {
 		case "video":
 			return `/video/${id}`;
 		case "pdf":
-		case "audio":
 			return `/processing/${id}`;
+		case "audio":
+			return `/audio/${id}`;
 		case "youtube":
 			return `/library`;
 		case "project":
@@ -23,7 +24,7 @@ export function workItemFallbackMessage(type: WorkItemType): string {
 		case "pdf":
 			return "Import a PDF to start knowledge processing.";
 		case "audio":
-			return "Import audio to generate a transcript.";
+			return "Upload audio to generate a transcript.";
 		case "youtube":
 			return "Link a YouTube source from import.";
 		case "project":

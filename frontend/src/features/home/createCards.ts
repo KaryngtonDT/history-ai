@@ -9,6 +9,7 @@ export interface CreateCard {
 	route: string;
 	icon: string;
 	primary?: boolean;
+	comingSoon?: boolean;
 }
 
 export const CREATE_CARDS: CreateCard[] = [
@@ -38,7 +39,7 @@ export const CREATE_CARDS: CreateCard[] = [
 		label: "Audio",
 		description: "Import audio to generate transcripts and insights.",
 		nextStep: "Transcript becomes available for review.",
-		route: "/import",
+		route: "/audio/upload",
 		icon: "🎤",
 	},
 	{
@@ -46,8 +47,9 @@ export const CREATE_CARDS: CreateCard[] = [
 		type: "youtube",
 		label: "YouTube",
 		description: "Link a YouTube source for processing.",
-		nextStep: "Use import flow for supported sources.",
+		nextStep: "Coming in Sprint 52.",
 		route: "/import",
 		icon: "▶️",
+		comingSoon: true,
 	},
 ];

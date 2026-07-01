@@ -1,0 +1,1 @@
+export { AudioDropzone } from "./AudioDropzone";

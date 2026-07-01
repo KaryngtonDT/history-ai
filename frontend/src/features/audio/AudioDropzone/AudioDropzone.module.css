@@ -1,0 +1,14 @@
+.card {
+	padding: 0;
+	overflow: hidden;
+}
+
+.dropzone {
+	margin: 0;
+	padding: var(--space-2);
+	border: none;
+}
+
+.input {
+	display: none;
+}

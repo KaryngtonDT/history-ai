@@ -1,3 +1,4 @@
+import type { AudioSource } from "@/services/audioSource/types";
 import type {
 	Content,
 	ContentSourceType,
@@ -58,8 +59,12 @@ function contentCurrentStep(
 }
 
 function contentOpenRoute(id: string, sourceType: ContentSourceType): string {
-	if (sourceType === "pdf" || sourceType === "audio") {
+	if (sourceType === "pdf") {
 		return `/processing/${id}`;
+	}
+
+	if (sourceType === "audio") {
+		return `/audio/${id}`;
 	}
 
 	if (sourceType === "video") {
@@ -151,6 +156,27 @@ export function mapVideoToWorkItem(
 			"render",
 		],
 		updatedAt: addedAt,
+	};
+}
+
+export function mapAudioSourceToWorkItem(source: AudioSource): WorkItem {
+	const isProcessing =
+		source.status === "queued" || source.status === "processing";
+
+	return {
+		id: source.id,
+		type: "audio",
+		title: source.title,
+		status: isProcessing ? "processing" : "ready",
+		progress: source.status === "completed" ? 100 : isProcessing ? 40 : 0,
+		currentStep: isProcessing ? "Generating transcript" : "Transcript ready",
+		openRoute: `/audio/${source.id}`,
+		primaryActionLabel: isProcessing ? "Resume" : "Open",
+		primaryActionRoute: `/audio/${source.id}`,
+		icon: TYPE_ICONS.audio,
+		description: "Audio source in History AI.",
+		capabilities: ["transcript", "translation", "library", "chat", "graph"],
+		updatedAt: source.createdAt,
 	};
 }
 

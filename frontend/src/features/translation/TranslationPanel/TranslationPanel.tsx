@@ -22,7 +22,8 @@ import { TranslationLanguageTabs } from "../TranslationLanguageTabs";
 import styles from "./TranslationPanel.module.css";
 
 export function TranslationPanel() {
-	const { videoId = "" } = useParams();
+	const { videoId = "", audioId = "" } = useParams();
+	const resourceId = videoId || audioId;
 	const [transcript, setTranscript] = useState<VideoTranscript | null>(null);
 	const [translations, setTranslations] = useState<VideoTranslation[]>([]);
 	const [selectedTargets, setSelectedTargets] = useState<TranslationLanguage[]>(
@@ -40,15 +41,15 @@ export function TranslationPanel() {
 		setError(null);
 
 		const [transcriptResult, summaries] = await Promise.all([
-			transcriptService.getTranscript(videoId),
-			translationService.listTranslations(videoId),
+			transcriptService.getTranscript(resourceId),
+			translationService.listTranslations(resourceId),
 		]);
 
 		setTranscript(transcriptResult);
 
 		const loadedTranslations = await Promise.all(
 			summaries.map((summary) =>
-				translationService.getTranslation(videoId, summary.targetLanguage),
+				translationService.getTranslation(resourceId, summary.targetLanguage),
 			),
 		);
 
@@ -61,7 +62,7 @@ export function TranslationPanel() {
 			(current) => current ?? available[0]?.targetLanguage ?? null,
 		);
 		setLoading(false);
-	}, [videoId]);
+	}, [resourceId]);
 
 	useEffect(() => {
 		void loadData();
@@ -80,7 +81,7 @@ export function TranslationPanel() {
 		setError(null);
 
 		try {
-			await translationService.generateTranslations(videoId, {
+			await translationService.generateTranslations(resourceId, {
 				targetLanguages: selectedTargets,
 				provider,
 			});

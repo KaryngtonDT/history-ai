@@ -9,25 +9,36 @@ export function CreateSection() {
 				What do you want to transform?
 			</h2>
 			<div className={styles.grid}>
-				{CREATE_CARDS.map((card) => (
-					<Link
-						key={card.id}
-						to={card.route}
-						aria-label={`Create ${card.label}`}
-						className={
-							card.primary
-								? `${styles.card} ${styles.cardPrimary}`
-								: styles.card
-						}
-					>
-						<span className={styles.icon} aria-hidden="true">
-							{card.icon}
-						</span>
-						<span className={styles.label}>{card.label}</span>
-						<span className={styles.description}>{card.description}</span>
-						<span className={styles.nextStep}>Next: {card.nextStep}</span>
-					</Link>
-				))}
+				{CREATE_CARDS.map((card) =>
+					card.comingSoon ? (
+						<div key={card.id} className={styles.card}>
+							<span className={styles.icon} aria-hidden="true">
+								{card.icon}
+							</span>
+							<span className={styles.label}>{card.label}</span>
+							<span className={styles.description}>{card.description}</span>
+							<span className={styles.nextStep}>Coming soon</span>
+						</div>
+					) : (
+						<Link
+							key={card.id}
+							to={card.route}
+							aria-label={`Create ${card.label}`}
+							className={
+								card.primary
+									? `${styles.card} ${styles.cardPrimary}`
+									: styles.card
+							}
+						>
+							<span className={styles.icon} aria-hidden="true">
+								{card.icon}
+							</span>
+							<span className={styles.label}>{card.label}</span>
+							<span className={styles.description}>{card.description}</span>
+							<span className={styles.nextStep}>Next: {card.nextStep}</span>
+						</Link>
+					),
+				)}
 			</div>
 		</section>
 	);
