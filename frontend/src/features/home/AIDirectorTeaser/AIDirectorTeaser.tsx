@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Card } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
+import { useTranslation } from "@/i18n";
 import { orchestratorService } from "@/services/orchestrator/OrchestratorService";
 import type { PipelineRecommendation } from "@/services/orchestrator/types";
 import styles from "./AIDirectorTeaser.module.css";
 
 export function AIDirectorTeaser() {
+	const { t } = useTranslation();
 	const [recommendation, setRecommendation] =
 		useState<PipelineRecommendation | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -22,15 +24,16 @@ export function AIDirectorTeaser() {
 	return (
 		<section className={styles.root} aria-labelledby="ai-director-heading">
 			<h2 id="ai-director-heading" className={styles.heading}>
-				AI Director
+				{t("home.aiDirector.heading")}
 			</h2>
 			<Card className={styles.card}>
 				{loading ? (
-					<Spinner label="Loading recommendation" />
+					<Spinner label={t("home.aiDirector.loading")} />
 				) : recommendation ? (
 					<>
 						<p className={styles.summary}>
-							Recommended workflow: <strong>{recommendation.strategy}</strong>
+							{t("home.aiDirector.recommended")}{" "}
+							<strong>{recommendation.strategy}</strong>
 						</p>
 						<p className={styles.detail}>{recommendation.explanation}</p>
 						{recommendation.reasons && recommendation.reasons.length > 0 ? (
@@ -41,17 +44,14 @@ export function AIDirectorTeaser() {
 							</ul>
 						) : null}
 						<Link to="/video/upload" className={styles.link}>
-							Configure on upload →
+							{t("home.aiDirector.configureLink")}
 						</Link>
 					</>
 				) : (
 					<>
-						<p className={styles.detail}>
-							Upload a video in automatic mode to see AI pipeline
-							recommendations.
-						</p>
+						<p className={styles.detail}>{t("home.aiDirector.empty")}</p>
 						<Link to="/video/upload" className={styles.link}>
-							Upload video →
+							{t("home.aiDirector.uploadLink")}
 						</Link>
 					</>
 				)}

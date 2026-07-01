@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { useTranslation } from "@/i18n";
 import styles from "./ContinueWork.module.css";
 
 interface ContinueWorkProps {
@@ -6,10 +7,12 @@ interface ContinueWorkProps {
 }
 
 export function ContinueWork({ item }: ContinueWorkProps) {
+	const { t } = useTranslation();
+
 	return (
 		<section className={styles.root} aria-labelledby="continue-work-heading">
 			<h2 id="continue-work-heading" className={styles.heading}>
-				Continue your work
+				{t("home.continue.heading")}
 			</h2>
 			<div className={styles.card}>
 				<div className={styles.header}>
@@ -19,11 +22,14 @@ export function ContinueWork({ item }: ContinueWorkProps) {
 					<div>
 						<p className={styles.title}>{item.title}</p>
 						<p className={styles.meta}>
-							{item.type} · {item.status}
+							{t(`workItem.types.${item.type}`)} ·{" "}
+							{t(`workItem.statuses.${item.status}`)}
 						</p>
 					</div>
 				</div>
-				<p className={styles.step}>Current step: {item.currentStep}</p>
+				<p className={styles.step}>
+					{t("home.continue.currentStep")} {item.currentStep}
+				</p>
 				<Link to={item.primaryActionRoute} className={styles.resumeLink}>
 					{item.primaryActionLabel} →
 				</Link>

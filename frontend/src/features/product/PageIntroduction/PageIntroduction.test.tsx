@@ -1,10 +1,11 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { renderWithProviders } from "@/test/render";
 import { PageIntroduction } from "./PageIntroduction";
 
 describe("PageIntroduction", () => {
 	it("renders title, description, and help box", () => {
-		render(
+		renderWithProviders(
 			<PageIntroduction
 				title="Upload Video"
 				description="Start the pipeline."

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { useProductContext } from "@/features/product/ProductContext";
 import { videoPipelinePath } from "@/features/product/videoRoutes";
+import { useTranslation } from "@/i18n";
 import { COMMAND_ITEMS, filterCommandItems } from "../commandItems";
 import styles from "./CommandPalette.module.css";
 
@@ -10,8 +11,9 @@ export function CommandPalette() {
 	const [query, setQuery] = useState("");
 	const navigate = useNavigate();
 	const { videoId } = useProductContext();
+	const { t } = useTranslation();
 
-	const items = useMemo(() => filterCommandItems(query), [query]);
+	const items = useMemo(() => filterCommandItems(query, t), [query, t]);
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
@@ -61,25 +63,31 @@ export function CommandPalette() {
 			<button
 				type="button"
 				className={styles.backdrop}
-				aria-label="Close command palette"
+				aria-label={t("guidance.palette.closeAria")}
 				onClick={() => setOpen(false)}
 			/>
-			<div className={styles.panel} role="dialog" aria-label="Command palette">
+			<div
+				className={styles.panel}
+				role="dialog"
+				aria-label={t("guidance.palette.dialogAria")}
+			>
 				<input
 					className={styles.input}
 					type="search"
-					placeholder="Search videos, projects, pipeline, analytics…"
+					placeholder={t("guidance.palette.placeholder")}
 					value={query}
 					onChange={(event) => setQuery(event.target.value)}
 					ref={(element) => element?.focus()}
 				/>
 				{items.length === 0 ? (
-					<p className={styles.empty}>No matching commands.</p>
+					<p className={styles.empty}>{t("guidance.palette.empty")}</p>
 				) : (
 					<div className={styles.list}>
 						{Object.entries(grouped).map(([group, groupItems]) => (
 							<div key={group} className={styles.group}>
-								<p className={styles.groupLabel}>{group}</p>
+								<p className={styles.groupLabel}>
+									{t(`guidance.palette.groups.${group}`)}
+								</p>
 								<ul className={styles.groupList}>
 									{groupItems.map((item) => (
 										<li key={item.id}>
@@ -92,9 +100,11 @@ export function CommandPalette() {
 													setQuery("");
 												}}
 											>
-												<span className={styles.itemLabel}>{item.label}</span>
+												<span className={styles.itemLabel}>
+													{t(`guidance.commands.${item.id}.label`)}
+												</span>
 												<span className={styles.itemDescription}>
-													{item.description}
+													{t(`guidance.commands.${item.id}.description`)}
 												</span>
 											</button>
 										</li>
@@ -105,7 +115,7 @@ export function CommandPalette() {
 					</div>
 				)}
 				<p className={styles.hint}>
-					{COMMAND_ITEMS.length} commands · Esc to close
+					{t("guidance.palette.footer", { count: COMMAND_ITEMS.length })}
 				</p>
 			</div>
 		</div>

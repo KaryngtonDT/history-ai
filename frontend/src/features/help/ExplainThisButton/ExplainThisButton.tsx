@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { useTranslation } from "@/i18n";
 import type { FeatureHelpId } from "../content/features";
 import { FeatureAcademy } from "../FeatureAcademy";
 import styles from "./ExplainThisButton.module.css";
@@ -11,21 +12,23 @@ interface ExplainThisButtonProps {
 
 export function ExplainThisButton({
 	featureId,
-	label = "Explain this",
+	label,
 }: ExplainThisButtonProps) {
+	const { t } = useTranslation();
 	const [open, setOpen] = useState(false);
+	const buttonLabel = label ?? t("help.explain.defaultLabel");
 
 	return (
 		<>
 			<Button variant="secondary" size="sm" onClick={() => setOpen(true)}>
-				{label}
+				{buttonLabel}
 			</Button>
 			{open ? (
 				<div
 					className={styles.overlay}
 					role="dialog"
 					aria-modal="true"
-					aria-label="Feature explanation"
+					aria-label={t("help.explain.dialogAria")}
 				>
 					<FeatureAcademy
 						featureId={featureId}

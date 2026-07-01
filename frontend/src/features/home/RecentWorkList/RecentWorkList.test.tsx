@@ -1,7 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 import type { WorkItem } from "@/services/workItem/types";
+import { renderWithProviders } from "@/test/render";
 import { RecentWorkList } from "./RecentWorkList";
 
 const SAMPLE: WorkItem[] = [
@@ -24,7 +25,7 @@ const SAMPLE: WorkItem[] = [
 
 describe("RecentWorkList", () => {
 	it("renders open links with valid routes", () => {
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<RecentWorkList items={SAMPLE} />
 			</MemoryRouter>,

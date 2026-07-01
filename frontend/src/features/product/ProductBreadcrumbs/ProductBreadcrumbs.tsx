@@ -1,29 +1,31 @@
 import { Link, useLocation, useParams } from "react-router";
+import { useTranslation } from "@/i18n";
 import styles from "./ProductBreadcrumbs.module.css";
 
-const LABELS: Record<string, string> = {
-	"": "Home",
-	import: "Import",
-	video: "Video",
-	upload: "Upload",
-	transcript: "Transcript",
-	translations: "Translations",
-	audio: "Audio",
-	"voice-clone": "Cloned Voice",
-	"lip-sync": "Lip Sync Preview",
-	render: "Final Video",
-	workspace: "Workspace",
-	library: "Library",
-	collections: "Collections",
-	settings: "Settings",
-	ai: "AI Models",
-	pipeline: "Pipeline Setup",
-	processing: "Processing",
+const SEGMENT_KEYS: Record<string, string> = {
+	import: "shell.breadcrumbs.import",
+	video: "shell.breadcrumbs.video",
+	upload: "shell.breadcrumbs.upload",
+	transcript: "shell.breadcrumbs.transcript",
+	translations: "shell.breadcrumbs.translations",
+	audio: "shell.breadcrumbs.audio",
+	youtube: "shell.breadcrumbs.youtube",
+	"voice-clone": "shell.breadcrumbs.voice-clone",
+	"lip-sync": "shell.breadcrumbs.lip-sync",
+	render: "shell.breadcrumbs.render",
+	workspace: "shell.breadcrumbs.workspace",
+	library: "shell.breadcrumbs.library",
+	collections: "shell.breadcrumbs.collections",
+	settings: "shell.breadcrumbs.settings",
+	ai: "shell.breadcrumbs.ai",
+	pipeline: "shell.breadcrumbs.pipeline",
+	processing: "shell.breadcrumbs.processing",
 };
 
 export function ProductBreadcrumbs() {
 	const location = useLocation();
 	const params = useParams();
+	const { t } = useTranslation();
 	const segments = location.pathname.split("/").filter(Boolean);
 
 	const crumbs = segments.map((segment, index) => {
@@ -31,9 +33,11 @@ export function ProductBreadcrumbs() {
 		const isVideoId = segment === params.videoId;
 		const label = isVideoId
 			? segments[index + 1]
-				? `Video ${segment.slice(0, 8)}…`
-				: "Overview"
-			: (LABELS[segment] ?? segment);
+				? t("shell.breadcrumbs.videoId", { id: segment.slice(0, 8) })
+				: t("shell.breadcrumbs.overview")
+			: SEGMENT_KEYS[segment]
+				? t(SEGMENT_KEYS[segment])
+				: segment;
 
 		return { path, label, isLast: index === segments.length - 1 };
 	});
@@ -43,11 +47,11 @@ export function ProductBreadcrumbs() {
 	}
 
 	return (
-		<nav className={styles.root} aria-label="Breadcrumb">
+		<nav className={styles.root} aria-label={t("shell.breadcrumbs.ariaLabel")}>
 			<ol className={styles.list}>
 				<li className={styles.item}>
 					<Link to="/" className={styles.link}>
-						Home
+						{t("shell.breadcrumbs.home")}
 					</Link>
 					<span className={styles.separator} aria-hidden="true">
 						/

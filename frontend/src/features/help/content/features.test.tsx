@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { renderWithProviders } from "@/test/render";
 import { FeatureAcademy } from "../FeatureAcademy";
 import { FEATURE_HELP } from "./features";
 
@@ -42,7 +43,7 @@ describe("FEATURE_HELP", () => {
 
 describe("FeatureAcademy", () => {
 	it("renders voice clone help sections", () => {
-		render(<FeatureAcademy featureId="voice-clone" />);
+		renderWithProviders(<FeatureAcademy featureId="voice-clone" />);
 
 		expect(
 			screen.getByRole("heading", { name: "Voice Clone" }),

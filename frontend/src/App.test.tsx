@@ -1,14 +1,15 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 import { AppRouter } from "@/app/router";
+import { renderWithProviders } from "@/test/render";
 
 describe("Sprint 1 — app shell", () => {
 	it("renders layout and navigates between pages", async () => {
 		const user = userEvent.setup();
 
-		render(
+		renderWithProviders(
 			<MemoryRouter initialEntries={["/"]}>
 				<AppRouter />
 			</MemoryRouter>,

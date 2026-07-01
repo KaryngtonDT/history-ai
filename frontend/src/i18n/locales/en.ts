@@ -1,40 +1,9 @@
-export type Messages = {
-	common: {
-		loading: string;
-		save: string;
-		cancel: string;
-		delete: string;
-		edit: string;
-		close: string;
-		back: string;
-		next: string;
-		retry: string;
-		refresh: string;
-		download: string;
-		upload: string;
-		import: string;
-		export: string;
-		search: string;
-		filter: string;
-		yes: string;
-		no: string;
-		or: string;
-		error: string;
-		success: string;
-		warning: string;
-		info: string;
-		noResults: string;
-		comingSoon: string;
-	};
-	language: {
-		label: string;
-		en: string;
-		fr: string;
-		de: string;
-	};
-};
+import { type DeepStringRecord, mergeMessages } from "../localeUtils";
+import { shellDe } from "./sections/shell.de";
+import { shellEn } from "./sections/shell.en";
+import { shellFr } from "./sections/shell.fr";
 
-export const en = {
+const baseEn = {
 	common: {
 		loading: "Loading…",
 		save: "Save",
@@ -68,6 +37,84 @@ export const en = {
 		fr: "Français",
 		de: "Deutsch",
 	},
-} as const satisfies Messages;
+} as const;
 
-export type EnMessages = typeof en;
+export const en = mergeMessages(baseEn, shellEn);
+
+export type Messages = DeepStringRecord<typeof en>;
+
+const baseFr = {
+	common: {
+		loading: "Chargement…",
+		save: "Enregistrer",
+		cancel: "Annuler",
+		delete: "Supprimer",
+		edit: "Modifier",
+		close: "Fermer",
+		back: "Retour",
+		next: "Suivant",
+		retry: "Réessayer",
+		refresh: "Actualiser",
+		download: "Télécharger",
+		upload: "Téléverser",
+		import: "Importer",
+		export: "Exporter",
+		search: "Rechercher",
+		filter: "Filtrer",
+		yes: "Oui",
+		no: "Non",
+		or: "ou",
+		error: "Erreur",
+		success: "Succès",
+		warning: "Avertissement",
+		info: "Info",
+		noResults: "Aucun résultat",
+		comingSoon: "Bientôt disponible",
+	},
+	language: {
+		label: "Langue",
+		en: "English",
+		fr: "Français",
+		de: "Deutsch",
+	},
+} as const satisfies DeepStringRecord<typeof baseEn>;
+
+export const fr = mergeMessages(baseFr, shellFr) satisfies Messages;
+
+const baseDe = {
+	common: {
+		loading: "Wird geladen…",
+		save: "Speichern",
+		cancel: "Abbrechen",
+		delete: "Löschen",
+		edit: "Bearbeiten",
+		close: "Schließen",
+		back: "Zurück",
+		next: "Weiter",
+		retry: "Erneut versuchen",
+		refresh: "Aktualisieren",
+		download: "Herunterladen",
+		upload: "Hochladen",
+		import: "Importieren",
+		export: "Exportieren",
+		search: "Suchen",
+		filter: "Filtern",
+		yes: "Ja",
+		no: "Nein",
+		or: "oder",
+		error: "Fehler",
+		success: "Erfolg",
+		warning: "Warnung",
+		info: "Info",
+		noResults: "Keine Ergebnisse",
+		comingSoon: "Demnächst",
+	},
+	language: {
+		label: "Sprache",
+		en: "English",
+		fr: "Français",
+		de: "Deutsch",
+	},
+} as const satisfies DeepStringRecord<typeof baseEn>;
+
+export const de = mergeMessages(baseDe, shellDe) satisfies Messages;

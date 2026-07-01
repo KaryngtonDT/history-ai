@@ -2,8 +2,8 @@ import { Link } from "react-router";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/Progress";
+import { useTranslation } from "@/i18n";
 import type { WorkItem } from "@/services/workItem/types";
-import { workItemService } from "@/services/workItem/WorkItemService";
 import styles from "./RecentWorkList.module.css";
 
 interface RecentWorkListProps {
@@ -25,15 +25,15 @@ function statusVariant(
 }
 
 export function RecentWorkList({ items }: RecentWorkListProps) {
+	const { t } = useTranslation();
+
 	if (items.length === 0) {
 		return (
 			<section className={styles.root} aria-labelledby="recent-work-heading">
 				<h2 id="recent-work-heading" className={styles.heading}>
-					Recent work
+					{t("home.recent.heading")}
 				</h2>
-				<p className={styles.empty}>
-					No work yet. Upload a video or import a document to get started.
-				</p>
+				<p className={styles.empty}>{t("home.recent.empty")}</p>
 			</section>
 		);
 	}
@@ -41,7 +41,7 @@ export function RecentWorkList({ items }: RecentWorkListProps) {
 	return (
 		<section className={styles.root} aria-labelledby="recent-work-heading">
 			<h2 id="recent-work-heading" className={styles.heading}>
-				Recent work
+				{t("home.recent.heading")}
 			</h2>
 			<ul className={styles.list}>
 				{items.map((item) => (
@@ -54,12 +54,11 @@ export function RecentWorkList({ items }: RecentWorkListProps) {
 								<div className={styles.metaBlock}>
 									<p className={styles.title}>{item.title}</p>
 									<p className={styles.meta}>
-										{workItemService.formatTypeLabel(item.type)} ·{" "}
-										{item.currentStep}
+										{t(`workItem.types.${item.type}`)} · {item.currentStep}
 									</p>
 								</div>
 								<Badge variant={statusVariant(item.status)}>
-									{workItemService.formatStatusLabel(item.status)}
+									{t(`workItem.statuses.${item.status}`)}
 								</Badge>
 							</div>
 							{item.status === "processing" ? (
@@ -71,9 +70,9 @@ export function RecentWorkList({ items }: RecentWorkListProps) {
 							<Link
 								to={item.openRoute}
 								className={styles.openLink}
-								aria-label={`Open ${item.title}`}
+								aria-label={t("home.recent.openAria", { title: item.title })}
 							>
-								Open →
+								{t("home.recent.open")}
 							</Link>
 						</Card>
 					</li>

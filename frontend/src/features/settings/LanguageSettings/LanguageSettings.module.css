@@ -1,0 +1,39 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 1.25rem;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	background: var(--color-surface);
+}
+
+.title {
+	margin: 0;
+	font-size: 1.125rem;
+	font-weight: 600;
+}
+
+.description {
+	margin: 0;
+	color: var(--color-text-muted);
+	font-size: 0.9375rem;
+}
+
+.options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem 1.25rem;
+}
+
+.option {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
+	font-size: 0.9375rem;
+}
+
+.option input {
+	accent-color: var(--color-primary);
+}

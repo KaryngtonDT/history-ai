@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { COMMAND_ITEMS, filterCommandItems } from "./commandItems";
 
+const identityTranslate = (key: string) => key;
+
 describe("commandItems", () => {
 	it("includes core navigation commands", () => {
 		const ids = COMMAND_ITEMS.map((item) => item.id);
@@ -13,7 +15,7 @@ describe("commandItems", () => {
 	});
 
 	it("filters commands by keyword", () => {
-		const results = filterCommandItems("telemetry");
+		const results = filterCommandItems("telemetry", identityTranslate);
 
 		expect(results.some((item) => item.id === "analytics")).toBe(true);
 	});

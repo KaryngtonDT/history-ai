@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslation } from "@/i18n";
 import styles from "./PageIntroduction.module.css";
 
 interface PageIntroductionProps {
@@ -18,6 +19,8 @@ export function PageIntroduction({
 	primaryAction,
 	secondaryActions,
 }: PageIntroductionProps) {
+	const { t } = useTranslation();
+
 	return (
 		<header className={styles.root}>
 			<div className={styles.headerRow}>
@@ -35,7 +38,7 @@ export function PageIntroduction({
 			</div>
 			{whatCanIDo ? (
 				<div className={styles.helpBox}>
-					<p className={styles.helpTitle}>What can I do here?</p>
+					<p className={styles.helpTitle}>{t("shell.pageIntro.whatCanIDo")}</p>
 					<p className={styles.helpText}>{whatCanIDo}</p>
 				</div>
 			) : null}

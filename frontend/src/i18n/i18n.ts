@@ -1,6 +1,4 @@
-import { de } from "./locales/de";
-import { en, type Messages } from "./locales/en";
-import { fr } from "./locales/fr";
+import { de, en, fr, type Messages } from "./locales/en";
 import {
 	DEFAULT_LOCALE,
 	type Locale,

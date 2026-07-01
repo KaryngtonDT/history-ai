@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -6,6 +6,7 @@ import { HomeMissionControl } from "@/features/home";
 import { ImportPage } from "@/pages/Import/ImportPage";
 import { VideoUploadPage } from "@/pages/VideoUpload/VideoUploadPage";
 import { workItemService } from "@/services/workItem/WorkItemService";
+import { renderWithProviders } from "@/test/render";
 
 describe("HomeMissionControl", () => {
 	afterEach(() => {
@@ -13,7 +14,7 @@ describe("HomeMissionControl", () => {
 	});
 
 	it("renders create section and recent work", async () => {
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<HomeMissionControl />
 			</MemoryRouter>,
@@ -33,7 +34,7 @@ describe("HomeMissionControl", () => {
 	it("navigates from create video card to upload page", async () => {
 		const user = userEvent.setup();
 
-		render(
+		renderWithProviders(
 			<MemoryRouter initialEntries={["/"]}>
 				<Routes>
 					<Route path="/" element={<HomeMissionControl />} />
@@ -59,7 +60,7 @@ describe("HomeMissionControl", () => {
 			new Error("network"),
 		);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<HomeMissionControl />
 			</MemoryRouter>,
@@ -75,7 +76,7 @@ describe("HomeMissionControl — import navigation", () => {
 	it("navigates PDF card to import", async () => {
 		const user = userEvent.setup();
 
-		render(
+		renderWithProviders(
 			<MemoryRouter initialEntries={["/"]}>
 				<Routes>
 					<Route path="/" element={<HomeMissionControl />} />

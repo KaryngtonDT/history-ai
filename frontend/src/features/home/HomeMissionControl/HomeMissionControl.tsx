@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import { PageIntroduction } from "@/features/product";
+import { useTranslation } from "@/i18n";
 import type { WorkItemSummary } from "@/services/workItem/types";
 import { workItemService } from "@/services/workItem/WorkItemService";
 import { ActionableStats } from "../ActionableStats";
@@ -11,10 +12,8 @@ import { CreateSection } from "../CreateSection";
 import { RecentWorkList } from "../RecentWorkList";
 import styles from "./HomeMissionControl.module.css";
 
-const LOAD_ERROR_MESSAGE =
-	"Could not load your recent work. Check that the backend is running.";
-
 export function HomeMissionControl() {
+	const { t } = useTranslation();
 	const [summary, setSummary] = useState<WorkItemSummary | null>(null);
 	const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -34,20 +33,20 @@ export function HomeMissionControl() {
 					completedCount: 0,
 					artifactCount: 0,
 				});
-				setLoadError(LOAD_ERROR_MESSAGE);
+				setLoadError(t("home.loadError"));
 			});
-	}, []);
+	}, [t]);
 
 	if (summary === null) {
 		return (
 			<div className={styles.root}>
 				<PageIntroduction
-					eyebrow="Home"
-					title="History AI"
-					description="Transform knowledge into understanding."
+					eyebrow={t("home.eyebrow")}
+					title={t("home.title")}
+					description={t("home.description")}
 				/>
 				<div className={styles.loading}>
-					<Spinner label="Loading home" />
+					<Spinner label={t("home.loading")} />
 				</div>
 			</div>
 		);
@@ -56,14 +55,14 @@ export function HomeMissionControl() {
 	return (
 		<div className={styles.root}>
 			<PageIntroduction
-				eyebrow="Home"
-				title="History AI"
-				description="Transform knowledge into understanding."
-				whatCanIDo="Upload a video, import a document, or resume work in progress."
+				eyebrow={t("home.eyebrow")}
+				title={t("home.title")}
+				description={t("home.description")}
+				whatCanIDo={t("home.whatCanIDo")}
 			/>
 
 			{loadError !== null ? (
-				<EmptyState title="Unable to load home" description={loadError} />
+				<EmptyState title={t("home.errorTitle")} description={loadError} />
 			) : null}
 
 			<CreateSection />
