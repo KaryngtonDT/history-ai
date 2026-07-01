@@ -4,6 +4,7 @@ import type {
 	ContentSourceType,
 } from "@/services/content/domain/Content";
 import type { Project } from "@/services/workspace/types";
+import type { YouTubeImport } from "@/services/youtubeSource/types";
 import type { WorkItem, WorkItemStatus, WorkItemType } from "./types";
 
 const SOURCE_TYPE_MAP: Record<ContentSourceType, WorkItemType> = {
@@ -156,6 +157,36 @@ export function mapVideoToWorkItem(
 			"render",
 		],
 		updatedAt: addedAt,
+	};
+}
+
+export function mapYoutubeToWorkItem(importItem: YouTubeImport): WorkItem {
+	const isProcessing =
+		importItem.videoStatus === "queued" ||
+		importItem.videoStatus === "processing";
+
+	return {
+		id: importItem.videoId,
+		type: "youtube",
+		title: importItem.metadata.title,
+		status: isProcessing ? "processing" : "ready",
+		progress:
+			importItem.videoStatus === "completed" ? 100 : isProcessing ? 35 : 0,
+		currentStep: isProcessing ? "Importing from YouTube" : "Ready for pipeline",
+		openRoute: `/video/${importItem.videoId}`,
+		primaryActionLabel: "Open",
+		primaryActionRoute: `/video/${importItem.videoId}`,
+		icon: TYPE_ICONS.youtube,
+		description: "YouTube video imported into History AI.",
+		capabilities: [
+			"transcript",
+			"translation",
+			"audio",
+			"voice-clone",
+			"lip-sync",
+			"render",
+		],
+		updatedAt: importItem.importedAt,
 	};
 }
 

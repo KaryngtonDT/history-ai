@@ -47,9 +47,8 @@ export const CREATE_CARDS: CreateCard[] = [
 		type: "youtube",
 		label: "YouTube",
 		description: "Link a YouTube source for processing.",
-		nextStep: "Coming in Sprint 52.",
-		route: "/import",
+		nextStep: "Runs the full video localization pipeline.",
+		route: "/youtube/import",
 		icon: "▶️",
-		comingSoon: true,
 	},
 ];

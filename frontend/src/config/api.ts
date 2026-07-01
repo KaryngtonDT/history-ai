@@ -56,6 +56,8 @@ export const VIDEOS_PATH = "/api/videos";
 
 export const AUDIO_PATH = "/api/audio";
 
+export const YOUTUBE_PATH = "/api/youtube";
+
 export const PREFERENCES_PATH = "/api/preferences";
 
 export function videoReviewsPath(videoId: string): string {

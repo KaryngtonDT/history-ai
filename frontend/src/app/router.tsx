@@ -22,6 +22,7 @@ import { VideoTranslationsPage } from "@/pages/VideoTranslations/VideoTranslatio
 import { VideoUploadPage } from "@/pages/VideoUpload/VideoUploadPage";
 import { VideoVoiceClonePage } from "@/pages/VideoVoiceClone/VideoVoiceClonePage";
 import { WorkspacePage } from "@/pages/Workspace/WorkspacePage";
+import { YouTubeImportPage } from "@/pages/YouTubeImport/YouTubeImportPage";
 
 export function AppRouter() {
 	return (
@@ -30,6 +31,7 @@ export function AppRouter() {
 				<Route path="/" element={<DashboardPage />} />
 				<Route path="/import" element={<ImportPage />} />
 				<Route path="/video/upload" element={<VideoUploadPage />} />
+				<Route path="/youtube/import" element={<YouTubeImportPage />} />
 				<Route path="/audio/upload" element={<AudioUploadPage />} />
 				<Route path="/audio/:audioId" element={<AudioOverviewPage />} />
 				<Route

@@ -1,6 +1,7 @@
 import { audioSourceService } from "@/services/audioSource/AudioSourceService";
 import { contentService } from "@/services/content/ContentService";
 import { workspaceService } from "@/services/workspace/WorkspaceService";
+import { youtubeSourceService } from "@/services/youtubeSource/YouTubeSourceService";
 import type { WorkItem, WorkItemSummary } from "./types";
 import type { WorkItemRepository } from "./WorkItemRepository";
 import {
@@ -8,20 +9,24 @@ import {
 	mapContentToWorkItem,
 	mapProjectToWorkItem,
 	mapVideoToWorkItem,
+	mapYoutubeToWorkItem,
 } from "./workItemMappers";
 
 export class HttpWorkItemRepository implements WorkItemRepository {
 	async listRecentWork(limit = 10): Promise<WorkItem[]> {
-		const [contents, projects, audioSources] = await Promise.all([
-			contentService.listContents(),
-			workspaceService.listProjects(),
-			audioSourceService.listAudioSources(),
-		]);
+		const [contents, projects, audioSources, youtubeImports] =
+			await Promise.all([
+				contentService.listContents(),
+				workspaceService.listProjects(),
+				audioSourceService.listAudioSources(),
+				youtubeSourceService.listYouTubeImports(),
+			]);
 
 		const contentItems = contents
 			.filter((content) => content.sourceType !== "audio")
 			.map(mapContentToWorkItem);
 		const audioItems = audioSources.map(mapAudioSourceToWorkItem);
+		const youtubeItems = youtubeImports.map(mapYoutubeToWorkItem);
 		const projectItems = projects.flatMap((project) => {
 			const projectItem = mapProjectToWorkItem(project);
 			const videoItems = project.videos.map((video) =>
@@ -37,7 +42,7 @@ export class HttpWorkItemRepository implements WorkItemRepository {
 			return [projectItem, ...videoItems];
 		});
 
-		return [...contentItems, ...audioItems, ...projectItems]
+		return [...contentItems, ...audioItems, ...youtubeItems, ...projectItems]
 			.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
 			.slice(0, limit);
 	}

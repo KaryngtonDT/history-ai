@@ -13,6 +13,10 @@ describe("workItemRouting", () => {
 		expect(resolveWorkItemRoute("pdf", "1")).toBe("/processing/1");
 	});
 
+	it("routes youtube to video overview", () => {
+		expect(resolveWorkItemRoute("youtube", "abc")).toBe("/video/abc");
+	});
+
 	it("routes audio to overview", () => {
 		expect(resolveWorkItemRoute("audio", "abc")).toBe("/audio/abc");
 	});

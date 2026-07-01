@@ -9,7 +9,7 @@ export function resolveWorkItemRoute(type: WorkItemType, id: string): string {
 		case "audio":
 			return `/audio/${id}`;
 		case "youtube":
-			return `/library`;
+			return `/video/${id}`;
 		case "project":
 			return `/workspace`;
 		default:
