@@ -12,6 +12,8 @@ parameters:
 
     video.upload_max_bytes: '%env(int:default:video.upload_max_bytes_default:VIDEO_UPLOAD_MAX_BYTES)%'
     video.storage_dir: '%kernel.project_dir%/var/video-storage'
+    audio.upload_max_bytes: '%env(int:default:video.upload_max_bytes_default:AUDIO_UPLOAD_MAX_BYTES)%'
+    audio.source_storage_dir: '%kernel.project_dir%/var/audio-source-storage'
     stt.provider_default: 'faster_whisper'
     stt.faster_whisper.binary_default: 'faster-whisper'
     stt.faster_whisper.model_default: 'base'
@@ -136,6 +138,23 @@ services:
 
     App\Domain\Video\VideoRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Video\DoctrineVideoRepository
+
+    App\Domain\Source\SourceRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Source\DoctrineSourceRepository
+
+    App\Application\AudioUpload\Ports\AudioStorageInterface:
+        alias: App\Infrastructure\Storage\Audio\LocalAudioStorage
+
+    App\Application\AudioUpload\Ports\AudioProcessingQueueInterface:
+        alias: App\Infrastructure\Audio\MessengerAudioProcessingQueue
+
+    App\Application\AudioUpload\Handlers\UploadAudioHandler:
+        arguments:
+            $maxUploadBytes: '%audio.upload_max_bytes%'
+
+    App\Infrastructure\Storage\Audio\LocalAudioStorage:
+        arguments:
+            $storageDirectory: '%audio.source_storage_dir%'
 
     App\Domain\Speech\TranscriptRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Speech\DoctrineTranscriptRepository
