@@ -6,6 +6,7 @@ namespace App\Application\Video\Handlers;
 
 use App\Application\History\ExecutionHistoryRecorder;
 use App\Application\Quality\VideoQualityAssessmentRunner;
+use App\Application\Telemetry\PipelineTelemetryRecorder;
 use App\Application\Workspace\BatchJobProgressUpdater;
 use App\Application\LipSync\GenerateLipSyncConfiguration;
 use App\Application\LipSync\VideoLipSyncGenerator;
@@ -48,6 +49,15 @@ use Throwable;
 
 final class ProcessVideoHandler
 {
+    private float $pipelineStartedAt = 0.0;
+
+    /** @var array<string, float> */
+    private array $stageDurations = [];
+
+    private int $retryCount = 0;
+
+    private float $initialQueueTimeSeconds = 0.0;
+
     public function __construct(
         private readonly VideoRepositoryInterface $videoRepository,
         private readonly AIProviderResolverInterface $aiProviderResolver,
@@ -75,6 +85,7 @@ final class ProcessVideoHandler
         private readonly BatchJobProgressUpdater $batchJobProgressUpdater,
         private readonly ExecutionHistoryRecorder $executionHistoryRecorder,
         private readonly ExecutionReplayContextInterface $executionReplayContext,
+        private readonly PipelineTelemetryRecorder $pipelineTelemetryRecorder,
     ) {
     }
 
@@ -91,9 +102,15 @@ final class ProcessVideoHandler
         $this->videoRepository->save($processing);
 
         $succeeded = false;
+        $failureMessage = null;
+        $qualityReport = null;
+        $this->stageDurations = [];
+        $this->retryCount = 0;
+        $this->pipelineStartedAt = microtime(true);
 
         try {
             $this->configurePipelineForMessage($message, $processing);
+            $this->initialQueueTimeSeconds = $this->pipelineTelemetryRecorder->resolveInitialQueueTimeSeconds();
 
             $this->runScheduledStage(PipelineStageType::SpeechToText, function () use ($processing, $videoId): void {
                 $transcript = $this->aiProviderResolver
@@ -149,18 +166,30 @@ final class ProcessVideoHandler
                 );
             }
 
-            $report = $this->qualityAssessmentRunner->assess(
+            $qualityReport = $this->qualityAssessmentRunner->assess(
                 $videoId,
                 $this->runtimeOptimizationContext->get(),
             );
 
-            $this->executionHistoryRecorder->recordCompletedExecution($videoId, $report);
+            $this->executionHistoryRecorder->recordCompletedExecution($videoId, $qualityReport);
 
             $this->videoRepository->save($processing->complete());
             $succeeded = true;
-        } catch (Throwable) {
+        } catch (Throwable $throwable) {
+            $failureMessage = $throwable->getMessage();
             $this->videoRepository->save($processing->fail());
         } finally {
+            $this->pipelineTelemetryRecorder->record(
+                $videoId,
+                $message,
+                $succeeded,
+                microtime(true) - $this->pipelineStartedAt,
+                $this->stageDurations,
+                $qualityReport,
+                $failureMessage,
+                $this->retryCount,
+                $this->initialQueueTimeSeconds,
+            );
             $this->batchJobProgressUpdater->recordOutcome($message->batchJobId, $videoId, $succeeded);
             $this->executionReplayContext->clear($videoId);
             $this->runtimePipelineContext->clear();
@@ -179,6 +208,7 @@ final class ProcessVideoHandler
         $replayConfiguration = $this->executionReplayContext->consume(new VideoId($message->videoId));
 
         if (null !== $replayConfiguration) {
+            $this->retryCount = 1;
             $this->runtimePipelineContext->set($replayConfiguration);
 
             return;
@@ -214,12 +244,15 @@ final class ProcessVideoHandler
     private function runScheduledStage(PipelineStageType $stage, callable $callback): void
     {
         $this->runtimeScheduleContext->updateStage($stage, ScheduledStageStatus::Running);
+        $startedAt = microtime(true);
 
         try {
             $callback();
             $this->runtimeScheduleContext->updateStage($stage, ScheduledStageStatus::Completed);
+            $this->stageDurations[$stage->value] = microtime(true) - $startedAt;
         } catch (Throwable $throwable) {
             $this->runtimeScheduleContext->updateStage($stage, ScheduledStageStatus::Failed);
+            $this->stageDurations[$stage->value] = microtime(true) - $startedAt;
             throw $throwable;
         }
     }

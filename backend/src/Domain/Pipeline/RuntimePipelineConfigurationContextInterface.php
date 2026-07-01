@@ -8,5 +8,7 @@ interface RuntimePipelineConfigurationContextInterface
 {
     public function set(?PipelineConfiguration $configuration): void;
 
+    public function get(): ?PipelineConfiguration;
+
     public function clear(): void;
 }

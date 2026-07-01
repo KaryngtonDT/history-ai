@@ -41,6 +41,9 @@ use App\Tests\Unit\Application\History\InMemoryExecutionHistoryStore;
 use App\Application\History\ExecutionOptimizationSnapshotMapper;
 use App\Application\Pipeline\PipelineConfigurationJsonMapper;
 use App\Application\Quality\VideoQualityAssessmentRunner;
+use App\Application\Telemetry\CollectPipelineMetricsHandler;
+use App\Application\Telemetry\PipelineTelemetryRecorder;
+use App\Tests\Unit\Application\Telemetry\InMemoryPipelineTelemetryRepository;
 use App\Application\Workspace\BatchJobProgressUpdater;
 use App\Domain\Workspace\BatchJobRepositoryInterface;
 use App\Domain\Orchestrator\PipelinePlannerInterface;
@@ -174,6 +177,13 @@ final class ProcessVideoHandlerTest extends TestCase
             $this->createMock(FinalVideoRepositoryInterface::class),
         );
 
+        $telemetryRecorder = new PipelineTelemetryRecorder(
+            new CollectPipelineMetricsHandler(new InMemoryPipelineTelemetryRepository()),
+            $this->createMock(\App\Domain\Workspace\ProjectRepositoryInterface::class),
+            $this->createMock(RuntimePipelineConfigurationContextInterface::class),
+            $this->runtimeScheduleContext,
+        );
+
         $this->handler = new ProcessVideoHandler(
             $this->videoRepository,
             $this->aiProviderResolver,
@@ -201,6 +211,7 @@ final class ProcessVideoHandlerTest extends TestCase
             $batchJobProgressUpdater,
             $executionHistoryRecorder,
             new ExecutionReplayContext(),
+            $telemetryRecorder,
         );
     }
 
