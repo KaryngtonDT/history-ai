@@ -2442,6 +2442,26 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('WorkspaceRole', $spec['components']['schemas']);
     }
 
+    public function testOpenApiSpecDocumentsTelemetryOperations(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertSame('getWorkspaceAnalytics', $spec['paths']['/api/workspaces/{id}/analytics']['get']['operationId']);
+        self::assertSame('getWorkspaceProviderStatistics', $spec['paths']['/api/workspaces/{id}/providers']['get']['operationId']);
+        self::assertSame('listWorkspaceTelemetry', $spec['paths']['/api/workspaces/{id}/telemetry']['get']['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsTelemetrySchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('PipelineTelemetry', $spec['components']['schemas']);
+        self::assertArrayHasKey('ExecutionMetric', $spec['components']['schemas']);
+        self::assertArrayHasKey('ProviderUsage', $spec['components']['schemas']);
+        self::assertArrayHasKey('WorkspaceAnalytics', $spec['components']['schemas']);
+        self::assertArrayHasKey('ProviderStatistics', $spec['components']['schemas']);
+    }
+
     /**
      * @return array<string, mixed>
      */

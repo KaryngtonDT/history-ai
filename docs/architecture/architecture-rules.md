@@ -1276,6 +1276,24 @@ Organization → Workspace → Members → Projects → Videos
 
 Feature components must use `collaborationService`, not `HttpCollaborationRepository` or `HttpClient` directly.
 
+## Platform Sprint 49 — Observability, Monitoring & Analytics
+
+```text
+Pipeline → Telemetry Collector → Metrics Repository → Analytics Engine → Dashboard
+```
+
+| Component | Role |
+| --------- | ---- |
+| `ExecutionMetricType` | Processing, queue, CPU/GPU, memory, success rate, retry metrics |
+| `PipelineTelemetry` | Immutable append-only execution telemetry aggregate |
+| `CollectPipelineMetricsHandler` | Persists telemetry without blocking processing |
+| `WorkspaceAnalyticsAggregator` | Deterministic workspace-level aggregation |
+| `PipelineTelemetryRecorder` | Runtime instrumentation from `ProcessVideoHandler` |
+| `AnalyticsDashboard` | Workspace analytics UI |
+| `TelemetryService` | Repository-backed analytics operations |
+
+Feature components must use `telemetryService`, not `HttpTelemetryRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

@@ -879,6 +879,28 @@ The frontend `TeamPanel` on `/workspace` uses `CollaborationService`.
 
 ---
 
+# Observability & Analytics (Platform Sprint 49)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/workspaces/{id}/analytics` | Aggregated workspace analytics |
+| GET | `/api/workspaces/{id}/providers` | Provider usage statistics |
+| GET | `/api/workspaces/{id}/telemetry` | Pipeline telemetry records |
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `PipelineTelemetry` | `id`, `workspaceId`, `videoId`, `success`, `metrics[]`, `providerUsages[]`, `recordedAt`, optional `qualityScore`, `errorMessage` |
+| `ExecutionMetric` | `type`, `value`, `unit` |
+| `ProviderUsage` | `stage`, `providerId`, `invocationCount`, `totalDurationSeconds` |
+| `WorkspaceAnalytics` | `processedVideos`, `averageProcessingTimeLabel`, `averageQuality`, `successRate`, `gpuUsagePercent`, top providers, `recentErrors[]` |
+| `ProviderStatistics` | `providers[]` with invocation counts and average durations |
+
+The frontend analytics panels on `/workspace` use `TelemetryService`.
+
+---
+
 # Production considerations
 
 | Topic | Recommendation |

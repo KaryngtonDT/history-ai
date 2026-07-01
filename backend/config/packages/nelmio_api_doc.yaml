@@ -143,6 +143,13 @@ nelmio_api_doc:
             - { alias: WorkspaceInvitation, type: App\Presentation\OpenApi\Schema\WorkspaceInvitationSchema }
             - { alias: InviteWorkspaceMemberRequest, type: App\Presentation\OpenApi\Schema\InviteWorkspaceMemberRequestSchema }
             - { alias: UpdateWorkspaceMemberRoleRequest, type: App\Presentation\OpenApi\Schema\UpdateWorkspaceMemberRoleRequestSchema }
+            - { alias: ExecutionMetric, type: App\Presentation\OpenApi\Schema\ExecutionMetricSchema }
+            - { alias: ProviderUsage, type: App\Presentation\OpenApi\Schema\ProviderUsageSchema }
+            - { alias: PipelineTelemetry, type: App\Presentation\OpenApi\Schema\PipelineTelemetrySchema }
+            - { alias: RecentTelemetryError, type: App\Presentation\OpenApi\Schema\RecentTelemetryErrorSchema }
+            - { alias: WorkspaceAnalytics, type: App\Presentation\OpenApi\Schema\WorkspaceAnalyticsSchema }
+            - { alias: ProviderStat, type: App\Presentation\OpenApi\Schema\ProviderStatSchema }
+            - { alias: ProviderStatistics, type: App\Presentation\OpenApi\Schema\ProviderStatisticsSchema }
     areas:
         default:
             path_patterns:

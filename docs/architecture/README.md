@@ -1177,6 +1177,26 @@ Verification: [Sprint48-Verification.md](../reports/Sprint48-Verification.md)
 
 ---
 
+# Platform Sprint 49 — Observability, Monitoring & Analytics (2026-06)
+
+Platform Sprint 49 makes History AI **operable in production** by capturing pipeline telemetry, aggregating workspace analytics, and exposing an analytics dashboard for administrators.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P49-SLICE-01 | Telemetry domain model | ✅ |
+| P49-SLICE-02 | Metrics collection engine and persistence | ✅ |
+| P49-SLICE-03 | Runtime pipeline instrumentation | ✅ |
+| P49-SLICE-04 | Analytics dashboard and `TelemetryService` | ✅ |
+| P49-SLICE-05 | OpenAPI telemetry schemas, docs, verification report | ✅ |
+
+```text
+Workspace → Projects → Pipeline → Telemetry → Analytics Dashboard
+```
+
+Verification: [Sprint49-Verification.md](../reports/Sprint49-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:
