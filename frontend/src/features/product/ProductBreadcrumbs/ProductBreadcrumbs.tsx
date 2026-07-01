@@ -2,22 +2,22 @@ import { Link, useLocation, useParams } from "react-router";
 import styles from "./ProductBreadcrumbs.module.css";
 
 const LABELS: Record<string, string> = {
-	"": "Dashboard",
+	"": "Home",
 	import: "Import",
 	video: "Video",
 	upload: "Upload",
 	transcript: "Transcript",
 	translations: "Translations",
 	audio: "Audio",
-	"voice-clone": "Voice Clone",
-	"lip-sync": "Lip Sync",
-	render: "Final Render",
+	"voice-clone": "Cloned Voice",
+	"lip-sync": "Lip Sync Preview",
+	render: "Final Video",
 	workspace: "Workspace",
 	library: "Library",
 	collections: "Collections",
 	settings: "Settings",
-	ai: "AI Engines",
-	pipeline: "Pipeline",
+	ai: "AI Models",
+	pipeline: "Pipeline Setup",
 	processing: "Processing",
 };
 
@@ -30,7 +30,9 @@ export function ProductBreadcrumbs() {
 		const path = `/${segments.slice(0, index + 1).join("/")}`;
 		const isVideoId = segment === params.videoId;
 		const label = isVideoId
-			? `Video ${segment.slice(0, 8)}…`
+			? segments[index + 1]
+				? `Video ${segment.slice(0, 8)}…`
+				: "Overview"
 			: (LABELS[segment] ?? segment);
 
 		return { path, label, isLast: index === segments.length - 1 };

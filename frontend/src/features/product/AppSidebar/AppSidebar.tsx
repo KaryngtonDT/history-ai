@@ -1,5 +1,6 @@
-import { NavLink } from "react-router";
+import { Link, NavLink } from "react-router";
 import { cn } from "@/lib/cn";
+import { NAV_ICONS, RESULTS_EMPTY_HINTS } from "../navIcons";
 import { PRODUCT_NAV_GROUPS, resolveNavPath } from "../navigation";
 import { useProductContext } from "../ProductContext";
 import styles from "./AppSidebar.module.css";
@@ -21,16 +22,29 @@ export function AppSidebar() {
 						{group.items.map((item) => {
 							const path = resolveNavPath(item.to, videoId);
 							const disabled = item.requiresVideoId && !videoId;
+							const icon = NAV_ICONS[item.id] ?? "";
 
 							if (disabled) {
+								const hint = RESULTS_EMPTY_HINTS[item.id];
+
 								return (
-									<span
-										key={item.id}
-										className={cn(styles.link, styles.linkDisabled)}
-										title="Upload or select a video first"
-									>
-										{item.label}
-									</span>
+									<div key={item.id} className={styles.emptyItem}>
+										<span className={styles.emptyLabel}>
+											{icon ? `${icon} ` : ""}
+											{item.label}
+										</span>
+										{hint ? (
+											<>
+												<p className={styles.emptyReason}>{hint.reason}</p>
+												<Link
+													to={hint.actionRoute}
+													className={styles.emptyAction}
+												>
+													{hint.action} →
+												</Link>
+											</>
+										) : null}
+									</div>
 								);
 							}
 
@@ -44,15 +58,11 @@ export function AppSidebar() {
 									}
 									title={item.description}
 								>
+									{icon ? `${icon} ` : ""}
 									{item.label}
 								</NavLink>
 							);
 						})}
-						{group.id === "results" && !videoId ? (
-							<p className={styles.hint}>
-								Upload a video to unlock pipeline results.
-							</p>
-						) : null}
 					</div>
 				))}
 			</nav>

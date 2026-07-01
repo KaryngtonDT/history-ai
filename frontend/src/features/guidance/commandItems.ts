@@ -10,11 +10,11 @@ export interface CommandItem {
 export const COMMAND_ITEMS: CommandItem[] = [
 	{
 		id: "dashboard",
-		label: "Dashboard",
-		description: "Overview of recent work",
+		label: "Home",
+		description: "Orientation and recent work",
 		path: "/",
 		group: "Navigate",
-		keywords: ["home", "overview"],
+		keywords: ["home", "overview", "dashboard"],
 	},
 	{
 		id: "upload",

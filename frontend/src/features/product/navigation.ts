@@ -24,10 +24,10 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 		items: [
 			{
 				id: "dashboard",
-				label: "Dashboard",
+				label: "Home",
 				to: "/",
 				end: true,
-				description: "Overview of your recent work.",
+				description: "Orientation, create, and recent work.",
 			},
 			{
 				id: "upload",
@@ -57,14 +57,14 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 		items: [
 			{
 				id: "pipeline-settings",
-				label: "Pipeline Configuration",
+				label: "Pipeline Setup",
 				to: "/settings/pipeline",
 				sprint: 39,
 				description: "Choose AI engines per processing stage.",
 			},
 			{
 				id: "ai-engines",
-				label: "AI Engines",
+				label: "AI Models",
 				to: "/settings/ai",
 				sprint: 34,
 				description: "View available AI providers and capabilities.",
@@ -101,7 +101,7 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 			},
 			{
 				id: "voice-clone",
-				label: "Voice Clone",
+				label: "Cloned Voice",
 				to: "/video/:videoId/voice-clone",
 				kind: "contextual",
 				requiresVideoId: true,
@@ -109,7 +109,7 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 			},
 			{
 				id: "lip-sync",
-				label: "Lip Sync",
+				label: "Lip Sync Preview",
 				to: "/video/:videoId/lip-sync",
 				kind: "contextual",
 				requiresVideoId: true,
@@ -117,7 +117,7 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 			},
 			{
 				id: "render",
-				label: "Final Render",
+				label: "Final Video",
 				to: "/video/:videoId/render",
 				kind: "contextual",
 				requiresVideoId: true,
