@@ -1,0 +1,93 @@
+import type { ShadowRepository } from "./ShadowRepository";
+import { createShadowRepository } from "./ShadowRepositoryFactory";
+import type {
+	AskShadowQuestionRequest,
+	ShadowAnswer,
+	ShadowSession,
+	StartShadowSessionRequest,
+	WatchContext,
+} from "./types";
+
+const UUID_PATTERN =
+	/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+export class ShadowService {
+	private readonly repository: ShadowRepository;
+
+	constructor(repository: ShadowRepository) {
+		this.repository = repository;
+	}
+
+	getContext(
+		videoId: string,
+		time: number,
+		language: string,
+		conversationId?: string,
+	): Promise<WatchContext | null> {
+		if (!this.isValidVideoId(videoId)) {
+			return Promise.resolve(null);
+		}
+
+		return this.repository.getContext(
+			videoId.trim(),
+			time,
+			language,
+			conversationId,
+		);
+	}
+
+	startSession(
+		videoId: string,
+		request: StartShadowSessionRequest,
+	): Promise<ShadowSession> {
+		if (!this.isValidVideoId(videoId)) {
+			return Promise.reject(new Error("Invalid video id"));
+		}
+
+		return this.repository.startSession(videoId.trim(), request);
+	}
+
+	askQuestion(
+		videoId: string,
+		sessionId: string,
+		request: AskShadowQuestionRequest,
+	): Promise<ShadowAnswer> {
+		if (!this.isValidVideoId(videoId) || sessionId.trim() === "") {
+			return Promise.reject(new Error("Invalid shadow session request"));
+		}
+
+		return this.repository.askQuestion(videoId.trim(), sessionId, request);
+	}
+
+	pauseSession(
+		videoId: string,
+		sessionId: string,
+		time?: number,
+	): Promise<ShadowSession> {
+		if (!this.isValidVideoId(videoId) || sessionId.trim() === "") {
+			return Promise.reject(new Error("Invalid shadow session request"));
+		}
+
+		return this.repository.pauseSession(videoId.trim(), sessionId, time);
+	}
+
+	resumeSession(
+		videoId: string,
+		sessionId: string,
+		time?: number,
+	): Promise<ShadowSession> {
+		if (!this.isValidVideoId(videoId) || sessionId.trim() === "") {
+			return Promise.reject(new Error("Invalid shadow session request"));
+		}
+
+		return this.repository.resumeSession(videoId.trim(), sessionId, time);
+	}
+
+	private isValidVideoId(videoId: string): boolean {
+		const normalized = videoId.trim();
+
+		return normalized !== "" && UUID_PATTERN.test(normalized);
+	}
+}
+
+export const shadowService = new ShadowService(createShadowRepository());

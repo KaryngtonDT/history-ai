@@ -1,0 +1,43 @@
+.panel {
+	border: 1px solid var(--color-border);
+	border-radius: 10px;
+	background: var(--color-surface);
+}
+
+.header {
+	width: 100%;
+	padding: 0.75rem 1rem;
+	border: 0;
+	background: transparent;
+	text-align: left;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.body {
+	padding: 0 1rem 1rem;
+	display: grid;
+	gap: 0.75rem;
+}
+
+.active {
+	margin: 0;
+	padding: 0.5rem;
+	border-radius: 8px;
+	background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+}
+
+.muted,
+.nearby {
+	margin: 0;
+	font-size: 0.9rem;
+	line-height: 1.4;
+}
+
+.muted {
+	color: var(--color-text-muted);
+}
+
+.nearby {
+	color: var(--color-text-muted);
+}

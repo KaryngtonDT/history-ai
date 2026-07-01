@@ -21,6 +21,7 @@ import { VideoTranscriptPage } from "@/pages/VideoTranscript/VideoTranscriptPage
 import { VideoTranslationsPage } from "@/pages/VideoTranslations/VideoTranslationsPage";
 import { VideoUploadPage } from "@/pages/VideoUpload/VideoUploadPage";
 import { VideoVoiceClonePage } from "@/pages/VideoVoiceClone/VideoVoiceClonePage";
+import { VideoWatchPage } from "@/pages/VideoWatch/VideoWatchPage";
 import { WorkspacePage } from "@/pages/Workspace/WorkspacePage";
 import { YouTubeImportPage } from "@/pages/YouTubeImport/YouTubeImportPage";
 
@@ -58,6 +59,7 @@ export function AppRouter() {
 				/>
 				<Route path="/video/:videoId/lip-sync" element={<VideoLipSyncPage />} />
 				<Route path="/video/:videoId/render" element={<VideoRenderPage />} />
+				<Route path="/video/:videoId/watch" element={<VideoWatchPage />} />
 				<Route path="/library" element={<LibraryPage />} />
 				<Route path="/library/:libraryItemId" element={<LibraryItemPage />} />
 				<Route path="/collections" element={<CollectionsPage />} />

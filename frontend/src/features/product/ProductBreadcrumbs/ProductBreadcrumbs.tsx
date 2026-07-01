@@ -13,6 +13,7 @@ const SEGMENT_KEYS: Record<string, string> = {
 	"voice-clone": "shell.breadcrumbs.voice-clone",
 	"lip-sync": "shell.breadcrumbs.lip-sync",
 	render: "shell.breadcrumbs.render",
+	watch: "shell.breadcrumbs.watch",
 	workspace: "shell.breadcrumbs.workspace",
 	library: "shell.breadcrumbs.library",
 	collections: "shell.breadcrumbs.collections",

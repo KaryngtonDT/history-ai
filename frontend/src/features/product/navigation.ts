@@ -123,6 +123,15 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 				requiresVideoId: true,
 				sprint: 38,
 			},
+			{
+				id: "shadow",
+				label: "Shadow",
+				to: "/video/:videoId/watch",
+				kind: "contextual",
+				requiresVideoId: true,
+				sprint: 55,
+				description: "Watch with Shadow AI companion.",
+			},
 		],
 	},
 	{

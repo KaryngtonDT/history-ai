@@ -22,6 +22,7 @@ export const shellEn = {
 			"voice-clone": "Cloned Voice",
 			"lip-sync": "Lip Sync Preview",
 			render: "Final Video",
+			watch: "Shadow Watch",
 			workspace: "Workspace",
 			library: "Library",
 			collections: "Collections",
@@ -74,6 +75,7 @@ export const shellEn = {
 				"voice-clone": { label: "Cloned Voice" },
 				"lip-sync": { label: "Lip Sync Preview" },
 				render: { label: "Final Video" },
+				shadow: { label: "Shadow" },
 				library: { label: "Library" },
 				collections: { label: "Collections" },
 				"settings-hub": {
@@ -111,6 +113,11 @@ export const shellEn = {
 					reason: "No final video yet.",
 					why: "The final render produces a downloadable localized MP4.",
 					action: "Run the pipeline",
+				},
+				shadow: {
+					reason: "Shadow watch not started.",
+					why: "Shadow helps you learn while watching with contextual Q&A.",
+					action: "Open a video",
 				},
 			},
 		},

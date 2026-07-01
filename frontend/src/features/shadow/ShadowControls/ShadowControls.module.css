@@ -1,0 +1,17 @@
+.controls {
+	display: flex;
+	gap: 0.5rem;
+}
+
+.controls button {
+	padding: 0.5rem 1rem;
+	border: 1px solid var(--color-border);
+	border-radius: 8px;
+	background: var(--color-surface);
+	cursor: pointer;
+}
+
+.controls button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}

@@ -13,6 +13,7 @@ export const pipelineFr: PipelineMessages = {
 			voiceClone: "Clonage de voix",
 			lipSync: "Lip sync",
 			render: "Rendu final",
+			shadow: "Shadow",
 			quality: "Qualité",
 		},
 		upload: {
@@ -324,6 +325,39 @@ export const pipelineFr: PipelineMessages = {
 			renderDescription: "MP4 téléchargeable",
 			qualityLabel: "Qualité",
 			qualityDescription: "Score de préparation à la publication",
+		},
+		shadow: {
+			eyebrow: "Regarder avec Shadow",
+			title: "Shadow",
+			description:
+				"Regardez avec votre compagnon IA. Posez des questions sur le moment présent, mettez en pause ensemble et suivez transcription et traduction.",
+			loading: "Démarrage de la session Shadow...",
+			emptyTitle: "Shadow indisponible",
+			emptyDescription:
+				"Impossible de démarrer une session. Vérifiez que la vidéo a une transcription.",
+			noVideoTitle: "Aucune vidéo lisible",
+			noVideoDescription: "Générez un rendu final pour regarder avec Shadow.",
+			currentTime: "Temps actuel",
+			currentSegment: "Segment {{index}} : {{text}}",
+			noSegment: "Aucun segment à cet instant.",
+			transcriptTitle: "Transcription",
+			translationTitle: "Traduction",
+			noTranslation: "Traduction indisponible pour ce moment.",
+			conversationTitle: "Conversation Shadow",
+			questionLabel: "Demander à Shadow",
+			questionPlaceholder:
+				"Expliquez cette phrase, traduisez plus littéralement...",
+			askShadow: "Demander à Shadow",
+			asking: "Réflexion...",
+			pause: "Pause",
+			resume: "Reprendre",
+			voiceInput: "Parler",
+			listening: "Écoute...",
+			voiceUnavailable: "Entrée vocale indisponible — utilisez le texte.",
+			timelineEmpty: "Aucune question pour l'instant.",
+			vocabularyTitle: "Vocabulaire",
+			vocabularyDescription:
+				"Les mots sauvegardés apparaîtront dans un prochain sprint.",
 		},
 		create: {
 			videoEyebrow: "Créer",

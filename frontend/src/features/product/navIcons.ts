@@ -11,6 +11,7 @@ export const NAV_ICONS: Record<string, string> = {
 	"voice-clone": "🎙",
 	"lip-sync": "🎬",
 	render: "🎞",
+	shadow: "🌑",
 	library: "📚",
 	collections: "🗂",
 	"settings-hub": "🔧",

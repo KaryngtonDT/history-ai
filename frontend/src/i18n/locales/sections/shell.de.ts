@@ -27,6 +27,7 @@ export const shellDe: ShellMessages = {
 			"voice-clone": "Geklonte Stimme",
 			"lip-sync": "Lip-Sync-Vorschau",
 			render: "Finales Video",
+			watch: "Shadow",
 			workspace: "Arbeitsbereich",
 			library: "Bibliothek",
 			collections: "Sammlungen",
@@ -79,6 +80,7 @@ export const shellDe: ShellMessages = {
 				"voice-clone": { label: "Geklonte Stimme" },
 				"lip-sync": { label: "Lip-Sync-Vorschau" },
 				render: { label: "Finales Video" },
+				shadow: { label: "Shadow" },
 				library: { label: "Bibliothek" },
 				collections: { label: "Sammlungen" },
 				"settings-hub": {
@@ -116,6 +118,11 @@ export const shellDe: ShellMessages = {
 					reason: "Noch kein finales Video.",
 					why: "Der Final-Render erzeugt eine herunterladbare lokalisierte MP4.",
 					action: "Pipeline ausführen",
+				},
+				shadow: {
+					reason: "Shadow-Watch noch nicht gestartet.",
+					why: "Shadow hilft beim Lernen mit kontextbezogenen Fragen.",
+					action: "Video öffnen",
 				},
 			},
 		},

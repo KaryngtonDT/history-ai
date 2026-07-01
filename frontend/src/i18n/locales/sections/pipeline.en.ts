@@ -8,6 +8,7 @@ export const pipelineEn = {
 			voiceClone: "Voice Clone",
 			lipSync: "Lip Sync",
 			render: "Final Render",
+			shadow: "Shadow",
 			quality: "Quality",
 		},
 		upload: {
@@ -313,6 +314,40 @@ export const pipelineEn = {
 			renderDescription: "Downloadable MP4",
 			qualityLabel: "Quality",
 			qualityDescription: "Publication readiness score",
+		},
+		shadow: {
+			eyebrow: "Watch with Shadow",
+			title: "Shadow",
+			description:
+				"Watch with your AI companion. Ask about the current moment, pause together, and follow transcript and translation in sync.",
+			loading: "Starting Shadow watch session...",
+			emptyTitle: "Shadow unavailable",
+			emptyDescription:
+				"Could not start a watch session. Check that the video has a transcript.",
+			noVideoTitle: "No playable video yet",
+			noVideoDescription:
+				"Generate a final render to watch with Shadow, or process the video first.",
+			currentTime: "Current time",
+			currentSegment: "Segment {{index}}: {{text}}",
+			noSegment: "No segment at this timestamp.",
+			transcriptTitle: "Transcript",
+			translationTitle: "Translation",
+			noTranslation: "Translation not available for this moment.",
+			conversationTitle: "Shadow conversation",
+			questionLabel: "Ask Shadow",
+			questionPlaceholder:
+				"Explain this sentence, translate literally, summarize...",
+			askShadow: "Ask Shadow",
+			asking: "Thinking...",
+			pause: "Pause",
+			resume: "Resume",
+			voiceInput: "Speak question",
+			listening: "Listening...",
+			voiceUnavailable: "Voice input unavailable — use text below.",
+			timelineEmpty: "No questions yet. Ask Shadow about the current moment.",
+			vocabularyTitle: "Vocabulary",
+			vocabularyDescription:
+				"Saved words and learning notes will appear here in a future sprint.",
 		},
 		create: {
 			videoEyebrow: "Create",

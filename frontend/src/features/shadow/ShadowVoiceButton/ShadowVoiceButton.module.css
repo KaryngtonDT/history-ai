@@ -1,0 +1,19 @@
+.button,
+.active {
+	padding: 0.5rem 0.75rem;
+	border-radius: 999px;
+	border: 1px solid var(--color-border);
+	background: var(--color-surface);
+	cursor: pointer;
+}
+
+.active {
+	border-color: var(--color-accent);
+	color: var(--color-accent);
+}
+
+.fallback {
+	margin: 0;
+	font-size: 0.85rem;
+	color: var(--color-text-muted);
+}

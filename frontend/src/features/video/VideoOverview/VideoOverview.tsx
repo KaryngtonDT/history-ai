@@ -42,6 +42,10 @@ const OVERVIEW_TABS = [
 		id: "render",
 		path: (id: string) => videoPipelinePath("render", id),
 	},
+	{
+		id: "shadow",
+		path: (id: string) => `/video/${id}/watch`,
+	},
 ] as const;
 
 export function VideoOverview() {
@@ -95,16 +99,18 @@ export function VideoOverview() {
 					>
 						{tab.id === "overview"
 							? t("pipeline.steps.overview")
-							: getVideoPipelineStepLabel(
-									t,
-									tab.id as
-										| "transcript"
-										| "translations"
-										| "audio"
-										| "voice-clone"
-										| "lip-sync"
-										| "render",
-								)}
+							: tab.id === "shadow"
+								? t("pipeline.steps.shadow")
+								: getVideoPipelineStepLabel(
+										t,
+										tab.id as
+											| "transcript"
+											| "translations"
+											| "audio"
+											| "voice-clone"
+											| "lip-sync"
+											| "render",
+									)}
 					</NavLink>
 				))}
 				<Link to="/workspace" className={styles.tab}>
@@ -175,6 +181,9 @@ export function VideoOverview() {
 				</Link>
 				<Link to="/workspace" className={styles.secondaryLink}>
 					{t("pipeline.videoOverview.viewWorkspaceAnalytics")}
+				</Link>
+				<Link to={`/video/${videoId}/watch`} className={styles.secondaryLink}>
+					{t("pipeline.steps.shadow")}
 				</Link>
 			</div>
 		</div>

@@ -13,6 +13,7 @@ export const pipelineDe: PipelineMessages = {
 			voiceClone: "Stimmenklon",
 			lipSync: "Lip-Sync",
 			render: "Finales Rendering",
+			shadow: "Shadow",
 			quality: "Qualität",
 		},
 		upload: {
@@ -324,6 +325,39 @@ export const pipelineDe: PipelineMessages = {
 			renderDescription: "Herunterladbares MP4",
 			qualityLabel: "Qualität",
 			qualityDescription: "Bewertung der Veröffentlichungsreife",
+		},
+		shadow: {
+			eyebrow: "Mit Shadow ansehen",
+			title: "Shadow",
+			description:
+				"Schauen Sie mit Ihrem KI-Begleiter. Fragen Sie zum aktuellen Moment, pausieren Sie gemeinsam und folgen Sie Transkript und Übersetzung.",
+			loading: "Shadow-Sitzung wird gestartet...",
+			emptyTitle: "Shadow nicht verfügbar",
+			emptyDescription:
+				"Sitzung konnte nicht gestartet werden. Prüfen Sie, ob ein Transkript vorhanden ist.",
+			noVideoTitle: "Noch kein abspielbares Video",
+			noVideoDescription:
+				"Erzeugen Sie einen Final Render, um mit Shadow zu schauen.",
+			currentTime: "Aktuelle Zeit",
+			currentSegment: "Segment {{index}}: {{text}}",
+			noSegment: "Kein Segment zu diesem Zeitpunkt.",
+			transcriptTitle: "Transkript",
+			translationTitle: "Übersetzung",
+			noTranslation: "Keine Übersetzung für diesen Moment.",
+			conversationTitle: "Shadow-Unterhaltung",
+			questionLabel: "Shadow fragen",
+			questionPlaceholder: "Erkläre diesen Satz, übersetze wörtlicher...",
+			askShadow: "Shadow fragen",
+			asking: "Denkt nach...",
+			pause: "Pause",
+			resume: "Fortsetzen",
+			voiceInput: "Sprechen",
+			listening: "Hört zu...",
+			voiceUnavailable: "Spracheingabe nicht verfügbar — Text nutzen.",
+			timelineEmpty: "Noch keine Fragen.",
+			vocabularyTitle: "Vokabular",
+			vocabularyDescription:
+				"Gespeicherte Wörter erscheinen in einem späteren Sprint.",
 		},
 		create: {
 			videoEyebrow: "Erstellen",

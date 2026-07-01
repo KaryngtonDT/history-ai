@@ -166,6 +166,35 @@ export function videoRenderStreamPath(
 	return `${VIDEOS_PATH}/${videoId}/render/${language}/stream`;
 }
 
+export function videoShadowContextPath(videoId: string): string {
+	return `${VIDEOS_PATH}/${videoId}/shadow/context`;
+}
+
+export function videoShadowSessionsPath(videoId: string): string {
+	return `${VIDEOS_PATH}/${videoId}/shadow/sessions`;
+}
+
+export function videoShadowSessionAskPath(
+	videoId: string,
+	sessionId: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/ask`;
+}
+
+export function videoShadowSessionPausePath(
+	videoId: string,
+	sessionId: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/pause`;
+}
+
+export function videoShadowSessionResumePath(
+	videoId: string,
+	sessionId: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/resume`;
+}
+
 export function timelinePath(artifactId: string): string {
 	return `/api/timeline/${artifactId}`;
 }

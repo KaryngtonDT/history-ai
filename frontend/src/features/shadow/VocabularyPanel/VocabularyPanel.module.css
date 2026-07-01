@@ -1,0 +1,16 @@
+.panel {
+	padding: 1rem;
+	border: 1px dashed var(--color-border);
+	border-radius: 10px;
+}
+
+.title {
+	margin: 0 0 0.5rem;
+	font-size: 0.95rem;
+}
+
+.description {
+	margin: 0;
+	font-size: 0.85rem;
+	color: var(--color-text-muted);
+}

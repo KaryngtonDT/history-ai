@@ -28,6 +28,7 @@ export const shellFr: ShellMessages = {
 			"voice-clone": "Voix clonée",
 			"lip-sync": "Aperçu lip sync",
 			render: "Vidéo finale",
+			watch: "Shadow",
 			workspace: "Espace de travail",
 			library: "Bibliothèque",
 			collections: "Collections",
@@ -82,6 +83,7 @@ export const shellFr: ShellMessages = {
 				"voice-clone": { label: "Voix clonée" },
 				"lip-sync": { label: "Aperçu lip sync" },
 				render: { label: "Vidéo finale" },
+				shadow: { label: "Shadow" },
 				library: { label: "Bibliothèque" },
 				collections: { label: "Collections" },
 				"settings-hub": {
@@ -119,6 +121,11 @@ export const shellFr: ShellMessages = {
 					reason: "Pas encore de vidéo finale.",
 					why: "Le rendu final produit un MP4 localisé téléchargeable.",
 					action: "Lancer le pipeline",
+				},
+				shadow: {
+					reason: "Session Shadow non démarrée.",
+					why: "Shadow aide à apprendre en regardant avec des Q&R contextuelles.",
+					action: "Ouvrir une vidéo",
 				},
 			},
 		},
