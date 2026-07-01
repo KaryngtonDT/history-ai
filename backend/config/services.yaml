@@ -251,6 +251,9 @@ services:
     App\Domain\Shadow\ShadowSessionRepositoryInterface:
         alias: App\Infrastructure\Shadow\InMemoryShadowSessionRepository
 
+    App\Domain\Learning\LearningProfileRepositoryInterface:
+        alias: App\Infrastructure\Learning\InMemoryLearningProfileRepository
+
     App\Domain\Shadow\ShadowConversationContextInterface:
         alias: App\Infrastructure\Shadow\NullShadowConversationContext
 
