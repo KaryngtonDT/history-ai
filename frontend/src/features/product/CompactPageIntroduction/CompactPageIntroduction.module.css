@@ -1,0 +1,70 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+	margin-bottom: var(--space-4);
+}
+
+.headerRow {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: var(--space-3);
+}
+
+.eyebrow {
+	margin: 0;
+	font-size: var(--font-xs);
+	font-weight: var(--font-weight-semibold);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--shell-text-muted);
+}
+
+.title {
+	margin: 0.15rem 0 0;
+	font-size: var(--font-xl);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.description {
+	margin: var(--space-1) 0 0;
+	max-width: 42rem;
+	font-size: var(--font-sm);
+	line-height: 1.5;
+	color: var(--shell-text-muted);
+}
+
+.helpDetails {
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-md);
+	padding: var(--space-2) var(--space-3);
+	background: var(--shell-surface);
+}
+
+.helpSummary {
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+	cursor: pointer;
+	list-style: none;
+}
+
+.helpSummary::-webkit-details-marker {
+	display: none;
+}
+
+.helpText {
+	margin: var(--space-2) 0 0;
+	font-size: var(--font-sm);
+	line-height: 1.5;
+	color: var(--shell-text-muted);
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2);
+}

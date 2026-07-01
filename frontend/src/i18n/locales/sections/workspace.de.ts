@@ -241,9 +241,17 @@ export const workspaceDe: WorkspaceMessages = {
 		import: {
 			couldNotStartProcessing:
 				"Verarbeitung konnte nicht gestartet werden. Prüfen Sie, ob das Backend läuft, und versuchen Sie es erneut.",
-			headerTitle: "Import",
+			eyebrow: "Erstellen",
+			headerTitle: "Wissen importieren",
 			headerDescription:
 				"Bringen Sie Wissensquellen in Lumen. Wählen Sie zum Start eine PDF-Datei aus.",
+			whatCanIDo:
+				"Laden Sie eine PDF hoch, um Inhalt zu extrahieren, einen Verarbeitungsjob zu erstellen und den geführten Zusammenfassungs-Workflow zu öffnen.",
+			whatHappensNext:
+				"Lumen importiert die PDF, erstellt einen Inhaltsdatensatz und startet einen Zusammenfassungsjob. Fortschritt auf der Verarbeitungsseite verfolgen.",
+			supportedFiles:
+				"Unterstützte Dateien: nur PDF. Textbasierte PDFs funktionieren am besten.",
+			helpTitle: "Hilfe",
 			pdfDropzoneAria: "PDF-Ablagebereich",
 			dropPdfTitle: "PDF hier ablegen",
 			dropPdfDescription: "Oder eine Datei von Ihrem Gerät auswählen.",

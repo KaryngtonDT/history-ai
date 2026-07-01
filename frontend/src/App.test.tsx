@@ -28,7 +28,9 @@ describe("Sprint 1 — app shell", () => {
 		expect(screen.getAllByText("The Roman Empire").length).toBeGreaterThan(0);
 
 		await user.click(screen.getByRole("link", { name: /Import Documents/i }));
-		expect(screen.getByRole("heading", { name: "Import" })).toBeInTheDocument();
+		expect(
+			screen.getByRole("heading", { name: "Import knowledge" }),
+		).toBeInTheDocument();
 		expect(
 			screen.getByRole("button", { name: "Select PDF" }),
 		).toBeInTheDocument();

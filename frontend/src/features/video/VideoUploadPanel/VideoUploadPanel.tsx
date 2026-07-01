@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { VideoIntelligenceDashboard } from "@/features/intelligence";
 import { OptimizationDashboard } from "@/features/optimization";
 import { ProcessingModeSelector } from "@/features/orchestrator";
+import { CreatePageLayout } from "@/features/product";
 import { QualityDashboard } from "@/features/quality";
 import { ProcessingResourceMonitor } from "@/features/scheduler";
 import { useTranslation } from "@/i18n/useTranslation";
@@ -132,38 +134,62 @@ export function VideoUploadPanel() {
 		}
 	};
 
+	const automaticPreviews =
+		processingMode === "automatic" ? (
+			<>
+				<CollapsibleSection title={t("pipeline.intelligence.title")}>
+					<VideoIntelligenceDashboard
+						intelligence={intelligence}
+						recommendation={recommendation}
+						loading={loadingAutomaticPreview}
+					/>
+				</CollapsibleSection>
+				<CollapsibleSection title={t("pipeline.optimization.title")}>
+					<OptimizationDashboard
+						optimization={optimization}
+						loading={loadingAutomaticPreview}
+					/>
+				</CollapsibleSection>
+				<CollapsibleSection title={t("pipeline.scheduler.title")}>
+					<ProcessingResourceMonitor
+						schedule={schedule}
+						loading={loadingAutomaticPreview}
+					/>
+				</CollapsibleSection>
+				<CollapsibleSection title={t("pipeline.qualityDashboard.title")}>
+					<QualityDashboard
+						report={qualityReport}
+						loading={loadingAutomaticPreview}
+					/>
+				</CollapsibleSection>
+			</>
+		) : null;
+
 	return (
 		<div className={styles.root}>
 			<div className={styles.content}>
 				{phase === "idle" ? (
-					<>
-						<ProcessingModeSelector
-							mode={processingMode}
-							onChange={setProcessingMode}
-						/>
-						{processingMode === "automatic" ? (
+					<CreatePageLayout
+						primary={
 							<>
-								<VideoIntelligenceDashboard
-									intelligence={intelligence}
-									recommendation={recommendation}
-									loading={loadingAutomaticPreview}
+								<ProcessingModeSelector
+									mode={processingMode}
+									onChange={setProcessingMode}
 								/>
-								<OptimizationDashboard
-									optimization={optimization}
-									loading={loadingAutomaticPreview}
-								/>
-								<ProcessingResourceMonitor
-									schedule={schedule}
-									loading={loadingAutomaticPreview}
-								/>
-								<QualityDashboard
-									report={qualityReport}
-									loading={loadingAutomaticPreview}
-								/>
+								<VideoDropzone onFileSelected={handleFileSelected} />
 							</>
-						) : null}
-						<VideoDropzone onFileSelected={handleFileSelected} />
-					</>
+						}
+						secondary={
+							<>
+								{automaticPreviews}
+								<CollapsibleSection title={t("shell.pageIntro.whatCanIDo")}>
+									<p className={styles.helpText}>
+										{t("pipeline.create.videoWhatCanIDo")}
+									</p>
+								</CollapsibleSection>
+							</>
+						}
+					/>
 				) : null}
 				{phase === "uploading" ? (
 					<VideoUploadProgress fileName={fileName} progress={progress} />

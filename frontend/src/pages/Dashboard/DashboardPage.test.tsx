@@ -51,7 +51,7 @@ describe("HomeMissionControl", () => {
 
 		await user.click(screen.getByRole("link", { name: "Create Video" }));
 		expect(
-			screen.getByRole("heading", { name: "Upload Video", level: 1 }),
+			screen.getByRole("heading", { name: "Upload video", level: 1 }),
 		).toBeInTheDocument();
 	});
 
@@ -92,6 +92,8 @@ describe("HomeMissionControl — import navigation", () => {
 		});
 
 		await user.click(screen.getByRole("link", { name: "Create PDF" }));
-		expect(screen.getByRole("heading", { name: "Import" })).toBeInTheDocument();
+		expect(
+			screen.getByRole("heading", { name: "Import knowledge" }),
+		).toBeInTheDocument();
 	});
 });

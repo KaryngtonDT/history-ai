@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
+import { CompactPageIntroduction, CreatePageLayout } from "@/features/product";
 import { useTranslation } from "@/i18n";
 import { contentService } from "@/services/content/ContentService";
 import { processingService } from "@/services/processing/ProcessingService";
-import { ImportHeader } from "../ImportHeader";
 import { PdfDropzone } from "../PdfDropzone";
 import type { ImportPhase } from "../types";
 import { UploadError } from "../UploadError";
@@ -58,10 +59,36 @@ export function Import() {
 
 	return (
 		<div className={styles.root}>
-			<ImportHeader />
+			<CompactPageIntroduction
+				eyebrow={t("workspace.import.eyebrow")}
+				title={t("workspace.import.headerTitle")}
+				description={t("workspace.import.headerDescription")}
+				whatCanIDo={t("workspace.import.whatCanIDo")}
+			/>
 			<div className={styles.content}>
 				{phase === "idle" ? (
-					<PdfDropzone onFileSelected={handleFileSelected} />
+					<CreatePageLayout
+						primary={<PdfDropzone onFileSelected={handleFileSelected} />}
+						secondary={
+							<>
+								<CollapsibleSection
+									title={t("pipeline.create.whatHappensNext")}
+								>
+									<p className={styles.guidanceText}>
+										{t("workspace.import.whatHappensNext")}
+									</p>
+								</CollapsibleSection>
+								<CollapsibleSection title={t("workspace.import.helpTitle")}>
+									<p className={styles.guidanceText}>
+										{t("workspace.import.supportedFiles")}
+									</p>
+									<p className={styles.guidanceText}>
+										{t("workspace.import.whatCanIDo")}
+									</p>
+								</CollapsibleSection>
+							</>
+						}
+					/>
 				) : null}
 				{phase === "uploading" ? (
 					<UploadProgress fileName={fileName} progress={progress} />

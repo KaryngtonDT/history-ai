@@ -1,4 +1,6 @@
 export { AppSidebar } from "./AppSidebar";
+export { CompactPageIntroduction } from "./CompactPageIntroduction";
+export { CreatePageLayout } from "./CreatePageLayout";
 export { PRODUCT_NAV_GROUPS, resolveNavPath } from "./navigation";
 export { PageIntroduction } from "./PageIntroduction";
 export { ProductBreadcrumbs } from "./ProductBreadcrumbs";

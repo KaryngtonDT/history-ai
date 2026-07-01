@@ -1,0 +1,33 @@
+.root {
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-lg);
+	background: var(--shell-surface);
+}
+
+.summary {
+	padding: var(--space-3) var(--space-4);
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+	cursor: pointer;
+	list-style: none;
+}
+
+.summary::-webkit-details-marker {
+	display: none;
+}
+
+.summary::before {
+	content: "▸";
+	display: inline-block;
+	margin-right: var(--space-2);
+	transition: transform 0.15s ease;
+}
+
+.root[open] .summary::before {
+	transform: rotate(90deg);
+}
+
+.content {
+	padding: 0 var(--space-4) var(--space-4);
+}

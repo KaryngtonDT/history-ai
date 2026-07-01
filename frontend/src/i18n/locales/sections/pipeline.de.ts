@@ -318,12 +318,24 @@ export const pipelineDe: PipelineMessages = {
 			qualityDescription: "Bewertung der Veröffentlichungsreife",
 		},
 		create: {
+			videoEyebrow: "Erstellen",
+			videoTitle: "Video hochladen",
+			videoDescription:
+				"Starten Sie die KI-Lokalisierungspipeline mit dem Upload Ihres Quellvideos.",
+			videoWhatCanIDo:
+				"Wählen Sie manuellen oder automatischen Modus, laden Sie ein Video hoch und folgen Sie der Pipeline von Transkript bis Final-Render.",
 			audioEyebrow: "Erstellen",
 			audioTitle: "Audio transformieren",
 			audioDescription:
 				"Laden Sie Podcast, Vorlesung oder Aufnahme hoch. Lumen transkribiert, übersetzt und bereitet Wissensartefakte vor.",
 			audioWhatCanIDo:
 				"Wählen Sie Ihren KI-Modus, laden Sie Audio hoch und öffnen Sie dann die Übersicht, um die Verarbeitung zu verfolgen.",
+			audioPipelineExplanation:
+				"Audio wird transkribiert, übersetzt und für die Wissenssuche indexiert. Der Verarbeitungsmodus steuert die Automatisierung vor Ihrer Prüfung.",
+			youtubeWhatHappensNext:
+				"Lumen lädt das Video herunter, erstellt einen Pipeline-Job und öffnet die Video-Übersicht. Danach können Sie Transkript, Übersetzungen und lokalisierte Ausgaben erzeugen.",
+			whatHappensNext: "Nächste Schritte",
+			pipelineExplanation: "So funktioniert die Verarbeitung",
 		},
 	},
 };

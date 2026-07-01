@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { ProcessingModeSelector } from "@/features/orchestrator";
-import { PageIntroduction } from "@/features/product";
+import { CompactPageIntroduction, CreatePageLayout } from "@/features/product";
 import { useTranslation } from "@/i18n/useTranslation";
 import type { ProcessingMode } from "@/services/orchestrator/types";
 import type { YouTubeMetadata } from "@/services/youtubeSource/types";
@@ -64,71 +65,98 @@ export function YouTubeImportPanel() {
 		}
 	};
 
+	const showForm =
+		phase === "idle" || phase === "previewing" || phase === "importing";
+
 	return (
 		<div className={styles.root}>
-			<PageIntroduction
+			<CompactPageIntroduction
 				eyebrow={t("pipeline.youtube.eyebrow")}
 				title={t("pipeline.youtube.title")}
 				description={t("pipeline.youtube.description")}
 				whatCanIDo={t("pipeline.youtube.whatCanIDo")}
 			/>
 
-			<Card className={styles.formCard}>
-				<label className={styles.label} htmlFor="youtube-url">
-					{t("pipeline.youtube.urlLabel")}
-				</label>
-				<input
-					id="youtube-url"
-					className={styles.input}
-					type="url"
-					placeholder={t("pipeline.youtube.urlPlaceholder")}
-					value={url}
-					onChange={(event) => setUrl(event.target.value)}
+			{showForm ? (
+				<CreatePageLayout
+					primary={
+						<>
+							<Card className={styles.formCard}>
+								<label className={styles.label} htmlFor="youtube-url">
+									{t("pipeline.youtube.urlLabel")}
+								</label>
+								<input
+									id="youtube-url"
+									className={styles.input}
+									type="url"
+									placeholder={t("pipeline.youtube.urlPlaceholder")}
+									value={url}
+									onChange={(event) => setUrl(event.target.value)}
+								/>
+								<div className={styles.actions}>
+									<Button
+										variant="secondary"
+										disabled={
+											!url || phase === "previewing" || phase === "importing"
+										}
+										onClick={() => void handlePreview()}
+									>
+										{t("pipeline.youtube.previewCta")}
+									</Button>
+									<Button
+										variant="primary"
+										disabled={!url || phase === "importing"}
+										onClick={() => void handleImport()}
+									>
+										{t("pipeline.youtube.importCta")}
+									</Button>
+								</div>
+							</Card>
+
+							<ProcessingModeSelector
+								mode={processingMode}
+								onChange={setProcessingMode}
+							/>
+
+							{metadata ? (
+								<Card className={styles.previewCard}>
+									{metadata.thumbnailUrl ? (
+										<img
+											className={styles.thumbnail}
+											src={metadata.thumbnailUrl}
+											alt=""
+										/>
+									) : null}
+									<div>
+										<h2 className={styles.previewTitle}>{metadata.title}</h2>
+										<p className={styles.previewMeta}>
+											{formatDuration(metadata.durationSeconds)}
+											{metadata.channelName ? ` · ${metadata.channelName}` : ""}
+										</p>
+									</div>
+								</Card>
+							) : null}
+
+							{phase === "importing" ? (
+								<p role="status">{t("pipeline.youtube.importingStatus")}</p>
+							) : null}
+						</>
+					}
+					secondary={
+						<>
+							<CollapsibleSection title={t("pipeline.create.whatHappensNext")}>
+								<p className={styles.guidanceText}>
+									{t("pipeline.create.youtubeWhatHappensNext")}
+								</p>
+							</CollapsibleSection>
+							<CollapsibleSection title={t("shell.pageIntro.whatCanIDo")}>
+								<p className={styles.guidanceText}>
+									{t("pipeline.youtube.whatCanIDo")}
+								</p>
+							</CollapsibleSection>
+						</>
+					}
 				/>
-				<div className={styles.actions}>
-					<Button
-						variant="secondary"
-						disabled={!url || phase === "previewing" || phase === "importing"}
-						onClick={() => void handlePreview()}
-					>
-						{t("pipeline.youtube.previewCta")}
-					</Button>
-					<Button
-						variant="primary"
-						disabled={!url || phase === "importing"}
-						onClick={() => void handleImport()}
-					>
-						{t("pipeline.youtube.importCta")}
-					</Button>
-				</div>
-			</Card>
-
-			<ProcessingModeSelector
-				mode={processingMode}
-				onChange={setProcessingMode}
-			/>
-
-			{metadata ? (
-				<Card className={styles.previewCard}>
-					{metadata.thumbnailUrl ? (
-						<img
-							className={styles.thumbnail}
-							src={metadata.thumbnailUrl}
-							alt=""
-						/>
-					) : null}
-					<div>
-						<h2 className={styles.previewTitle}>{metadata.title}</h2>
-						<p className={styles.previewMeta}>
-							{formatDuration(metadata.durationSeconds)}
-							{metadata.channelName ? ` · ${metadata.channelName}` : ""}
-						</p>
-					</div>
-				</Card>
-			) : null}
-
-			{phase === "importing" ? (
-				<p role="status">{t("pipeline.youtube.importingStatus")}</p>
 			) : null}
 
 			{phase === "success" ? (

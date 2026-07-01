@@ -226,9 +226,16 @@ export const workspaceEn = {
 		import: {
 			couldNotStartProcessing:
 				"Could not start processing. Check that the backend is running and try again.",
-			headerTitle: "Import",
+			eyebrow: "Create",
+			headerTitle: "Import knowledge",
 			headerDescription:
 				"Bring knowledge sources into Lumen. Select a PDF to begin.",
+			whatCanIDo:
+				"Upload a PDF to extract content, create a processing job, and open the guided summary workflow.",
+			whatHappensNext:
+				"Lumen imports the PDF, creates a content record, and starts a summary processing job. You can follow progress on the processing page.",
+			supportedFiles: "Supported files: PDF only. Text-based PDFs work best.",
+			helpTitle: "Help",
 			pdfDropzoneAria: "PDF drop zone",
 			dropPdfTitle: "Drop your PDF here",
 			dropPdfDescription: "Or select a file from your device.",

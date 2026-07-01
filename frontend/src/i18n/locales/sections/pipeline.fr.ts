@@ -319,12 +319,24 @@ export const pipelineFr: PipelineMessages = {
 			qualityDescription: "Score de préparation à la publication",
 		},
 		create: {
+			videoEyebrow: "Créer",
+			videoTitle: "Téléverser une vidéo",
+			videoDescription:
+				"Démarrez le pipeline de localisation IA en téléversant votre vidéo source.",
+			videoWhatCanIDo:
+				"Choisissez le mode manuel ou automatique, téléversez une vidéo, puis suivez le pipeline de la transcription au rendu final.",
 			audioEyebrow: "Créer",
 			audioTitle: "Transformer l'audio",
 			audioDescription:
 				"Téléversez un podcast, un cours ou un enregistrement. Lumen transcrit, traduit et prépare des artefacts de connaissance.",
 			audioWhatCanIDo:
 				"Choisissez votre mode IA, téléversez l'audio, puis ouvrez la vue d'ensemble pour suivre le traitement.",
+			audioPipelineExplanation:
+				"L'audio est transcrit, traduit et indexé pour la recherche de connaissances. Le mode de traitement contrôle le niveau d'automatisation avant votre revue.",
+			youtubeWhatHappensNext:
+				"Lumen télécharge la vidéo, crée un job de pipeline et ouvre la vue d'ensemble. Vous pourrez ensuite générer transcription, traductions et sorties localisées.",
+			whatHappensNext: "Étapes suivantes",
+			pipelineExplanation: "Fonctionnement du traitement",
 		},
 	},
 };

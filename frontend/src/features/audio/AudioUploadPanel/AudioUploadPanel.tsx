@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { ProcessingModeSelector } from "@/features/orchestrator";
-import { PageIntroduction } from "@/features/product";
+import { CompactPageIntroduction, CreatePageLayout } from "@/features/product";
 import { useTranslation } from "@/i18n/useTranslation";
 import { audioSourceService } from "@/services/audioSource/AudioSourceService";
 import type { ProcessingMode } from "@/services/orchestrator/types";
@@ -54,20 +55,41 @@ export function AudioUploadPanel() {
 
 	return (
 		<div className={styles.root}>
-			<PageIntroduction
+			<CompactPageIntroduction
 				eyebrow={t("pipeline.create.audioEyebrow")}
 				title={t("pipeline.create.audioTitle")}
 				description={t("pipeline.create.audioDescription")}
 				whatCanIDo={t("pipeline.create.audioWhatCanIDo")}
 			/>
 
-			<ProcessingModeSelector
-				mode={processingMode}
-				onChange={setProcessingMode}
-			/>
-
 			{phase === "idle" ? (
-				<AudioDropzone onFileSelected={handleFileSelected} />
+				<CreatePageLayout
+					primary={
+						<>
+							<ProcessingModeSelector
+								mode={processingMode}
+								onChange={setProcessingMode}
+							/>
+							<AudioDropzone onFileSelected={handleFileSelected} />
+						</>
+					}
+					secondary={
+						<>
+							<CollapsibleSection
+								title={t("pipeline.create.pipelineExplanation")}
+							>
+								<p className={styles.guidanceText}>
+									{t("pipeline.create.audioPipelineExplanation")}
+								</p>
+							</CollapsibleSection>
+							<CollapsibleSection title={t("shell.pageIntro.whatCanIDo")}>
+								<p className={styles.guidanceText}>
+									{t("pipeline.create.audioWhatCanIDo")}
+								</p>
+							</CollapsibleSection>
+						</>
+					}
+				/>
 			) : null}
 
 			{phase === "uploading" ? (

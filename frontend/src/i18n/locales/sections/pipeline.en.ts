@@ -307,12 +307,24 @@ export const pipelineEn = {
 			qualityDescription: "Publication readiness score",
 		},
 		create: {
+			videoEyebrow: "Create",
+			videoTitle: "Upload video",
+			videoDescription:
+				"Start the AI localization pipeline by uploading your source video.",
+			videoWhatCanIDo:
+				"Choose manual or automatic mode, upload a video, then follow the pipeline from transcript to final render.",
 			audioEyebrow: "Create",
 			audioTitle: "Transform audio",
 			audioDescription:
 				"Upload a podcast, lecture, or recording. Lumen transcribes, translates, and prepares knowledge artifacts.",
 			audioWhatCanIDo:
 				"Choose your AI mode, upload audio, then open the overview to follow processing.",
+			audioPipelineExplanation:
+				"Audio is transcribed, translated, and indexed for knowledge search. Processing mode controls how much automation runs before you review each step.",
+			youtubeWhatHappensNext:
+				"Lumen downloads the video, creates a pipeline job, and opens the video overview. You can then generate transcript, translations, and localized outputs.",
+			whatHappensNext: "What happens next",
+			pipelineExplanation: "How processing works",
 		},
 	},
 } as const;

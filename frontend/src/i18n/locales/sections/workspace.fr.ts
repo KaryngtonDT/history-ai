@@ -241,9 +241,17 @@ export const workspaceFr: WorkspaceMessages = {
 		import: {
 			couldNotStartProcessing:
 				"Impossible de démarrer le traitement. Vérifiez que le backend est démarré puis réessayez.",
-			headerTitle: "Importer",
+			eyebrow: "Créer",
+			headerTitle: "Importer des connaissances",
 			headerDescription:
 				"Importez des sources de connaissance dans Lumen. Sélectionnez un PDF pour commencer.",
+			whatCanIDo:
+				"Téléversez un PDF pour extraire le contenu, créer un job de traitement et ouvrir le flux de résumé guidé.",
+			whatHappensNext:
+				"Lumen importe le PDF, crée un enregistrement de contenu et démarre un job de résumé. Suivez la progression sur la page de traitement.",
+			supportedFiles:
+				"Fichiers pris en charge : PDF uniquement. Les PDF textuels donnent les meilleurs résultats.",
+			helpTitle: "Aide",
 			pdfDropzoneAria: "Zone de dépôt PDF",
 			dropPdfTitle: "Déposez votre PDF ici",
 			dropPdfDescription: "Ou sélectionnez un fichier depuis votre appareil.",

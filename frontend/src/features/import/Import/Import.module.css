@@ -4,5 +4,16 @@
 }
 
 .content {
-	max-width: var(--size-content-narrow);
+	max-width: none;
+}
+
+.guidanceText {
+	margin: 0;
+	font-size: var(--font-sm);
+	line-height: 1.5;
+	color: var(--shell-text-muted);
+}
+
+.guidanceText + .guidanceText {
+	margin-top: var(--space-2);
 }

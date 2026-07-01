@@ -61,3 +61,10 @@
 .error {
 	color: var(--color-danger);
 }
+
+.guidanceText {
+	margin: 0;
+	font-size: var(--font-sm);
+	line-height: 1.5;
+	color: var(--shell-text-muted);
+}

@@ -1,15 +1,18 @@
 import { ExplainThisButton } from "@/features/help";
-import { PageIntroduction } from "@/features/product";
+import { CompactPageIntroduction } from "@/features/product";
 import { VideoUploadPanel } from "@/features/video";
+import { useTranslation } from "@/i18n";
 
 export function VideoUploadPage() {
+	const { t } = useTranslation();
+
 	return (
 		<section>
-			<PageIntroduction
-				eyebrow="Create"
-				title="Upload Video"
-				description="Start the AI localization pipeline by uploading your source video."
-				whatCanIDo="Choose manual or automatic mode, upload a video, then follow the pipeline from transcript to final render."
+			<CompactPageIntroduction
+				eyebrow={t("pipeline.create.videoEyebrow")}
+				title={t("pipeline.create.videoTitle")}
+				description={t("pipeline.create.videoDescription")}
+				whatCanIDo={t("pipeline.create.videoWhatCanIDo")}
 				secondaryActions={<ExplainThisButton featureId="video-upload" />}
 			/>
 			<VideoUploadPanel />
