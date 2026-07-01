@@ -219,6 +219,9 @@ services:
     App\Domain\Collaboration\WorkspaceInvitationRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Collaboration\DoctrineWorkspaceInvitationRepository
 
+    App\Domain\Telemetry\PipelineTelemetryRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Telemetry\DoctrinePipelineTelemetryRepository
+
     App\Domain\History\ExecutionReplayContextInterface:
         alias: App\Infrastructure\History\ExecutionReplayContext
 
