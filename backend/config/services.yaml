@@ -14,6 +14,8 @@ parameters:
     video.storage_dir: '%kernel.project_dir%/var/video-storage'
     audio.upload_max_bytes: '%env(int:default:video.upload_max_bytes_default:AUDIO_UPLOAD_MAX_BYTES)%'
     audio.source_storage_dir: '%kernel.project_dir%/var/audio-source-storage'
+    youtube.download_dir: '%kernel.project_dir%/var/youtube-downloads'
+    youtube.yt_dlp.binary_default: 'yt-dlp'
     stt.provider_default: 'faster_whisper'
     stt.faster_whisper.binary_default: 'faster-whisper'
     stt.faster_whisper.model_default: 'base'
@@ -155,6 +157,20 @@ services:
     App\Infrastructure\Storage\Audio\LocalAudioStorage:
         arguments:
             $storageDirectory: '%audio.source_storage_dir%'
+
+    App\Domain\YouTube\YouTubeImporterInterface:
+        alias: App\Infrastructure\YouTube\YtDlpYouTubeImporter
+
+    App\Domain\YouTube\YouTubeVideoRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\YouTube\DoctrineYouTubeVideoRepository
+
+    App\Infrastructure\YouTube\YtDlpYouTubeImporter:
+        arguments:
+            $binary: '%env(default:youtube.yt_dlp.binary_default:YOUTUBE_YT_DLP_BINARY)%'
+
+    App\Application\YouTube\Handlers\ImportYouTubeHandler:
+        arguments:
+            $downloadDirectory: '%youtube.download_dir%'
 
     App\Domain\Speech\TranscriptRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Speech\DoctrineTranscriptRepository

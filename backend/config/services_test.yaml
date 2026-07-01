@@ -113,8 +113,21 @@ when@test:
             class: App\Infrastructure\Video\NoOpVideoProcessingQueue
             public: true
 
+        App\Domain\YouTube\YouTubeImporterInterface:
+            class: App\Infrastructure\YouTube\MockYouTubeImporter
+            public: true
+
+        App\Domain\Source\SourceRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\Source\DoctrineSourceRepository
+            public: true
+
+        App\Domain\YouTube\YouTubeVideoRepositoryInterface:
+            alias: App\Infrastructure\Persistence\Doctrine\YouTube\DoctrineYouTubeVideoRepository
+            public: true
+
     parameters:
         video.storage_dir: '%kernel.cache_dir%/video-storage'
+        youtube.download_dir: '%kernel.cache_dir%/youtube-downloads'
         tts.output_dir: '%kernel.cache_dir%/audio-storage'
         voice_clone.output_dir: '%kernel.cache_dir%/voice-clone-storage'
         lip_sync.output_dir: '%kernel.cache_dir%/lip-sync-storage'
