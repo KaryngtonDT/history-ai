@@ -1,10 +1,13 @@
 import { useTranslation } from "@/i18n/useTranslation";
 import { ShadowVoiceButton } from "../ShadowVoiceButton";
+import type { ShadowSpeechLanguage } from "../shadowVoice";
 import styles from "./ShadowAnswerInput.module.css";
 
 interface ShadowAnswerInputProps {
 	value: string;
 	disabled?: boolean;
+	speechLanguage?: ShadowSpeechLanguage | string;
+	targetLanguage?: string;
 	onChange: (value: string) => void;
 	onSubmit: () => void;
 	onSkip: () => void;
@@ -13,6 +16,8 @@ interface ShadowAnswerInputProps {
 export function ShadowAnswerInput({
 	value,
 	disabled = false,
+	speechLanguage = "auto",
+	targetLanguage = "en",
 	onChange,
 	onSubmit,
 	onSkip,
@@ -39,7 +44,17 @@ export function ShadowAnswerInput({
 				placeholder={t("pipeline.shadow.answerPlaceholder")}
 				onChange={(event) => onChange(event.target.value)}
 			/>
-			<ShadowVoiceButton onTranscript={onChange} />
+			<ShadowVoiceButton
+				onTranscript={onChange}
+				speechLanguage={
+					speechLanguage === "en" ||
+					speechLanguage === "fr" ||
+					speechLanguage === "de"
+						? speechLanguage
+						: "auto"
+				}
+				targetLanguage={targetLanguage}
+			/>
 			<div className={styles.actions}>
 				<button type="submit" className={styles.primary} disabled={disabled}>
 					{t("pipeline.shadow.submitAnswer")}

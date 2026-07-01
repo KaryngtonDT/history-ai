@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/i18n/useTranslation";
+import type { ShadowSpeechLanguage } from "../shadowVoice";
+import {
+	isSpeechRecognitionSupported,
+	resolveRecognitionLanguage,
+} from "../shadowVoice";
 import styles from "./ShadowVoiceButton.module.css";
 
 interface ShadowVoiceButtonProps {
 	onTranscript: (text: string) => void;
+	speechLanguage?: ShadowSpeechLanguage;
+	targetLanguage?: string;
 }
 
 type BrowserSpeechRecognition = {
@@ -35,13 +42,17 @@ function getSpeechRecognition(): SpeechRecognitionConstructor | null {
 	);
 }
 
-export function ShadowVoiceButton({ onTranscript }: ShadowVoiceButtonProps) {
-	const { t } = useTranslation();
+export function ShadowVoiceButton({
+	onTranscript,
+	speechLanguage = "auto",
+	targetLanguage = "en",
+}: ShadowVoiceButtonProps) {
+	const { t, locale } = useTranslation();
 	const [supported, setSupported] = useState(false);
 	const [listening, setListening] = useState(false);
 
 	useEffect(() => {
-		setSupported(getSpeechRecognition() !== null);
+		setSupported(isSpeechRecognitionSupported());
 	}, []);
 
 	if (!supported) {
@@ -62,7 +73,11 @@ export function ShadowVoiceButton({ onTranscript }: ShadowVoiceButtonProps) {
 				}
 
 				const recognition = new Recognition();
-				recognition.lang = document.documentElement.lang || "en";
+				recognition.lang = resolveRecognitionLanguage(
+					speechLanguage,
+					targetLanguage,
+					locale,
+				);
 				recognition.interimResults = false;
 				recognition.maxAlternatives = 1;
 				setListening(true);
@@ -87,13 +102,4 @@ export function ShadowVoiceButton({ onTranscript }: ShadowVoiceButtonProps) {
 	);
 }
 
-export function speakShadowAnswer(text: string): void {
-	if (!("speechSynthesis" in window)) {
-		return;
-	}
-
-	window.speechSynthesis.cancel();
-	const utterance = new SpeechSynthesisUtterance(text);
-	utterance.lang = document.documentElement.lang || "en";
-	window.speechSynthesis.speak(utterance);
-}
+export { speakShadowAnswer } from "../shadowVoice";

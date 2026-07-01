@@ -344,6 +344,16 @@ export const pipelineEn = {
 			voiceInput: "Speak question",
 			listening: "Listening...",
 			voiceUnavailable: "Voice input unavailable — use text below.",
+			voiceSettingsTitle: "Shadow voice",
+			speakingLanguage: "Shadow speaking language",
+			speakingLanguageAuto: "Auto (match target language)",
+			speakingLanguageEnglish: "English",
+			speakingLanguageFrench: "Français",
+			speakingLanguageGerman: "Deutsch",
+			speechOutputUnavailable:
+				"Speech output unavailable in this browser — text answers still work.",
+			voiceMissing:
+				"No matching browser voice found for this language — text fallback is used.",
 			timelineEmpty: "No questions yet. Ask Shadow about the current moment.",
 			vocabularyTitle: "Vocabulary",
 			vocabularyDescription:

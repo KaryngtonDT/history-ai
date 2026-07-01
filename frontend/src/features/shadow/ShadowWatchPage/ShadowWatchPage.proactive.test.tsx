@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ShadowWatchPage } from "@/features/shadow/ShadowWatchPage";
 import { videoRenderService } from "@/services/render/VideoRenderService";
 import { shadowService } from "@/services/shadow/ShadowService";
+import { DEFAULT_SHADOW_VOICE_PREFERENCE } from "@/services/shadow/types";
 import { transcriptService } from "@/services/transcript/TranscriptService";
 import { renderWithProviders } from "@/test/render";
 
@@ -19,6 +20,8 @@ const defaultPolicy = {
 	autoResume: false,
 	allowAutoPause: true,
 };
+
+const defaultVoicePreference = DEFAULT_SHADOW_VOICE_PREFERENCE;
 
 describe("ShadowWatchPage proactive tutor", () => {
 	it("disables intervention checks when proactive mode is off", async () => {
@@ -36,6 +39,7 @@ describe("ShadowWatchPage proactive tutor", () => {
 			conversationId: null,
 			interactions: [],
 			policy: defaultPolicy,
+			voicePreference: defaultVoicePreference,
 		});
 		vi.spyOn(shadowService, "getContext").mockResolvedValue(null);
 		const checkSpy = vi
@@ -57,6 +61,7 @@ describe("ShadowWatchPage proactive tutor", () => {
 					conversationId: null,
 					interactions: [],
 					policy: defaultPolicy,
+					voicePreference: defaultVoicePreference,
 				},
 			});
 
@@ -90,6 +95,7 @@ describe("ShadowWatchPage proactive tutor", () => {
 			conversationId: null,
 			interactions: [],
 			policy: defaultPolicy,
+			voicePreference: defaultVoicePreference,
 		});
 		vi.spyOn(shadowService, "getContext").mockResolvedValue(null);
 		const updateSpy = vi
@@ -114,6 +120,52 @@ describe("ShadowWatchPage proactive tutor", () => {
 		});
 
 		await user.click(screen.getByLabelText("Proactive mode"));
+
+		await waitFor(() => {
+			expect(updateSpy).toHaveBeenCalled();
+		});
+	});
+
+	it("updates voice preference when speaking language changes", async () => {
+		vi.spyOn(videoRenderService, "listRenders").mockResolvedValue([]);
+		vi.spyOn(transcriptService, "getTranscript").mockResolvedValue(null);
+		vi.spyOn(shadowService, "startSession").mockResolvedValue({
+			sessionId: "550e8400-e29b-41d4-a716-446655440020",
+			videoId: VIDEO_ID,
+			playbackState: "playing",
+			targetLanguage: "fr",
+			currentTimeSeconds: 0,
+			currentTranscriptSegmentIndex: null,
+			currentTranslationSegmentIndex: null,
+			contentId: null,
+			conversationId: null,
+			interactions: [],
+			policy: defaultPolicy,
+			voicePreference: defaultVoicePreference,
+		});
+		vi.spyOn(shadowService, "getContext").mockResolvedValue(null);
+		const updateSpy = vi
+			.spyOn(shadowService, "updateVoicePreference")
+			.mockResolvedValue({
+				mode: "manual",
+				manualLanguage: "de",
+			});
+
+		const user = userEvent.setup();
+
+		renderWithProviders(
+			<MemoryRouter initialEntries={[`/video/${VIDEO_ID}/watch`]}>
+				<Routes>
+					<Route path="/video/:videoId/watch" element={<ShadowWatchPage />} />
+				</Routes>
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByLabelText("Shadow speaking language")).toBeInTheDocument();
+		});
+
+		await user.selectOptions(screen.getByLabelText("Shadow speaking language"), "de");
 
 		await waitFor(() => {
 			expect(updateSpy).toHaveBeenCalled();

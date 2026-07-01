@@ -3,8 +3,8 @@ import { useTranslation } from "@/i18n/useTranslation";
 import type { ShadowIntervention } from "@/services/shadow/types";
 import { ShadowAnswerInput } from "../ShadowAnswerInput";
 import { ShadowChallengePrompt } from "../ShadowChallengePrompt";
-import { speakShadowAnswer } from "../ShadowVoiceButton";
 import { ShadowWhyInterrupted } from "../ShadowWhyInterrupted";
+import { speakShadowAnswer } from "../shadowVoice";
 import styles from "./ShadowInterventionCard.module.css";
 
 interface ShadowInterventionCardProps {
@@ -12,6 +12,7 @@ interface ShadowInterventionCardProps {
 	answer: string;
 	reply: string | null;
 	isBusy: boolean;
+	speechLanguage?: string;
 	onAnswerChange: (value: string) => void;
 	onSubmitAnswer: () => void;
 	onSkip: () => void;
@@ -22,6 +23,7 @@ export function ShadowInterventionCard({
 	answer,
 	reply,
 	isBusy,
+	speechLanguage = "en",
 	onAnswerChange,
 	onSubmitAnswer,
 	onSkip,
@@ -35,9 +37,9 @@ export function ShadowInterventionCard({
 
 		if (prompt && spokenRef.current !== intervention.id) {
 			spokenRef.current = intervention.id;
-			speakShadowAnswer(prompt);
+			speakShadowAnswer(prompt, speechLanguage);
 		}
-	}, [intervention]);
+	}, [intervention, speechLanguage]);
 
 	return (
 		<section
@@ -69,6 +71,8 @@ export function ShadowInterventionCard({
 				<ShadowAnswerInput
 					value={answer}
 					disabled={isBusy}
+					speechLanguage={speechLanguage}
+					targetLanguage={speechLanguage}
 					onChange={onAnswerChange}
 					onSubmit={onSubmitAnswer}
 					onSkip={onSkip}

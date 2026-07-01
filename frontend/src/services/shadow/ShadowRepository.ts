@@ -6,9 +6,11 @@ import type {
 	ShadowInterventionCheck,
 	ShadowInterventionPolicy,
 	ShadowSession,
+	ShadowVoicePreference,
 	SkipShadowInterventionRequest,
 	StartShadowSessionRequest,
 	UpdateShadowInterventionPolicyRequest,
+	UpdateShadowVoicePreferenceRequest,
 	WatchContext,
 } from "./types";
 
@@ -68,4 +70,10 @@ export interface ShadowRepository {
 		sessionId: string,
 		request: UpdateShadowInterventionPolicyRequest,
 	): Promise<ShadowInterventionPolicy>;
+
+	updateVoicePreference(
+		videoId: string,
+		sessionId: string,
+		request: UpdateShadowVoicePreferenceRequest,
+	): Promise<ShadowVoicePreference>;
 }

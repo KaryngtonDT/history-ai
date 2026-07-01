@@ -8,6 +8,7 @@ import {
 	videoShadowSessionPolicyPath,
 	videoShadowSessionResumePath,
 	videoShadowSessionsPath,
+	videoShadowSessionVoicePath,
 } from "@/config/api";
 import type { HttpClient } from "@/services/http/HttpClient";
 import { ApiError } from "@/shared/errors";
@@ -16,6 +17,7 @@ import {
 	type AnswerShadowInterventionRequest,
 	type AskShadowQuestionRequest,
 	DEFAULT_SHADOW_INTERVENTION_POLICY,
+	DEFAULT_SHADOW_VOICE_PREFERENCE,
 	mapShadowAnswerFromApi,
 	mapShadowSessionFromApi,
 	mapWatchContextFromApi,
@@ -24,9 +26,11 @@ import {
 	type ShadowInterventionCheck,
 	type ShadowInterventionPolicy,
 	type ShadowSessionApiDto,
+	type ShadowVoicePreference,
 	type SkipShadowInterventionRequest,
 	type StartShadowSessionRequest,
 	type UpdateShadowInterventionPolicyRequest,
+	type UpdateShadowVoicePreferenceRequest,
 	type WatchContextApiDto,
 } from "./types";
 
@@ -172,5 +176,17 @@ export class HttpShadowRepository implements ShadowRepository {
 		);
 
 		return dto.policy ?? DEFAULT_SHADOW_INTERVENTION_POLICY;
+	}
+
+	async updateVoicePreference(
+		videoId: string,
+		sessionId: string,
+		request: UpdateShadowVoicePreferenceRequest,
+	) {
+		const dto = await this.httpClient.put<{
+			voicePreference: ShadowVoicePreference;
+		}>(videoShadowSessionVoicePath(videoId, sessionId), request);
+
+		return dto.voicePreference ?? DEFAULT_SHADOW_VOICE_PREFERENCE;
 	}
 }

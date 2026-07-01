@@ -8,9 +8,11 @@ import type {
 	ShadowInterventionCheck,
 	ShadowInterventionPolicy,
 	ShadowSession,
+	ShadowVoicePreference,
 	SkipShadowInterventionRequest,
 	StartShadowSessionRequest,
 	UpdateShadowInterventionPolicyRequest,
+	UpdateShadowVoicePreferenceRequest,
 	WatchContext,
 } from "./types";
 
@@ -155,6 +157,22 @@ export class ShadowService {
 		}
 
 		return this.repository.updateInterventionPolicy(
+			videoId.trim(),
+			sessionId,
+			request,
+		);
+	}
+
+	updateVoicePreference(
+		videoId: string,
+		sessionId: string,
+		request: UpdateShadowVoicePreferenceRequest,
+	): Promise<ShadowVoicePreference> {
+		if (!this.isValidVideoId(videoId) || sessionId.trim() === "") {
+			return Promise.reject(new Error("Invalid shadow session request"));
+		}
+
+		return this.repository.updateVoicePreference(
 			videoId.trim(),
 			sessionId,
 			request,

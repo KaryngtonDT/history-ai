@@ -28,8 +28,17 @@ import { ShadowTranscriptPanel } from "../ShadowTranscriptPanel";
 import { ShadowTranslationPanel } from "../ShadowTranslationPanel";
 import { ShadowTutorBadge } from "../ShadowTutorBadge";
 import { ShadowTutorSettings } from "../ShadowTutorSettings";
-import { ShadowVoiceButton, speakShadowAnswer } from "../ShadowVoiceButton";
+import { ShadowVoiceButton } from "../ShadowVoiceButton";
+import { ShadowVoiceSettings } from "../ShadowVoiceSettings";
 import { policyWithFrequency } from "../shadowTutorPolicy";
+import {
+	effectiveSpeechLanguage,
+	resolveSpeechLanguageFromAnswer,
+	type ShadowSpeechLanguage,
+	selectedLanguageFromPreference,
+	speakShadowAnswer,
+	toVoicePreferencePayload,
+} from "../shadowVoice";
 import { VocabularyPanel } from "../VocabularyPanel";
 import styles from "./ShadowWatchPage.module.css";
 
@@ -39,7 +48,7 @@ const DEFAULT_TARGET_LANGUAGE = "fr";
 
 export function ShadowWatchPage() {
 	const { videoId = "" } = useParams();
-	const { t } = useTranslation();
+	const { t, locale } = useTranslation();
 	const videoRef = useRef<HTMLVideoElement | null>(null);
 	const debounceRef = useRef<number | null>(null);
 	const interventionDebounceRef = useRef<number | null>(null);
@@ -241,6 +250,30 @@ export function ShadowWatchPage() {
 		}
 	};
 
+	const speakingLanguage: ShadowSpeechLanguage = session
+		? selectedLanguageFromPreference(session.voicePreference)
+		: "auto";
+
+	const handleVoiceLanguageChange = async (language: ShadowSpeechLanguage) => {
+		if (!session) {
+			return;
+		}
+
+		setIsBusy(true);
+
+		try {
+			const voicePreference = await shadowService.updateVoicePreference(
+				videoId,
+				session.sessionId,
+				toVoicePreferencePayload(language),
+			);
+
+			setSession({ ...session, voicePreference });
+		} finally {
+			setIsBusy(false);
+		}
+	};
+
 	const handleInterventionAnswer = async () => {
 		if (!session || !activeIntervention || interventionAnswer.trim() === "") {
 			return;
@@ -262,7 +295,10 @@ export function ShadowWatchPage() {
 			setSession(result.session);
 			setInterventionReply(result.reply);
 			setInterventionAnswer("");
-			speakShadowAnswer(result.reply);
+			speakShadowAnswer(
+				result.reply,
+				resolveSpeechLanguageFromAnswer(result.speechLanguage),
+			);
 			setShowResumePrompt(result.recommendResume);
 		} finally {
 			setIsBusy(false);
@@ -359,12 +395,16 @@ export function ShadowWatchPage() {
 				{
 					question: question.trim(),
 					time: currentTime,
+					interfaceLanguage: locale,
 				},
 			);
 
 			setSession(result.session);
 			setQuestion("");
-			speakShadowAnswer(result.answer);
+			speakShadowAnswer(
+				result.answer,
+				resolveSpeechLanguageFromAnswer(result.speechLanguage),
+			);
 		} finally {
 			setIsBusy(false);
 		}
@@ -420,10 +460,19 @@ export function ShadowWatchPage() {
 						currentTime={currentTime}
 						segment={context?.currentTranscriptSegment ?? null}
 					/>
-					<ShadowVoiceButton onTranscript={(text) => setQuestion(text)} />
+					<ShadowVoiceButton
+						onTranscript={(text) => setQuestion(text)}
+						speechLanguage={speakingLanguage}
+						targetLanguage={session.targetLanguage}
+					/>
 				</div>
 
 				<div className={styles.side}>
+					<ShadowVoiceSettings
+						selectedLanguage={speakingLanguage}
+						disabled={isBusy}
+						onChange={(language) => void handleVoiceLanguageChange(language)}
+					/>
 					<ShadowTutorSettings
 						policy={session.policy}
 						disabled={isBusy}
@@ -435,6 +484,10 @@ export function ShadowWatchPage() {
 							answer={interventionAnswer}
 							reply={interventionReply}
 							isBusy={isBusy}
+							speechLanguage={effectiveSpeechLanguage(
+								speakingLanguage,
+								session.targetLanguage,
+							)}
 							onAnswerChange={setInterventionAnswer}
 							onSubmitAnswer={() => void handleInterventionAnswer()}
 							onSkip={() => void handleInterventionSkip()}

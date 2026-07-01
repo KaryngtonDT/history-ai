@@ -3,6 +3,7 @@ import {
 	type AnswerShadowInterventionRequest,
 	type AskShadowQuestionRequest,
 	DEFAULT_SHADOW_INTERVENTION_POLICY,
+	DEFAULT_SHADOW_VOICE_PREFERENCE,
 	type ShadowIntervention,
 	type ShadowInterventionCheck,
 	type ShadowInterventionPolicy,
@@ -10,6 +11,7 @@ import {
 	type SkipShadowInterventionRequest,
 	type StartShadowSessionRequest,
 	type UpdateShadowInterventionPolicyRequest,
+	type UpdateShadowVoicePreferenceRequest,
 	type WatchContext,
 } from "./types";
 
@@ -59,6 +61,7 @@ function mockContext(time: number): WatchContext {
 export class MockShadowRepository implements ShadowRepository {
 	private session: ShadowSession | null = null;
 	private policy: ShadowInterventionPolicy = DEFAULT_SHADOW_INTERVENTION_POLICY;
+	private voicePreference = DEFAULT_SHADOW_VOICE_PREFERENCE;
 	private pendingIntervention: ShadowIntervention | null = null;
 
 	async getContext(
@@ -85,6 +88,7 @@ export class MockShadowRepository implements ShadowRepository {
 			conversationId: request.conversationId ?? null,
 			interactions: [],
 			policy: this.policy,
+			voicePreference: this.voicePreference,
 		};
 
 		return this.session;
@@ -120,6 +124,7 @@ export class MockShadowRepository implements ShadowRepository {
 				},
 			],
 			policy: session.policy,
+			voicePreference: session.voicePreference,
 		};
 
 		this.session = updated;
@@ -130,6 +135,10 @@ export class MockShadowRepository implements ShadowRepository {
 			currentTimeSeconds: request.time,
 			currentTranscriptSegmentIndex: 0,
 			currentTranslationSegmentIndex: 0,
+			answerLanguage: "fr",
+			speechLanguage: "fr",
+			fallbackUsed: false,
+			reason: "target_language",
 			session: updated,
 		};
 	}
@@ -243,6 +252,7 @@ export class MockShadowRepository implements ShadowRepository {
 			sessionId,
 			currentTimeSeconds: time,
 			policy: session.policy,
+			voicePreference: session.voicePreference,
 		};
 		this.session = updated;
 
@@ -286,6 +296,7 @@ export class MockShadowRepository implements ShadowRepository {
 				},
 			],
 			policy: session.policy,
+			voicePreference: session.voicePreference,
 		};
 
 		if (this.pendingIntervention?.id === interventionId) {
@@ -302,6 +313,10 @@ export class MockShadowRepository implements ShadowRepository {
 			interventionId,
 			reply,
 			recommendResume: session.policy.autoResume,
+			answerLanguage: "fr",
+			speechLanguage: "fr",
+			fallbackUsed: false,
+			reason: "target_language",
 			session: updated,
 		};
 	}
@@ -328,6 +343,7 @@ export class MockShadowRepository implements ShadowRepository {
 			sessionId,
 			currentTimeSeconds: request.time,
 			policy: session.policy,
+			voicePreference: session.voicePreference,
 		};
 		this.session = updated;
 
@@ -403,6 +419,29 @@ export class MockShadowRepository implements ShadowRepository {
 
 		this.policy = next;
 		this.session = { ...session, sessionId, policy: next };
+
+		return next;
+	}
+
+	async updateVoicePreference(
+		_videoId: string,
+		sessionId: string,
+		request: UpdateShadowVoicePreferenceRequest,
+	) {
+		const session =
+			this.session ??
+			(await this.startSession(MOCK_VIDEO_ID, { targetLanguage: "fr" }));
+
+		const next = {
+			...this.voicePreference,
+			...(request.mode ? { mode: request.mode } : {}),
+			...(request.manualLanguage
+				? { manualLanguage: request.manualLanguage, mode: "manual" as const }
+				: {}),
+		};
+
+		this.voicePreference = next;
+		this.session = { ...session, sessionId, voicePreference: next };
 
 		return next;
 	}

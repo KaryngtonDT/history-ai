@@ -43,7 +43,25 @@ export interface ShadowSession {
 	conversationId: string | null;
 	interactions: ShadowInteraction[];
 	policy: ShadowInterventionPolicy;
+	voicePreference: ShadowVoicePreference;
 }
+
+export interface ShadowVoicePreference {
+	mode: ShadowVoiceMode;
+	manualLanguage: ShadowVoiceLanguageCode | null;
+}
+
+export type ShadowVoiceMode =
+	| "same_as_interface"
+	| "same_as_target_language"
+	| "manual";
+
+export type ShadowVoiceLanguageCode = "en" | "fr" | "de";
+
+export const DEFAULT_SHADOW_VOICE_PREFERENCE: ShadowVoicePreference = {
+	mode: "same_as_target_language",
+	manualLanguage: null,
+};
 
 export interface ShadowInterventionPolicy {
 	enabled: boolean;
@@ -92,6 +110,10 @@ export interface ShadowInterventionAnswer {
 	interventionId: string;
 	reply: string;
 	recommendResume: boolean;
+	answerLanguage: string;
+	speechLanguage: string;
+	fallbackUsed: boolean;
+	reason: string;
 	session: ShadowSession;
 }
 
@@ -115,6 +137,11 @@ export interface UpdateShadowInterventionPolicyRequest {
 	allowAutoPause?: boolean;
 }
 
+export interface UpdateShadowVoicePreferenceRequest {
+	mode?: ShadowVoiceMode;
+	manualLanguage?: ShadowVoiceLanguageCode;
+}
+
 export const DEFAULT_SHADOW_INTERVENTION_POLICY: ShadowInterventionPolicy = {
 	enabled: false,
 	maxInterventionsPerMinute: 2,
@@ -131,6 +158,10 @@ export interface ShadowAnswer {
 	currentTimeSeconds: number;
 	currentTranscriptSegmentIndex: number | null;
 	currentTranslationSegmentIndex: number | null;
+	answerLanguage: string;
+	speechLanguage: string;
+	fallbackUsed: boolean;
+	reason: string;
 	session: ShadowSession;
 }
 
@@ -143,6 +174,7 @@ export interface StartShadowSessionRequest {
 export interface AskShadowQuestionRequest {
 	question: string;
 	time: number;
+	interfaceLanguage?: string;
 }
 
 export type WatchContextApiDto = WatchContext;
@@ -159,6 +191,7 @@ export function mapShadowSessionFromApi(
 	return {
 		...dto,
 		policy: dto.policy ?? DEFAULT_SHADOW_INTERVENTION_POLICY,
+		voicePreference: dto.voicePreference ?? DEFAULT_SHADOW_VOICE_PREFERENCE,
 	};
 }
 

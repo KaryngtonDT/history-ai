@@ -354,6 +354,16 @@ export const pipelineFr: PipelineMessages = {
 			voiceInput: "Parler",
 			listening: "Écoute...",
 			voiceUnavailable: "Entrée vocale indisponible — utilisez le texte.",
+			voiceSettingsTitle: "Voix Shadow",
+			speakingLanguage: "Langue de parole de Shadow",
+			speakingLanguageAuto: "Auto (langue cible)",
+			speakingLanguageEnglish: "English",
+			speakingLanguageFrench: "Français",
+			speakingLanguageGerman: "Deutsch",
+			speechOutputUnavailable:
+				"Sortie vocale indisponible dans ce navigateur — les réponses texte restent disponibles.",
+			voiceMissing:
+				"Aucune voix navigateur correspondante — repli sur le texte.",
 			timelineEmpty: "Aucune question pour l'instant.",
 			vocabularyTitle: "Vocabulaire",
 			vocabularyDescription:

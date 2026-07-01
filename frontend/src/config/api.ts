@@ -225,6 +225,13 @@ export function videoShadowSessionPolicyPath(
 	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/policy`;
 }
 
+export function videoShadowSessionVoicePath(
+	videoId: string,
+	sessionId: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/voice`;
+}
+
 export function timelinePath(artifactId: string): string {
 	return `/api/timeline/${artifactId}`;
 }

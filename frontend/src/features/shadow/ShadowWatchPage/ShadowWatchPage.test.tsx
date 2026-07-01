@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ShadowWatchPage } from "@/features/shadow/ShadowWatchPage";
 import { videoRenderService } from "@/services/render/VideoRenderService";
 import { shadowService } from "@/services/shadow/ShadowService";
+import { DEFAULT_SHADOW_VOICE_PREFERENCE } from "@/services/shadow/types";
 import { transcriptService } from "@/services/transcript/TranscriptService";
 import { renderWithProviders } from "@/test/render";
 
@@ -42,6 +43,7 @@ describe("ShadowWatchPage", () => {
 				autoResume: false,
 				allowAutoPause: true,
 			},
+			voicePreference: DEFAULT_SHADOW_VOICE_PREFERENCE,
 		});
 		vi.spyOn(shadowService, "getContext").mockResolvedValue({
 			videoId: VIDEO_ID,
@@ -108,6 +110,7 @@ describe("ShadowWatchPage", () => {
 				autoResume: false,
 				allowAutoPause: true,
 			},
+			voicePreference: DEFAULT_SHADOW_VOICE_PREFERENCE,
 		});
 		vi.spyOn(shadowService, "getContext").mockResolvedValue(null);
 		const askSpy = vi.spyOn(shadowService, "askQuestion").mockResolvedValue({
@@ -116,6 +119,10 @@ describe("ShadowWatchPage", () => {
 			currentTimeSeconds: 0,
 			currentTranscriptSegmentIndex: 0,
 			currentTranslationSegmentIndex: null,
+			answerLanguage: "fr",
+			speechLanguage: "fr",
+			fallbackUsed: false,
+			reason: "target_language",
 			session: {
 				sessionId: "550e8400-e29b-41d4-a716-446655440020",
 				videoId: VIDEO_ID,
@@ -149,6 +156,7 @@ describe("ShadowWatchPage", () => {
 					autoResume: false,
 					allowAutoPause: true,
 				},
+				voicePreference: DEFAULT_SHADOW_VOICE_PREFERENCE,
 			},
 		});
 

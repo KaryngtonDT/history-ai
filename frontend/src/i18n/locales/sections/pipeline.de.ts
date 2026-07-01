@@ -354,6 +354,16 @@ export const pipelineDe: PipelineMessages = {
 			voiceInput: "Sprechen",
 			listening: "Hört zu...",
 			voiceUnavailable: "Spracheingabe nicht verfügbar — Text nutzen.",
+			voiceSettingsTitle: "Shadow-Stimme",
+			speakingLanguage: "Shadow-Sprachausgabe",
+			speakingLanguageAuto: "Auto (Zielsprache)",
+			speakingLanguageEnglish: "English",
+			speakingLanguageFrench: "Français",
+			speakingLanguageGerman: "Deutsch",
+			speechOutputUnavailable:
+				"Sprachausgabe in diesem Browser nicht verfügbar — Textantworten funktionieren weiter.",
+			voiceMissing:
+				"Keine passende Browser-Stimme gefunden — Text-Fallback wird verwendet.",
 			timelineEmpty: "Noch keine Fragen.",
 			vocabularyTitle: "Vokabular",
 			vocabularyDescription:

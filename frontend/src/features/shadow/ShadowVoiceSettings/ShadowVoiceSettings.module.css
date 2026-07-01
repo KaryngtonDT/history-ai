@@ -1,0 +1,44 @@
+.voiceSettings {
+	border: 1px solid var(--color-border);
+	border-radius: 12px;
+	padding: 1rem;
+	background: var(--color-surface);
+}
+
+.header {
+	margin-bottom: 0.75rem;
+}
+
+.title {
+	margin: 0;
+	font-size: 1rem;
+}
+
+.field {
+	display: grid;
+	gap: 0.35rem;
+}
+
+.label {
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+.select {
+	width: 100%;
+	padding: 0.5rem 0.65rem;
+	border-radius: 8px;
+	border: 1px solid var(--color-border);
+	background: var(--color-background);
+}
+
+.warning,
+.note {
+	margin: 0.75rem 0 0;
+	font-size: 0.8125rem;
+	color: var(--color-text-muted);
+}
+
+.warning {
+	color: var(--color-warning, #9a6700);
+}
