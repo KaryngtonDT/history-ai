@@ -14,7 +14,7 @@ use App\Domain\YouTube\YouTubeVideoId;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-final class YouTubeUrlTest extends TestCase
+final class YouTubeDomainTest extends TestCase
 {
     #[DataProvider('validUrlsProvider')]
     public function testAcceptsSupportedYouTubeUrls(string $url): void
@@ -38,10 +38,7 @@ final class YouTubeUrlTest extends TestCase
         $this->expectException(InvalidYouTubeException::class);
         new YouTubeUrl('https://example.com/video');
     }
-}
 
-final class YouTubeVideoTest extends TestCase
-{
     public function testCreateLinksVideoId(): void
     {
         $youtubeId = YouTubeVideoId::generate();
@@ -59,11 +56,8 @@ final class YouTubeVideoTest extends TestCase
         self::assertTrue($video->videoId()->equals($videoId));
         self::assertSame('Lecture', $video->metadata()->title);
     }
-}
 
-final class YouTubeVideoIdTest extends TestCase
-{
-    public function testRejectsInvalidId(): void
+    public function testRejectsInvalidVideoId(): void
     {
         $this->expectException(InvalidYouTubeVideoIdException::class);
         new YouTubeVideoId('not-valid');
