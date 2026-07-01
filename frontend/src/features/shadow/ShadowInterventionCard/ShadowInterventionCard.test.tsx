@@ -4,6 +4,19 @@ import { describe, expect, it, vi } from "vitest";
 import { ShadowInterventionCard } from "@/features/shadow/ShadowInterventionCard";
 import { renderWithProviders } from "@/test/render";
 
+vi.mock("@/features/shadow/shadowVoice", async () => {
+	const actual = await vi.importActual<typeof import("@/features/shadow/shadowVoice")>(
+		"@/features/shadow/shadowVoice",
+	);
+
+	return {
+		...actual,
+		speakShadowAnswer: vi.fn(() => ({ spoken: true, fallbackUsed: false })),
+	};
+});
+
+import { speakShadowAnswer } from "@/features/shadow/shadowVoice";
+
 const intervention = {
 	id: "550e8400-e29b-41d4-a716-446655440030",
 	type: "vocabulary_check",
@@ -64,5 +77,25 @@ describe("ShadowInterventionCard", () => {
 
 		expect(onSubmit).toHaveBeenCalled();
 		expect(onSkip).toHaveBeenCalled();
+	});
+
+	it("speaks the challenge in the selected language", () => {
+		renderWithProviders(
+			<ShadowInterventionCard
+				intervention={intervention}
+				answer=""
+				reply={null}
+				isBusy={false}
+				speechLanguage="fr"
+				onAnswerChange={() => undefined}
+				onSubmitAnswer={() => undefined}
+				onSkip={() => undefined}
+			/>,
+		);
+
+		expect(speakShadowAnswer).toHaveBeenCalledWith(
+			"What does compound interest mean?",
+			"fr",
+		);
 	});
 });
