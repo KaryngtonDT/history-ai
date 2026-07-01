@@ -28,7 +28,7 @@ const TECHNICAL_TERMS = [
 	"OpenVoice",
 	"LatentSync",
 	"FFmpeg",
-	"History AI",
+	"Lumen",
 	"YouTube",
 	"PDF",
 	"MP4",
@@ -95,7 +95,7 @@ function scanFile(filePath) {
 			continue;
 		}
 
-		const jsxText = line.match(/>\s*([A-Z][A-Za-z0-9 ,.'!?…→:+\-]{2,80})\s*</);
+		const jsxText = line.match(/>\s*([A-Z][A-Za-z0-9 ,.'!?…→:+-]{2,80})\s*</);
 
 		if (jsxText) {
 			const text = jsxText[1].trim();

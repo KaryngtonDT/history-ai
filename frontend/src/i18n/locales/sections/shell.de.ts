@@ -6,8 +6,8 @@ type ShellMessages = DeepStringRecord<typeof shellEn>;
 export const shellDe: ShellMessages = {
 	shell: {
 		brand: {
-			title: "History AI",
-			subtitle: "Wissens-Betriebssystem",
+			title: "Lumen",
+			subtitle: "KI-Plattform für Video- und Wissenslokalisierung.",
 			tagline: "Geführte Videolokalisierung",
 		},
 		sidebar: {
@@ -116,7 +116,7 @@ export const shellDe: ShellMessages = {
 	},
 	home: {
 		eyebrow: "Start",
-		title: "History AI",
+		title: "Lumen",
 		description: "Wissen in Verständnis verwandeln.",
 		whatCanIDo:
 			"Video hochladen, Dokument importieren oder laufende Arbeit fortsetzen.",
@@ -262,7 +262,7 @@ export const shellDe: ShellMessages = {
 	settings: {
 		eyebrow: "Einstellungen",
 		title: "Einstellungen",
-		description: "Konfigurieren Sie, wie History AI Ihre Videos verarbeitet.",
+		description: "Konfigurieren Sie, wie Lumen Ihre Videos verarbeitet.",
 		whatCanIDo:
 			"KI-Engines und Pipeline-Schritte wählen. Änderungen gelten für den nächsten Lauf.",
 		language: {

@@ -58,7 +58,7 @@ export const pipelineDe: PipelineMessages = {
 			eyebrow: "Erstellen",
 			title: "Von YouTube importieren",
 			description:
-				"Fügen Sie einen öffentlichen YouTube-Link ein. History AI lädt das Video herunter und führt dieselbe Lokalisierungs-Pipeline wie bei Uploads aus.",
+				"Fügen Sie einen öffentlichen YouTube-Link ein. Lumen lädt das Video herunter und führt dieselbe Lokalisierungs-Pipeline wie bei Uploads aus.",
 			whatCanIDo:
 				"Metadaten prüfen, KI-Modus wählen und importieren, um die Video-Übersicht zu öffnen.",
 			urlLabel: "YouTube-URL",
@@ -321,7 +321,7 @@ export const pipelineDe: PipelineMessages = {
 			audioEyebrow: "Erstellen",
 			audioTitle: "Audio transformieren",
 			audioDescription:
-				"Laden Sie Podcast, Vorlesung oder Aufnahme hoch. History AI transkribiert, übersetzt und bereitet Wissensartefakte vor.",
+				"Laden Sie Podcast, Vorlesung oder Aufnahme hoch. Lumen transkribiert, übersetzt und bereitet Wissensartefakte vor.",
 			audioWhatCanIDo:
 				"Wählen Sie Ihren KI-Modus, laden Sie Audio hoch und öffnen Sie dann die Übersicht, um die Verarbeitung zu verfolgen.",
 		},

@@ -1,8 +1,8 @@
 export const shellEn = {
 	shell: {
 		brand: {
-			title: "History AI",
-			subtitle: "Knowledge Operating System",
+			title: "Lumen",
+			subtitle: "AI video and knowledge localization platform.",
 			tagline: "Guided video localization",
 		},
 		sidebar: {
@@ -111,7 +111,7 @@ export const shellEn = {
 	},
 	home: {
 		eyebrow: "Home",
-		title: "History AI",
+		title: "Lumen",
 		description: "Transform knowledge into understanding.",
 		whatCanIDo:
 			"Upload a video, import a document, or resume work in progress.",
@@ -255,7 +255,7 @@ export const shellEn = {
 	settings: {
 		eyebrow: "Settings",
 		title: "Settings",
-		description: "Configure how History AI processes your videos.",
+		description: "Configure how Lumen processes your videos.",
 		whatCanIDo:
 			"Choose AI engines and pipeline stages. Changes apply to the next processing run.",
 		language: {

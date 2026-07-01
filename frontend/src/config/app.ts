@@ -1,4 +1,4 @@
 export const APP = {
-	NAME: "History AI",
-	TAGLINE: "Knowledge Operating System",
+	NAME: "Lumen",
+	TAGLINE: "AI video and knowledge localization platform.",
 } as const;

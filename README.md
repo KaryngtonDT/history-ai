@@ -1,4 +1,4 @@
-# History AI
+# Lumen
 
 AI-powered platform that transforms educational content into structured learning experiences.
 

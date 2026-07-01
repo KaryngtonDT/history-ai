@@ -1,4 +1,5 @@
 import { NavLink } from "react-router";
+import { APP } from "@/config/app";
 import { cn } from "@/lib/cn";
 import styles from "./Sidebar.module.css";
 
@@ -15,7 +16,7 @@ export function Sidebar() {
 	return (
 		<aside className={styles.aside}>
 			<div className={styles.brand}>
-				<p className={styles.brandText}>🏛 History AI</p>
+				<p className={styles.brandText}>✦ {APP.NAME}</p>
 			</div>
 			<nav className={styles.nav}>
 				{navItems.map(({ to, label, end }) => (

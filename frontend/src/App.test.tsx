@@ -15,7 +15,9 @@ describe("Sprint 1 — app shell", () => {
 			</MemoryRouter>,
 		);
 
-		expect(screen.getByText("Knowledge Operating System")).toBeInTheDocument();
+		expect(
+			screen.getByText("AI video and knowledge localization platform."),
+		).toBeInTheDocument();
 		expect(
 			screen.getByText("Transform knowledge into understanding."),
 		).toBeInTheDocument();

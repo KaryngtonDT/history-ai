@@ -86,7 +86,7 @@ function contentDescription(sourceType: ContentSourceType): string {
 		case "youtube":
 			return "YouTube source linked for processing.";
 		default:
-			return "Content item in History AI.";
+			return "Content item in Lumen.";
 	}
 }
 
@@ -177,7 +177,7 @@ export function mapYoutubeToWorkItem(importItem: YouTubeImport): WorkItem {
 		primaryActionLabel: "Open",
 		primaryActionRoute: `/video/${importItem.videoId}`,
 		icon: TYPE_ICONS.youtube,
-		description: "YouTube video imported into History AI.",
+		description: "YouTube video imported into Lumen.",
 		capabilities: [
 			"transcript",
 			"translation",
@@ -205,7 +205,7 @@ export function mapAudioSourceToWorkItem(source: AudioSource): WorkItem {
 		primaryActionLabel: isProcessing ? "Resume" : "Open",
 		primaryActionRoute: `/audio/${source.id}`,
 		icon: TYPE_ICONS.audio,
-		description: "Audio source in History AI.",
+		description: "Audio source in Lumen.",
 		capabilities: ["transcript", "translation", "library", "chat", "graph"],
 		updatedAt: source.createdAt,
 	};

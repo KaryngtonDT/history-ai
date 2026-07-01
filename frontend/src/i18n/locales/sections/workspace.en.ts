@@ -228,7 +228,7 @@ export const workspaceEn = {
 				"Could not start processing. Check that the backend is running and try again.",
 			headerTitle: "Import",
 			headerDescription:
-				"Bring knowledge sources into History AI. Select a PDF to begin.",
+				"Bring knowledge sources into Lumen. Select a PDF to begin.",
 			pdfDropzoneAria: "PDF drop zone",
 			dropPdfTitle: "Drop your PDF here",
 			dropPdfDescription: "Or select a file from your device.",

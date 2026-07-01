@@ -243,7 +243,7 @@ export const workspaceFr: WorkspaceMessages = {
 				"Impossible de démarrer le traitement. Vérifiez que le backend est démarré puis réessayez.",
 			headerTitle: "Importer",
 			headerDescription:
-				"Importez des sources de connaissance dans History AI. Sélectionnez un PDF pour commencer.",
+				"Importez des sources de connaissance dans Lumen. Sélectionnez un PDF pour commencer.",
 			pdfDropzoneAria: "Zone de dépôt PDF",
 			dropPdfTitle: "Déposez votre PDF ici",
 			dropPdfDescription: "Ou sélectionnez un fichier depuis votre appareil.",

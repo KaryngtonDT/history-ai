@@ -38,7 +38,7 @@ export const FEATURE_HELP: Record<FeatureHelpId, FeatureHelpContent> = {
 		title: "Video Upload",
 		short: "Upload your source video to start the AI localization pipeline.",
 		details:
-			"Supported formats include MP4, MOV, and MKV. After upload, History AI queues transcription, translation, and optional audio, voice, lip-sync, and render steps.",
+			"Supported formats include MP4, MOV, and MKV. After upload, Lumen queues transcription, translation, and optional audio, voice, lip-sync, and render steps.",
 		bestPractice:
 			"Use clear audio and stable lighting. Choose Automatic mode to let the AI Director recommend the best pipeline.",
 		commonMistake:

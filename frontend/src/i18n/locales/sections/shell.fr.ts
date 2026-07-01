@@ -6,8 +6,9 @@ type ShellMessages = DeepStringRecord<typeof shellEn>;
 export const shellFr: ShellMessages = {
 	shell: {
 		brand: {
-			title: "History AI",
-			subtitle: "Système d'exploitation de la connaissance",
+			title: "Lumen",
+			subtitle:
+				"Plateforme de localisation vidéo et de connaissances par l'IA.",
 			tagline: "Localisation vidéo guidée",
 		},
 		sidebar: {
@@ -118,7 +119,7 @@ export const shellFr: ShellMessages = {
 	},
 	home: {
 		eyebrow: "Accueil",
-		title: "History AI",
+		title: "Lumen",
 		description: "Transformer la connaissance en compréhension.",
 		whatCanIDo:
 			"Téléversez une vidéo, importez un document ou reprenez un travail en cours.",
@@ -267,7 +268,7 @@ export const shellFr: ShellMessages = {
 	settings: {
 		eyebrow: "Paramètres",
 		title: "Paramètres",
-		description: "Configurez comment History AI traite vos vidéos.",
+		description: "Configurez comment Lumen traite vos vidéos.",
 		whatCanIDo:
 			"Choisissez les moteurs IA et les étapes du pipeline. Les changements s'appliquent au prochain traitement.",
 		language: {

@@ -243,7 +243,7 @@ export const workspaceDe: WorkspaceMessages = {
 				"Verarbeitung konnte nicht gestartet werden. Prüfen Sie, ob das Backend läuft, und versuchen Sie es erneut.",
 			headerTitle: "Import",
 			headerDescription:
-				"Bringen Sie Wissensquellen in History AI. Wählen Sie zum Start eine PDF-Datei aus.",
+				"Bringen Sie Wissensquellen in Lumen. Wählen Sie zum Start eine PDF-Datei aus.",
 			pdfDropzoneAria: "PDF-Ablagebereich",
 			dropPdfTitle: "PDF hier ablegen",
 			dropPdfDescription: "Oder eine Datei von Ihrem Gerät auswählen.",

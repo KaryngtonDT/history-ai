@@ -52,7 +52,7 @@ export const pipelineEn = {
 			eyebrow: "Create",
 			title: "Import from YouTube",
 			description:
-				"Paste any public YouTube link. History AI downloads the video and runs the same localization pipeline as uploaded files.",
+				"Paste any public YouTube link. Lumen downloads the video and runs the same localization pipeline as uploaded files.",
 			whatCanIDo:
 				"Preview metadata, choose AI mode, then import to open the video overview.",
 			urlLabel: "YouTube URL",
@@ -310,7 +310,7 @@ export const pipelineEn = {
 			audioEyebrow: "Create",
 			audioTitle: "Transform audio",
 			audioDescription:
-				"Upload a podcast, lecture, or recording. History AI transcribes, translates, and prepares knowledge artifacts.",
+				"Upload a podcast, lecture, or recording. Lumen transcribes, translates, and prepares knowledge artifacts.",
 			audioWhatCanIDo:
 				"Choose your AI mode, upload audio, then open the overview to follow processing.",
 		},
