@@ -25,7 +25,7 @@ Users bring **any source** (video, PDF, audio, YouTube). The pipeline adapts. Th
 | **Home** | `/` | Orientation, create, resume work, recent work summaries |
 | **Workspace** | `/workspace` | Projects, batch, team, detailed analytics |
 | **WorkItem Overview** | `/video/:id`, `/processing/:id` | Complete life of one item — hub, not detail work |
-| **Feature pages** | `/video/:id/transcript`, `/settings/pipeline` | Focused work on one capability |
+| **Feature pages** | `/video/:id/transcript`, `/video/:id/watch`, `/settings/pipeline` | Focused work on one capability |
 | **Settings** | `/settings`, `/settings/ai` | Configuration only |
 
 ### Rules

@@ -862,6 +862,31 @@ The frontend `ReviewPanel` on `/workspace` uses `ReviewService`.
 
 ---
 
+# Shadow AI Watch Companion (Platform Sprint 55)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/videos/{videoId}/shadow/context` | Resolve transcript/translation context at a timestamp |
+| POST | `/api/videos/{videoId}/shadow/sessions` | Start a watch session |
+| POST | `/api/videos/{videoId}/shadow/sessions/{sessionId}/ask` | Ask a contextual question |
+| POST | `/api/videos/{videoId}/shadow/sessions/{sessionId}/pause` | Pause session state |
+| POST | `/api/videos/{videoId}/shadow/sessions/{sessionId}/resume` | Resume session state |
+
+## Schemas
+
+| Schema | Purpose |
+| ------ | ------- |
+| `WatchContext` | Current segment, neighbors, nearby text, recent interactions |
+| `ShadowSession` | Session id, playback state, target language, interactions |
+| `ShadowInteraction` | Question, answer, pause, or resume at a timestamp |
+| `ShadowAnswer` | Answer text plus updated session |
+| `StartShadowSessionRequest` | `targetLanguage`, optional `contentId` / `conversationId` |
+| `AskShadowQuestionRequest` | `question`, `time` (seconds) |
+
+The frontend `ShadowWatchPage` at `/video/:videoId/watch` uses `ShadowService`. See [SHADOW_WATCH_COMPANION.md](./SHADOW_WATCH_COMPANION.md).
+
+---
+
 # Team Collaboration (Platform Sprint 48)
 
 | Method | Path | Description |

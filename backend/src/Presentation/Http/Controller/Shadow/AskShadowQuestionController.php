@@ -25,6 +25,22 @@ final class AskShadowQuestionController extends AbstractController
         operationId: 'askShadowQuestion',
         summary: 'Ask Shadow a contextual watch question',
         tags: ['Shadow'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/AskShadowQuestionRequest'),
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Shadow answer',
+                content: new OA\JsonContent(ref: '#/components/schemas/ShadowAnswer'),
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid request',
+                content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse'),
+            ),
+        ],
     )]
     #[Route(
         '/api/videos/{videoId}/shadow/sessions/{sessionId}/ask',

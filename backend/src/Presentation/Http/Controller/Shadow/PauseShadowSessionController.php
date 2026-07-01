@@ -23,6 +23,18 @@ final class PauseShadowSessionController extends AbstractController
         operationId: 'pauseShadowSession',
         summary: 'Pause a Shadow watch session',
         tags: ['Shadow'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Session paused',
+                content: new OA\JsonContent(ref: '#/components/schemas/ShadowSession'),
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid request',
+                content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse'),
+            ),
+        ],
     )]
     #[Route(
         '/api/videos/{videoId}/shadow/sessions/{sessionId}/pause',

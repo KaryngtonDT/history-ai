@@ -1295,6 +1295,26 @@ Product IA updates: [PRODUCT_INFORMATION_ARCHITECTURE.md](./PRODUCT_INFORMATION_
 
 ---
 
+# Sprint 55 — Shadow AI Watch Companion (2026-06)
+
+| Slice | Focus | Status |
+|-------|-------|--------|
+| P55-SLICE-01 | Shadow session domain aggregate | ✅ |
+| P55-SLICE-02 | Timeline context engine + `GET .../shadow/context` | ✅ |
+| P55-SLICE-03 | Contextual Q&A + pause/resume commands | ✅ |
+| P55-SLICE-04 | Frontend `/video/:videoId/watch` + voice MVP | ✅ |
+| P55-SLICE-05 | OpenAPI, architecture docs, verification | ✅ |
+
+- **Bounded context:** `Domain/Shadow` — session, interactions, playback state.
+- **Reuses** transcript, translation, and chat provider; does **not** duplicate video processing.
+- **Playback:** browser controls video; backend models session state only.
+
+Architecture: [SHADOW_WATCH_COMPANION.md](./SHADOW_WATCH_COMPANION.md)
+
+Verification: [Sprint55-Verification.md](../reports/Sprint55-Verification.md)
+
+---
+
 # Project architecture overview
 
 **Lumen** is a **modular monolith** with three runtime applications and a shared domain story:

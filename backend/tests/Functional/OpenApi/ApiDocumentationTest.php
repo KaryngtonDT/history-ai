@@ -2462,6 +2462,29 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('ProviderStatistics', $spec['components']['schemas']);
     }
 
+    public function testShadowEndpointsAreDocumented(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('/api/videos/{videoId}/shadow/context', $spec['paths']);
+        self::assertArrayHasKey('/api/videos/{videoId}/shadow/sessions', $spec['paths']);
+        self::assertArrayHasKey(
+            '/api/videos/{videoId}/shadow/sessions/{sessionId}/ask',
+            $spec['paths'],
+        );
+        self::assertSame(
+            'getShadowContext',
+            $spec['paths']['/api/videos/{videoId}/shadow/context']['get']['operationId'],
+        );
+        self::assertSame(
+            'startShadowSession',
+            $spec['paths']['/api/videos/{videoId}/shadow/sessions']['post']['operationId'],
+        );
+        self::assertArrayHasKey('WatchContext', $spec['components']['schemas']);
+        self::assertArrayHasKey('ShadowSession', $spec['components']['schemas']);
+        self::assertArrayHasKey('ShadowAnswer', $spec['components']['schemas']);
+    }
+
     /**
      * @return array<string, mixed>
      */

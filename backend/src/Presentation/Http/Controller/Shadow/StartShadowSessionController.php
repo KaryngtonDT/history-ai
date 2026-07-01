@@ -25,6 +25,22 @@ final class StartShadowSessionController extends AbstractController
         operationId: 'startShadowSession',
         summary: 'Start a Shadow watch session',
         tags: ['Shadow'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/StartShadowSessionRequest'),
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Session started',
+                content: new OA\JsonContent(ref: '#/components/schemas/ShadowSession'),
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid request',
+                content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse'),
+            ),
+        ],
     )]
     #[Route(
         '/api/videos/{videoId}/shadow/sessions',

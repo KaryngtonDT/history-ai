@@ -56,6 +56,7 @@ final class GetShadowContextController extends AbstractController
             new OA\Response(
                 response: 200,
                 description: 'Watch context resolved',
+                content: new OA\JsonContent(ref: '#/components/schemas/WatchContext'),
             ),
             new OA\Response(
                 response: 400,

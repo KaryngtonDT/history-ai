@@ -150,6 +150,13 @@ nelmio_api_doc:
             - { alias: WorkspaceAnalytics, type: App\Presentation\OpenApi\Schema\WorkspaceAnalyticsSchema }
             - { alias: ProviderStat, type: App\Presentation\OpenApi\Schema\ProviderStatSchema }
             - { alias: ProviderStatistics, type: App\Presentation\OpenApi\Schema\ProviderStatisticsSchema }
+            - { alias: WatchContextSegment, type: App\Presentation\OpenApi\Schema\WatchContextSegmentSchema }
+            - { alias: ShadowInteraction, type: App\Presentation\OpenApi\Schema\ShadowInteractionSchema }
+            - { alias: WatchContext, type: App\Presentation\OpenApi\Schema\WatchContextSchema }
+            - { alias: ShadowSession, type: App\Presentation\OpenApi\Schema\ShadowSessionSchema }
+            - { alias: StartShadowSessionRequest, type: App\Presentation\OpenApi\Schema\StartShadowSessionRequestSchema }
+            - { alias: AskShadowQuestionRequest, type: App\Presentation\OpenApi\Schema\AskShadowQuestionRequestSchema }
+            - { alias: ShadowAnswer, type: App\Presentation\OpenApi\Schema\ShadowAnswerSchema }
     areas:
         default:
             path_patterns:
