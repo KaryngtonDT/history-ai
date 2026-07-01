@@ -1,0 +1,112 @@
+.overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 200;
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	padding: 10vh var(--space-4) var(--space-4);
+}
+
+.backdrop {
+	position: absolute;
+	inset: 0;
+	border: none;
+	background: rgba(0, 0, 0, 0.5);
+	cursor: default;
+}
+
+.panel {
+	position: relative;
+	z-index: 1;
+	width: min(36rem, 100%);
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-lg);
+	overflow: hidden;
+	background: var(--shell-surface);
+	box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+}
+
+.input {
+	width: 100%;
+	border: none;
+	border-bottom: 1px solid var(--shell-border);
+	padding: var(--space-4);
+	font-size: var(--font-md);
+	color: var(--shell-text);
+	background: transparent;
+}
+
+.input:focus {
+	outline: none;
+}
+
+.list {
+	max-height: 20rem;
+	overflow-y: auto;
+	padding: var(--space-2);
+}
+
+.group {
+	margin-bottom: var(--space-2);
+}
+
+.groupList {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.itemButton {
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.15rem;
+	border: none;
+	border-radius: var(--radius-md);
+	padding: var(--space-3);
+	text-align: left;
+	cursor: pointer;
+	background: transparent;
+}
+
+.itemButton:hover,
+.itemButton:focus {
+	background: var(--shell-nav-hover-bg);
+	outline: none;
+}
+
+.itemLabel {
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-medium);
+	color: var(--shell-text);
+}
+
+.itemDescription {
+	font-size: var(--font-xs);
+	color: var(--shell-text-muted);
+}
+
+.groupLabel {
+	margin: var(--space-2) var(--space-3) var(--space-1);
+	font-size: var(--font-xs);
+	font-weight: var(--font-weight-semibold);
+	text-transform: uppercase;
+	color: var(--shell-text-muted);
+}
+
+.empty {
+	margin: 0;
+	padding: var(--space-4);
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
+.hint {
+	margin: 0;
+	padding: var(--space-3) var(--space-4);
+	font-size: var(--font-xs);
+	color: var(--shell-text-muted);
+	border-top: 1px solid var(--shell-border);
+}
