@@ -855,6 +855,30 @@ The frontend `ReviewPanel` on `/workspace` uses `ReviewService`.
 
 ---
 
+# Team Collaboration (Platform Sprint 48)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/workspaces/{id}/members` | List workspace members |
+| POST | `/api/workspaces/{id}/members` | Invite a member (creates pending invitation) |
+| PATCH | `/api/workspaces/{id}/members/{memberId}` | Update member role |
+| DELETE | `/api/workspaces/{id}/members/{memberId}` | Remove a member |
+| GET | `/api/workspaces/{id}/invitations` | List pending invitations |
+
+## Schemas
+
+| Schema | Values / fields |
+| ------ | ---------------- |
+| `WorkspaceMember` | `id`, `workspaceId`, `userId`, `displayName`, `role`, `joinedAt` |
+| `WorkspaceInvitation` | `id`, `workspaceId`, `email`, `role`, `status`, `token`, `createdAt`, `expiresAt` |
+| `WorkspaceRole` | `owner`, `editor`, `reviewer`, `viewer` |
+
+Authorization uses the `X-Collaborator-Id` and `X-Collaborator-Name` headers until authentication is introduced in a later sprint.
+
+The frontend `TeamPanel` on `/workspace` uses `CollaborationService`.
+
+---
+
 # Production considerations
 
 | Topic | Recommendation |

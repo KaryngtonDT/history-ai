@@ -138,6 +138,11 @@ nelmio_api_doc:
             - { alias: ReviewComment, type: App\Presentation\OpenApi\Schema\ReviewCommentSchema }
             - { alias: SaveReviewRequest, type: App\Presentation\OpenApi\Schema\SaveReviewRequestSchema }
             - { alias: PreferenceProfile, type: App\Presentation\OpenApi\Schema\PreferenceProfileSchema }
+            - { alias: WorkspaceRole, type: App\Presentation\OpenApi\Schema\WorkspaceRoleSchema }
+            - { alias: WorkspaceMember, type: App\Presentation\OpenApi\Schema\WorkspaceMemberSchema }
+            - { alias: WorkspaceInvitation, type: App\Presentation\OpenApi\Schema\WorkspaceInvitationSchema }
+            - { alias: InviteWorkspaceMemberRequest, type: App\Presentation\OpenApi\Schema\InviteWorkspaceMemberRequestSchema }
+            - { alias: UpdateWorkspaceMemberRoleRequest, type: App\Presentation\OpenApi\Schema\UpdateWorkspaceMemberRoleRequestSchema }
     areas:
         default:
             path_patterns:

@@ -1258,6 +1258,24 @@ Quality Assessment → User Review → Preference Profile → AI Director
 
 Feature components must use `reviewService`, not `HttpReviewRepository` or `HttpClient` directly.
 
+## Platform Sprint 48 — Team Collaboration & Shared Workspaces
+
+```text
+Organization → Workspace → Members → Projects → Videos
+```
+
+| Component | Role |
+| --------- | ---- |
+| `WorkspaceRole` | Owner, Editor, Reviewer, Viewer permission model |
+| `WorkspaceMember` | Immutable membership aggregate |
+| `WorkspaceInvitation` | Deterministic pending invite with expiry |
+| `InviteWorkspaceMemberHandler` | Owner-only invitations |
+| `WorkspaceAuthorizationService` | Role checks on workspace actions |
+| `TeamPanel` | Member list, invite form, role management UI |
+| `CollaborationService` | Repository-backed team operations |
+
+Feature components must use `collaborationService`, not `HttpCollaborationRepository` or `HttpClient` directly.
+
 ## Enforcement
 
 | Tool | Location | Command |

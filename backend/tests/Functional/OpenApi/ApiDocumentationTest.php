@@ -2420,6 +2420,28 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('PreferenceProfile', $spec['components']['schemas']);
     }
 
+    public function testOpenApiSpecDocumentsCollaborationOperations(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertSame('listWorkspaceMembers', $spec['paths']['/api/workspaces/{id}/members']['get']['operationId']);
+        self::assertSame('inviteWorkspaceMember', $spec['paths']['/api/workspaces/{id}/members']['post']['operationId']);
+        self::assertSame(
+            'removeWorkspaceMember',
+            $spec['paths']['/api/workspaces/{id}/members/{memberId}']['delete']['operationId'],
+        );
+        self::assertSame('listWorkspaceInvitations', $spec['paths']['/api/workspaces/{id}/invitations']['get']['operationId']);
+    }
+
+    public function testOpenApiSpecDocumentsCollaborationSchemas(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('WorkspaceMember', $spec['components']['schemas']);
+        self::assertArrayHasKey('WorkspaceInvitation', $spec['components']['schemas']);
+        self::assertArrayHasKey('WorkspaceRole', $spec['components']['schemas']);
+    }
+
     /**
      * @return array<string, mixed>
      */

@@ -1157,6 +1157,26 @@ Verification: [Sprint47-Verification.md](../reports/Sprint47-Verification.md)
 
 ---
 
+# Platform Sprint 48 — Team Collaboration & Shared Workspaces (2026-06)
+
+Platform Sprint 48 transforms History AI from a personal tool into a **collaborative SaaS platform**: teams share workspaces, assign roles, send deterministic invitations, and enforce permissions across processing, review, and project management.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P48-SLICE-01 | Collaboration domain model | ✅ |
+| P48-SLICE-02 | Membership engine and persistence | ✅ |
+| P48-SLICE-03 | Authorization integration across handlers | ✅ |
+| P48-SLICE-04 | `TeamPanel`, `CollaborationService` | ✅ |
+| P48-SLICE-05 | OpenAPI collaboration schemas, docs, verification report | ✅ |
+
+```text
+Organization → Workspace → Team → Projects → AI Director → Pipeline → Final Videos
+```
+
+Verification: [Sprint48-Verification.md](../reports/Sprint48-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:
