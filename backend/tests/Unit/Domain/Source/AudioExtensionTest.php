@@ -41,6 +41,7 @@ final class AudioExtensionTest extends TestCase
     public function testAudioTypeIsImplementedConnector(): void
     {
         self::assertTrue(SourceType::Audio->isConnectorImplemented());
-        self::assertFalse(SourceType::Youtube->isConnectorImplemented());
+        self::assertFalse(SourceType::Pdf->isConnectorImplemented());
+        self::assertTrue(SourceType::Youtube->isConnectorImplemented());
     }
 }

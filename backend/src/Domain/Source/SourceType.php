@@ -23,6 +23,6 @@ enum SourceType: string
 
     public function isConnectorImplemented(): bool
     {
-        return self::Audio === $this;
+        return self::Audio === $this || self::Youtube === $this;
     }
 }
