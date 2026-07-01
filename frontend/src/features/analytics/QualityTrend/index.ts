@@ -1,0 +1,1 @@
+export { QualityTrend } from "./QualityTrend";

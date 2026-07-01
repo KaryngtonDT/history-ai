@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import {
+	AnalyticsDashboard,
+	PerformanceCharts,
+	ProviderStatistics,
+	QualityTrend,
+} from "@/features/analytics";
 import { TeamPanel } from "@/features/collaboration";
 import { ExecutionHistoryPanel } from "@/features/history";
 import {
@@ -10,6 +16,12 @@ import {
 } from "@/features/review";
 import { reviewService } from "@/services/review/ReviewService";
 import type { PreferenceProfile, Review } from "@/services/review/types";
+import { telemetryService } from "@/services/telemetry/TelemetryService";
+import type {
+	PipelineTelemetry,
+	ProviderStatistics as ProviderStatisticsModel,
+	WorkspaceAnalytics,
+} from "@/services/telemetry/types";
 import type { Project } from "@/services/workspace/types";
 import { WORKSPACE_TARGET_LANGUAGES } from "@/services/workspace/types";
 import { workspaceService } from "@/services/workspace/WorkspaceService";
@@ -37,8 +49,41 @@ export function WorkspacePage() {
 	const [reviews, setReviews] = useState<Review[]>([]);
 	const [preferenceProfile, setPreferenceProfile] =
 		useState<PreferenceProfile | null>(null);
+	const [analytics, setAnalytics] = useState<WorkspaceAnalytics | null>(null);
+	const [providerStatistics, setProviderStatistics] =
+		useState<ProviderStatisticsModel | null>(null);
+	const [telemetryRecords, setTelemetryRecords] = useState<PipelineTelemetry[]>(
+		[],
+	);
+	const [analyticsError, setAnalyticsError] = useState<string | null>(null);
+	const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
 	const selectedVideoId = selectedProject?.videos[0]?.videoId ?? null;
+
+	const loadAnalyticsData = useCallback(async (workspaceId: string) => {
+		setAnalyticsLoading(true);
+		setAnalyticsError(null);
+
+		try {
+			const [loadedAnalytics, loadedProviders, loadedTelemetry] =
+				await Promise.all([
+					telemetryService.loadAnalytics(workspaceId),
+					telemetryService.loadProviderStatistics(workspaceId),
+					telemetryService.loadTelemetry(workspaceId),
+				]);
+
+			setAnalytics(loadedAnalytics);
+			setProviderStatistics(loadedProviders);
+			setTelemetryRecords(loadedTelemetry);
+		} catch {
+			setAnalytics(null);
+			setProviderStatistics(null);
+			setTelemetryRecords([]);
+			setAnalyticsError("Could not load workspace analytics.");
+		} finally {
+			setAnalyticsLoading(false);
+		}
+	}, []);
 
 	const loadReviewData = useCallback(async (videoId: string | null) => {
 		if (!videoId) {
@@ -108,6 +153,17 @@ export function WorkspacePage() {
 			setSelectedProject(null);
 		});
 	}, [selectedProjectId, refreshSelectedProject]);
+
+	useEffect(() => {
+		if (!selectedProjectId) {
+			setAnalytics(null);
+			setProviderStatistics(null);
+			setTelemetryRecords([]);
+			return;
+		}
+
+		void loadAnalyticsData(selectedProjectId);
+	}, [loadAnalyticsData, selectedProjectId]);
 
 	useEffect(() => {
 		if (!selectedProject || !workspaceService.isBatchRunning(selectedProject)) {
@@ -243,6 +299,30 @@ export function WorkspacePage() {
 							<ProjectCard project={selectedProject} />
 
 							<TeamPanel workspaceId={selectedProject.id} />
+
+							<AnalyticsDashboard
+								analytics={analytics}
+								loading={analyticsLoading}
+								error={analyticsError}
+							/>
+
+							<div className={styles.section}>
+								<h2 className={styles.sectionTitle}>Provider Statistics</h2>
+								<ProviderStatistics statistics={providerStatistics} />
+							</div>
+
+							<div className={styles.section}>
+								<h2 className={styles.sectionTitle}>Performance</h2>
+								<PerformanceCharts records={telemetryRecords} />
+							</div>
+
+							<div className={styles.section}>
+								<h2 className={styles.sectionTitle}>Quality Trend</h2>
+								<QualityTrend
+									records={telemetryRecords}
+									recentErrors={analytics?.recentErrors ?? []}
+								/>
+							</div>
 
 							<div className={styles.section}>
 								<h2 className={styles.sectionTitle}>Videos</h2>

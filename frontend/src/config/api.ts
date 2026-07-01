@@ -252,3 +252,15 @@ export function workspaceMemberPath(
 export function workspaceInvitationsPath(workspaceId: string): string {
 	return `/api/workspaces/${workspaceId}/invitations`;
 }
+
+export function workspaceAnalyticsPath(workspaceId: string): string {
+	return `/api/workspaces/${workspaceId}/analytics`;
+}
+
+export function workspaceProvidersPath(workspaceId: string): string {
+	return `/api/workspaces/${workspaceId}/providers`;
+}
+
+export function workspaceTelemetryPath(workspaceId: string): string {
+	return `/api/workspaces/${workspaceId}/telemetry`;
+}
