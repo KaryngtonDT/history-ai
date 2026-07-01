@@ -1197,6 +1197,30 @@ Verification: [Sprint49-Verification.md](../reports/Sprint49-Verification.md)
 
 ---
 
+# Platform Sprint 50.5 — Product Information Architecture (2026-07)
+
+Platform Sprint 50.5 aligns the visible product structure with **Knowledge In → AI Processing → Knowledge / Media Out** without merging backend Content and Video domains.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P50.5-SLICE-01 | WorkItem product read model (`frontend/src/services/workItem/`) | ✅ |
+| P50.5-SLICE-02 | Home Mission Control (replaces legacy dashboard at `/`) | ✅ |
+| P50.5-SLICE-03 | Actionable recent work and stats routing | ✅ |
+| P50.5-SLICE-04 | Video Overview hub at `/video/:videoId` | ✅ |
+| P50.5-SLICE-05 | Sidebar icons, product language, empty states | ✅ |
+| P50.5-SLICE-06 | Architecture docs and verification | ✅ |
+
+```text
+Home → WorkItem → Video Overview → Feature pages
+Workspace = projects + batch + team + analytics (unchanged role)
+```
+
+See [PRODUCT_INFORMATION_ARCHITECTURE.md](./PRODUCT_INFORMATION_ARCHITECTURE.md).
+
+Verification: [Sprint50_5-Verification.md](../reports/Sprint50_5-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

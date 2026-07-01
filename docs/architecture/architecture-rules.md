@@ -1294,6 +1294,24 @@ Pipeline → Telemetry Collector → Metrics Repository → Analytics Engine →
 
 Feature components must use `telemetryService`, not `HttpTelemetryRepository` or `HttpClient` directly.
 
+## Product read model (Sprint 50.5)
+
+`WorkItem` is a **frontend product read model** — not a backend domain merge.
+
+| Rule | Detail |
+| ---- | ------ |
+| Location | `frontend/src/services/workItem/` |
+| Purpose | Unify Home, navigation, and recent work across Content, Video, Project |
+| Do not | Replace or merge `Content` / `Video` backend aggregates |
+| Do not | Invent actions without backend support |
+| Must | Every WorkItem exposes a valid `openRoute` |
+
+Feature components (Home, Recent Work, sidebar) must use `workItemService`, not `HttpWorkItemRepository` or raw Content/Video HTTP calls for list/navigation UX.
+
+Video hub: `/video/:videoId` is the overview entry; step routes (`/transcript`, `/render`, …) remain detail pages.
+
+See [PRODUCT_INFORMATION_ARCHITECTURE.md](./PRODUCT_INFORMATION_ARCHITECTURE.md).
+
 ## Enforcement
 
 | Tool | Location | Command |
