@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useTranslation } from "@/i18n";
 import type { Review } from "@/services/review/types";
 import { REVIEW_CATEGORIES } from "@/services/review/types";
@@ -11,7 +12,12 @@ export function ReviewSummary({ reviews }: ReviewSummaryProps) {
 	const { t } = useTranslation();
 
 	if (reviews.length === 0) {
-		return <p className={styles.empty}>{t("workspace.review.noReviewsYet")}</p>;
+		return (
+			<EmptyState
+				title={t("workspace.review.emptyTitle")}
+				description={t("workspace.review.emptyDescription")}
+			/>
+		);
 	}
 
 	return (

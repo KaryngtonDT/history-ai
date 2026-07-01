@@ -424,8 +424,44 @@ export function WorkspacePage() {
 					</>
 				);
 			case "history":
+				if (!selectedVideoId) {
+					return (
+						<EmptyState
+							title={t("workspace.history.noVideoTitle")}
+							description={t("workspace.history.noVideoDescription")}
+							action={
+								<button
+									type="button"
+									className={styles.secondaryButton}
+									onClick={() => setActiveTab("projects")}
+								>
+									{t("workspace.history.noVideoAction")}
+								</button>
+							}
+						/>
+					);
+				}
+
 				return <ExecutionHistoryPanel videoId={selectedVideoId} />;
 			case "reviews":
+				if (!selectedVideoId) {
+					return (
+						<EmptyState
+							title={t("workspace.history.noVideoTitle")}
+							description={t("workspace.history.noVideoDescription")}
+							action={
+								<button
+									type="button"
+									className={styles.secondaryButton}
+									onClick={() => setActiveTab("projects")}
+								>
+									{t("workspace.history.noVideoAction")}
+								</button>
+							}
+						/>
+					);
+				}
+
 				return (
 					<>
 						<ReviewPanel
@@ -486,7 +522,10 @@ export function WorkspacePage() {
 						{t("workspace.page.projects")}
 					</h2>
 					{projects.length === 0 ? (
-						<p className={styles.empty}>{t("workspace.page.noProjectsYet")}</p>
+						<EmptyState
+							title={t("workspace.page.noProjectsTitle")}
+							description={t("workspace.page.noProjectsDescription")}
+						/>
 					) : (
 						<div className={styles.projectList}>
 							{projects.map((project) => (

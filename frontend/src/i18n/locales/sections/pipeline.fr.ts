@@ -123,7 +123,8 @@ export const pipelineFr: PipelineMessages = {
 			loading: "Chargement de la transcription",
 			unavailableTitle: "Transcription indisponible",
 			unavailableDescription:
-				"Aucune transcription trouvée pour cette vidéo pour le moment.",
+				"Aucune transcription trouvée pour cette vidéo pour le moment. Téléversez ou ouvrez un fichier source pour en générer une.",
+			emptyAction: "Téléverser une vidéo",
 			title: "Transcription",
 			videoId: "ID vidéo :",
 			fullText: "Texte complet",
@@ -299,6 +300,12 @@ export const pipelineFr: PipelineMessages = {
 			defaultTitle: "Parcours des artefacts",
 			subtitle:
 				"Suivez le pipeline depuis le téléversement vidéo jusqu'au rapport qualité final.",
+			noVideoTitle: "Aucune vidéo sélectionnée",
+			noVideoDescription:
+				"Téléversez une vidéo pour débloquer le parcours pipeline et les étapes guidées.",
+			noVideoAction: "Téléverser une vidéo",
+			lockedHint: "Terminez {{step}} d'abord pour débloquer cette étape.",
+			lockedAction: "Aller à {{step}}",
 			dependsOn: "Dépend de : {{step}}",
 			actionOpen: "Ouvrir",
 			actionStart: "Démarrer",

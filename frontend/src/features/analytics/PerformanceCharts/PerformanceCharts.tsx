@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useTranslation } from "@/i18n";
 import type {
 	ExecutionMetric,
@@ -28,9 +30,15 @@ export function PerformanceCharts({ records }: PerformanceChartsProps) {
 
 	if (samples.length === 0) {
 		return (
-			<p className={styles.empty}>
-				{t("workspace.analytics.noPerformanceSamples")}
-			</p>
+			<EmptyState
+				title={t("workspace.analytics.noPerformanceTitle")}
+				description={t("workspace.analytics.noPerformanceDescription")}
+				action={
+					<Link to="/workspace" className={styles.emptyAction}>
+						{t("workspace.analytics.noPerformanceAction")} →
+					</Link>
+				}
+			/>
 		);
 	}
 

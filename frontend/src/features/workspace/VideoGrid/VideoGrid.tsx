@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useTranslation } from "@/i18n";
 import type { ProjectVideo } from "@/services/workspace/types";
 import styles from "./VideoGrid.module.css";
@@ -17,7 +18,17 @@ export function VideoGrid({
 	const { t } = useTranslation();
 
 	if (videos.length === 0) {
-		return <p className={styles.empty}>{t("workspace.videoGrid.empty")}</p>;
+		return (
+			<EmptyState
+				title={t("workspace.videoGrid.emptyTitle")}
+				description={t("workspace.videoGrid.emptyDescription")}
+				action={
+					<Link to="/video/upload" className={styles.emptyAction}>
+						{t("workspace.videoGrid.emptyAction")} →
+					</Link>
+				}
+			/>
+		);
 	}
 
 	return (

@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useTranslation } from "@/i18n";
 import type { PreferenceProfile } from "@/services/review/types";
 import styles from "./PreferenceProfileCard.module.css";
@@ -11,14 +12,10 @@ export function PreferenceProfileCard({ profile }: PreferenceProfileCardProps) {
 
 	if (!profile) {
 		return (
-			<section className={styles.card}>
-				<h3 className={styles.title}>
-					{t("workspace.review.preferenceProfile.title")}
-				</h3>
-				<p className={styles.empty}>
-					{t("workspace.review.preferenceProfile.empty")}
-				</p>
-			</section>
+			<EmptyState
+				title={t("workspace.review.preferenceProfile.emptyTitle")}
+				description={t("workspace.review.preferenceProfile.emptyDescription")}
+			/>
 		);
 	}
 

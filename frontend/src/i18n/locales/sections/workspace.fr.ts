@@ -21,6 +21,10 @@ export const workspaceFr: WorkspaceMessages = {
 			createProject: "Créer un projet",
 			projects: "Projets",
 			noProjectsYet: "Aucun projet pour le moment.",
+			noProjectsTitle: "Aucun projet pour le moment",
+			noProjectsDescription:
+				"Créez un projet pour organiser vidéos, langues et traitement par lot.",
+			noProjectsAction: "Créer votre premier projet",
 			providerStatistics: "Statistiques des fournisseurs",
 			performance: "Performance",
 			qualityTrend: "Tendance qualité",
@@ -50,6 +54,10 @@ export const workspaceFr: WorkspaceMessages = {
 			videoCountOther: "{{count}} vidéos",
 		},
 		videoGrid: {
+			emptyTitle: "Aucune vidéo dans ce projet",
+			emptyDescription:
+				"Ajoutez des vidéos pour lancer la localisation par lot dans les langues cibles.",
+			emptyAction: "Téléverser une vidéo",
 			empty:
 				"Ajoutez des vidéos à ce projet pour démarrer le traitement par lot.",
 			openPipeline: "Ouvrir le pipeline →",
@@ -101,6 +109,14 @@ export const workspaceFr: WorkspaceMessages = {
 			compare: "Comparer",
 			reprocess: "Retraiter",
 			noExecutionHistory: "Aucun historique d'exécution enregistré.",
+			emptyTitle: "Aucun historique d'exécution",
+			emptyDescription:
+				"L'historique apparaît après le traitement d'une vidéo dans cet espace.",
+			emptyAction: "Ouvrir une vidéo",
+			noVideoTitle: "Aucune vidéo sélectionnée",
+			noVideoDescription:
+				"Choisissez un projet avec des vidéos pour comparer les versions.",
+			noVideoAction: "Aller aux projets",
 			versionLabel: "V{{version}}",
 			scoreLabel: "Score {{score}}",
 			comparingVersions: "Comparaison des versions...",
@@ -120,6 +136,10 @@ export const workspaceFr: WorkspaceMessages = {
 			starsAria: "{{category}} {{score}} étoiles",
 			historyVersion: "Version {{version}}",
 			noReviewsYet: "Aucun avis pour le moment.",
+			emptyTitle: "Aucun avis pour le moment",
+			emptyDescription:
+				"Enregistrez un retour sur une version pour guider les prochains traitements.",
+			emptyAction: "Laisser un avis",
 			categoryLabels: {
 				overall: "Global",
 				translation: "Traduction",
@@ -131,6 +151,10 @@ export const workspaceFr: WorkspaceMessages = {
 				title: "Profil de préférences",
 				empty:
 					"Envoyez des avis pour construire votre profil de préférences adaptatif.",
+				emptyTitle: "Aucun profil de préférences",
+				emptyDescription:
+					"Les avis apprennent à Lumen vos préférences de traduction, voix et rendu.",
+				emptyAction: "Envoyer un avis",
 				translationStyle: "Style de traduction",
 				voiceStability: "Stabilité de la voix",
 				renderingPreset: "Préréglage de rendu",
@@ -140,12 +164,28 @@ export const workspaceFr: WorkspaceMessages = {
 		analytics: {
 			title: "Analyse de l'espace de travail",
 			loading: "Chargement de l'analyse...",
+			emptyTitle: "Aucune analyse pour le moment",
+			emptyDescription:
+				"Traitez des vidéos dans un projet pour voir débit, qualité et usage des fournisseurs.",
+			emptyAction: "Aller aux projets",
 			noProviderStats: "Aucune statistique fournisseur pour le moment.",
+			noProviderStatsTitle: "Aucune statistique fournisseur",
+			noProviderStatsDescription:
+				"Lancez un traitement par lot pour comparer les fournisseurs IA.",
+			noProviderStatsAction: "Traiter les vidéos",
 			providerRuns: "{{count}} exécutions",
 			averageDuration: "moy {{seconds}}s",
 			noPerformanceSamples: "Aucun échantillon de performance.",
+			noPerformanceTitle: "Aucune donnée de performance",
+			noPerformanceDescription:
+				"Les graphiques apparaissent après des exécutions de pipeline dans cet espace.",
+			noPerformanceAction: "Traiter les vidéos",
 			runLabel: "Exécution {{index}}",
 			noQualityTrendData: "Aucune donnée de tendance qualité.",
+			noQualityTitle: "Aucune tendance qualité",
+			noQualityDescription:
+				"Les scores qualité sont enregistrés quand les vidéos terminent le traitement.",
+			noQualityAction: "Traiter les vidéos",
 			lastErrors: "Dernières erreurs",
 			labels: {
 				processedVideos: "Vidéos traitées",

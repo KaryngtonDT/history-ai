@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -52,6 +52,11 @@ export function TranscriptPanel() {
 				<EmptyState
 					title={t("pipeline.transcript.unavailableTitle")}
 					description={t("pipeline.transcript.unavailableDescription")}
+					action={
+						<Link to="/video/upload">
+							{t("pipeline.transcript.emptyAction")} →
+						</Link>
+					}
 				/>
 			</div>
 		);

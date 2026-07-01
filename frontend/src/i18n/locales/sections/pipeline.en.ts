@@ -114,7 +114,9 @@ export const pipelineEn = {
 		transcript: {
 			loading: "Loading transcript",
 			unavailableTitle: "Transcript unavailable",
-			unavailableDescription: "No transcript was found for this video yet.",
+			unavailableDescription:
+				"No transcript was found for this video yet. Upload or open a source file to generate one.",
+			emptyAction: "Upload video",
 			title: "Transcript",
 			videoId: "Video ID:",
 			fullText: "Full text",
@@ -287,6 +289,12 @@ export const pipelineEn = {
 			defaultTitle: "Artifact journey",
 			subtitle:
 				"Follow the pipeline from video upload to final quality report.",
+			noVideoTitle: "No video selected",
+			noVideoDescription:
+				"Upload a video to unlock the pipeline journey and step-by-step guidance.",
+			noVideoAction: "Upload video",
+			lockedHint: "Complete {{step}} first to unlock this step.",
+			lockedAction: "Go to {{step}}",
 			dependsOn: "Depends on: {{step}}",
 			actionOpen: "Open",
 			actionStart: "Start",

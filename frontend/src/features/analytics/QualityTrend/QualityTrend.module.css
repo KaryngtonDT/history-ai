@@ -30,6 +30,13 @@
 	color: var(--text-muted, #9aa4b2);
 }
 
+.emptyAction {
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--shell-nav-active-text, #2563eb);
+	text-decoration: none;
+}
+
 .errors {
 	margin-top: 1rem;
 }

@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useTranslation } from "@/i18n";
 import { historyService } from "@/services/history/HistoryService";
 import type { ExecutionVersion } from "@/services/history/types";
@@ -18,9 +20,15 @@ export function VersionTimeline({
 
 	if (versions.length === 0) {
 		return (
-			<p className={styles.empty}>
-				{t("workspace.history.noExecutionHistory")}
-			</p>
+			<EmptyState
+				title={t("workspace.history.emptyTitle")}
+				description={t("workspace.history.emptyDescription")}
+				action={
+					<Link to="/video/upload" className={styles.emptyAction}>
+						{t("workspace.history.emptyAction")} →
+					</Link>
+				}
+			/>
 		);
 	}
 

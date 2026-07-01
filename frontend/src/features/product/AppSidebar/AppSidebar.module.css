@@ -115,6 +115,12 @@
 	color: var(--shell-text-muted);
 }
 
+.emptyWhy {
+	margin: 0;
+	font-size: var(--font-xs);
+	color: var(--shell-text-muted);
+}
+
 .emptyAction {
 	font-size: var(--font-xs);
 	font-weight: var(--font-weight-medium);

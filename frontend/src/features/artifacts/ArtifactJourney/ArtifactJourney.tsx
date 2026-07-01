@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useTranslation } from "@/i18n/useTranslation";
 import { buildArtifactJourney } from "../journeyModel";
 import styles from "./ArtifactJourney.module.css";
@@ -48,6 +49,17 @@ export function ArtifactJourney({ videoId, title }: ArtifactJourneyProps) {
 			<p className={styles.subtitle}>
 				{t("pipeline.artifactJourney.subtitle")}
 			</p>
+			{!videoId ? (
+				<EmptyState
+					title={t("pipeline.artifactJourney.noVideoTitle")}
+					description={t("pipeline.artifactJourney.noVideoDescription")}
+					action={
+						<Link to="/video/upload" className={styles.action}>
+							{t("pipeline.artifactJourney.noVideoAction")} →
+						</Link>
+					}
+				/>
+			) : null}
 			<div className={styles.track}>
 				{steps.map((step, index) => (
 					<div key={step.id} style={{ display: "contents" }}>
@@ -72,6 +84,13 @@ export function ArtifactJourney({ videoId, title }: ArtifactJourneyProps) {
 								<Link to={step.path} className={styles.action}>
 									{actionLabel(step.status, t)} →
 								</Link>
+							) : null}
+							{step.status === "locked" && step.dependsOnLabel ? (
+								<p className={styles.lockedHint}>
+									{t("pipeline.artifactJourney.lockedHint", {
+										step: step.dependsOnLabel,
+									})}
+								</p>
 							) : null}
 						</article>
 						{index < steps.length - 1 ? (

@@ -45,9 +45,11 @@ export function AppSidebar() {
 
 							if (disabled) {
 								const reason = t(`shell.nav.empty.${item.id}.reason`);
+								const why = t(`shell.nav.empty.${item.id}.why`);
 								const action = t(`shell.nav.empty.${item.id}.action`);
 								const hasEmptyHint =
 									reason !== `shell.nav.empty.${item.id}.reason`;
+								const hasWhy = why !== `shell.nav.empty.${item.id}.why`;
 
 								return (
 									<div key={item.id} className={styles.emptyItem}>
@@ -58,6 +60,9 @@ export function AppSidebar() {
 										{hasEmptyHint ? (
 											<>
 												<p className={styles.emptyReason}>{reason}</p>
+												{hasWhy ? (
+													<p className={styles.emptyWhy}>{why}</p>
+												) : null}
 												<Link to="/video/upload" className={styles.emptyAction}>
 													{action} →
 												</Link>

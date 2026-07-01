@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useTranslation } from "@/i18n";
 import type { ProviderStatistics as ProviderStatisticsModel } from "@/services/telemetry/types";
 import styles from "./ProviderStatistics.module.css";
@@ -11,7 +13,15 @@ export function ProviderStatistics({ statistics }: ProviderStatisticsProps) {
 
 	if (!statistics || statistics.providers.length === 0) {
 		return (
-			<p className={styles.empty}>{t("workspace.analytics.noProviderStats")}</p>
+			<EmptyState
+				title={t("workspace.analytics.noProviderStatsTitle")}
+				description={t("workspace.analytics.noProviderStatsDescription")}
+				action={
+					<Link to="/workspace" className={styles.emptyAction}>
+						{t("workspace.analytics.noProviderStatsAction")} →
+					</Link>
+				}
+			/>
 		);
 	}
 

@@ -89,26 +89,32 @@ export const shellDe: ShellMessages = {
 			empty: {
 				transcript: {
 					reason: "Noch kein Transkript.",
+					why: "Transkripte ermöglichen Übersetzung, Audio und Wissenssuche.",
 					action: "Video hochladen",
 				},
 				translations: {
 					reason: "Noch keine Übersetzungen.",
+					why: "Übersetzungen lokalisieren Inhalte für jede Zielsprache.",
 					action: "Video öffnen",
 				},
 				audio: {
 					reason: "Noch kein Audio generiert.",
+					why: "Generierte Sprache treibt Voice-Clone und Lip-Sync an.",
 					action: "Video öffnen",
 				},
 				"voice-clone": {
 					reason: "Noch keine geklonte Stimme.",
+					why: "Geklonte Stimme bewahrt die Identität des Originalsprechers.",
 					action: "Zuerst Audio generieren",
 				},
 				"lip-sync": {
 					reason: "Noch keine Lip-Sync-Vorschau.",
+					why: "Lip-Sync richtet Lippenbewegungen vor dem Final-Render aus.",
 					action: "Vorherige Schritte abschließen",
 				},
 				render: {
 					reason: "Noch kein finales Video.",
+					why: "Der Final-Render erzeugt eine herunterladbare lokalisierte MP4.",
 					action: "Pipeline ausführen",
 				},
 			},

@@ -21,6 +21,10 @@ export const workspaceDe: WorkspaceMessages = {
 			createProject: "Projekt erstellen",
 			projects: "Projekte",
 			noProjectsYet: "Noch keine Projekte.",
+			noProjectsTitle: "Noch keine Projekte",
+			noProjectsDescription:
+				"Erstellen Sie ein Projekt, um Videos, Sprachen und Stapelverarbeitung zu organisieren.",
+			noProjectsAction: "Erstes Projekt erstellen",
 			providerStatistics: "Anbieterstatistiken",
 			performance: "Leistung",
 			qualityTrend: "Qualitätstrend",
@@ -50,6 +54,10 @@ export const workspaceDe: WorkspaceMessages = {
 			videoCountOther: "{{count}} Videos",
 		},
 		videoGrid: {
+			emptyTitle: "Keine Videos in diesem Projekt",
+			emptyDescription:
+				"Fügen Sie Videos hinzu, um Stapel-Lokalisierung für Zielsprachen zu starten.",
+			emptyAction: "Video hochladen",
 			empty:
 				"Fügen Sie diesem Projekt Videos hinzu, um die Stapelverarbeitung zu starten.",
 			openPipeline: "Pipeline öffnen →",
@@ -101,6 +109,14 @@ export const workspaceDe: WorkspaceMessages = {
 			compare: "Vergleichen",
 			reprocess: "Neu verarbeiten",
 			noExecutionHistory: "Noch kein Ausführungsverlauf erfasst.",
+			emptyTitle: "Kein Ausführungsverlauf",
+			emptyDescription:
+				"Der Verlauf erscheint nach der Verarbeitung eines Videos in diesem Workspace.",
+			emptyAction: "Video öffnen",
+			noVideoTitle: "Kein Video ausgewählt",
+			noVideoDescription:
+				"Wählen Sie ein Projekt mit Videos, um Versionen zu vergleichen.",
+			noVideoAction: "Zu Projekten",
 			versionLabel: "V{{version}}",
 			scoreLabel: "Punktzahl {{score}}",
 			comparingVersions: "Versionen werden verglichen...",
@@ -120,6 +136,10 @@ export const workspaceDe: WorkspaceMessages = {
 			starsAria: "{{category}} {{score}} Sterne",
 			historyVersion: "Version {{version}}",
 			noReviewsYet: "Noch keine Reviews.",
+			emptyTitle: "Noch keine Reviews",
+			emptyDescription:
+				"Speichern Sie Feedback zu einer Pipeline-Version für künftige Läufe.",
+			emptyAction: "Review abgeben",
 			categoryLabels: {
 				overall: "Gesamt",
 				translation: "Übersetzung",
@@ -131,6 +151,10 @@ export const workspaceDe: WorkspaceMessages = {
 				title: "Präferenzprofil",
 				empty:
 					"Senden Sie Reviews, um Ihr adaptives Präferenzprofil aufzubauen.",
+				emptyTitle: "Noch kein Präferenzprofil",
+				emptyDescription:
+					"Reviews lehren Lumen Ihre Übersetzungs-, Stimm- und Render-Präferenzen.",
+				emptyAction: "Review senden",
 				translationStyle: "Übersetzungsstil",
 				voiceStability: "Stimmstabilität",
 				renderingPreset: "Rendering-Voreinstellung",
@@ -140,12 +164,28 @@ export const workspaceDe: WorkspaceMessages = {
 		analytics: {
 			title: "Arbeitsbereich-Analytik",
 			loading: "Analytik wird geladen...",
+			emptyTitle: "Noch keine Analytik",
+			emptyDescription:
+				"Verarbeiten Sie Videos in einem Projekt, um Durchsatz, Qualität und Anbieter zu sehen.",
+			emptyAction: "Zu Projekten",
 			noProviderStats: "Noch keine Anbieterstatistiken.",
+			noProviderStatsTitle: "Keine Anbieterstatistiken",
+			noProviderStatsDescription:
+				"Starten Sie Stapelverarbeitung, um KI-Anbieter zu vergleichen.",
+			noProviderStatsAction: "Videos verarbeiten",
 			providerRuns: "{{count}} Läufe",
 			averageDuration: "Ø {{seconds}}s",
 			noPerformanceSamples: "Noch keine Leistungsdaten.",
+			noPerformanceTitle: "Keine Leistungsdaten",
+			noPerformanceDescription:
+				"Diagramme erscheinen nach abgeschlossenen Pipeline-Läufen in diesem Workspace.",
+			noPerformanceAction: "Videos verarbeiten",
 			runLabel: "Lauf {{index}}",
 			noQualityTrendData: "Noch keine Qualitätstrend-Daten.",
+			noQualityTitle: "Kein Qualitätstrend",
+			noQualityDescription:
+				"Qualitätswerte werden erfasst, wenn Videos die Verarbeitung abschließen.",
+			noQualityAction: "Videos verarbeiten",
 			lastErrors: "Letzte Fehler",
 			labels: {
 				processedVideos: "Verarbeitete Videos",

@@ -92,26 +92,32 @@ export const shellFr: ShellMessages = {
 			empty: {
 				transcript: {
 					reason: "Pas encore de transcription.",
+					why: "La transcription débloque traduction, audio et recherche de connaissances.",
 					action: "Téléverser une vidéo",
 				},
 				translations: {
 					reason: "Pas encore de traductions.",
+					why: "Les traductions localisent votre contenu pour chaque langue cible.",
 					action: "Ouvrir une vidéo",
 				},
 				audio: {
 					reason: "Pas encore d'audio généré.",
+					why: "La parole générée alimente le clonage vocal et le lip sync.",
 					action: "Ouvrir une vidéo",
 				},
 				"voice-clone": {
 					reason: "Pas encore de voix clonée.",
+					why: "La voix clonée conserve l'identité du locuteur original.",
 					action: "Générer l'audio d'abord",
 				},
 				"lip-sync": {
 					reason: "Pas encore d'aperçu lip sync.",
+					why: "Le lip sync aligne les mouvements des lèvres avant le rendu final.",
 					action: "Compléter les étapes précédentes",
 				},
 				render: {
 					reason: "Pas encore de vidéo finale.",
+					why: "Le rendu final produit un MP4 localisé téléchargeable.",
 					action: "Lancer le pipeline",
 				},
 			},

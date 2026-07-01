@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useTranslation } from "@/i18n";
 import type { WorkspaceAnalytics } from "@/services/telemetry/types";
 import styles from "./AnalyticsDashboard.module.css";
@@ -34,7 +36,17 @@ export function AnalyticsDashboard({
 	}
 
 	if (!analytics) {
-		return null;
+		return (
+			<EmptyState
+				title={t("workspace.analytics.emptyTitle")}
+				description={t("workspace.analytics.emptyDescription")}
+				action={
+					<Link to="/workspace" className={styles.emptyAction}>
+						{t("workspace.analytics.emptyAction")} →
+					</Link>
+				}
+			/>
+		);
 	}
 
 	return (

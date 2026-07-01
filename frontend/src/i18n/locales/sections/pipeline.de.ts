@@ -123,7 +123,8 @@ export const pipelineDe: PipelineMessages = {
 			loading: "Transkript wird geladen",
 			unavailableTitle: "Transkript nicht verfügbar",
 			unavailableDescription:
-				"Für dieses Video wurde noch kein Transkript gefunden.",
+				"Für dieses Video wurde noch kein Transkript gefunden. Laden Sie eine Quelldatei hoch oder öffnen Sie sie, um eines zu erzeugen.",
+			emptyAction: "Video hochladen",
 			title: "Transkript",
 			videoId: "Video-ID:",
 			fullText: "Volltext",
@@ -298,6 +299,13 @@ export const pipelineDe: PipelineMessages = {
 			defaultTitle: "Artefakt-Reise",
 			subtitle:
 				"Folgen Sie der Pipeline vom Video-Upload bis zum finalen Qualitätsbericht.",
+			noVideoTitle: "Kein Video ausgewählt",
+			noVideoDescription:
+				"Laden Sie ein Video hoch, um die Pipeline-Reise und Schritt-für-Schritt-Anleitung freizuschalten.",
+			noVideoAction: "Video hochladen",
+			lockedHint:
+				"Schließen Sie zuerst {{step}} ab, um diesen Schritt freizuschalten.",
+			lockedAction: "Zu {{step}}",
 			dependsOn: "Abhängig von: {{step}}",
 			actionOpen: "Öffnen",
 			actionStart: "Starten",

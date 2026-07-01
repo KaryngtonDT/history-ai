@@ -84,26 +84,32 @@ export const shellEn = {
 			empty: {
 				transcript: {
 					reason: "No transcript yet.",
-					action: "Upload a video",
+					why: "Transcripts unlock translation, audio, and knowledge search.",
+					action: "Upload video",
 				},
 				translations: {
 					reason: "No translations yet.",
+					why: "Translations localize your content for each target language.",
 					action: "Open a video",
 				},
 				audio: {
 					reason: "No audio generated yet.",
+					why: "Generated speech powers voice clone and lip sync steps.",
 					action: "Open a video",
 				},
 				"voice-clone": {
 					reason: "No cloned voice yet.",
+					why: "Cloned voice keeps the original speaker identity in localized audio.",
 					action: "Generate audio first",
 				},
 				"lip-sync": {
 					reason: "No lip sync preview yet.",
+					why: "Lip sync aligns mouth movement with localized speech before final render.",
 					action: "Complete prior steps",
 				},
 				render: {
 					reason: "No final video yet.",
+					why: "The final render produces a downloadable localized MP4.",
 					action: "Run the pipeline",
 				},
 			},

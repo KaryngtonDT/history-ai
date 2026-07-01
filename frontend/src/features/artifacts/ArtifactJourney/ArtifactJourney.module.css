@@ -65,6 +65,12 @@
 	color: var(--shell-text-muted);
 }
 
+.lockedHint {
+	margin: 0;
+	font-size: var(--font-xs);
+	color: var(--shell-text-muted);
+}
+
 .badge {
 	display: inline-block;
 	border-radius: 999px;

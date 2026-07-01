@@ -40,3 +40,10 @@
 	font-size: 0.875rem;
 	color: var(--color-text-muted, #4b5563);
 }
+
+.emptyAction {
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--shell-nav-active-text, #2563eb);
+	text-decoration: none;
+}

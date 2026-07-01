@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useTranslation } from "@/i18n";
 import type {
 	PipelineTelemetry,
@@ -19,9 +21,15 @@ export function QualityTrend({ records, recentErrors }: QualityTrendProps) {
 	return (
 		<div>
 			{qualityRecords.length === 0 ? (
-				<p className={styles.empty}>
-					{t("workspace.analytics.noQualityTrendData")}
-				</p>
+				<EmptyState
+					title={t("workspace.analytics.noQualityTitle")}
+					description={t("workspace.analytics.noQualityDescription")}
+					action={
+						<Link to="/workspace" className={styles.emptyAction}>
+							{t("workspace.analytics.noQualityAction")} →
+						</Link>
+					}
+				/>
 			) : (
 				<ul className={styles.list}>
 					{qualityRecords.slice(0, 5).map((record) => (

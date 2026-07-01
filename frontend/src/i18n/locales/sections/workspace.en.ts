@@ -16,6 +16,10 @@ export const workspaceEn = {
 			createProject: "Create project",
 			projects: "Projects",
 			noProjectsYet: "No projects yet.",
+			noProjectsTitle: "No projects yet",
+			noProjectsDescription:
+				"Create a project to organize videos, languages, and batch processing.",
+			noProjectsAction: "Create your first project",
 			providerStatistics: "Provider Statistics",
 			performance: "Performance",
 			qualityTrend: "Quality Trend",
@@ -45,6 +49,10 @@ export const workspaceEn = {
 			videoCountOther: "{{count}} videos",
 		},
 		videoGrid: {
+			emptyTitle: "No videos in this project",
+			emptyDescription:
+				"Add videos to run batch localization across target languages.",
+			emptyAction: "Upload video",
 			empty: "Add videos to this project to start batch processing.",
 			openPipeline: "Open pipeline →",
 			remove: "Remove",
@@ -95,6 +103,14 @@ export const workspaceEn = {
 			compare: "Compare",
 			reprocess: "Reprocess",
 			noExecutionHistory: "No execution history recorded yet.",
+			emptyTitle: "No execution history",
+			emptyDescription:
+				"History appears after you process a video in this workspace.",
+			emptyAction: "Open a video",
+			noVideoTitle: "No video selected",
+			noVideoDescription:
+				"Choose a project with videos to compare versions and reprocess runs.",
+			noVideoAction: "Go to projects",
 			versionLabel: "V{{version}}",
 			scoreLabel: "Score {{score}}",
 			comparingVersions: "Comparing versions...",
@@ -114,6 +130,10 @@ export const workspaceEn = {
 			starsAria: "{{category}} {{score}} stars",
 			historyVersion: "Version {{version}}",
 			noReviewsYet: "No reviews yet.",
+			emptyTitle: "No reviews yet",
+			emptyDescription:
+				"Save feedback on a pipeline version to guide future processing.",
+			emptyAction: "Leave a review",
 			categoryLabels: {
 				overall: "Overall",
 				translation: "Translation",
@@ -124,6 +144,10 @@ export const workspaceEn = {
 			preferenceProfile: {
 				title: "Preference Profile",
 				empty: "Submit reviews to build your adaptive preference profile.",
+				emptyTitle: "No preference profile yet",
+				emptyDescription:
+					"Reviews teach Lumen your translation, voice, and render preferences.",
+				emptyAction: "Submit a review",
 				translationStyle: "Translation style",
 				voiceStability: "Voice stability",
 				renderingPreset: "Rendering preset",
@@ -133,12 +157,28 @@ export const workspaceEn = {
 		analytics: {
 			title: "Workspace Analytics",
 			loading: "Loading analytics...",
+			emptyTitle: "No analytics yet",
+			emptyDescription:
+				"Process videos in a project to see throughput, quality scores, and provider usage.",
+			emptyAction: "Go to projects",
 			noProviderStats: "No provider statistics yet.",
+			noProviderStatsTitle: "No provider statistics",
+			noProviderStatsDescription:
+				"Run batch processing to compare AI providers across pipeline stages.",
+			noProviderStatsAction: "Process videos",
 			providerRuns: "{{count}} runs",
 			averageDuration: "avg {{seconds}}s",
 			noPerformanceSamples: "No performance samples yet.",
+			noPerformanceTitle: "No performance data",
+			noPerformanceDescription:
+				"Performance charts appear after pipeline runs complete in this workspace.",
+			noPerformanceAction: "Process videos",
 			runLabel: "Run {{index}}",
 			noQualityTrendData: "No quality trend data yet.",
+			noQualityTitle: "No quality trend",
+			noQualityDescription:
+				"Quality scores are recorded when videos finish processing.",
+			noQualityAction: "Process videos",
 			lastErrors: "Last Errors",
 			labels: {
 				processedVideos: "Processed Videos",
