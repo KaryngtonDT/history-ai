@@ -22,6 +22,8 @@ final readonly class ShadowSession
         private ?int $currentTranscriptSegmentIndex,
         private ?int $currentTranslationSegmentIndex,
         private ShadowInteractionCollection $interactions,
+        private ShadowInterventionPolicy $interventionPolicy,
+        private ShadowInterventionCollection $interventions,
     ) {
         if ('' === trim($targetLanguage)) {
             throw new InvalidShadowSessionException('Target language cannot be empty.');
@@ -58,6 +60,8 @@ final readonly class ShadowSession
             null,
             null,
             ShadowInteractionCollection::empty(),
+            ShadowInterventionPolicy::disabled(),
+            ShadowInterventionCollection::empty(),
         );
     }
 
@@ -111,6 +115,16 @@ final readonly class ShadowSession
         return $this->interactions;
     }
 
+    public function interventionPolicy(): ShadowInterventionPolicy
+    {
+        return $this->interventionPolicy;
+    }
+
+    public function interventions(): ShadowInterventionCollection
+    {
+        return $this->interventions;
+    }
+
     public function withTimestamp(
         ShadowTimestamp $timestamp,
         ?int $transcriptSegmentIndex = null,
@@ -127,6 +141,62 @@ final readonly class ShadowSession
             $transcriptSegmentIndex,
             $translationSegmentIndex,
             $this->interactions,
+            $this->interventionPolicy,
+            $this->interventions,
+        );
+    }
+
+    public function withInterventionPolicy(ShadowInterventionPolicy $policy): self
+    {
+        return new self(
+            $this->id,
+            $this->videoId,
+            $this->contentId,
+            $this->conversationId,
+            $this->currentTimestamp,
+            $this->playbackState,
+            $this->targetLanguage,
+            $this->currentTranscriptSegmentIndex,
+            $this->currentTranslationSegmentIndex,
+            $this->interactions,
+            $policy,
+            $this->interventions,
+        );
+    }
+
+    public function recordIntervention(ShadowIntervention $intervention): self
+    {
+        return new self(
+            $this->id,
+            $this->videoId,
+            $this->contentId,
+            $this->conversationId,
+            $this->currentTimestamp,
+            $this->playbackState,
+            $this->targetLanguage,
+            $this->currentTranscriptSegmentIndex,
+            $this->currentTranslationSegmentIndex,
+            $this->interactions,
+            $this->interventionPolicy,
+            $this->interventions->append($intervention),
+        );
+    }
+
+    public function replaceIntervention(ShadowIntervention $intervention): self
+    {
+        return new self(
+            $this->id,
+            $this->videoId,
+            $this->contentId,
+            $this->conversationId,
+            $this->currentTimestamp,
+            $this->playbackState,
+            $this->targetLanguage,
+            $this->currentTranscriptSegmentIndex,
+            $this->currentTranslationSegmentIndex,
+            $this->interactions,
+            $this->interventionPolicy,
+            $this->interventions->replace($intervention),
         );
     }
 
@@ -149,6 +219,8 @@ final readonly class ShadowSession
             $this->currentTranscriptSegmentIndex,
             $this->currentTranslationSegmentIndex,
             $this->interactions->append(ShadowInteraction::createPause($this->currentTimestamp)),
+            $this->interventionPolicy,
+            $this->interventions,
         );
     }
 
@@ -171,6 +243,8 @@ final readonly class ShadowSession
             $this->currentTranscriptSegmentIndex,
             $this->currentTranslationSegmentIndex,
             $this->interactions->append(ShadowInteraction::createResume($this->currentTimestamp)),
+            $this->interventionPolicy,
+            $this->interventions,
         );
     }
 
@@ -191,6 +265,8 @@ final readonly class ShadowSession
             $this->currentTranscriptSegmentIndex,
             $this->currentTranslationSegmentIndex,
             $this->interactions,
+            $this->interventionPolicy,
+            $this->interventions,
         );
     }
 
@@ -209,6 +285,8 @@ final readonly class ShadowSession
             $this->interactions->append(
                 ShadowInteraction::createQuestion($question, $this->currentTimestamp),
             ),
+            $this->interventionPolicy,
+            $this->interventions,
         );
     }
 
@@ -227,6 +305,8 @@ final readonly class ShadowSession
             $this->interactions->append(
                 ShadowInteraction::createAnswer($answer, $this->currentTimestamp),
             ),
+            $this->interventionPolicy,
+            $this->interventions,
         );
     }
 }

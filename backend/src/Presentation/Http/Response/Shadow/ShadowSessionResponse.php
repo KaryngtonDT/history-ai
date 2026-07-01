@@ -23,6 +23,7 @@ final readonly class ShadowSessionResponse
         public ?string $contentId,
         public ?string $conversationId,
         public array $interactions,
+        public array $policy,
     ) {
     }
 
@@ -39,6 +40,7 @@ final readonly class ShadowSessionResponse
             contentId: $result->contentId,
             conversationId: $result->conversationId,
             interactions: $result->interactions,
+            policy: $result->policy->toArray(),
         );
     }
 
@@ -58,6 +60,7 @@ final readonly class ShadowSessionResponse
             'contentId' => $this->contentId,
             'conversationId' => $this->conversationId,
             'interactions' => $this->interactions,
+            'policy' => $this->policy,
         ];
     }
 }
