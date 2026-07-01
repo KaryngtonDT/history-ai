@@ -162,10 +162,15 @@ describe("ShadowWatchPage proactive tutor", () => {
 		);
 
 		await waitFor(() => {
-			expect(screen.getByLabelText("Shadow speaking language")).toBeInTheDocument();
+			expect(
+				screen.getByLabelText("Shadow speaking language"),
+			).toBeInTheDocument();
 		});
 
-		await user.selectOptions(screen.getByLabelText("Shadow speaking language"), "de");
+		await user.selectOptions(
+			screen.getByLabelText("Shadow speaking language"),
+			"de",
+		);
 
 		await waitFor(() => {
 			expect(updateSpy).toHaveBeenCalled();

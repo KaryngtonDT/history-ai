@@ -5,9 +5,9 @@ import { ShadowInterventionCard } from "@/features/shadow/ShadowInterventionCard
 import { renderWithProviders } from "@/test/render";
 
 vi.mock("@/features/shadow/shadowVoice", async () => {
-	const actual = await vi.importActual<typeof import("@/features/shadow/shadowVoice")>(
-		"@/features/shadow/shadowVoice",
-	);
+	const actual = await vi.importActual<
+		typeof import("@/features/shadow/shadowVoice")
+	>("@/features/shadow/shadowVoice");
 
 	return {
 		...actual,
