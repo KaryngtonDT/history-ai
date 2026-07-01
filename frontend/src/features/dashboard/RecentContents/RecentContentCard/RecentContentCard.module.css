@@ -1,23 +1,40 @@
 .card {
 	padding: var(--space-4);
-	cursor: pointer;
-	transition: box-shadow var(--duration-fast);
 }
 
-.card:hover {
-	box-shadow: var(--shadow-card);
+.icon {
+	font-size: 1.25rem;
+	line-height: 1;
 }
 
-.card:focus-visible {
-	outline: none;
-	box-shadow: var(--button-focus-ring);
+.metaBlock {
+	flex: 1;
+	min-width: 0;
+}
+
+.meta {
+	margin: var(--space-1) 0 0;
+	font-size: var(--font-xs);
+	color: var(--shell-text-muted);
+}
+
+.openLink {
+	display: inline-flex;
+	margin-top: var(--space-3);
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-medium);
+	color: var(--shell-nav-active-text, #2563eb);
+	text-decoration: none;
+}
+
+.openLink:hover {
+	text-decoration: underline;
 }
 
 .header {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: center;
-	justify-content: space-between;
+	align-items: flex-start;
 	gap: var(--space-3);
 }
 
