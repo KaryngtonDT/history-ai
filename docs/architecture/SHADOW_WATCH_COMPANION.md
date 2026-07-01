@@ -67,6 +67,7 @@ Route: `/video/:videoId/watch`
 - Shadow conversation panel with text input (always available)
 - Browser `SpeechRecognition` for voice questions when supported
 - `speechSynthesis` for answer playback with text fallback
+- **Multilingual voice (Sprint 56.5):** speaking language selector (Auto / EN / FR / DE), browser voice matching, answer language metadata from backend
 - Transcript/translation panels highlight the current segment
 - UI localized in English, French, and German
 
@@ -80,7 +81,8 @@ Route: `/video/:videoId/watch`
 | Vocabulary panel | Placeholder UI; proactive tutor handles vocabulary checks (Sprint 56) |
 | Speaker detection | Not available in transcript segments |
 | Video source | Requires final render for playback; no source-file stream in UI |
-| Voice | Browser APIs only; quality varies by browser |
+| Voice | Browser APIs only; quality varies by browser; no server TTS yet |
+| Multilingual voice | EN/FR/DE via browser voices + backend answer language resolution (Sprint 56.5) |
 
 ---
 
@@ -98,5 +100,6 @@ Adding Shadow does not change `ProcessVideoHandler`, STT providers, or translati
 | ------ | ----- |
 | 55 | Shadow watch companion (this document) |
 | 56 | Shadow proactive tutor — optional interventions and policy |
+| 56.5 | Shadow multilingual voice — EN/FR/DE speech and answer language |
 | 57 | Adaptive Intelligence |
 | 58 | Public API |

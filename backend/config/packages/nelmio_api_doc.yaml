@@ -165,6 +165,9 @@ nelmio_api_doc:
             - { alias: ShadowInterventionPolicyResponse, type: App\Presentation\OpenApi\Schema\ShadowInterventionPolicyResponseSchema }
             - { alias: AnswerShadowInterventionRequest, type: App\Presentation\OpenApi\Schema\AnswerShadowInterventionRequestSchema }
             - { alias: ShadowInterventionAnswer, type: App\Presentation\OpenApi\Schema\ShadowInterventionAnswerSchema }
+            - { alias: ShadowVoicePreference, type: App\Presentation\OpenApi\Schema\ShadowVoicePreferenceSchema }
+            - { alias: UpdateShadowVoicePreferenceRequest, type: App\Presentation\OpenApi\Schema\UpdateShadowVoicePreferenceRequestSchema }
+            - { alias: ShadowVoicePreferenceResponse, type: App\Presentation\OpenApi\Schema\ShadowVoicePreferenceResponseSchema }
     areas:
         default:
             path_patterns:

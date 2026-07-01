@@ -2504,10 +2504,19 @@ final class ApiDocumentationTest extends WebTestCase
             'updateShadowInterventionPolicy',
             $spec['paths']['/api/videos/{videoId}/shadow/sessions/{sessionId}/policy']['put']['operationId'],
         );
+        self::assertArrayHasKey(
+            '/api/videos/{videoId}/shadow/sessions/{sessionId}/voice',
+            $spec['paths'],
+        );
+        self::assertSame(
+            'updateShadowVoicePreference',
+            $spec['paths']['/api/videos/{videoId}/shadow/sessions/{sessionId}/voice']['put']['operationId'],
+        );
         self::assertArrayHasKey('WatchContext', $spec['components']['schemas']);
         self::assertArrayHasKey('ShadowSession', $spec['components']['schemas']);
         self::assertArrayHasKey('ShadowAnswer', $spec['components']['schemas']);
         self::assertArrayHasKey('ShadowInterventionPolicy', $spec['components']['schemas']);
+        self::assertArrayHasKey('ShadowVoicePreference', $spec['components']['schemas']);
         self::assertArrayHasKey('ShadowIntervention', $spec['components']['schemas']);
         self::assertArrayHasKey('ShadowInterventionCheck', $spec['components']['schemas']);
         self::assertArrayHasKey('ShadowInterventionAnswer', $spec['components']['schemas']);

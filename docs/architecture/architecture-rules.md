@@ -1470,6 +1470,7 @@ Do **not** rename backend namespaces, database tables, or package names as part 
 | Intervention timing is deterministic | `ShadowInterventionDecider`; LLM only for answer text |
 | Reuse pipeline artifacts | Transcript/translation repos; no duplicate STT/translation |
 | Manual Q&A unchanged | `POST .../shadow/sessions/{sessionId}/ask` |
+| Multilingual voice is not UI i18n | Backend `answerLanguage` + browser TTS/STT (Sprint 56.5) |
 
 See [SHADOW_WATCH_COMPANION.md](./SHADOW_WATCH_COMPANION.md) and [SHADOW_PROACTIVE_TUTOR.md](./SHADOW_PROACTIVE_TUTOR.md).
 

@@ -126,6 +126,10 @@ final class WatchContextSchema
             property: 'policy',
             ref: '#/components/schemas/ShadowInterventionPolicy',
         ),
+        new OA\Property(
+            property: 'voicePreference',
+            ref: '#/components/schemas/ShadowVoicePreference',
+        ),
     ],
 )]
 final class ShadowSessionSchema
@@ -151,6 +155,7 @@ final class StartShadowSessionRequestSchema
     properties: [
         new OA\Property(property: 'question', type: 'string'),
         new OA\Property(property: 'time', type: 'number', format: 'float'),
+        new OA\Property(property: 'interfaceLanguage', type: 'string', nullable: true),
     ],
 )]
 final class AskShadowQuestionRequestSchema
@@ -159,17 +164,86 @@ final class AskShadowQuestionRequestSchema
 
 #[OA\Schema(
     schema: 'ShadowAnswer',
-    required: ['sessionId', 'answer', 'currentTimeSeconds', 'session'],
+    required: [
+        'sessionId',
+        'answer',
+        'currentTimeSeconds',
+        'answerLanguage',
+        'speechLanguage',
+        'fallbackUsed',
+        'reason',
+        'session',
+    ],
     properties: [
         new OA\Property(property: 'sessionId', type: 'string', format: 'uuid'),
         new OA\Property(property: 'answer', type: 'string'),
         new OA\Property(property: 'currentTimeSeconds', type: 'number', format: 'float'),
         new OA\Property(property: 'currentTranscriptSegmentIndex', type: 'integer', nullable: true),
         new OA\Property(property: 'currentTranslationSegmentIndex', type: 'integer', nullable: true),
+        new OA\Property(property: 'answerLanguage', type: 'string', enum: ['en', 'fr', 'de']),
+        new OA\Property(property: 'speechLanguage', type: 'string', enum: ['en', 'fr', 'de']),
+        new OA\Property(property: 'fallbackUsed', type: 'boolean'),
+        new OA\Property(property: 'reason', type: 'string'),
         new OA\Property(property: 'session', ref: '#/components/schemas/ShadowSession'),
     ],
 )]
 final class ShadowAnswerSchema
+{
+}
+
+#[OA\Schema(
+    schema: 'ShadowVoicePreference',
+    required: ['mode'],
+    properties: [
+        new OA\Property(
+            property: 'mode',
+            type: 'string',
+            enum: ['same_as_interface', 'same_as_target_language', 'manual'],
+        ),
+        new OA\Property(
+            property: 'manualLanguage',
+            type: 'string',
+            enum: ['en', 'fr', 'de'],
+            nullable: true,
+        ),
+    ],
+)]
+final class ShadowVoicePreferenceSchema
+{
+}
+
+#[OA\Schema(
+    schema: 'UpdateShadowVoicePreferenceRequest',
+    properties: [
+        new OA\Property(
+            property: 'mode',
+            type: 'string',
+            enum: ['same_as_interface', 'same_as_target_language', 'manual'],
+            nullable: true,
+        ),
+        new OA\Property(
+            property: 'manualLanguage',
+            type: 'string',
+            enum: ['en', 'fr', 'de'],
+            nullable: true,
+        ),
+    ],
+)]
+final class UpdateShadowVoicePreferenceRequestSchema
+{
+}
+
+#[OA\Schema(
+    schema: 'ShadowVoicePreferenceResponse',
+    required: ['voicePreference'],
+    properties: [
+        new OA\Property(
+            property: 'voicePreference',
+            ref: '#/components/schemas/ShadowVoicePreference',
+        ),
+    ],
+)]
+final class ShadowVoicePreferenceResponseSchema
 {
 }
 
@@ -341,12 +415,26 @@ final class AnswerShadowInterventionRequestSchema
 
 #[OA\Schema(
     schema: 'ShadowInterventionAnswer',
-    required: ['sessionId', 'interventionId', 'reply', 'recommendResume', 'session'],
+    required: [
+        'sessionId',
+        'interventionId',
+        'reply',
+        'recommendResume',
+        'answerLanguage',
+        'speechLanguage',
+        'fallbackUsed',
+        'reason',
+        'session',
+    ],
     properties: [
         new OA\Property(property: 'sessionId', type: 'string', format: 'uuid'),
         new OA\Property(property: 'interventionId', type: 'string', format: 'uuid'),
         new OA\Property(property: 'reply', type: 'string'),
         new OA\Property(property: 'recommendResume', type: 'boolean'),
+        new OA\Property(property: 'answerLanguage', type: 'string', enum: ['en', 'fr', 'de']),
+        new OA\Property(property: 'speechLanguage', type: 'string', enum: ['en', 'fr', 'de']),
+        new OA\Property(property: 'fallbackUsed', type: 'boolean'),
+        new OA\Property(property: 'reason', type: 'string'),
         new OA\Property(property: 'session', ref: '#/components/schemas/ShadowSession'),
     ],
 )]

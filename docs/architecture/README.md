@@ -1335,6 +1335,24 @@ Verification: [Sprint56-Verification.md](../reports/Sprint56-Verification.md)
 
 ---
 
+# Sprint 56.5 — Shadow Multilingual Voice (2026-06)
+
+| Slice | Focus | Status |
+|-------|-------|--------|
+| P56.5-SLICE-01 | Voice language domain | ✅ |
+| P56.5-SLICE-02 | Answer language resolution + API metadata | ✅ |
+| P56.5-SLICE-03 | Frontend voice settings + browser TTS/STT | ✅ |
+| P56.5-SLICE-04 | Multilingual voice tests | ✅ |
+| P56.5-SLICE-05 | OpenAPI, docs, verification | ✅ |
+
+- **UI i18n ≠ voice i18n** — buttons are translated; Shadow speech is a separate layer.
+- Browser `speechSynthesis` / `SpeechRecognition` with text fallback.
+- Server neural TTS deferred to a future sprint.
+
+Verification: [Sprint56_5-Verification.md](../reports/Sprint56_5-Verification.md)
+
+---
+
 # Project architecture overview
 
 **Lumen** is a **modular monolith** with three runtime applications and a shared domain story:

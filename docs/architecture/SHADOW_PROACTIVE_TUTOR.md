@@ -79,6 +79,7 @@ On `/video/:videoId/watch`:
 - **Resume prompt** — after answer/skip when backend recommends resume
 - Debounced intervention checks (900ms) while playing and policy enabled
 - Localized in English, French, and German (`pipeline.shadow.*`)
+- Challenge prompts and replies use backend `speechLanguage` metadata for browser TTS (Sprint 56.5)
 
 ---
 

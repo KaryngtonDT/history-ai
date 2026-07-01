@@ -912,6 +912,24 @@ The frontend `ShadowWatchPage` at `/video/:videoId/watch` uses `ShadowService`. 
 
 ---
 
+# Shadow Multilingual Voice (Platform Sprint 56.5)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| PUT | `/api/videos/{videoId}/shadow/sessions/{sessionId}/voice` | Update Shadow speaking language preference |
+
+## Schemas
+
+| Schema | Purpose |
+| ------ | ------- |
+| `ShadowVoicePreference` | `mode` + optional `manualLanguage` (`en`, `fr`, `de`) |
+| `UpdateShadowVoicePreferenceRequest` | Partial voice preference update |
+| `ShadowAnswer` | Adds `answerLanguage`, `speechLanguage`, `fallbackUsed`, `reason` |
+
+Voice behavior uses **browser** `SpeechRecognition` and `speechSynthesis` — not server neural TTS. The backend resolves answer language from target language, session preference, UI locale, and explicit user overrides (`explique en français`, etc.). Future server TTS can reuse the same metadata.
+
+---
+
 # Team Collaboration (Platform Sprint 48)
 
 | Method | Path | Description |
