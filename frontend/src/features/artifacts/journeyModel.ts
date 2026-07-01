@@ -80,8 +80,8 @@ export function buildArtifactJourney(
 			label: "Quality",
 			description: "Publication readiness score",
 			status: videoId ? "open" : "locked",
-			path: videoId ? `/video/upload` : undefined,
-			dependsOnLabel: "Final Render",
+			path: videoId ? `/video/${videoId}` : undefined,
+			dependsOnLabel: "Final Video",
 		},
 	];
 }

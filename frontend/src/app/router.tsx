@@ -11,6 +11,7 @@ import { ProcessingPage } from "@/pages/Processing/ProcessingPage";
 import { SettingsPage } from "@/pages/Settings/SettingsPage";
 import { VideoAudioPage } from "@/pages/VideoAudio/VideoAudioPage";
 import { VideoLipSyncPage } from "@/pages/VideoLipSync/VideoLipSyncPage";
+import { VideoOverviewPage } from "@/pages/VideoOverview/VideoOverviewPage";
 import { VideoRenderPage } from "@/pages/VideoRender/VideoRenderPage";
 import { VideoTranscriptPage } from "@/pages/VideoTranscript/VideoTranscriptPage";
 import { VideoTranslationsPage } from "@/pages/VideoTranslations/VideoTranslationsPage";
@@ -25,6 +26,7 @@ export function AppRouter() {
 				<Route path="/" element={<DashboardPage />} />
 				<Route path="/import" element={<ImportPage />} />
 				<Route path="/video/upload" element={<VideoUploadPage />} />
+				<Route path="/video/:videoId" element={<VideoOverviewPage />} />
 				<Route
 					path="/video/:videoId/transcript"
 					element={<VideoTranscriptPage />}

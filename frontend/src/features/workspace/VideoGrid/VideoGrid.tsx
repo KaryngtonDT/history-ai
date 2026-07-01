@@ -1,5 +1,4 @@
 import { Link } from "react-router";
-import { videoPipelinePath } from "@/features/product/videoRoutes";
 import type { ProjectVideo } from "@/services/workspace/types";
 import styles from "./VideoGrid.module.css";
 
@@ -30,10 +29,7 @@ export function VideoGrid({
 						✓
 					</span>
 					<span className={styles.filename}>{video.filename}</span>
-					<Link
-						to={videoPipelinePath("transcript", video.videoId)}
-						className={styles.pipelineLink}
-					>
+					<Link to={`/video/${video.videoId}`} className={styles.pipelineLink}>
 						Open pipeline →
 					</Link>
 					{onRemoveVideo ? (
