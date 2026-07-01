@@ -79,10 +79,4 @@ export const learningEn = {
 			},
 		},
 	},
-	settings: {
-		learning: {
-			title: "Adaptive Learning",
-			description: "Review and control Lumen's deterministic learning profile.",
-		},
-	},
 } as const;

@@ -82,11 +82,4 @@ export const learningFr = {
 			},
 		},
 	},
-	settings: {
-		learning: {
-			title: "Apprentissage adaptatif",
-			description:
-				"Consultez et contrôlez le profil d'apprentissage déterministe de Lumen.",
-		},
-	},
 } as const;

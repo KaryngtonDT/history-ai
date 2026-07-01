@@ -290,6 +290,10 @@ export const shellDe: ShellMessages = {
 			title: "Pipeline-Konfiguration",
 			description: "Engines pro Verarbeitungsschritt zuweisen (Sprint 39).",
 		},
+		learning: {
+			title: "Adaptives Lernen",
+			description: "Lumens deterministisches Lernprofil ansehen und steuern.",
+		},
 	},
 	workItem: {
 		types: {

@@ -298,6 +298,11 @@ export const shellFr: ShellMessages = {
 			description:
 				"Assignez des moteurs à chaque étape de traitement (Sprint 39).",
 		},
+		learning: {
+			title: "Apprentissage adaptatif",
+			description:
+				"Consultez et contrôlez le profil d'apprentissage déterministe de Lumen.",
+		},
 	},
 	workItem: {
 		types: {

@@ -68,6 +68,7 @@ Route: `/video/:videoId/watch`
 - Browser `SpeechRecognition` for voice questions when supported
 - `speechSynthesis` for answer playback with text fallback
 - **Multilingual voice (Sprint 56.5):** speaking language selector (Auto / EN / FR / DE), browser voice matching, answer language metadata from backend
+- **Adaptive intelligence (Sprint 57):** when enabled, explanation style hints and voice language may follow learned preferences; manual voice selection always wins
 - Transcript/translation panels highlight the current segment
 - UI localized in English, French, and German
 
@@ -83,6 +84,21 @@ Route: `/video/:videoId/watch`
 | Video source | Requires final render for playback; no source-file stream in UI |
 | Voice | Browser APIs only; quality varies by browser; no server TTS yet |
 | Multilingual voice | EN/FR/DE via browser voices + backend answer language resolution (Sprint 56.5) |
+| Adaptive learning | Optional; off by default; requires user to enable at `/settings/learning` (Sprint 57) |
+
+---
+
+## Adaptive integration (Sprint 57)
+
+When the user enables adaptive recommendations (`LearningProfile.adaptiveRecommendationsEnabled`):
+
+- Shadow answer prompts may include a learned explanation style hint (short vs detailed)
+- Voice language may default to a learned preference when the user has not set manual voice mode
+- Proactive tutor challenge level may soften or increase based on skip/answer patterns
+
+When adaptive is disabled or no profile exists, Sprint 55–56.5 behavior is unchanged.
+
+See [ADAPTIVE_INTELLIGENCE_ENGINE.md](./ADAPTIVE_INTELLIGENCE_ENGINE.md).
 
 ---
 

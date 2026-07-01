@@ -17,6 +17,13 @@ final class GetLearningProfileController extends AbstractController
         operationId: 'getLearningProfile',
         summary: 'Get the adaptive learning profile',
         tags: ['Learning'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Learning profile',
+                content: new OA\JsonContent(ref: '#/components/schemas/LearningProfile'),
+            ),
+        ],
     )]
     #[Route('/api/learning/profile', name: 'api_learning_profile_get', methods: ['GET'])]
     public function __invoke(Request $request, GetLearningProfileHandler $handler): JsonResponse

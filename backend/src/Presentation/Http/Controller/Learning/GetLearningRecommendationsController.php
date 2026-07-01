@@ -17,6 +17,9 @@ final class GetLearningRecommendationsController extends AbstractController
         operationId: 'getLearningRecommendations',
         summary: 'Get adaptive learning recommendations and hints',
         tags: ['Learning'],
+        responses: [
+            new OA\Response(response: 200, description: 'Learning recommendations payload'),
+        ],
     )]
     #[Route('/api/learning/recommendations', name: 'api_learning_recommendations_get', methods: ['GET'])]
     public function __invoke(Request $request, GetLearningRecommendationsHandler $handler): JsonResponse

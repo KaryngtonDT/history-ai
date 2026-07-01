@@ -168,6 +168,13 @@ nelmio_api_doc:
             - { alias: ShadowVoicePreference, type: App\Presentation\OpenApi\Schema\ShadowVoicePreferenceSchema }
             - { alias: UpdateShadowVoicePreferenceRequest, type: App\Presentation\OpenApi\Schema\UpdateShadowVoicePreferenceRequestSchema }
             - { alias: ShadowVoicePreferenceResponse, type: App\Presentation\OpenApi\Schema\ShadowVoicePreferenceResponseSchema }
+            - { alias: LearningSignal, type: App\Presentation\OpenApi\Schema\LearningSignalSchema }
+            - { alias: LearningInsight, type: App\Presentation\OpenApi\Schema\LearningInsightSchema }
+            - { alias: LearningRecommendation, type: App\Presentation\OpenApi\Schema\LearningRecommendationSchema }
+            - { alias: LearningPreference, type: App\Presentation\OpenApi\Schema\LearningPreferenceSchema }
+            - { alias: LearningProfile, type: App\Presentation\OpenApi\Schema\LearningProfileSchema }
+            - { alias: UpdateLearningPreferencesRequest, type: App\Presentation\OpenApi\Schema\UpdateLearningPreferencesRequestSchema }
+            - { alias: RecordLearningSignalsRequest, type: App\Presentation\OpenApi\Schema\RecordLearningSignalsRequestSchema }
     areas:
         default:
             path_patterns:

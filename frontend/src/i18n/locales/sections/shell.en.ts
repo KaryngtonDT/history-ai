@@ -283,6 +283,10 @@ export const shellEn = {
 			title: "Pipeline Configuration",
 			description: "Assign engines to each processing stage (Sprint 39).",
 		},
+		learning: {
+			title: "Adaptive Learning",
+			description: "Review and control Lumen's deterministic learning profile.",
+		},
 	},
 	workItem: {
 		types: {

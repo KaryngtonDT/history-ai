@@ -912,6 +912,28 @@ The frontend `ShadowWatchPage` at `/video/:videoId/watch` uses `ShadowService`. 
 
 ---
 
+# Adaptive Intelligence Engine (Platform Sprint 57)
+
+| Method | Path | Operation |
+| ------ | ---- | --------- |
+| GET | `/api/learning/profile` | `getLearningProfile` |
+| GET | `/api/learning/recommendations` | `getLearningRecommendations` |
+| POST | `/api/learning/signals` | `postLearningSignals` |
+| POST | `/api/learning/reset` | `postLearningReset` |
+| PUT | `/api/learning/preferences` | `putLearningPreferences` |
+
+| Schema | Purpose |
+| ------ | ------- |
+| `LearningProfile` | Scope, preferences, signals, insights, recommendations |
+| `LearningSignal` | Append-only usage signal with typed context |
+| `LearningInsight` | Derived pattern with source signal ids |
+| `LearningRecommendation` | Derived suggestion with explanation and source insight ids |
+| `LearningPreference` | Adaptive toggle and future preference keys |
+
+Frontend Learning Center: `/settings/learning`. See [ADAPTIVE_INTELLIGENCE_ENGINE.md](./ADAPTIVE_INTELLIGENCE_ENGINE.md).
+
+---
+
 # Shadow Multilingual Voice (Platform Sprint 56.5)
 
 | Method | Path | Description |

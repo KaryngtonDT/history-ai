@@ -25,8 +25,8 @@ Users bring **any source** (video, PDF, audio, YouTube). The pipeline adapts. Th
 | **Home** | `/` | Orientation, create, resume work, recent work summaries |
 | **Workspace** | `/workspace` | Projects, batch, team, detailed analytics |
 | **WorkItem Overview** | `/video/:id`, `/processing/:id` | Complete life of one item — hub, not detail work |
-| **Feature pages** | `/video/:id/transcript`, `/video/:id/watch`, `/settings/pipeline` | Focused work on one capability |
-| **Settings** | `/settings`, `/settings/ai` | Configuration only |
+| **Feature pages** | `/video/:id/transcript`, `/video/:id/watch`, `/settings/pipeline`, `/settings/learning` | Focused work on one capability |
+| **Settings** | `/settings`, `/settings/ai`, `/settings/pipeline`, `/settings/learning` | Configuration only |
 
 ### Rules
 
@@ -131,6 +131,25 @@ Use `CompactPageIntroduction` + `CreatePageLayout` from `frontend/src/features/p
 ### Empty states
 
 Disabled sidebar items and empty panels must state what is missing, why it matters, and the next action (`EmptyState` + `shell.nav.empty.*` i18n keys).
+
+---
+
+## Sprint 57 — Adaptive Learning Center
+
+Route: `/settings/learning`
+
+| Section | Purpose |
+| ------- | ------- |
+| Learning profile | Signal/insight/recommendation counts and adaptive status |
+| Signal timeline | Append-only usage signals with types and timestamps |
+| Insights | Deterministic patterns with source signal references |
+| Recommendations | Actionable suggestions with “generated because…” explanations |
+| Adaptive toggle | Enable/disable adaptive help for Shadow and AI Director |
+| Reset panel | Clear learning state; preferences preserved unless changed |
+
+Settings hub (`/settings`) links to the Learning Center alongside AI Engines and Pipeline Configuration.
+
+i18n keys live in `learning.*` (feature) and `settings.learning.*` (settings hub link) — never as a top-level `settings` object in feature locale files (shallow merge).
 
 ---
 

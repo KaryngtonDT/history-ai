@@ -79,10 +79,4 @@ export const learningDe = {
 			},
 		},
 	},
-	settings: {
-		learning: {
-			title: "Adaptives Lernen",
-			description: "Lumens deterministisches Lernprofil ansehen und steuern.",
-		},
-	},
 } as const;

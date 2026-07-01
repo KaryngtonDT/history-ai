@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Shadow;
 
+use App\Application\Learning\LearningAdaptiveAdvisor;
+use App\Application\Learning\LearningAdaptiveVoiceResolver;
 use App\Application\Shadow\Commands\AskShadowQuestionCommand;
 use App\Application\Shadow\Commands\PauseShadowSessionCommand;
 use App\Application\Shadow\Commands\ResumeShadowSessionCommand;
@@ -35,6 +37,7 @@ use App\Domain\Speech\TranscriptSegmentCollection;
 use App\Domain\Translation\TranslationRepositoryInterface;
 use App\Domain\Video\VideoId;
 use App\Infrastructure\Chat\MockChatProvider;
+use App\Infrastructure\Learning\InMemoryLearningProfileRepository;
 use App\Infrastructure\Shadow\InMemoryShadowSessionRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -170,6 +173,8 @@ final class ShadowHandlersTest extends TestCase
             $this->shadowContextFactory(),
             new ShadowWatchAnswerer($chatProvider, new ShadowWatchPromptBuilder()),
             new \App\Application\Shadow\ShadowAnswerLanguageResolver(),
+            new LearningAdaptiveAdvisor(new InMemoryLearningProfileRepository()),
+            new LearningAdaptiveVoiceResolver(),
         );
     }
 

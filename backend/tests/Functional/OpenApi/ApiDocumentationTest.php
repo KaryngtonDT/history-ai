@@ -2522,6 +2522,25 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('ShadowInterventionAnswer', $spec['components']['schemas']);
     }
 
+    public function testLearningEndpointsAreDocumented(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('/api/learning/profile', $spec['paths']);
+        self::assertArrayHasKey('/api/learning/recommendations', $spec['paths']);
+        self::assertArrayHasKey('/api/learning/signals', $spec['paths']);
+        self::assertArrayHasKey('/api/learning/reset', $spec['paths']);
+        self::assertArrayHasKey('/api/learning/preferences', $spec['paths']);
+        self::assertSame(
+            'getLearningProfile',
+            $spec['paths']['/api/learning/profile']['get']['operationId'],
+        );
+        self::assertArrayHasKey('LearningProfile', $spec['components']['schemas']);
+        self::assertArrayHasKey('LearningSignal', $spec['components']['schemas']);
+        self::assertArrayHasKey('LearningInsight', $spec['components']['schemas']);
+        self::assertArrayHasKey('LearningRecommendation', $spec['components']['schemas']);
+    }
+
     /**
      * @return array<string, mixed>
      */

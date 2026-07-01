@@ -18,6 +18,18 @@ final class PutLearningPreferencesController extends AbstractController
         operationId: 'putLearningPreferences',
         summary: 'Update adaptive learning preferences',
         tags: ['Learning'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/UpdateLearningPreferencesRequest'),
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Updated learning profile',
+                content: new OA\JsonContent(ref: '#/components/schemas/LearningProfile'),
+            ),
+            new OA\Response(response: 400, description: 'Invalid request'),
+        ],
     )]
     #[Route('/api/learning/preferences', name: 'api_learning_preferences_put', methods: ['PUT'])]
     public function __invoke(Request $request, UpdateLearningPreferencesHandler $handler): JsonResponse

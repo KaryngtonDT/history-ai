@@ -1476,6 +1476,26 @@ See [SHADOW_WATCH_COMPANION.md](./SHADOW_WATCH_COMPANION.md) and [SHADOW_PROACTI
 
 ---
 
+# Sprint 57 — Adaptive Intelligence Engine
+
+| Rule | Implementation |
+| ---- | -------------- |
+| Learning is a bounded context | `Domain/Learning`, `Application/Learning`, `features/learning/` |
+| Deterministic learning only | Threshold-based insight/recommendation engines; no LLM for learning decisions |
+| Not model training | No fine-tuning, provider weight changes, or autonomous self-modification |
+| Signals append-only | `LearningSignal` collected from Shadow, reviews, telemetry, quality |
+| Insights derive from signals | Every insight lists `sourceSignalIds` |
+| Recommendations derive from insights | Every recommendation lists `sourceInsightIds` + `explanation` |
+| Adaptive off by default | `LearningProfile::adaptiveRecommendationsEnabled()` defaults false |
+| Manual mode preserved | Shadow/AI Director unchanged unless user enables adaptive help |
+| User overrides win | Explicit user choices beat learned preferences |
+| User can reset | `POST /api/learning/reset` clears signals, insights, recommendations |
+| No pipeline duplication | Reuses existing Shadow, review, telemetry, quality inputs |
+
+See [ADAPTIVE_INTELLIGENCE_ENGINE.md](./ADAPTIVE_INTELLIGENCE_ENGINE.md).
+
+---
+
 # Running all architecture checks
 
 ```bash

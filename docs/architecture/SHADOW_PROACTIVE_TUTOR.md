@@ -80,6 +80,26 @@ On `/video/:videoId/watch`:
 - Debounced intervention checks (900ms) while playing and policy enabled
 - Localized in English, French, and German (`pipeline.shadow.*`)
 - Challenge prompts and replies use backend `speechLanguage` metadata for browser TTS (Sprint 56.5)
+- When adaptive recommendations are enabled (Sprint 57), challenge level and explanation style may follow learned preferences; user policy settings always override
+
+---
+
+## Adaptive tutor integration (Sprint 57)
+
+`ShadowInterventionContextBuilder` consults `LearningAdaptiveShadowPolicyResolver` when a learning profile exists and adaptive mode is on:
+
+| Learned signal pattern | Adaptive effect |
+| ---------------------- | --------------- |
+| Many skipped hard challenges | Lower proactive challenge level |
+| Easy challenges answered correctly | Raise challenge level |
+| Frequent vocabulary questions | Vocabulary-focused interventions |
+| Preferred explanation depth | Short vs detailed challenge prompts |
+
+Intervention **timing** remains deterministic (`ShadowInterventionDecider`). Learning only adjusts **style and difficulty**, not when to interrupt.
+
+User policy (`ShadowInterventionPolicy`) and manual mode always take precedence.
+
+See [ADAPTIVE_INTELLIGENCE_ENGINE.md](./ADAPTIVE_INTELLIGENCE_ENGINE.md).
 
 ---
 
@@ -98,4 +118,5 @@ On `/video/:videoId/watch`:
 ## Related documents
 
 - [SHADOW_WATCH_COMPANION.md](./SHADOW_WATCH_COMPANION.md) — Sprint 55 foundation
+- [ADAPTIVE_INTELLIGENCE_ENGINE.md](./ADAPTIVE_INTELLIGENCE_ENGINE.md) — Sprint 57 controlled learning loop
 - [openapi.md](./openapi.md) — Shadow proactive endpoints and schemas

@@ -1353,6 +1353,26 @@ Verification: [Sprint56_5-Verification.md](../reports/Sprint56_5-Verification.md
 
 ---
 
+# Sprint 57 — Adaptive Intelligence Engine (2026-06)
+
+| Slice | Focus | Status |
+|-------|-------|--------|
+| P57-SLICE-01 | Learning domain | ✅ |
+| P57-SLICE-02 | Deterministic insight engine | ✅ |
+| P57-SLICE-03 | Shadow / AI Director integration | ✅ |
+| P57-SLICE-04 | Frontend Learning Center | ✅ |
+| P57-SLICE-05 | OpenAPI, docs, verification | ✅ |
+
+- Deterministic learning from Shadow, reviews, telemetry, and quality signals.
+- Not model training — explainable insights and recommendations with reset/disable controls.
+- UI at `/settings/learning`; API under `/api/learning/*`.
+
+Architecture: [ADAPTIVE_INTELLIGENCE_ENGINE.md](./ADAPTIVE_INTELLIGENCE_ENGINE.md)
+
+Verification: [Sprint57-Verification.md](../reports/Sprint57-Verification.md)
+
+---
+
 # Project architecture overview
 
 **Lumen** is a **modular monolith** with three runtime applications and a shared domain story:

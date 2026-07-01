@@ -18,6 +18,18 @@ final class PostLearningSignalsController extends AbstractController
         operationId: 'postLearningSignals',
         summary: 'Record learning signals for adaptive intelligence',
         tags: ['Learning'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/RecordLearningSignalsRequest'),
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Updated learning profile',
+                content: new OA\JsonContent(ref: '#/components/schemas/LearningProfile'),
+            ),
+            new OA\Response(response: 400, description: 'Invalid request'),
+        ],
     )]
     #[Route('/api/learning/signals', name: 'api_learning_signals_post', methods: ['POST'])]
     public function __invoke(Request $request, RecordLearningSignalsHandler $handler): JsonResponse
