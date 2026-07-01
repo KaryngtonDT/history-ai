@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Application\Shadow\Handlers;
 
+use App\Application\Learning\LearningAdaptiveAdvisor;
+use App\Application\Learning\LearningAdaptiveVoiceResolver;
 use App\Application\Shadow\Commands\AskShadowQuestionCommand;
 use App\Application\Shadow\DTO\ShadowAnswerResult;
 use App\Application\Shadow\ShadowAnswerLanguageResolver;
@@ -23,6 +25,8 @@ final class AskShadowQuestionHandler
         private readonly ShadowContextFactory $shadowContextFactory,
         private readonly ShadowWatchAnswerer $shadowWatchAnswerer,
         private readonly ShadowAnswerLanguageResolver $languageResolver,
+        private readonly LearningAdaptiveAdvisor $learningAdvisor,
+        private readonly LearningAdaptiveVoiceResolver $adaptiveVoiceResolver,
     ) {
     }
 
@@ -65,7 +69,21 @@ final class AskShadowQuestionHandler
             $interfaceLanguage,
         );
 
-        $answer = $this->shadowWatchAnswerer->answer($context, $question, $voice);
+        $explicitLanguage = str_contains($voice->reason, 'explicit_user_override');
+        $hints = $this->learningAdvisor->hints();
+        $voice = $this->adaptiveVoiceResolver->apply(
+            $voice,
+            $session->voicePreference(),
+            $hints,
+            $explicitLanguage,
+        );
+
+        $answer = $this->shadowWatchAnswerer->answer(
+            $context,
+            $question,
+            $voice,
+            $hints->explanationStyle,
+        );
         $session = $session->recordAnswer($answer);
 
         $this->sessionRepository->save($session);

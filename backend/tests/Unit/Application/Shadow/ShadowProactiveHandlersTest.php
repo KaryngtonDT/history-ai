@@ -17,6 +17,8 @@ use App\Application\Shadow\ShadowChallengeGenerator;
 use App\Application\Shadow\ShadowContextFactory;
 use App\Application\Shadow\ShadowInterventionAnswerPromptBuilder;
 use App\Application\Shadow\ShadowInterventionAnswerer;
+use App\Application\Learning\LearningAdaptiveAdvisor;
+use App\Application\Learning\LearningAdaptiveShadowPolicyResolver;
 use App\Application\Shadow\ShadowInterventionContextBuilder;
 use App\Application\Shadow\ShadowInterventionDecider;
 use App\Application\Shadow\ShadowInterventionPlanner;
@@ -262,6 +264,8 @@ final class ShadowProactiveHandlersTest extends TestCase
             $this->shadowContextFactory(),
             $videoRepository,
             $intelligenceFactory,
+            new LearningAdaptiveAdvisor(new \App\Infrastructure\Learning\InMemoryLearningProfileRepository()),
+            new LearningAdaptiveShadowPolicyResolver(),
         );
     }
 

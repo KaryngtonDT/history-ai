@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Shadow;
 
 use App\Domain\Chat\ChatPrompt;
+use App\Domain\Shadow\ShadowExplanationStyle;
 use App\Domain\Shadow\ShadowVoiceLanguage;
 use App\Domain\Shadow\ShadowQuestion;
 
@@ -14,13 +15,23 @@ final class ShadowWatchPromptBuilder
         WatchContext $context,
         ShadowQuestion $question,
         ShadowVoiceLanguage $answerLanguage,
+        ?ShadowExplanationStyle $explanationStyleHint = null,
     ): ChatPrompt {
         $lines = [
             'You are Shadow, the Lumen AI watch companion. Answer using the current video moment.',
             sprintf('Respond in %s.', $answerLanguage->label()),
-            sprintf('Current playback time: %.1f seconds', $context->currentTimeSeconds),
-            sprintf('Target language: %s', $context->targetLanguage),
         ];
+
+        if (null !== $explanationStyleHint) {
+            $lines[] = match ($explanationStyleHint) {
+                ShadowExplanationStyle::Short => 'Keep the answer concise and practical.',
+                ShadowExplanationStyle::Detailed => 'Provide a detailed, step-by-step explanation.',
+                ShadowExplanationStyle::ExampleFirst => 'Lead with a concrete example, then explain.',
+            };
+        }
+
+        $lines[] = sprintf('Current playback time: %.1f seconds', $context->currentTimeSeconds);
+        $lines[] = sprintf('Target language: %s', $context->targetLanguage);
 
         if (null !== $context->currentTranscriptSegment) {
             $segment = $context->currentTranscriptSegment;

@@ -203,16 +203,28 @@ services:
         alias: App\Infrastructure\Pipeline\RuntimePipelineConfigurationContext
 
     App\Domain\Orchestrator\PipelinePlannerInterface:
-        alias: App\Infrastructure\Orchestrator\DeterministicPipelinePlanner
+        alias: App\Infrastructure\Orchestrator\LearningAwarePipelinePlanner
+
+    App\Infrastructure\Orchestrator\DeterministicPipelinePlanner: ~
+
+    App\Infrastructure\Orchestrator\LearningAwarePipelinePlanner:
+        arguments:
+            $inner: '@App\Infrastructure\Orchestrator\DeterministicPipelinePlanner'
+
+    App\Domain\Optimization\ExecutionOptimizerInterface:
+        alias: App\Infrastructure\Optimization\LearningAwareExecutionOptimizer
+
+    App\Infrastructure\Optimization\DeterministicExecutionOptimizer: ~
+
+    App\Infrastructure\Optimization\LearningAwareExecutionOptimizer:
+        arguments:
+            $inner: '@App\Infrastructure\Optimization\DeterministicExecutionOptimizer'
 
     App\Domain\Orchestrator\VideoAnalysisFactoryInterface:
         alias: App\Infrastructure\Orchestrator\VideoJobVideoAnalysisFactory
 
     App\Domain\VideoIntelligence\VideoAnalyzerInterface:
         alias: App\Infrastructure\VideoIntelligence\CompositeVideoAnalyzer
-
-    App\Domain\Optimization\ExecutionOptimizerInterface:
-        alias: App\Infrastructure\Optimization\DeterministicExecutionOptimizer
 
     App\Domain\Optimization\RuntimeExecutionOptimizationContextInterface:
         alias: App\Infrastructure\Optimization\RuntimeExecutionOptimizationContext

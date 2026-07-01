@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Application\Shadow;
 
-use App\Domain\Shadow\ShadowInterventionPolicy;
+use App\Application\Learning\LearningAdaptiveAdvisor;
+use App\Application\Learning\LearningAdaptiveShadowPolicyResolver;
 use App\Domain\Shadow\ShadowSession;
 use App\Domain\Video\VideoId;
 use App\Domain\Video\VideoRepositoryInterface;
@@ -17,6 +18,8 @@ final class ShadowInterventionContextBuilder
         private readonly ShadowContextFactory $shadowContextFactory,
         private readonly VideoRepositoryInterface $videoRepository,
         private readonly VideoIntelligenceFactoryInterface $videoIntelligenceFactory,
+        private readonly LearningAdaptiveAdvisor $learningAdvisor,
+        private readonly LearningAdaptiveShadowPolicyResolver $policyResolver,
     ) {
     }
 
@@ -29,10 +32,15 @@ final class ShadowInterventionContextBuilder
             $session->conversationId()?->value,
         );
 
+        $policy = $this->policyResolver->apply(
+            $session->interventionPolicy(),
+            $this->learningAdvisor->hints(),
+        );
+
         return new ShadowInterventionContext(
             $watchContext,
             $session,
-            $session->interventionPolicy(),
+            $policy,
             $session->interventions(),
             $this->resolveVideoIntelligence($session->videoId()),
         );
