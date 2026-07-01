@@ -248,6 +248,12 @@ services:
     App\Domain\Review\UserPreferenceProfileRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Review\DoctrineUserPreferenceProfileRepository
 
+    App\Domain\Shadow\ShadowSessionRepositoryInterface:
+        alias: App\Infrastructure\Shadow\InMemoryShadowSessionRepository
+
+    App\Domain\Shadow\ShadowConversationContextInterface:
+        alias: App\Infrastructure\Shadow\NullShadowConversationContext
+
     App\Domain\Collaboration\WorkspaceMemberRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Collaboration\DoctrineWorkspaceMemberRepository
 
