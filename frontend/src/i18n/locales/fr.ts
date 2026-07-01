@@ -1,0 +1,37 @@
+import type { Messages } from "./en";
+
+export const fr = {
+	common: {
+		loading: "Chargement…",
+		save: "Enregistrer",
+		cancel: "Annuler",
+		delete: "Supprimer",
+		edit: "Modifier",
+		close: "Fermer",
+		back: "Retour",
+		next: "Suivant",
+		retry: "Réessayer",
+		refresh: "Actualiser",
+		download: "Télécharger",
+		upload: "Téléverser",
+		import: "Importer",
+		export: "Exporter",
+		search: "Rechercher",
+		filter: "Filtrer",
+		yes: "Oui",
+		no: "Non",
+		or: "ou",
+		error: "Erreur",
+		success: "Succès",
+		warning: "Avertissement",
+		info: "Info",
+		noResults: "Aucun résultat",
+		comingSoon: "Bientôt disponible",
+	},
+	language: {
+		label: "Langue",
+		en: "English",
+		fr: "Français",
+		de: "Deutsch",
+	},
+} as const satisfies Messages;
