@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { TeamPanel } from "@/features/collaboration";
 import { ExecutionHistoryPanel } from "@/features/history";
 import {
 	PreferenceProfileCard,
@@ -240,6 +241,8 @@ export function WorkspacePage() {
 					{selectedProject ? (
 						<>
 							<ProjectCard project={selectedProject} />
+
+							<TeamPanel workspaceId={selectedProject.id} />
 
 							<div className={styles.section}>
 								<h2 className={styles.sectionTitle}>Videos</h2>

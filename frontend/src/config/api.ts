@@ -237,3 +237,18 @@ export function contentAgentRunPath(contentId: string): string {
 export function collectionItemsPath(collectionId: string): string {
 	return `${COLLECTIONS_PATH}/${collectionId}/items`;
 }
+
+export function workspaceMembersPath(workspaceId: string): string {
+	return `/api/workspaces/${workspaceId}/members`;
+}
+
+export function workspaceMemberPath(
+	workspaceId: string,
+	memberId: string,
+): string {
+	return `/api/workspaces/${workspaceId}/members/${memberId}`;
+}
+
+export function workspaceInvitationsPath(workspaceId: string): string {
+	return `/api/workspaces/${workspaceId}/invitations`;
+}
