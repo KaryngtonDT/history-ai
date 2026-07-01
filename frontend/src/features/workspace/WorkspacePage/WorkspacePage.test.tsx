@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 import { MOCK_PREVIEW_PROJECT } from "@/services/workspace/MockWorkspaceRepository";
 import { BatchProgress } from "../BatchProgress";
@@ -13,12 +14,19 @@ describe("Workspace feature components", () => {
 		expect(screen.getByText("3 videos")).toBeInTheDocument();
 	});
 
-	it("renders video grid with filenames", () => {
-		render(<VideoGrid videos={MOCK_PREVIEW_PROJECT.videos} />);
+	it("renders video grid with filenames and pipeline links", () => {
+		render(
+			<MemoryRouter>
+				<VideoGrid videos={MOCK_PREVIEW_PROJECT.videos} />
+			</MemoryRouter>,
+		);
 
 		expect(screen.getByText("Interview.mp4")).toBeInTheDocument();
 		expect(screen.getByText("Podcast.mp4")).toBeInTheDocument();
 		expect(screen.getByText("Demo.mp4")).toBeInTheDocument();
+		expect(
+			screen.getAllByRole("link", { name: "Open pipeline →" }),
+		).toHaveLength(3);
 	});
 
 	it("renders batch progress bar and percentage", () => {

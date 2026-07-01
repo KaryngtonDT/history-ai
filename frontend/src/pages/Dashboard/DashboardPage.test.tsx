@@ -119,7 +119,7 @@ describe("DashboardPage — S2-SLICE-05 real backend data", () => {
 
 		await user.click(screen.getByRole("button", { name: "Import Video" }));
 		expect(
-			screen.getByRole("heading", { name: "Upload Video" }),
+			screen.getByRole("heading", { name: "Upload Video", level: 1 }),
 		).toBeInTheDocument();
 	});
 });

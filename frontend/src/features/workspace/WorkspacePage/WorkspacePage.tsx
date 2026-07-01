@@ -7,8 +7,11 @@ import {
 	ProviderStatistics,
 	QualityTrend,
 } from "@/features/analytics";
+import { ArtifactJourney } from "@/features/artifacts";
 import { TeamPanel } from "@/features/collaboration";
+import { ExplainThisButton } from "@/features/help";
 import { ExecutionHistoryPanel } from "@/features/history";
+import { PageIntroduction } from "@/features/product";
 import {
 	PreferenceProfileCard,
 	ReviewPanel,
@@ -249,30 +252,32 @@ export function WorkspacePage() {
 
 	return (
 		<div className={styles.root}>
-			<header className={styles.header}>
-				<div>
-					<p className={styles.eyebrow}>Workspace</p>
-					<h1 className={styles.title}>Project Workspace</h1>
-				</div>
-				<div className={styles.createForm}>
-					<input
-						type="text"
-						value={newProjectName}
-						onChange={(event) => setNewProjectName(event.target.value)}
-						placeholder="New project name"
-						className={styles.input}
-						aria-label="New project name"
-					/>
-					<button
-						type="button"
-						className={styles.secondaryButton}
-						onClick={handleCreateProject}
-						disabled={creating || newProjectName.trim() === ""}
-					>
-						Create project
-					</button>
-				</div>
-			</header>
+			<PageIntroduction
+				eyebrow="Workspace"
+				title="Project Workspace"
+				description="Organize videos, run batch processing, and review team output."
+				whatCanIDo="Create projects, add videos, choose languages, process batches, and review analytics, history, and team activity."
+				secondaryActions={<ExplainThisButton featureId="workspace" />}
+			/>
+
+			<div className={styles.createForm}>
+				<input
+					type="text"
+					value={newProjectName}
+					onChange={(event) => setNewProjectName(event.target.value)}
+					placeholder="New project name"
+					className={styles.input}
+					aria-label="New project name"
+				/>
+				<button
+					type="button"
+					className={styles.secondaryButton}
+					onClick={handleCreateProject}
+					disabled={creating || newProjectName.trim() === ""}
+				>
+					Create project
+				</button>
+			</div>
 
 			<div className={styles.layout}>
 				<section className={styles.sidebar}>
@@ -328,6 +333,13 @@ export function WorkspacePage() {
 								<h2 className={styles.sectionTitle}>Videos</h2>
 								<VideoGrid videos={selectedProject.videos} />
 							</div>
+
+							{selectedVideoId ? (
+								<ArtifactJourney
+									videoId={selectedVideoId}
+									title="Selected video pipeline"
+								/>
+							) : null}
 
 							<div className={styles.section}>
 								<h2 className={styles.sectionTitle}>Languages</h2>

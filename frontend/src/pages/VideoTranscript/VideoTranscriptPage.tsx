@@ -1,5 +1,10 @@
+import { VideoPipelinePageLayout } from "@/features/product";
 import { TranscriptPanel } from "@/features/transcript";
 
 export function VideoTranscriptPage() {
-	return <TranscriptPanel />;
+	return (
+		<VideoPipelinePageLayout stepId="transcript" featureId="transcript">
+			<TranscriptPanel />
+		</VideoPipelinePageLayout>
+	);
 }

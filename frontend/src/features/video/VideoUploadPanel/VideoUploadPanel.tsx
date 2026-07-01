@@ -22,7 +22,6 @@ import { ValidationError } from "@/shared/errors";
 import type { VideoUploadPhase } from "../types";
 import { VideoDropzone } from "../VideoDropzone";
 import { VideoUploadError } from "../VideoUploadError";
-import { VideoUploadHeader } from "../VideoUploadHeader";
 import { VideoUploadProgress } from "../VideoUploadProgress";
 import { VideoUploadSuccess } from "../VideoUploadSuccess";
 import styles from "./VideoUploadPanel.module.css";
@@ -136,7 +135,6 @@ export function VideoUploadPanel() {
 
 	return (
 		<div className={styles.root}>
-			<VideoUploadHeader />
 			<div className={styles.content}>
 				{phase === "idle" ? (
 					<>
