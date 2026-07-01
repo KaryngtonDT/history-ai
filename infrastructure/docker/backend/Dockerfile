@@ -10,7 +10,10 @@ RUN apk add --no-cache \
         icu-dev \
         postgresql-dev \
         linux-headers \
+        python3 \
+        py3-pip \
         $PHPIZE_DEPS \
+    && pip3 install --break-system-packages yt-dlp \
     && docker-php-ext-install -j"$(nproc)" intl opcache pdo_pgsql \
     && pecl install redis \
     && docker-php-ext-enable redis \

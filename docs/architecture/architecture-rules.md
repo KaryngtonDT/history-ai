@@ -1312,16 +1312,20 @@ Video hub: `/video/:videoId` is the overview entry; step routes (`/transcript`, 
 
 See [PRODUCT_INFORMATION_ARCHITECTURE.md](./PRODUCT_INFORMATION_ARCHITECTURE.md).
 
-## Source processing platform (Sprint 51)
+## Source processing platform (Sprint 51–52)
 
 `Source` is the **ingestion domain** above legacy `Content` and `Video` aggregates.
 
 | Rule | Detail |
 | ---- | ------ |
 | Location | `backend/src/Domain/Source/` |
-| First connector | Audio (`POST /api/audio`) |
+| Connectors | Audio (`POST /api/audio`), YouTube (`POST /api/youtube`) |
 | Do not | Merge `Content` / `Video` domains |
-| Pipeline | Reuse STT + translation; skip lip-sync/render for audio |
+| Audio pipeline | Reuse STT + translation; skip lip-sync/render for audio |
+| YouTube pipeline | Download → `VideoJob` → **full existing video pipeline** |
+| Do not | Create `YouTubeTranscript`, `YouTubeTranslation`, etc. |
+
+YouTube domain: `backend/src/Domain/YouTube/`. Importer port: `YouTubeImporterInterface` (yt-dlp in Docker, mock in tests).
 
 See [SOURCE_PROCESSING_PLATFORM.md](./SOURCE_PROCESSING_PLATFORM.md).
 

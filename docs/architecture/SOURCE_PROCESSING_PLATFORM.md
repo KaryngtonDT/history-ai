@@ -1,8 +1,8 @@
 # Source Processing Platform
 
-Version: 1.0  
-Date: 2026-07-02  
-Status: Accepted (Sprint 51 — Audio foundation)
+Version: 1.1  
+Date: 2026-07-13  
+Status: Accepted (Sprint 52 — YouTube connector)
 
 ---
 
@@ -22,8 +22,8 @@ Source (Video | Audio | PDF | YouTube | …)
    Artifacts
 ```
 
-Sprint 51 implements the **domain and first connector: Audio Upload**.  
-Sprint 52 will add **YouTube** as another connector on the same platform.
+Sprint 51 implemented the **domain and first connector: Audio Upload**.  
+Sprint 52 adds **YouTube** as a connector that feeds the **existing video pipeline**.
 
 ---
 
@@ -37,11 +37,27 @@ Sprint 52 will add **YouTube** as another connector on the same platform.
 | `SourceProcessorInterface` | Connector contract for future sources |
 | `SourceRepositoryInterface` | Persistence port |
 
-**Video and Content domains are unchanged.** Audio uses `Source` + shared artifact keys (UUID).
+**Video and Content domains are unchanged.** Connectors use `Source` + shared artifact keys (UUID).
 
 ---
 
-## Audio API
+## YouTube domain (`backend/src/Domain/YouTube/`)
+
+| Type | Role |
+|------|------|
+| `YouTubeVideo` | Aggregate linking import metadata to `VideoJob` |
+| `YouTubeVideoId` | UUID (= `SourceId`) |
+| `YouTubeUrl` | Validated YouTube URL value object |
+| `YouTubeMetadata` | Title, duration, thumbnail, language |
+| `YouTubeImportRequest` | URL + processing options |
+| `YouTubeImportResult` | Import outcome with `videoId` |
+| `YouTubeImporterInterface` | Download port (yt-dlp in prod, mock in tests) |
+
+YouTube does **not** introduce `YouTubeTranscript`, `YouTubeTranslation`, etc. All artifacts use the video pipeline keyed by `videoId`.
+
+---
+
+## Audio API (Sprint 51)
 
 | Method | Path | Role |
 |--------|------|------|
@@ -51,6 +67,28 @@ Sprint 52 will add **YouTube** as another connector on the same platform.
 | `DELETE` | `/api/audio/{audioId}` | Delete source + file |
 
 Supported formats: **mp3, wav, flac, m4a, ogg**.
+
+---
+
+## YouTube API (Sprint 52)
+
+| Method | Path | Role |
+|--------|------|------|
+| `POST` | `/api/youtube` | Import URL → `VideoJob` + queue pipeline |
+| `POST` | `/api/youtube/preview` | Metadata preview (no download) |
+| `GET` | `/api/youtube` | List recent imports |
+| `GET` | `/api/youtube/{youtubeId}` | Import detail |
+
+Import flow:
+
+```text
+POST /api/youtube { url }
+    → validate YouTubeUrl
+    → YouTubeImporterInterface::download()
+    → store file via VideoStorageInterface
+    → create VideoJob + Source (type: youtube)
+    → VideoProcessingQueueInterface::enqueue()
+```
 
 ---
 
@@ -70,19 +108,42 @@ Does **not** run: Lip Sync, Video Render, Voice Clone.
 
 ---
 
+## YouTube pipeline (Sprint 52)
+
+```text
+YouTube URL → Download → VideoJob → Existing Video Pipeline
+```
+
+Reuses the **full video pipeline**:
+
+- STT → Translation → TTS → Voice Clone → Lip Sync → Render → Quality
+
+No YouTube-specific processing stages.
+
+---
+
 ## Frontend
 
 | Route | Role |
 |-------|------|
 | `/audio/upload` | Create audio source |
-| `/audio/:audioId` | Overview hub |
+| `/audio/:audioId` | Audio overview hub |
 | `/audio/:audioId/transcript` | Transcript detail |
 | `/audio/:audioId/translations` | Translation detail |
+| `/youtube/import` | Paste YouTube URL, preview, import |
+| `/video/:videoId` | Video hub (upload **or** YouTube import) |
 
-Home **Create → Audio** links to `/audio/upload`.  
-YouTube card shows **Coming soon** (Sprint 52).
+Home **Create** section:
 
-WorkItem `audio` type routes to `/audio/:id`.
+- 🎥 Video → `/video/upload`
+- 🎵 Audio → `/audio/upload`
+- 📄 PDF → `/import`
+- ▶️ YouTube → `/youtube/import`
+
+WorkItem routing:
+
+- `audio` → `/audio/:id`
+- `youtube` → `/video/:videoId` (same as video)
 
 ---
 
@@ -91,7 +152,7 @@ WorkItem `audio` type routes to `/audio/:id`.
 Recommended resources:
 
 - `POST /api/audio` (implemented)
-- `POST /api/youtube` (Sprint 52)
+- `POST /api/youtube` (implemented)
 - `GET /api/work-items` (product read model)
 
 ---
@@ -100,3 +161,4 @@ Recommended resources:
 
 - [PRODUCT_INFORMATION_ARCHITECTURE.md](./PRODUCT_INFORMATION_ARCHITECTURE.md)
 - [Sprint51-Verification.md](../reports/Sprint51-Verification.md)
+- [Sprint52-Verification.md](../reports/Sprint52-Verification.md)

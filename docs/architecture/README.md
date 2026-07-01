@@ -1239,6 +1239,24 @@ Verification: [Sprint51-Verification.md](../reports/Sprint51-Verification.md)
 
 ---
 
+# Platform Sprint 52 — YouTube Processing Platform (2026-07)
+
+Platform Sprint 52 adds **YouTube URL import** as a Source connector. Downloads via `yt-dlp`, creates a `VideoJob`, and runs the **existing video pipeline** — no YouTube-specific processing stages.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P52-SLICE-01 | YouTube domain + `SourceType::Youtube` | ✅ |
+| P52-SLICE-02 | Import API (`POST/GET /api/youtube`) | ✅ |
+| P52-SLICE-03 | Video pipeline integration | ✅ |
+| P52-SLICE-04 | Frontend `/youtube/import`, WorkItem | ✅ |
+| P52-SLICE-05 | Docs and verification | ✅ |
+
+See [SOURCE_PROCESSING_PLATFORM.md](./SOURCE_PROCESSING_PLATFORM.md).
+
+Verification: [Sprint52-Verification.md](../reports/Sprint52-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:

@@ -67,6 +67,13 @@ The **`default`** area uses `disable_default_routes: true`, so only controller a
 | Chat | POST | `/api/contents/{contentId}/conversations/{conversationId}/chat/stream` |
 | Chat | PUT | `/api/conversations/{conversationId}/documents` |
 | Video | POST | `/api/videos` |
+| Audio | POST | `/api/audio` |
+| Audio | GET | `/api/audio` |
+| Audio | GET | `/api/audio/{audioId}` |
+| YouTube | POST | `/api/youtube` |
+| YouTube | POST | `/api/youtube/preview` |
+| YouTube | GET | `/api/youtube` |
+| YouTube | GET | `/api/youtube/{youtubeId}` |
 | Video | GET | `/api/videos/{videoId}/transcript` |
 | Video | GET | `/api/videos/{videoId}/translations` |
 | Video | GET | `/api/videos/{videoId}/translations/{language}` |
@@ -898,6 +905,25 @@ The frontend `TeamPanel` on `/workspace` uses `CollaborationService`.
 | `ProviderStatistics` | `providers[]` with invocation counts and average durations |
 
 The frontend analytics panels on `/workspace` use `TelemetryService`.
+
+---
+
+# YouTube import (Platform Sprint 52)
+
+| Method | Path | Role |
+| ------ | ---- | ---- |
+| `POST` | `/api/youtube` | Import URL → `VideoJob` + queue video pipeline |
+| `POST` | `/api/youtube/preview` | Metadata preview (title, thumbnail, duration) |
+| `GET` | `/api/youtube` | List recent imports |
+| `GET` | `/api/youtube/{youtubeId}` | Import detail with linked `videoId` |
+
+Schemas: `YouTubeMetadata`, `ImportYouTubeResponse`, `YouTubeImportResponse` in `Presentation/OpenApi/Schema/YouTubeSchemas.php`.
+
+Invalid URLs return **400** (`InvalidYouTubeException`). Download failures return **502** (`YouTubeImporterException`).
+
+After import, all video artifact endpoints (`/api/videos/{videoId}/…`) apply — no YouTube-specific routes.
+
+The frontend `YouTubeImportPanel` at `/youtube/import` uses `youtubeSourceService`.
 
 ---
 
