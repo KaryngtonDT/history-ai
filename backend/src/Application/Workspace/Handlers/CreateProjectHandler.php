@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Application\Workspace\Handlers;
 
+use App\Application\Collaboration\EnsureWorkspaceOwnerHandler;
 use App\Application\Workspace\Commands\CreateProjectCommand;
 use App\Application\Workspace\DTO\ProjectResult;
+use App\Domain\Collaboration\WorkspaceId;
 use App\Domain\Workspace\Project;
 use App\Domain\Workspace\ProjectId;
 use App\Domain\Workspace\ProjectRepositoryInterface;
@@ -14,6 +16,7 @@ final class CreateProjectHandler
 {
     public function __construct(
         private readonly ProjectRepositoryInterface $projectRepository,
+        private readonly EnsureWorkspaceOwnerHandler $ensureWorkspaceOwnerHandler,
     ) {
     }
 
@@ -21,6 +24,11 @@ final class CreateProjectHandler
     {
         $project = Project::create(ProjectId::generate(), $command->name);
         $this->projectRepository->save($project);
+        $this->ensureWorkspaceOwnerHandler->ensureOwner(
+            new WorkspaceId($project->id()->value),
+            $command->ownerUserId,
+            $command->ownerDisplayName,
+        );
 
         return ProjectResult::fromProject($project);
     }

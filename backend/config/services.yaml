@@ -213,6 +213,12 @@ services:
     App\Domain\Review\UserPreferenceProfileRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Review\DoctrineUserPreferenceProfileRepository
 
+    App\Domain\Collaboration\WorkspaceMemberRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Collaboration\DoctrineWorkspaceMemberRepository
+
+    App\Domain\Collaboration\WorkspaceInvitationRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Collaboration\DoctrineWorkspaceInvitationRepository
+
     App\Domain\History\ExecutionReplayContextInterface:
         alias: App\Infrastructure\History\ExecutionReplayContext
 
