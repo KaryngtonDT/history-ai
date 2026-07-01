@@ -20,7 +20,6 @@ use App\Infrastructure\Persistence\Doctrine\Translation\TranslationRecord;
 use App\Infrastructure\Persistence\Doctrine\Video\VideoJobRecord;
 use App\Infrastructure\Persistence\Doctrine\VideoRender\FinalVideoRecord;
 use App\Infrastructure\Persistence\Doctrine\YouTube\YouTubeImportRecord;
-use App\Infrastructure\Video\MessengerVideoProcessingQueue;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -33,10 +32,6 @@ final class YouTubeVideoPipelineFlowTest extends WebTestCase
         $this->resetDatabaseSchema();
 
         $container = static::getContainer();
-        $container->set(
-            'App\Application\Video\Ports\VideoProcessingQueueInterface',
-            $container->get(MessengerVideoProcessingQueue::class),
-        );
 
         $importHandler = $container->get(ImportYouTubeHandler::class);
         $result = $importHandler(new ImportYouTubeCommand(
