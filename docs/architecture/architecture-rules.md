@@ -1329,6 +1329,26 @@ YouTube domain: `backend/src/Domain/YouTube/`. Importer port: `YouTubeImporterIn
 
 See [SOURCE_PROCESSING_PLATFORM.md](./SOURCE_PROCESSING_PLATFORM.md).
 
+## Internationalization (Sprint 53)
+
+Frontend UI strings use a **typed dictionary** i18n layer — not i18next.
+
+| Rule | Detail |
+| ---- | ------ |
+| Location | `frontend/src/i18n/` |
+| Locales | `en` (default), `fr`, `de` |
+| Hook | `useTranslation()` → `t(key, params?)` |
+| Persistence | `localStorage` key `history-ai-locale` |
+| Switcher | `Settings → Interface language` |
+| Translate | Application UI labels, buttons, help section headings |
+| Do not translate | User content, transcripts, project names, provider names, routes, API enums |
+
+Locale sections: `shell`, `pipeline`, `workspace` under `locales/sections/`.
+
+Audit: `node frontend/scripts/localization-audit.mjs`
+
+See [Sprint53-Verification.md](../reports/Sprint53-Verification.md).
+
 ## Enforcement
 
 | Tool | Location | Command |

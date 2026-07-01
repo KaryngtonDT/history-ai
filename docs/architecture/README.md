@@ -1257,6 +1257,24 @@ Verification: [Sprint52-Verification.md](../reports/Sprint52-Verification.md)
 
 ---
 
+# Platform Sprint 53 — Internationalization & Localization (2026-07)
+
+Platform Sprint 53 makes the **frontend UI multilingual** (English, French, German) before the Public API. User-generated content and provider names are not translated.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P53-SLICE-01 | i18n foundation (`useTranslation`, persistence) | ✅ |
+| P53-SLICE-02 | Product shell + language selector | ✅ |
+| P53-SLICE-03 | Pipeline features (Sprints 31–44) | ✅ |
+| P53-SLICE-04 | Workspace, review, analytics | ✅ |
+| P53-SLICE-05 | Audit script + documentation | ✅ |
+
+Location: `frontend/src/i18n/`
+
+Verification: [Sprint53-Verification.md](../reports/Sprint53-Verification.md) · [Sprint53-LocalizationAudit.md](../reports/Sprint53-LocalizationAudit.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:
