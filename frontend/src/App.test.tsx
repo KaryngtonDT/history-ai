@@ -20,9 +20,9 @@ describe("Sprint 1 — app shell", () => {
 		).toBeInTheDocument();
 
 		await waitFor(() => {
-			expect(screen.getByText("Recent Content")).toBeInTheDocument();
+			expect(screen.getByText("Recent work")).toBeInTheDocument();
 		});
-		expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+		expect(screen.getAllByText("The Roman Empire").length).toBeGreaterThan(0);
 
 		await user.click(screen.getByRole("link", { name: "Import Documents" }));
 		expect(screen.getByRole("heading", { name: "Import" })).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe("Sprint 1 — app shell", () => {
 		).toBeInTheDocument();
 
 		await waitFor(() => {
-			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
+			expect(screen.getAllByText("The Roman Empire").length).toBeGreaterThan(0);
 		});
 
 		await user.click(screen.getByRole("link", { name: "Settings" }));

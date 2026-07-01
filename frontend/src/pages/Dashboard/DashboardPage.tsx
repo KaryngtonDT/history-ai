@@ -1,5 +1,5 @@
-import { Dashboard } from "@/features/dashboard";
+import { HomeMissionControl } from "@/features/home";
 
 export function DashboardPage() {
-	return <Dashboard />;
+	return <HomeMissionControl />;
 }

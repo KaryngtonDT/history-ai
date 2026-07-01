@@ -1,0 +1,29 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+}
+
+.loading {
+	display: flex;
+	justify-content: center;
+	padding: var(--space-8);
+}
+
+.columns {
+	display: grid;
+	grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+	gap: var(--space-6);
+}
+
+.side {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4);
+}
+
+@media (max-width: 960px) {
+	.columns {
+		grid-template-columns: 1fr;
+	}
+}

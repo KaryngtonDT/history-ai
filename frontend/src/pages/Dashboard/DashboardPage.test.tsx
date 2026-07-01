@@ -2,110 +2,41 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
+import { HomeMissionControl } from "@/features/home";
 import { ImportPage } from "@/pages/Import/ImportPage";
 import { VideoUploadPage } from "@/pages/VideoUpload/VideoUploadPage";
-import { contentService } from "@/services/content/ContentService";
+import { workItemService } from "@/services/workItem/WorkItemService";
 
-describe("DashboardPage — S2-SLICE-05 real backend data", () => {
+describe("HomeMissionControl", () => {
 	afterEach(() => {
 		vi.restoreAllMocks();
 	});
 
-	it("renders dashboard data from the service layer", async () => {
+	it("renders create section and recent work", async () => {
 		render(
 			<MemoryRouter>
-				<DashboardPage />
-			</MemoryRouter>,
-		);
-
-		await waitFor(() => {
-			expect(screen.getByText("The Roman Empire")).toBeInTheDocument();
-		});
-
-		expect(
-			screen.getByText("Transform knowledge into understanding."),
-		).toBeInTheDocument();
-		expect(screen.getByRole("progressbar")).toHaveAttribute(
-			"aria-valuenow",
-			"62",
-		);
-		expect(screen.getByText("French Revolution")).toBeInTheDocument();
-		expect(screen.getByText("Contents")).toBeInTheDocument();
-		expect(screen.getByText("12")).toBeInTheDocument();
-	});
-
-	it("shows EmptyState when there is no content", async () => {
-		vi.spyOn(contentService, "getDashboardData").mockResolvedValue({
-			recentContents: [],
-			statistics: {
-				contents: 0,
-				completed: 0,
-				processing: 0,
-				artifacts: 0,
-			},
-		});
-
-		render(
-			<MemoryRouter>
-				<DashboardPage />
-			</MemoryRouter>,
-		);
-
-		await waitFor(() => {
-			expect(screen.getByText("No content yet")).toBeInTheDocument();
-		});
-
-		expect(screen.getByText("Contents")).toBeInTheDocument();
-		expect(screen.getAllByText("0")).toHaveLength(4);
-	});
-
-	it("shows EmptyState when the backend is unavailable", async () => {
-		vi.spyOn(contentService, "getDashboardData").mockRejectedValue(
-			new Error("network"),
-		);
-
-		render(
-			<MemoryRouter>
-				<DashboardPage />
-			</MemoryRouter>,
-		);
-
-		await waitFor(() => {
-			expect(screen.getByText("Unable to load dashboard")).toBeInTheDocument();
-		});
-	});
-
-	it("logs content route on card click", async () => {
-		const user = userEvent.setup();
-		const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
-
-		render(
-			<MemoryRouter>
-				<DashboardPage />
+				<HomeMissionControl />
 			</MemoryRouter>,
 		);
 
 		await waitFor(() => {
 			expect(
-				screen.getByRole("button", { name: /The Roman Empire/i }),
+				screen.getByText("What do you want to transform?"),
 			).toBeInTheDocument();
 		});
 
-		await user.click(screen.getByRole("button", { name: /The Roman Empire/i }));
-		expect(logSpy).toHaveBeenCalledWith("/content/1");
-
-		logSpy.mockRestore();
+		expect(screen.getByText("Recent work")).toBeInTheDocument();
+		expect(screen.getByText("At a glance")).toBeInTheDocument();
+		expect(screen.getByText("AI Director")).toBeInTheDocument();
 	});
 
-	it("navigates quick actions to import and video upload", async () => {
+	it("navigates from create video card to upload page", async () => {
 		const user = userEvent.setup();
 
 		render(
 			<MemoryRouter initialEntries={["/"]}>
 				<Routes>
-					<Route path="/" element={<DashboardPage />} />
-					<Route path="/import" element={<ImportPage />} />
+					<Route path="/" element={<HomeMissionControl />} />
 					<Route path="/video/upload" element={<VideoUploadPage />} />
 				</Routes>
 			</MemoryRouter>,
@@ -113,13 +44,53 @@ describe("DashboardPage — S2-SLICE-05 real backend data", () => {
 
 		await waitFor(() => {
 			expect(
-				screen.getByRole("button", { name: "Import Video" }),
+				screen.getByRole("link", { name: "Create Video" }),
 			).toBeInTheDocument();
 		});
 
-		await user.click(screen.getByRole("button", { name: "Import Video" }));
+		await user.click(screen.getByRole("link", { name: "Create Video" }));
 		expect(
 			screen.getByRole("heading", { name: "Upload Video", level: 1 }),
 		).toBeInTheDocument();
+	});
+
+	it("shows empty recent work when summary fails", async () => {
+		vi.spyOn(workItemService, "getSummary").mockRejectedValue(
+			new Error("network"),
+		);
+
+		render(
+			<MemoryRouter>
+				<HomeMissionControl />
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByText("Unable to load home")).toBeInTheDocument();
+		});
+	});
+});
+
+describe("HomeMissionControl — import navigation", () => {
+	it("navigates PDF card to import", async () => {
+		const user = userEvent.setup();
+
+		render(
+			<MemoryRouter initialEntries={["/"]}>
+				<Routes>
+					<Route path="/" element={<HomeMissionControl />} />
+					<Route path="/import" element={<ImportPage />} />
+				</Routes>
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(
+				screen.getByRole("link", { name: "Create PDF" }),
+			).toBeInTheDocument();
+		});
+
+		await user.click(screen.getByRole("link", { name: "Create PDF" }));
+		expect(screen.getByRole("heading", { name: "Import" })).toBeInTheDocument();
 	});
 });
