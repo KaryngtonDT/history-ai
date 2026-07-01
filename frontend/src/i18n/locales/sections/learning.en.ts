@@ -16,7 +16,8 @@ export const learningEn = {
 		},
 		profile: {
 			title: "Learning profile",
-			description: "Deterministic learning state derived from recent usage signals.",
+			description:
+				"Deterministic learning state derived from recent usage signals.",
 			signals: "Signals",
 			insights: "Insights",
 			recommendations: "Recommendations",
@@ -28,7 +29,8 @@ export const learningEn = {
 		},
 		signals: {
 			title: "Signal timeline",
-			description: "Append-only usage signals collected from Shadow and pipeline activity.",
+			description:
+				"Append-only usage signals collected from Shadow and pipeline activity.",
 			empty: "No learning signals recorded yet.",
 		},
 		insights: {
@@ -49,7 +51,8 @@ export const learningEn = {
 			disabled: "Disabled",
 			statusTitle: "Adaptive status",
 			statusEnabled: "Adaptive help is active for Shadow and AI Director.",
-			statusDisabled: "Adaptive help is off. Existing manual settings are preserved.",
+			statusDisabled:
+				"Adaptive help is off. Existing manual settings are preserved.",
 			noAppliedHints: "No adaptive hints are currently applied.",
 		},
 		reset: {
@@ -61,7 +64,8 @@ export const learningEn = {
 		sections: {
 			shadow: {
 				title: "Shadow learning",
-				description: "Vocabulary, challenge level, voice, and explanation preferences.",
+				description:
+					"Vocabulary, challenge level, voice, and explanation preferences.",
 				vocabularyGaps: "Vocabulary gaps",
 				challengeLevel: "Challenge level",
 				voiceLanguage: "Voice language",

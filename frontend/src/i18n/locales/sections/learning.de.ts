@@ -73,8 +73,7 @@ export const learningDe = {
 			},
 			director: {
 				title: "AI-Director-Lernen",
-				description:
-					"Weiche Provider- und Übersetzungsstil-Präferenzen.",
+				description: "Weiche Provider- und Übersetzungsstil-Präferenzen.",
 				providerPreference: "Provider-Präferenz",
 				translationStyle: "Übersetzungsstil",
 			},
@@ -83,8 +82,7 @@ export const learningDe = {
 	settings: {
 		learning: {
 			title: "Adaptives Lernen",
-			description:
-				"Lumens deterministisches Lernprofil ansehen und steuern.",
+			description: "Lumens deterministisches Lernprofil ansehen und steuern.",
 		},
 	},
 } as const;

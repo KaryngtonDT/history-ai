@@ -11,7 +11,8 @@ export const learningFr = {
 		recommendationReason: "Basé sur {{sources}} insight(s) source.",
 		errors: {
 			loadFailed: "Impossible de charger le profil d'apprentissage.",
-			updateFailed: "Impossible de mettre à jour les préférences d'apprentissage.",
+			updateFailed:
+				"Impossible de mettre à jour les préférences d'apprentissage.",
 			resetFailed: "Impossible de réinitialiser le profil d'apprentissage.",
 		},
 		profile: {
@@ -41,7 +42,8 @@ export const learningFr = {
 		recommendations: {
 			title: "Recommandations",
 			description: "Suggestions explicables dérivées des insights.",
-			empty: "Activez les recommandations adaptatives pour générer des suggestions.",
+			empty:
+				"Activez les recommandations adaptatives pour générer des suggestions.",
 		},
 		adaptive: {
 			toggleLabel: "Recommandations adaptatives",
