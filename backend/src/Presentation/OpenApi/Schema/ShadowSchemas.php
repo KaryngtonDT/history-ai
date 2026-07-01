@@ -105,6 +105,7 @@ final class WatchContextSchema
         'targetLanguage',
         'currentTimeSeconds',
         'interactions',
+        'policy',
     ],
     properties: [
         new OA\Property(property: 'sessionId', type: 'string', format: 'uuid'),
@@ -120,6 +121,10 @@ final class WatchContextSchema
             property: 'interactions',
             type: 'array',
             items: new OA\Items(ref: '#/components/schemas/ShadowInteraction'),
+        ),
+        new OA\Property(
+            property: 'policy',
+            ref: '#/components/schemas/ShadowInterventionPolicy',
         ),
     ],
 )]
@@ -165,5 +170,186 @@ final class AskShadowQuestionRequestSchema
     ],
 )]
 final class ShadowAnswerSchema
+{
+}
+
+#[OA\Schema(
+    schema: 'ShadowInterventionPolicy',
+    required: [
+        'enabled',
+        'maxInterventionsPerMinute',
+        'minSecondsBetweenInterventions',
+        'challengeLevel',
+        'explanationStyle',
+        'autoResume',
+        'allowAutoPause',
+    ],
+    properties: [
+        new OA\Property(property: 'enabled', type: 'boolean'),
+        new OA\Property(property: 'maxInterventionsPerMinute', type: 'integer', minimum: 0),
+        new OA\Property(property: 'minSecondsBetweenInterventions', type: 'number', format: 'float'),
+        new OA\Property(property: 'challengeLevel', type: 'string', enum: ['easy', 'normal', 'hard']),
+        new OA\Property(
+            property: 'explanationStyle',
+            type: 'string',
+            enum: ['short', 'detailed', 'example_first'],
+        ),
+        new OA\Property(property: 'autoResume', type: 'boolean'),
+        new OA\Property(property: 'allowAutoPause', type: 'boolean'),
+    ],
+)]
+final class ShadowInterventionPolicySchema
+{
+}
+
+#[OA\Schema(
+    schema: 'ShadowChallenge',
+    required: ['questionText'],
+    properties: [
+        new OA\Property(property: 'questionText', type: 'string'),
+        new OA\Property(property: 'suggestedAnswer', type: 'string', nullable: true),
+    ],
+)]
+final class ShadowChallengeSchema
+{
+}
+
+#[OA\Schema(
+    schema: 'ShadowIntervention',
+    required: [
+        'id',
+        'type',
+        'trigger',
+        'reason',
+        'videoTimestamp',
+        'expectedUserAction',
+        'allowAutoPause',
+        'skipped',
+        'answered',
+    ],
+    properties: [
+        new OA\Property(property: 'id', type: 'string', format: 'uuid'),
+        new OA\Property(
+            property: 'type',
+            type: 'string',
+            enum: ['vocabulary_check', 'concept_check', 'explanation', 'recap'],
+        ),
+        new OA\Property(
+            property: 'trigger',
+            type: 'string',
+            enum: [
+                'unknown_vocabulary',
+                'complex_sentence',
+                'long_segment',
+                'segment_boundary',
+                'idle_watch',
+            ],
+        ),
+        new OA\Property(property: 'reason', type: 'string'),
+        new OA\Property(property: 'videoTimestamp', type: 'number', format: 'float'),
+        new OA\Property(property: 'expectedUserAction', type: 'string'),
+        new OA\Property(property: 'allowAutoPause', type: 'boolean'),
+        new OA\Property(property: 'explanation', type: 'string', nullable: true),
+        new OA\Property(
+            property: 'challenge',
+            ref: '#/components/schemas/ShadowChallenge',
+            nullable: true,
+        ),
+        new OA\Property(property: 'skipped', type: 'boolean'),
+        new OA\Property(property: 'answered', type: 'boolean'),
+    ],
+)]
+final class ShadowInterventionSchema
+{
+}
+
+#[OA\Schema(
+    schema: 'ShadowInterventionCheck',
+    required: ['hasIntervention', 'recommendPause', 'recommendResume', 'session'],
+    properties: [
+        new OA\Property(property: 'hasIntervention', type: 'boolean'),
+        new OA\Property(
+            property: 'intervention',
+            ref: '#/components/schemas/ShadowIntervention',
+            nullable: true,
+        ),
+        new OA\Property(property: 'recommendPause', type: 'boolean'),
+        new OA\Property(property: 'recommendResume', type: 'boolean'),
+        new OA\Property(property: 'session', ref: '#/components/schemas/ShadowSession'),
+    ],
+)]
+final class ShadowInterventionCheckSchema
+{
+}
+
+#[OA\Schema(
+    schema: 'UpdateShadowInterventionPolicyRequest',
+    properties: [
+        new OA\Property(property: 'enabled', type: 'boolean', nullable: true),
+        new OA\Property(property: 'maxInterventionsPerMinute', type: 'integer', nullable: true),
+        new OA\Property(
+            property: 'minSecondsBetweenInterventions',
+            type: 'number',
+            format: 'float',
+            nullable: true,
+        ),
+        new OA\Property(
+            property: 'challengeLevel',
+            type: 'string',
+            enum: ['easy', 'normal', 'hard'],
+            nullable: true,
+        ),
+        new OA\Property(
+            property: 'explanationStyle',
+            type: 'string',
+            enum: ['short', 'detailed', 'example_first'],
+            nullable: true,
+        ),
+        new OA\Property(property: 'autoResume', type: 'boolean', nullable: true),
+        new OA\Property(property: 'allowAutoPause', type: 'boolean', nullable: true),
+    ],
+)]
+final class UpdateShadowInterventionPolicyRequestSchema
+{
+}
+
+#[OA\Schema(
+    schema: 'ShadowInterventionPolicyResponse',
+    required: ['policy'],
+    properties: [
+        new OA\Property(
+            property: 'policy',
+            ref: '#/components/schemas/ShadowInterventionPolicy',
+        ),
+    ],
+)]
+final class ShadowInterventionPolicyResponseSchema
+{
+}
+
+#[OA\Schema(
+    schema: 'AnswerShadowInterventionRequest',
+    required: ['answer', 'time'],
+    properties: [
+        new OA\Property(property: 'answer', type: 'string'),
+        new OA\Property(property: 'time', type: 'number', format: 'float'),
+    ],
+)]
+final class AnswerShadowInterventionRequestSchema
+{
+}
+
+#[OA\Schema(
+    schema: 'ShadowInterventionAnswer',
+    required: ['sessionId', 'interventionId', 'reply', 'recommendResume', 'session'],
+    properties: [
+        new OA\Property(property: 'sessionId', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'interventionId', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'reply', type: 'string'),
+        new OA\Property(property: 'recommendResume', type: 'boolean'),
+        new OA\Property(property: 'session', ref: '#/components/schemas/ShadowSession'),
+    ],
+)]
+final class ShadowInterventionAnswerSchema
 {
 }

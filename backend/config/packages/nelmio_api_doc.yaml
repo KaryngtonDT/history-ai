@@ -157,6 +157,14 @@ nelmio_api_doc:
             - { alias: StartShadowSessionRequest, type: App\Presentation\OpenApi\Schema\StartShadowSessionRequestSchema }
             - { alias: AskShadowQuestionRequest, type: App\Presentation\OpenApi\Schema\AskShadowQuestionRequestSchema }
             - { alias: ShadowAnswer, type: App\Presentation\OpenApi\Schema\ShadowAnswerSchema }
+            - { alias: ShadowInterventionPolicy, type: App\Presentation\OpenApi\Schema\ShadowInterventionPolicySchema }
+            - { alias: ShadowChallenge, type: App\Presentation\OpenApi\Schema\ShadowChallengeSchema }
+            - { alias: ShadowIntervention, type: App\Presentation\OpenApi\Schema\ShadowInterventionSchema }
+            - { alias: ShadowInterventionCheck, type: App\Presentation\OpenApi\Schema\ShadowInterventionCheckSchema }
+            - { alias: UpdateShadowInterventionPolicyRequest, type: App\Presentation\OpenApi\Schema\UpdateShadowInterventionPolicyRequestSchema }
+            - { alias: ShadowInterventionPolicyResponse, type: App\Presentation\OpenApi\Schema\ShadowInterventionPolicyResponseSchema }
+            - { alias: AnswerShadowInterventionRequest, type: App\Presentation\OpenApi\Schema\AnswerShadowInterventionRequestSchema }
+            - { alias: ShadowInterventionAnswer, type: App\Presentation\OpenApi\Schema\ShadowInterventionAnswerSchema }
     areas:
         default:
             path_patterns:

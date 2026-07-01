@@ -887,6 +887,31 @@ The frontend `ShadowWatchPage` at `/video/:videoId/watch` uses `ShadowService`. 
 
 ---
 
+# Shadow Proactive Tutor (Platform Sprint 56)
+
+| Method | Path | Description |
+| ------ | ---- | ----------- |
+| GET | `/api/videos/{videoId}/shadow/sessions/{sessionId}/intervention` | Check whether Shadow should intervene at a timestamp |
+| POST | `/api/videos/{videoId}/shadow/sessions/{sessionId}/intervention/{interventionId}/answer` | Answer a proactive challenge |
+| POST | `/api/videos/{videoId}/shadow/sessions/{sessionId}/intervention/{interventionId}/skip` | Skip an intervention |
+| PUT | `/api/videos/{videoId}/shadow/sessions/{sessionId}/policy` | Update proactive tutor policy |
+
+## Schemas
+
+| Schema | Purpose |
+| ------ | ------- |
+| `ShadowInterventionPolicy` | Enabled flag, frequency limits, challenge level, explanation style |
+| `ShadowIntervention` | Type, trigger, reason, challenge, answered/skipped state |
+| `ShadowChallenge` | Question text and optional suggested answer |
+| `ShadowInterventionCheck` | Intervention result plus `recommendPause` / `recommendResume` |
+| `ShadowInterventionAnswer` | Shadow reply after answering a challenge |
+| `UpdateShadowInterventionPolicyRequest` | Partial policy update payload |
+| `AnswerShadowInterventionRequest` | `answer`, `time` (seconds) |
+
+`ShadowSession` now includes a `policy` object. Proactive mode is off by default. See [SHADOW_PROACTIVE_TUTOR.md](./SHADOW_PROACTIVE_TUTOR.md).
+
+---
+
 # Team Collaboration (Platform Sprint 48)
 
 | Method | Path | Description |

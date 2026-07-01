@@ -82,8 +82,9 @@ ruff check .
 | Sprint | Feature |
 | ------ | ------- |
 | **55** | Shadow AI Watch Companion ✅ |
-| **56** | Controlled Learning Loop |
-| **57** | Public API |
+| **56** | Shadow Proactive Tutor ✅ |
+| **57** | Adaptive Intelligence |
+| **58** | Public API |
 
 Shadow must use the video pipeline as **interactive temporal memory**, not replace it.
 

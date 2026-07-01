@@ -1460,6 +1460,21 @@ Do **not** rename backend namespaces, database tables, or package names as part 
 
 ---
 
+# Sprint 55–56 — Shadow watch companion
+
+| Rule | Implementation |
+| ---- | -------------- |
+| Shadow is a bounded context | `Domain/Shadow`, `Application/Shadow`, `features/shadow/` |
+| Backend never controls the video player | Session state + `recommendPause` / `recommendResume` only |
+| Proactive tutor off by default | `ShadowInterventionPolicy::disabled()` on session start |
+| Intervention timing is deterministic | `ShadowInterventionDecider`; LLM only for answer text |
+| Reuse pipeline artifacts | Transcript/translation repos; no duplicate STT/translation |
+| Manual Q&A unchanged | `POST .../shadow/sessions/{sessionId}/ask` |
+
+See [SHADOW_WATCH_COMPANION.md](./SHADOW_WATCH_COMPANION.md) and [SHADOW_PROACTIVE_TUTOR.md](./SHADOW_PROACTIVE_TUTOR.md).
+
+---
+
 # Running all architecture checks
 
 ```bash

@@ -2480,9 +2480,37 @@ final class ApiDocumentationTest extends WebTestCase
             'startShadowSession',
             $spec['paths']['/api/videos/{videoId}/shadow/sessions']['post']['operationId'],
         );
+        self::assertArrayHasKey(
+            '/api/videos/{videoId}/shadow/sessions/{sessionId}/intervention',
+            $spec['paths'],
+        );
+        self::assertArrayHasKey(
+            '/api/videos/{videoId}/shadow/sessions/{sessionId}/intervention/{interventionId}/answer',
+            $spec['paths'],
+        );
+        self::assertArrayHasKey(
+            '/api/videos/{videoId}/shadow/sessions/{sessionId}/intervention/{interventionId}/skip',
+            $spec['paths'],
+        );
+        self::assertArrayHasKey(
+            '/api/videos/{videoId}/shadow/sessions/{sessionId}/policy',
+            $spec['paths'],
+        );
+        self::assertSame(
+            'checkShadowIntervention',
+            $spec['paths']['/api/videos/{videoId}/shadow/sessions/{sessionId}/intervention']['get']['operationId'],
+        );
+        self::assertSame(
+            'updateShadowInterventionPolicy',
+            $spec['paths']['/api/videos/{videoId}/shadow/sessions/{sessionId}/policy']['put']['operationId'],
+        );
         self::assertArrayHasKey('WatchContext', $spec['components']['schemas']);
         self::assertArrayHasKey('ShadowSession', $spec['components']['schemas']);
         self::assertArrayHasKey('ShadowAnswer', $spec['components']['schemas']);
+        self::assertArrayHasKey('ShadowInterventionPolicy', $spec['components']['schemas']);
+        self::assertArrayHasKey('ShadowIntervention', $spec['components']['schemas']);
+        self::assertArrayHasKey('ShadowInterventionCheck', $spec['components']['schemas']);
+        self::assertArrayHasKey('ShadowInterventionAnswer', $spec['components']['schemas']);
     }
 
     /**

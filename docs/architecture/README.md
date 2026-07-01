@@ -1315,6 +1315,26 @@ Verification: [Sprint55-Verification.md](../reports/Sprint55-Verification.md)
 
 ---
 
+# Sprint 56 — Shadow Proactive Tutor (2026-06)
+
+| Slice | Focus | Status |
+|-------|-------|--------|
+| P56-SLICE-01 | Proactive intervention domain | ✅ |
+| P56-SLICE-02 | Deterministic intervention engine | ✅ |
+| P56-SLICE-03 | Intervention API + session policy | ✅ |
+| P56-SLICE-04 | Frontend tutor settings + intervention UX | ✅ |
+| P56-SLICE-05 | OpenAPI, architecture docs, verification | ✅ |
+
+- **Optional proactive tutor** on `/video/:videoId/watch`; disabled by default.
+- **Backend recommends** pause/resume; browser controls playback.
+- **Extends** Sprint 55 Shadow bounded context; no pipeline duplication.
+
+Architecture: [SHADOW_PROACTIVE_TUTOR.md](./SHADOW_PROACTIVE_TUTOR.md)
+
+Verification: [Sprint56-Verification.md](../reports/Sprint56-Verification.md)
+
+---
+
 # Project architecture overview
 
 **Lumen** is a **modular monolith** with three runtime applications and a shared domain story:

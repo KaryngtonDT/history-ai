@@ -77,7 +77,7 @@ Route: `/video/:videoId/watch`
 | Area | Limitation |
 | ---- | ---------- |
 | Session persistence | In-memory repository (resets on deploy) |
-| Vocabulary panel | Placeholder for Sprint 56 Controlled Learning Loop |
+| Vocabulary panel | Placeholder UI; proactive tutor handles vocabulary checks (Sprint 56) |
 | Speaker detection | Not available in transcript segments |
 | Video source | Requires final render for playback; no source-file stream in UI |
 | Voice | Browser APIs only; quality varies by browser |
@@ -97,5 +97,6 @@ Adding Shadow does not change `ProcessVideoHandler`, STT providers, or translati
 | Sprint | Focus |
 | ------ | ----- |
 | 55 | Shadow watch companion (this document) |
-| 56 | Controlled Learning Loop — vocabulary, preferences |
-| 57 | Public API |
+| 56 | Shadow proactive tutor — optional interventions and policy |
+| 57 | Adaptive Intelligence |
+| 58 | Public API |
