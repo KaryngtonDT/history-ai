@@ -77,6 +77,7 @@ final class AskShadowQuestionController extends AbstractController
                 sessionId: $sessionId,
                 question: $questionRequest->question,
                 currentTimeSeconds: $questionRequest->time,
+                interfaceLanguage: $questionRequest->interfaceLanguage,
             ));
         } catch (InvalidShadowSessionException) {
             return $this->invalidRequestResponse();

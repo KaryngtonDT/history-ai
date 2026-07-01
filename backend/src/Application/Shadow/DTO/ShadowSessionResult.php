@@ -28,6 +28,7 @@ final readonly class ShadowSessionResult
         public ?string $conversationId,
         public array $interactions,
         public ShadowInterventionPolicyResult $policy,
+        public ShadowVoicePreferenceResult $voicePreference,
     ) {
     }
 
@@ -65,6 +66,7 @@ final readonly class ShadowSessionResult
             conversationId: $session->conversationId()?->value,
             interactions: $interactions,
             policy: ShadowInterventionPolicyResult::fromDomain($session->interventionPolicy()),
+            voicePreference: ShadowVoicePreferenceResult::fromDomain($session->voicePreference()),
         );
     }
 }

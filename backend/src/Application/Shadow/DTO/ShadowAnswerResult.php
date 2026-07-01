@@ -14,18 +14,29 @@ final readonly class ShadowAnswerResult
         public float $currentTimeSeconds,
         public ?int $currentTranscriptSegmentIndex,
         public ?int $currentTranslationSegmentIndex,
+        public string $answerLanguage,
+        public string $speechLanguage,
+        public bool $fallbackUsed,
+        public string $reason,
         public ShadowSessionResult $session,
     ) {
     }
 
-    public static function fromSession(ShadowSession $session, string $answer): self
-    {
+    public static function fromSession(
+        ShadowSession $session,
+        string $answer,
+        ShadowAnswerVoiceMetadata $voice,
+    ): self {
         return new self(
             sessionId: $session->id()->value,
             answer: $answer,
             currentTimeSeconds: $session->currentTimestamp()->seconds(),
             currentTranscriptSegmentIndex: $session->currentTranscriptSegmentIndex(),
             currentTranslationSegmentIndex: $session->currentTranslationSegmentIndex(),
+            answerLanguage: $voice->answerLanguage->value,
+            speechLanguage: $voice->speechLanguage->value,
+            fallbackUsed: $voice->fallbackUsed,
+            reason: $voice->reason,
             session: ShadowSessionResult::fromDomain($session),
         );
     }

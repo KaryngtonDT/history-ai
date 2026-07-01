@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Shadow;
 
+use App\Application\Shadow\DTO\ShadowAnswerVoiceMetadata;
 use App\Domain\Chat\ChatProviderInterface;
 use App\Domain\Chat\ChatProviderOptions;
 use App\Domain\Chat\ChatRequest;
@@ -26,6 +27,7 @@ final class ShadowInterventionAnswerer
         WatchContext $context,
         ShadowIntervention $intervention,
         ShadowChallengeAnswer $answer,
+        ShadowAnswerVoiceMetadata $voice,
     ): string {
         if ($this->isContinueCommand($answer->text())) {
             return 'Continuing playback. Say "explain more" anytime if you want another hint.';
@@ -36,7 +38,7 @@ final class ShadowInterventionAnswerer
         }
 
         try {
-            $prompt = $this->promptBuilder->build($context, $intervention, $answer);
+            $prompt = $this->promptBuilder->build($context, $intervention, $answer, $voice->answerLanguage);
             $response = $this->chatProvider->answer(ChatRequest::create(
                 $prompt,
                 ChatSourceCollection::empty(),

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Shadow;
 
+use App\Application\Shadow\DTO\ShadowAnswerVoiceMetadata;
 use App\Application\Shadow\ShadowWatchAnswerer;
 use App\Application\Shadow\ShadowWatchPromptBuilder;
 use App\Application\Shadow\WatchContext;
@@ -13,6 +14,7 @@ use App\Domain\Chat\ChatRequest;
 use App\Domain\Chat\ChatResponse;
 use App\Domain\Chat\ChatSourceCollection;
 use App\Domain\Shadow\ShadowQuestion;
+use App\Domain\Shadow\ShadowVoiceLanguage;
 use App\Infrastructure\Chat\MockChatProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -50,11 +52,23 @@ final class ShadowWatchAnswererTest extends TestCase
             conversationMemory: [],
         );
 
-        $answer = $answerer->answer($context, ShadowQuestion::fromString('Explain this sentence.'));
+        $voice = new ShadowAnswerVoiceMetadata(
+            ShadowVoiceLanguage::French,
+            ShadowVoiceLanguage::French,
+            false,
+            'target_language',
+        );
+
+        $answer = $answerer->answer(
+            $context,
+            ShadowQuestion::fromString('Explain this sentence.'),
+            $voice,
+        );
 
         self::assertSame('Segment-aware answer.', $answer->text());
         self::assertStringContainsString('Second segment.', $provider->lastPrompt);
         self::assertStringContainsString('7.5 seconds', $provider->lastPrompt);
+        self::assertStringContainsString('Respond in French.', $provider->lastPrompt);
     }
 
     public function testUsesFallbackAnswerOnProviderFailure(): void
@@ -85,7 +99,18 @@ final class ShadowWatchAnswererTest extends TestCase
             conversationMemory: [],
         );
 
-        $answer = $answerer->answer($context, ShadowQuestion::fromString('Translate more literally.'));
+        $voice = new ShadowAnswerVoiceMetadata(
+            ShadowVoiceLanguage::French,
+            ShadowVoiceLanguage::French,
+            false,
+            'target_language',
+        );
+
+        $answer = $answerer->answer(
+            $context,
+            ShadowQuestion::fromString('Translate more literally.'),
+            $voice,
+        );
 
         self::assertSame(ShadowWatchAnswerer::FALLBACK_ANSWER, $answer->text());
     }

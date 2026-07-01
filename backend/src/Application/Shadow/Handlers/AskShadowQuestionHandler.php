@@ -6,6 +6,7 @@ namespace App\Application\Shadow\Handlers;
 
 use App\Application\Shadow\Commands\AskShadowQuestionCommand;
 use App\Application\Shadow\DTO\ShadowAnswerResult;
+use App\Application\Shadow\ShadowAnswerLanguageResolver;
 use App\Application\Shadow\ShadowContextFactory;
 use App\Application\Shadow\ShadowSessionResolver;
 use App\Application\Shadow\ShadowWatchAnswerer;
@@ -21,6 +22,7 @@ final class AskShadowQuestionHandler
         private readonly ShadowSessionResolver $sessionResolver,
         private readonly ShadowContextFactory $shadowContextFactory,
         private readonly ShadowWatchAnswerer $shadowWatchAnswerer,
+        private readonly ShadowAnswerLanguageResolver $languageResolver,
     ) {
     }
 
@@ -51,11 +53,23 @@ final class AskShadowQuestionHandler
             )
             ->recordQuestion($question);
 
-        $answer = $this->shadowWatchAnswerer->answer($context, $question);
+        $interfaceLanguage = null !== $command->interfaceLanguage
+            ? \App\Domain\Shadow\ShadowVoiceLanguage::tryFrom($command->interfaceLanguage)
+                ?? \App\Domain\Shadow\ShadowVoiceLanguage::tryFromTargetLanguage($command->interfaceLanguage)
+            : null;
+
+        $voice = $this->languageResolver->resolve(
+            $command->question,
+            $session->targetLanguage(),
+            $session->voicePreference(),
+            $interfaceLanguage,
+        );
+
+        $answer = $this->shadowWatchAnswerer->answer($context, $question, $voice);
         $session = $session->recordAnswer($answer);
 
         $this->sessionRepository->save($session);
 
-        return ShadowAnswerResult::fromSession($session, $answer->text());
+        return ShadowAnswerResult::fromSession($session, $answer->text(), $voice);
     }
 }

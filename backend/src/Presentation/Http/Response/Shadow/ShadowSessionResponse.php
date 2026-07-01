@@ -24,6 +24,7 @@ final readonly class ShadowSessionResponse
         public ?string $conversationId,
         public array $interactions,
         public array $policy,
+        public array $voicePreference,
     ) {
     }
 
@@ -41,6 +42,7 @@ final readonly class ShadowSessionResponse
             conversationId: $result->conversationId,
             interactions: $result->interactions,
             policy: $result->policy->toArray(),
+            voicePreference: $result->voicePreference->toArray(),
         );
     }
 
@@ -61,6 +63,7 @@ final readonly class ShadowSessionResponse
             'conversationId' => $this->conversationId,
             'interactions' => $this->interactions,
             'policy' => $this->policy,
+            'voicePreference' => $this->voicePreference,
         ];
     }
 }

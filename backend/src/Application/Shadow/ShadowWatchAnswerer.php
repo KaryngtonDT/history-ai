@@ -8,6 +8,7 @@ use App\Domain\Chat\ChatProviderInterface;
 use App\Domain\Chat\ChatProviderOptions;
 use App\Domain\Chat\ChatRequest;
 use App\Domain\Chat\ChatSourceCollection;
+use App\Application\Shadow\DTO\ShadowAnswerVoiceMetadata;
 use App\Domain\Shadow\ShadowAnswer;
 use App\Domain\Shadow\ShadowQuestion;
 use Throwable;
@@ -22,10 +23,13 @@ final class ShadowWatchAnswerer
     ) {
     }
 
-    public function answer(WatchContext $context, ShadowQuestion $question): ShadowAnswer
-    {
+    public function answer(
+        WatchContext $context,
+        ShadowQuestion $question,
+        ShadowAnswerVoiceMetadata $voice,
+    ): ShadowAnswer {
         try {
-            $prompt = $this->promptBuilder->build($context, $question);
+            $prompt = $this->promptBuilder->build($context, $question, $voice->answerLanguage);
             $response = $this->chatProvider->answer(ChatRequest::create(
                 $prompt,
                 ChatSourceCollection::empty(),

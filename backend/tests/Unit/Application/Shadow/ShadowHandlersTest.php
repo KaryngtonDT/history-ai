@@ -169,6 +169,7 @@ final class ShadowHandlersTest extends TestCase
             new ShadowSessionResolver($this->sessionRepository),
             $this->shadowContextFactory(),
             new ShadowWatchAnswerer($chatProvider, new ShadowWatchPromptBuilder()),
+            new \App\Application\Shadow\ShadowAnswerLanguageResolver(),
         );
     }
 

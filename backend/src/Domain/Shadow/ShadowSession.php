@@ -23,6 +23,7 @@ final readonly class ShadowSession
         private ?int $currentTranslationSegmentIndex,
         private ShadowInteractionCollection $interactions,
         private ShadowInterventionPolicy $interventionPolicy,
+        private ShadowVoicePreference $voicePreference,
         private ShadowInterventionCollection $interventions,
     ) {
         if ('' === trim($targetLanguage)) {
@@ -61,6 +62,7 @@ final readonly class ShadowSession
             null,
             ShadowInteractionCollection::empty(),
             ShadowInterventionPolicy::disabled(),
+            ShadowVoicePreference::default(),
             ShadowInterventionCollection::empty(),
         );
     }
@@ -120,6 +122,30 @@ final readonly class ShadowSession
         return $this->interventionPolicy;
     }
 
+    public function voicePreference(): ShadowVoicePreference
+    {
+        return $this->voicePreference;
+    }
+
+    public function withVoicePreference(ShadowVoicePreference $voicePreference): self
+    {
+        return new self(
+            $this->id,
+            $this->videoId,
+            $this->contentId,
+            $this->conversationId,
+            $this->currentTimestamp,
+            $this->playbackState,
+            $this->targetLanguage,
+            $this->currentTranscriptSegmentIndex,
+            $this->currentTranslationSegmentIndex,
+            $this->interactions,
+            $this->interventionPolicy,
+            $voicePreference,
+            $this->interventions,
+        );
+    }
+
     public function interventions(): ShadowInterventionCollection
     {
         return $this->interventions;
@@ -142,6 +168,7 @@ final readonly class ShadowSession
             $translationSegmentIndex,
             $this->interactions,
             $this->interventionPolicy,
+            $this->voicePreference,
             $this->interventions,
         );
     }
@@ -160,6 +187,7 @@ final readonly class ShadowSession
             $this->currentTranslationSegmentIndex,
             $this->interactions,
             $policy,
+            $this->voicePreference,
             $this->interventions,
         );
     }
@@ -178,6 +206,7 @@ final readonly class ShadowSession
             $this->currentTranslationSegmentIndex,
             $this->interactions,
             $this->interventionPolicy,
+            $this->voicePreference,
             $this->interventions->append($intervention),
         );
     }
@@ -196,6 +225,7 @@ final readonly class ShadowSession
             $this->currentTranslationSegmentIndex,
             $this->interactions,
             $this->interventionPolicy,
+            $this->voicePreference,
             $this->interventions->replace($intervention),
         );
     }
@@ -220,6 +250,7 @@ final readonly class ShadowSession
             $this->currentTranslationSegmentIndex,
             $this->interactions->append(ShadowInteraction::createPause($this->currentTimestamp)),
             $this->interventionPolicy,
+            $this->voicePreference,
             $this->interventions,
         );
     }
@@ -244,6 +275,7 @@ final readonly class ShadowSession
             $this->currentTranslationSegmentIndex,
             $this->interactions->append(ShadowInteraction::createResume($this->currentTimestamp)),
             $this->interventionPolicy,
+            $this->voicePreference,
             $this->interventions,
         );
     }
@@ -266,6 +298,7 @@ final readonly class ShadowSession
             $this->currentTranslationSegmentIndex,
             $this->interactions,
             $this->interventionPolicy,
+            $this->voicePreference,
             $this->interventions,
         );
     }
@@ -286,6 +319,7 @@ final readonly class ShadowSession
                 ShadowInteraction::createQuestion($question, $this->currentTimestamp),
             ),
             $this->interventionPolicy,
+            $this->voicePreference,
             $this->interventions,
         );
     }
@@ -306,6 +340,7 @@ final readonly class ShadowSession
                 ShadowInteraction::createAnswer($answer, $this->currentTimestamp),
             ),
             $this->interventionPolicy,
+            $this->voicePreference,
             $this->interventions,
         );
     }

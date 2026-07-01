@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Application\Shadow\Commands;
 
-final readonly class AskShadowQuestionCommand
+use App\Domain\Shadow\ShadowVoicePreference;
+
+final readonly class UpdateShadowVoicePreferenceCommand
 {
     public function __construct(
         public string $videoId,
         public string $sessionId,
-        public string $question,
-        public float $currentTimeSeconds,
-        public ?string $interfaceLanguage = null,
+        public ShadowVoicePreference $voicePreference,
     ) {
     }
 }

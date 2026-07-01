@@ -13,6 +13,10 @@ final readonly class ShadowInterventionAnswerResponse
         public string $interventionId,
         public string $reply,
         public bool $recommendResume,
+        public string $answerLanguage,
+        public string $speechLanguage,
+        public bool $fallbackUsed,
+        public string $reason,
         public ShadowSessionResponse $session,
     ) {
     }
@@ -24,6 +28,10 @@ final readonly class ShadowInterventionAnswerResponse
             interventionId: $result->interventionId,
             reply: $result->reply,
             recommendResume: $result->recommendResume,
+            answerLanguage: $result->answerLanguage,
+            speechLanguage: $result->speechLanguage,
+            fallbackUsed: $result->fallbackUsed,
+            reason: $result->reason,
             session: ShadowSessionResponse::fromResult($result->session),
         );
     }
@@ -38,6 +46,10 @@ final readonly class ShadowInterventionAnswerResponse
             'interventionId' => $this->interventionId,
             'reply' => $this->reply,
             'recommendResume' => $this->recommendResume,
+            'answerLanguage' => $this->answerLanguage,
+            'speechLanguage' => $this->speechLanguage,
+            'fallbackUsed' => $this->fallbackUsed,
+            'reason' => $this->reason,
             'session' => $this->session->toArray(),
         ];
     }

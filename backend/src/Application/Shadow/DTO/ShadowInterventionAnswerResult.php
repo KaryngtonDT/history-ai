@@ -13,6 +13,10 @@ final readonly class ShadowInterventionAnswerResult
         public string $interventionId,
         public string $reply,
         public bool $recommendResume,
+        public string $answerLanguage,
+        public string $speechLanguage,
+        public bool $fallbackUsed,
+        public string $reason,
         public ShadowSessionResult $session,
     ) {
     }
@@ -22,12 +26,17 @@ final readonly class ShadowInterventionAnswerResult
         string $interventionId,
         string $reply,
         bool $recommendResume,
+        ShadowAnswerVoiceMetadata $voice,
     ): self {
         return new self(
             sessionId: $session->id()->value,
             interventionId: $interventionId,
             reply: $reply,
             recommendResume: $recommendResume,
+            answerLanguage: $voice->answerLanguage->value,
+            speechLanguage: $voice->speechLanguage->value,
+            fallbackUsed: $voice->fallbackUsed,
+            reason: $voice->reason,
             session: ShadowSessionResult::fromDomain($session),
         );
     }

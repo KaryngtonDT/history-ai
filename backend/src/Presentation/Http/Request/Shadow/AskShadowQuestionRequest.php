@@ -11,6 +11,7 @@ final readonly class AskShadowQuestionRequest
     public function __construct(
         public string $question,
         public float $time,
+        public ?string $interfaceLanguage = null,
     ) {
     }
 
@@ -31,6 +32,12 @@ final readonly class AskShadowQuestionRequest
             throw new InvalidShadowRequestException('Playback time is required.');
         }
 
-        return new self(trim($question), (float) $time);
+        $interfaceLanguage = $payload['interfaceLanguage'] ?? null;
+
+        if (null !== $interfaceLanguage && !is_string($interfaceLanguage)) {
+            throw new InvalidShadowRequestException('Interface language must be a string.');
+        }
+
+        return new self(trim($question), (float) $time, is_string($interfaceLanguage) ? trim($interfaceLanguage) : null);
     }
 }

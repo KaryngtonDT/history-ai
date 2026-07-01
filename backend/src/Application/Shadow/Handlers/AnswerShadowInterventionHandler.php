@@ -6,6 +6,7 @@ namespace App\Application\Shadow\Handlers;
 
 use App\Application\Shadow\Commands\AnswerShadowInterventionCommand;
 use App\Application\Shadow\DTO\ShadowInterventionAnswerResult;
+use App\Application\Shadow\ShadowAnswerLanguageResolver;
 use App\Application\Shadow\ShadowContextFactory;
 use App\Application\Shadow\ShadowInterventionAnswerer;
 use App\Application\Shadow\ShadowSessionResolver;
@@ -24,6 +25,7 @@ final class AnswerShadowInterventionHandler
         private readonly ShadowSessionResolver $sessionResolver,
         private readonly ShadowContextFactory $shadowContextFactory,
         private readonly ShadowInterventionAnswerer $interventionAnswerer,
+        private readonly ShadowAnswerLanguageResolver $languageResolver,
     ) {
     }
 
@@ -55,7 +57,13 @@ final class AnswerShadowInterventionHandler
 
         $session = $session->withTimestamp(ShadowTimestamp::fromSeconds($command->currentTimeSeconds));
 
-        $reply = $this->interventionAnswerer->reply($context, $intervention, $answer);
+        $voice = $this->languageResolver->resolve(
+            $command->answer,
+            $session->targetLanguage(),
+            $session->voicePreference(),
+        );
+
+        $reply = $this->interventionAnswerer->reply($context, $intervention, $answer, $voice);
         $session = $session
             ->recordQuestion(ShadowQuestion::fromString($answer->text()))
             ->replaceIntervention($intervention->markAnswered())
@@ -68,6 +76,7 @@ final class AnswerShadowInterventionHandler
             $interventionId->value,
             $reply,
             $session->interventionPolicy()->autoResume(),
+            $voice,
         );
     }
 

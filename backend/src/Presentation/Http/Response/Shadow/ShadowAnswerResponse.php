@@ -14,6 +14,10 @@ final readonly class ShadowAnswerResponse
         public float $currentTimeSeconds,
         public ?int $currentTranscriptSegmentIndex,
         public ?int $currentTranslationSegmentIndex,
+        public string $answerLanguage,
+        public string $speechLanguage,
+        public bool $fallbackUsed,
+        public string $reason,
         public ShadowSessionResponse $session,
     ) {
     }
@@ -26,6 +30,10 @@ final readonly class ShadowAnswerResponse
             currentTimeSeconds: $result->currentTimeSeconds,
             currentTranscriptSegmentIndex: $result->currentTranscriptSegmentIndex,
             currentTranslationSegmentIndex: $result->currentTranslationSegmentIndex,
+            answerLanguage: $result->answerLanguage,
+            speechLanguage: $result->speechLanguage,
+            fallbackUsed: $result->fallbackUsed,
+            reason: $result->reason,
             session: ShadowSessionResponse::fromResult($result->session),
         );
     }
@@ -41,6 +49,10 @@ final readonly class ShadowAnswerResponse
             'currentTimeSeconds' => $this->currentTimeSeconds,
             'currentTranscriptSegmentIndex' => $this->currentTranscriptSegmentIndex,
             'currentTranslationSegmentIndex' => $this->currentTranslationSegmentIndex,
+            'answerLanguage' => $this->answerLanguage,
+            'speechLanguage' => $this->speechLanguage,
+            'fallbackUsed' => $this->fallbackUsed,
+            'reason' => $this->reason,
             'session' => $this->session->toArray(),
         ];
     }

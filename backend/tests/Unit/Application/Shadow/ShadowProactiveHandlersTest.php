@@ -222,6 +222,7 @@ final class ShadowProactiveHandlersTest extends TestCase
                 new MockChatProvider(),
                 new ShadowInterventionAnswerPromptBuilder(),
             ),
+            new \App\Application\Shadow\ShadowAnswerLanguageResolver(),
         );
     }
 
