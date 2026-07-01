@@ -15,7 +15,7 @@ Status: Complete
 | 03 | `e25f668` | feat(orchestrator): integrate adaptive intelligence |
 | 04 | `649c53b` | feat(frontend): add adaptive learning center |
 | 04 fix | `26990eb` | fix(frontend): apply biome formatting in learning i18n and router |
-| 05 | pending | docs(learning): document adaptive intelligence engine |
+| 05 | `3df85a2` | docs(learning): document adaptive intelligence engine |
 
 ---
 
