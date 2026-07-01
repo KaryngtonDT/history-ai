@@ -27,6 +27,17 @@
 	font-size: 0.9375rem;
 }
 
+.pipelineLink {
+	font-size: 0.8125rem;
+	color: var(--shell-nav-active-text, #2563eb);
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.pipelineLink:hover {
+	text-decoration: underline;
+}
+
 .removeButton {
 	border: none;
 	background: transparent;
