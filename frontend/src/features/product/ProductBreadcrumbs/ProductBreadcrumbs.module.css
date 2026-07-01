@@ -1,0 +1,40 @@
+.root {
+	margin: 0 0 var(--space-4);
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}
+
+.list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-2);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.item {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+}
+
+.separator {
+	color: var(--shell-text-muted);
+}
+
+.link {
+	color: var(--shell-text-muted);
+	text-decoration: none;
+}
+
+.link:hover {
+	color: var(--shell-text);
+	text-decoration: underline;
+}
+
+.current {
+	font-weight: var(--font-weight-medium);
+	color: var(--shell-text);
+}

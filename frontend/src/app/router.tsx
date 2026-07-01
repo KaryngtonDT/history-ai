@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router";
-import { AppLayout } from "@/app/AppLayout";
+import { ProductShell } from "@/features/product";
 import { AIEngineSettingsPage } from "@/pages/AIEngineSettings/AIEngineSettingsPage";
 import { CollectionsPage } from "@/pages/Collections/CollectionsPage";
 import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
@@ -21,7 +21,7 @@ import { WorkspacePage } from "@/pages/Workspace/WorkspacePage";
 export function AppRouter() {
 	return (
 		<Routes>
-			<Route element={<AppLayout />}>
+			<Route element={<ProductShell />}>
 				<Route path="/" element={<DashboardPage />} />
 				<Route path="/import" element={<ImportPage />} />
 				<Route path="/video/upload" element={<VideoUploadPage />} />

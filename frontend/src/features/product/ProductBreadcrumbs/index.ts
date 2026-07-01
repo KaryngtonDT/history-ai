@@ -1,0 +1,1 @@
+export { ProductBreadcrumbs } from "./ProductBreadcrumbs";

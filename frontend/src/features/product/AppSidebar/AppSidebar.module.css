@@ -1,0 +1,114 @@
+.root {
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+	border-bottom: 1px solid var(--shell-border);
+	background-color: var(--shell-surface);
+}
+
+@media (min-width: 1024px) {
+	.root {
+		width: var(--layout-sidebar-width);
+		min-height: 100vh;
+		border-right: 1px solid var(--shell-border);
+		border-bottom: none;
+	}
+}
+
+.brand {
+	border-bottom: 1px solid var(--shell-border);
+	padding: var(--space-5);
+}
+
+.brandText {
+	margin: 0;
+	font-size: var(--font-md);
+	font-weight: var(--font-weight-semibold);
+	color: var(--shell-text);
+}
+
+.brandSub {
+	margin: 0.25rem 0 0;
+	font-size: var(--font-xs);
+	color: var(--shell-text-muted);
+}
+
+.nav {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: var(--space-4);
+	overflow-y: auto;
+	padding: var(--space-4);
+}
+
+.group {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-1);
+}
+
+.groupLabel {
+	margin: 0 0 var(--space-1);
+	padding: 0 var(--space-2);
+	font-size: var(--font-xs);
+	font-weight: var(--font-weight-semibold);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--shell-text-muted);
+}
+
+.link {
+	display: block;
+	border-radius: var(--radius-md);
+	padding: var(--space-2) var(--space-3);
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-medium);
+	color: var(--shell-text-muted);
+	text-decoration: none;
+	transition:
+		background-color var(--duration-fast),
+		color var(--duration-fast);
+}
+
+.link:hover {
+	background-color: var(--shell-nav-hover-bg);
+	color: var(--shell-text);
+}
+
+.linkActive {
+	background-color: var(--shell-nav-active-bg);
+	color: var(--shell-nav-active-text);
+}
+
+.linkDisabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+.hint {
+	margin: 0;
+	padding: 0 var(--space-2);
+	font-size: var(--font-xs);
+	color: var(--shell-text-muted);
+}
+
+.footer {
+	border-top: 1px solid var(--shell-border);
+	padding: var(--space-3) var(--space-4);
+}
+
+.shortcut {
+	margin: 0;
+	font-size: var(--font-xs);
+	color: var(--shell-text-muted);
+}
+
+kbd {
+	border: 1px solid var(--shell-border);
+	border-radius: 4px;
+	padding: 0 0.35rem;
+	font-size: 0.7rem;
+	background: var(--shell-bg);
+}
