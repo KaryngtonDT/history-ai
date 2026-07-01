@@ -26,6 +26,19 @@ export const workspaceEn = {
 			selectProjectTitle: "Select a project",
 			selectProjectDescription:
 				"Create or choose a project to manage videos and batch processing.",
+			tabsAria: "Workspace sections",
+			tabs: {
+				projects: "Projects",
+				team: "Team",
+				analytics: "Analytics",
+				history: "History",
+				reviews: "Reviews",
+				preferences: "Preferences",
+			},
+			stickyVideosOne: "{{count}} video selected",
+			stickyVideosOther: "{{count}} videos selected",
+			stickyLanguages: "Target languages: {{languages}}",
+			stickyLanguagesEmpty: "No target languages selected",
 		},
 		projectCard: {
 			videoCountOne: "{{count}} video",

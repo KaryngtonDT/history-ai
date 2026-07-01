@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import {
@@ -36,6 +36,17 @@ import styles from "./WorkspacePage.module.css";
 
 const POLL_INTERVAL_MS = 2000;
 
+const WORKSPACE_TABS = [
+	"projects",
+	"team",
+	"analytics",
+	"history",
+	"reviews",
+	"preferences",
+] as const;
+
+type WorkspaceTab = (typeof WORKSPACE_TABS)[number];
+
 export function WorkspacePage() {
 	const { t } = useTranslation();
 	const [projects, setProjects] = useState<Project[] | null>(null);
@@ -47,6 +58,7 @@ export function WorkspacePage() {
 		"fr",
 		"de",
 	]);
+	const [activeTab, setActiveTab] = useState<WorkspaceTab>("projects");
 	const [loadError, setLoadError] = useState<string | null>(null);
 	const [processing, setProcessing] = useState(false);
 	const [creating, setCreating] = useState(false);
@@ -64,6 +76,7 @@ export function WorkspacePage() {
 	const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
 	const selectedVideoId = selectedProject?.videos[0]?.videoId ?? null;
+	const videoCount = selectedProject?.videos.length ?? 0;
 
 	const loadAnalyticsData = useCallback(
 		async (workspaceId: string) => {
@@ -161,15 +174,12 @@ export function WorkspacePage() {
 	}, [selectedProjectId, refreshSelectedProject]);
 
 	useEffect(() => {
-		if (!selectedProjectId) {
-			setAnalytics(null);
-			setProviderStatistics(null);
-			setTelemetryRecords([]);
+		if (!selectedProjectId || activeTab !== "analytics") {
 			return;
 		}
 
 		void loadAnalyticsData(selectedProjectId);
-	}, [loadAnalyticsData, selectedProjectId]);
+	}, [activeTab, loadAnalyticsData, selectedProjectId]);
 
 	useEffect(() => {
 		if (!selectedProject || !workspaceService.isBatchRunning(selectedProject)) {
@@ -186,11 +196,15 @@ export function WorkspacePage() {
 	}, [selectedProject, refreshSelectedProject]);
 
 	useEffect(() => {
+		if (activeTab !== "reviews" && activeTab !== "preferences") {
+			return;
+		}
+
 		void loadReviewData(selectedVideoId).catch(() => {
 			setReviews([]);
 			setPreferenceProfile(null);
 		});
-	}, [loadReviewData, selectedVideoId]);
+	}, [activeTab, loadReviewData, selectedVideoId]);
 
 	const toggleLanguage = (language: string): void => {
 		setSelectedLanguages((current) =>
@@ -243,13 +257,9 @@ export function WorkspacePage() {
 		selectedProject?.videos.length ?? 0,
 		selectedLanguages,
 	)
-		? (selectedProject?.videos.length ?? 0) === 1
-			? t("workspace.batch.processButtonOne", {
-					count: selectedProject?.videos.length ?? 0,
-				})
-			: t("workspace.batch.processButtonOther", {
-					count: selectedProject?.videos.length ?? 0,
-				})
+		? videoCount === 1
+			? t("workspace.batch.processButtonOne", { count: videoCount })
+			: t("workspace.batch.processButtonOther", { count: videoCount })
 		: selectedProject
 			? t("workspace.batch.processButtonOther", {
 					count: selectedProject.videos.length,
@@ -263,6 +273,21 @@ export function WorkspacePage() {
 
 		return workspaceService.formatLanguage(language);
 	};
+
+	const stickyLanguageSummary =
+		selectedLanguages.length > 0
+			? t("workspace.page.stickyLanguages", {
+					languages: selectedLanguages.map(languageLabel).join(", "),
+				})
+			: t("workspace.page.stickyLanguagesEmpty");
+
+	const stickyVideoSummary =
+		videoCount === 1
+			? t("workspace.page.stickyVideosOne", { count: videoCount })
+			: t("workspace.page.stickyVideosOther", { count: videoCount });
+
+	const tabLabel = (tab: WorkspaceTab): string =>
+		t(`workspace.page.tabs.${tab}`);
 
 	if (projects === null) {
 		return (
@@ -280,6 +305,151 @@ export function WorkspacePage() {
 			/>
 		);
 	}
+
+	const renderTabPanel = (): ReactNode => {
+		if (!selectedProject) {
+			return (
+				<EmptyState
+					title={t("workspace.page.selectProjectTitle")}
+					description={t("workspace.page.selectProjectDescription")}
+				/>
+			);
+		}
+
+		switch (activeTab) {
+			case "projects":
+				return (
+					<>
+						<ProjectCard project={selectedProject} />
+
+						<div className={styles.section}>
+							<h2 className={styles.sectionTitle}>
+								{t("workspace.page.videos")}
+							</h2>
+							<VideoGrid videos={selectedProject.videos} />
+						</div>
+
+						{selectedVideoId ? (
+							<ArtifactJourney
+								videoId={selectedVideoId}
+								title={t("workspace.page.selectedVideoPipeline")}
+							/>
+						) : null}
+
+						<div className={styles.stickyBar}>
+							<div className={styles.stickySummary}>
+								<span>{stickyVideoSummary}</span>
+								<span>{stickyLanguageSummary}</span>
+							</div>
+
+							<ul className={styles.languageList}>
+								{WORKSPACE_TARGET_LANGUAGES.map((language) => {
+									const selected = selectedLanguages.includes(language);
+
+									return (
+										<li key={language}>
+											<label className={styles.languageOption}>
+												<input
+													type="checkbox"
+													checked={selected}
+													onChange={() => toggleLanguage(language)}
+												/>
+												<span>
+													{selected ? "✓ " : ""}
+													{languageLabel(language)}
+												</span>
+											</label>
+										</li>
+									);
+								})}
+							</ul>
+
+							<button
+								type="button"
+								className={styles.primaryButton}
+								onClick={handleProcess}
+								disabled={
+									processing ||
+									!workspaceService.canProcess(
+										selectedProject.videos.length,
+										selectedLanguages,
+									)
+								}
+							>
+								{processButtonLabel}
+							</button>
+
+							<BatchProgress
+								progress={selectedProject.batchProgress}
+								status={selectedProject.batchStatus}
+								loading={processing}
+							/>
+						</div>
+					</>
+				);
+			case "team":
+				return <TeamPanel workspaceId={selectedProject.id} />;
+			case "analytics":
+				return (
+					<>
+						<AnalyticsDashboard
+							analytics={analytics}
+							loading={analyticsLoading}
+							error={analyticsError}
+						/>
+
+						<div className={styles.section}>
+							<h2 className={styles.sectionTitle}>
+								{t("workspace.page.providerStatistics")}
+							</h2>
+							<ProviderStatistics statistics={providerStatistics} />
+						</div>
+
+						<div className={styles.section}>
+							<h2 className={styles.sectionTitle}>
+								{t("workspace.page.performance")}
+							</h2>
+							<PerformanceCharts records={telemetryRecords} />
+						</div>
+
+						<div className={styles.section}>
+							<h2 className={styles.sectionTitle}>
+								{t("workspace.page.qualityTrend")}
+							</h2>
+							<QualityTrend
+								records={telemetryRecords}
+								recentErrors={analytics?.recentErrors ?? []}
+							/>
+						</div>
+					</>
+				);
+			case "history":
+				return <ExecutionHistoryPanel videoId={selectedVideoId} />;
+			case "reviews":
+				return (
+					<>
+						<ReviewPanel
+							key={selectedVideoId ?? "no-video"}
+							videoId={selectedVideoId}
+							onSaved={() => {
+								void loadReviewData(selectedVideoId);
+							}}
+						/>
+
+						<div className={styles.section}>
+							<h2 className={styles.sectionTitle}>
+								{t("workspace.page.reviewHistory")}
+							</h2>
+							<ReviewSummary reviews={reviews} />
+						</div>
+					</>
+				);
+			case "preferences":
+				return <PreferenceProfileCard profile={preferenceProfile} />;
+			default:
+				return null;
+		}
+	};
 
 	return (
 		<div className={styles.root}>
@@ -332,129 +502,39 @@ export function WorkspacePage() {
 				</section>
 
 				<section className={styles.main}>
-					{selectedProject ? (
-						<>
-							<ProjectCard project={selectedProject} />
-
-							<TeamPanel workspaceId={selectedProject.id} />
-
-							<AnalyticsDashboard
-								analytics={analytics}
-								loading={analyticsLoading}
-								error={analyticsError}
-							/>
-
-							<div className={styles.section}>
-								<h2 className={styles.sectionTitle}>
-									{t("workspace.page.providerStatistics")}
-								</h2>
-								<ProviderStatistics statistics={providerStatistics} />
-							</div>
-
-							<div className={styles.section}>
-								<h2 className={styles.sectionTitle}>
-									{t("workspace.page.performance")}
-								</h2>
-								<PerformanceCharts records={telemetryRecords} />
-							</div>
-
-							<div className={styles.section}>
-								<h2 className={styles.sectionTitle}>
-									{t("workspace.page.qualityTrend")}
-								</h2>
-								<QualityTrend
-									records={telemetryRecords}
-									recentErrors={analytics?.recentErrors ?? []}
-								/>
-							</div>
-
-							<div className={styles.section}>
-								<h2 className={styles.sectionTitle}>
-									{t("workspace.page.videos")}
-								</h2>
-								<VideoGrid videos={selectedProject.videos} />
-							</div>
-
-							{selectedVideoId ? (
-								<ArtifactJourney
-									videoId={selectedVideoId}
-									title={t("workspace.page.selectedVideoPipeline")}
-								/>
-							) : null}
-
-							<div className={styles.section}>
-								<h2 className={styles.sectionTitle}>
-									{t("workspace.page.languages")}
-								</h2>
-								<ul className={styles.languageList}>
-									{WORKSPACE_TARGET_LANGUAGES.map((language) => {
-										const selected = selectedLanguages.includes(language);
-
-										return (
-											<li key={language}>
-												<label className={styles.languageOption}>
-													<input
-														type="checkbox"
-														checked={selected}
-														onChange={() => toggleLanguage(language)}
-													/>
-													<span>
-														{selected ? "✓ " : ""}
-														{languageLabel(language)}
-													</span>
-												</label>
-											</li>
-										);
-									})}
-								</ul>
-							</div>
-
+					<div
+						className={styles.tabList}
+						role="tablist"
+						aria-label={t("workspace.page.tabsAria")}
+					>
+						{WORKSPACE_TABS.map((tab) => (
 							<button
+								key={tab}
 								type="button"
-								className={styles.primaryButton}
-								onClick={handleProcess}
-								disabled={
-									processing ||
-									!workspaceService.canProcess(
-										selectedProject.videos.length,
-										selectedLanguages,
-									)
+								role="tab"
+								id={`workspace-tab-${tab}`}
+								aria-selected={activeTab === tab}
+								aria-controls={`workspace-panel-${tab}`}
+								className={
+									activeTab === tab
+										? `${styles.tab} ${styles.tabActive}`
+										: styles.tab
 								}
+								onClick={() => setActiveTab(tab)}
 							>
-								{processButtonLabel}
+								{tabLabel(tab)}
 							</button>
+						))}
+					</div>
 
-							<BatchProgress
-								progress={selectedProject.batchProgress}
-								status={selectedProject.batchStatus}
-								loading={processing}
-							/>
-
-							<ExecutionHistoryPanel videoId={selectedVideoId} />
-
-							<ReviewPanel
-								key={selectedVideoId ?? "no-video"}
-								videoId={selectedVideoId}
-								onSaved={() => {
-									void loadReviewData(selectedVideoId);
-								}}
-							/>
-
-							<PreferenceProfileCard profile={preferenceProfile} />
-
-							<div className={styles.section}>
-								<h2 className={styles.sectionTitle}>
-									{t("workspace.page.reviewHistory")}
-								</h2>
-								<ReviewSummary reviews={reviews} />
-							</div>
-						</>
-					) : (
-						<EmptyState
-							title={t("workspace.page.selectProjectTitle")}
-							description={t("workspace.page.selectProjectDescription")}
-						/>
-					)}
+					<div
+						className={styles.tabPanel}
+						role="tabpanel"
+						id={`workspace-panel-${activeTab}`}
+						aria-labelledby={`workspace-tab-${activeTab}`}
+					>
+						{renderTabPanel()}
+					</div>
 				</section>
 			</div>
 		</div>

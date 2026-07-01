@@ -31,6 +31,19 @@ export const workspaceFr: WorkspaceMessages = {
 			selectProjectTitle: "Sélectionnez un projet",
 			selectProjectDescription:
 				"Créez ou choisissez un projet pour gérer les vidéos et le traitement par lot.",
+			tabsAria: "Sections de l'espace de travail",
+			tabs: {
+				projects: "Projets",
+				team: "Équipe",
+				analytics: "Analytique",
+				history: "Historique",
+				reviews: "Revues",
+				preferences: "Préférences",
+			},
+			stickyVideosOne: "{{count}} vidéo sélectionnée",
+			stickyVideosOther: "{{count}} vidéos sélectionnées",
+			stickyLanguages: "Langues cibles : {{languages}}",
+			stickyLanguagesEmpty: "Aucune langue cible sélectionnée",
 		},
 		projectCard: {
 			videoCountOne: "{{count}} vidéo",
