@@ -9,4 +9,6 @@ use App\Domain\Video\VideoJob;
 interface SpeechToTextProviderInterface
 {
     public function transcribe(VideoJob $video): Transcript;
+
+    public function transcribePath(string $storagePath): Transcript;
 }

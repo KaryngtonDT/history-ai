@@ -27,9 +27,20 @@ final class FasterWhisperProvider implements SpeechToTextProviderInterface
             throw new FasterWhisperProviderException('Video job must have a storage path before transcription.');
         }
 
+        return $this->transcribePath($storagePath);
+    }
+
+    public function transcribePath(string $storagePath): Transcript
+    {
+        $normalized = trim($storagePath);
+
+        if ('' === $normalized) {
+            throw new FasterWhisperProviderException('Storage path cannot be empty before transcription.');
+        }
+
         $command = [
             $this->binary,
-            $storagePath,
+            $normalized,
             '--model',
             $this->model,
             '--output-format',

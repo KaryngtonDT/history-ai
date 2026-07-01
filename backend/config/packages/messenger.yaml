@@ -11,6 +11,7 @@ framework:
 
         routing:
             App\Application\Video\Messages\ProcessVideoMessage: sync
+            App\Application\AudioUpload\Messages\ProcessAudioMessage: sync
 
 # when@test:
 #    framework:
