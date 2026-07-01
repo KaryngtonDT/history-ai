@@ -1,0 +1,1 @@
+export { ShadowChallengePrompt } from "./ShadowChallengePrompt";

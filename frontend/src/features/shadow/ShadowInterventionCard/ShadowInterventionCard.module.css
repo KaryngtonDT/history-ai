@@ -1,0 +1,35 @@
+.card {
+	display: grid;
+	gap: 0.85rem;
+	padding: 1rem;
+	border: 1px solid var(--color-border);
+	border-radius: 0.75rem;
+	background: var(--color-surface);
+	box-shadow: 0 8px 24px rgb(0 0 0 / 8%);
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+}
+
+.title {
+	margin: 0;
+	font-size: 1rem;
+}
+
+.reply {
+	margin: 0;
+	padding: 0.75rem;
+	border-radius: 0.5rem;
+	background: var(--color-background);
+	font-size: 0.9rem;
+}
+
+.busy {
+	margin: 0;
+	font-size: 0.85rem;
+	color: var(--color-text-muted);
+}

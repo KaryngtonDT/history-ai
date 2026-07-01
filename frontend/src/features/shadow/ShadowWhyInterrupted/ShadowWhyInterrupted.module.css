@@ -1,0 +1,21 @@
+.why {
+	margin: 0;
+	padding: 0.65rem 0.75rem;
+	border-left: 3px solid var(--color-primary);
+	background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+	border-radius: 0.35rem;
+	font-size: 0.85rem;
+	color: var(--color-text-muted);
+}
+
+.title {
+	margin: 0 0 0.35rem;
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--color-text-muted);
+}
+
+.text {
+	margin: 0;
+}

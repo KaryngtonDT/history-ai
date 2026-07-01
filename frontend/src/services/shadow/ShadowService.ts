@@ -1,10 +1,16 @@
 import type { ShadowRepository } from "./ShadowRepository";
 import { createShadowRepository } from "./ShadowRepositoryFactory";
 import type {
+	AnswerShadowInterventionRequest,
 	AskShadowQuestionRequest,
 	ShadowAnswer,
+	ShadowInterventionAnswer,
+	ShadowInterventionCheck,
+	ShadowInterventionPolicy,
 	ShadowSession,
+	SkipShadowInterventionRequest,
 	StartShadowSessionRequest,
+	UpdateShadowInterventionPolicyRequest,
 	WatchContext,
 } from "./types";
 
@@ -81,6 +87,78 @@ export class ShadowService {
 		}
 
 		return this.repository.resumeSession(videoId.trim(), sessionId, time);
+	}
+
+	checkIntervention(
+		videoId: string,
+		sessionId: string,
+		time: number,
+	): Promise<ShadowInterventionCheck> {
+		if (!this.isValidVideoId(videoId) || sessionId.trim() === "") {
+			return Promise.reject(new Error("Invalid shadow session request"));
+		}
+
+		return this.repository.checkIntervention(videoId.trim(), sessionId, time);
+	}
+
+	answerIntervention(
+		videoId: string,
+		sessionId: string,
+		interventionId: string,
+		request: AnswerShadowInterventionRequest,
+	): Promise<ShadowInterventionAnswer> {
+		if (
+			!this.isValidVideoId(videoId) ||
+			sessionId.trim() === "" ||
+			interventionId.trim() === ""
+		) {
+			return Promise.reject(new Error("Invalid shadow intervention request"));
+		}
+
+		return this.repository.answerIntervention(
+			videoId.trim(),
+			sessionId,
+			interventionId,
+			request,
+		);
+	}
+
+	skipIntervention(
+		videoId: string,
+		sessionId: string,
+		interventionId: string,
+		request: SkipShadowInterventionRequest,
+	): Promise<ShadowInterventionCheck> {
+		if (
+			!this.isValidVideoId(videoId) ||
+			sessionId.trim() === "" ||
+			interventionId.trim() === ""
+		) {
+			return Promise.reject(new Error("Invalid shadow intervention request"));
+		}
+
+		return this.repository.skipIntervention(
+			videoId.trim(),
+			sessionId,
+			interventionId,
+			request,
+		);
+	}
+
+	updateInterventionPolicy(
+		videoId: string,
+		sessionId: string,
+		request: UpdateShadowInterventionPolicyRequest,
+	): Promise<ShadowInterventionPolicy> {
+		if (!this.isValidVideoId(videoId) || sessionId.trim() === "") {
+			return Promise.reject(new Error("Invalid shadow session request"));
+		}
+
+		return this.repository.updateInterventionPolicy(
+			videoId.trim(),
+			sessionId,
+			request,
+		);
 	}
 
 	private isValidVideoId(videoId: string): boolean {

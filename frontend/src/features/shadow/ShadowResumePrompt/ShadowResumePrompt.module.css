@@ -1,0 +1,28 @@
+.panel {
+	display: grid;
+	gap: 0.75rem;
+	padding: 0.85rem 1rem;
+	border: 1px solid var(--color-primary);
+	border-radius: 0.75rem;
+	background: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
+}
+
+.text {
+	margin: 0;
+	font-size: 0.9rem;
+}
+
+.button {
+	justify-self: start;
+	padding: 0.55rem 0.85rem;
+	border: none;
+	border-radius: 0.5rem;
+	background: var(--color-primary);
+	color: var(--color-primary-contrast, #fff);
+	cursor: pointer;
+}
+
+.button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}

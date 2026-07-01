@@ -195,6 +195,36 @@ export function videoShadowSessionResumePath(
 	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/resume`;
 }
 
+export function videoShadowSessionInterventionPath(
+	videoId: string,
+	sessionId: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/intervention`;
+}
+
+export function videoShadowSessionInterventionAnswerPath(
+	videoId: string,
+	sessionId: string,
+	interventionId: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/intervention/${interventionId}/answer`;
+}
+
+export function videoShadowSessionInterventionSkipPath(
+	videoId: string,
+	sessionId: string,
+	interventionId: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/intervention/${interventionId}/skip`;
+}
+
+export function videoShadowSessionPolicyPath(
+	videoId: string,
+	sessionId: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/policy`;
+}
+
 export function timelinePath(artifactId: string): string {
 	return `/api/timeline/${artifactId}`;
 }

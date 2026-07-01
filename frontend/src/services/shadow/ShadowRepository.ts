@@ -1,8 +1,14 @@
 import type {
+	AnswerShadowInterventionRequest,
 	AskShadowQuestionRequest,
 	ShadowAnswer,
+	ShadowInterventionAnswer,
+	ShadowInterventionCheck,
+	ShadowInterventionPolicy,
 	ShadowSession,
+	SkipShadowInterventionRequest,
 	StartShadowSessionRequest,
+	UpdateShadowInterventionPolicyRequest,
 	WatchContext,
 } from "./types";
 
@@ -36,4 +42,30 @@ export interface ShadowRepository {
 		sessionId: string,
 		time?: number,
 	): Promise<ShadowSession>;
+
+	checkIntervention(
+		videoId: string,
+		sessionId: string,
+		time: number,
+	): Promise<ShadowInterventionCheck>;
+
+	answerIntervention(
+		videoId: string,
+		sessionId: string,
+		interventionId: string,
+		request: AnswerShadowInterventionRequest,
+	): Promise<ShadowInterventionAnswer>;
+
+	skipIntervention(
+		videoId: string,
+		sessionId: string,
+		interventionId: string,
+		request: SkipShadowInterventionRequest,
+	): Promise<ShadowInterventionCheck>;
+
+	updateInterventionPolicy(
+		videoId: string,
+		sessionId: string,
+		request: UpdateShadowInterventionPolicyRequest,
+	): Promise<ShadowInterventionPolicy>;
 }

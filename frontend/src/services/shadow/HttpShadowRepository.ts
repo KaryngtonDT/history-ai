@@ -1,7 +1,11 @@
 import {
 	videoShadowContextPath,
 	videoShadowSessionAskPath,
+	videoShadowSessionInterventionAnswerPath,
+	videoShadowSessionInterventionPath,
+	videoShadowSessionInterventionSkipPath,
 	videoShadowSessionPausePath,
+	videoShadowSessionPolicyPath,
 	videoShadowSessionResumePath,
 	videoShadowSessionsPath,
 } from "@/config/api";
@@ -9,13 +13,20 @@ import type { HttpClient } from "@/services/http/HttpClient";
 import { ApiError } from "@/shared/errors";
 import type { ShadowRepository } from "./ShadowRepository";
 import {
+	type AnswerShadowInterventionRequest,
 	type AskShadowQuestionRequest,
+	DEFAULT_SHADOW_INTERVENTION_POLICY,
 	mapShadowAnswerFromApi,
 	mapShadowSessionFromApi,
 	mapWatchContextFromApi,
 	type ShadowAnswerApiDto,
+	type ShadowInterventionAnswer,
+	type ShadowInterventionCheck,
+	type ShadowInterventionPolicy,
 	type ShadowSessionApiDto,
+	type SkipShadowInterventionRequest,
 	type StartShadowSessionRequest,
+	type UpdateShadowInterventionPolicyRequest,
 	type WatchContextApiDto,
 } from "./types";
 
@@ -94,5 +105,72 @@ export class HttpShadowRepository implements ShadowRepository {
 		);
 
 		return mapShadowSessionFromApi(dto);
+	}
+
+	async checkIntervention(videoId: string, sessionId: string, time: number) {
+		const params = new URLSearchParams({ time: String(time) });
+		const dto = await this.httpClient.get<ShadowInterventionCheck>(
+			`${videoShadowSessionInterventionPath(videoId, sessionId)}?${params.toString()}`,
+		);
+
+		return {
+			...dto,
+			session: mapShadowSessionFromApi(dto.session),
+		};
+	}
+
+	async answerIntervention(
+		videoId: string,
+		sessionId: string,
+		interventionId: string,
+		request: AnswerShadowInterventionRequest,
+	) {
+		const dto = await this.httpClient.post<ShadowInterventionAnswer>(
+			videoShadowSessionInterventionAnswerPath(
+				videoId,
+				sessionId,
+				interventionId,
+			),
+			request,
+		);
+
+		return {
+			...dto,
+			session: mapShadowSessionFromApi(dto.session),
+		};
+	}
+
+	async skipIntervention(
+		videoId: string,
+		sessionId: string,
+		interventionId: string,
+		request: SkipShadowInterventionRequest,
+	) {
+		const dto = await this.httpClient.post<ShadowInterventionCheck>(
+			videoShadowSessionInterventionSkipPath(
+				videoId,
+				sessionId,
+				interventionId,
+			),
+			request,
+		);
+
+		return {
+			...dto,
+			session: mapShadowSessionFromApi(dto.session),
+		};
+	}
+
+	async updateInterventionPolicy(
+		videoId: string,
+		sessionId: string,
+		request: UpdateShadowInterventionPolicyRequest,
+	) {
+		const dto = await this.httpClient.put<{ policy: ShadowInterventionPolicy }>(
+			videoShadowSessionPolicyPath(videoId, sessionId),
+			request,
+		);
+
+		return dto.policy ?? DEFAULT_SHADOW_INTERVENTION_POLICY;
 	}
 }

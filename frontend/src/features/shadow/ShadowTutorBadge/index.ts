@@ -1,0 +1,1 @@
+export { ShadowTutorBadge } from "./ShadowTutorBadge";

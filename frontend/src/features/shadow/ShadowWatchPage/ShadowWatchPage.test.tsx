@@ -33,6 +33,15 @@ describe("ShadowWatchPage", () => {
 			contentId: VIDEO_ID,
 			conversationId: null,
 			interactions: [],
+			policy: {
+				enabled: false,
+				maxInterventionsPerMinute: 2,
+				minSecondsBetweenInterventions: 45,
+				challengeLevel: "easy",
+				explanationStyle: "short",
+				autoResume: false,
+				allowAutoPause: true,
+			},
 		});
 		vi.spyOn(shadowService, "getContext").mockResolvedValue({
 			videoId: VIDEO_ID,
@@ -90,6 +99,15 @@ describe("ShadowWatchPage", () => {
 			contentId: null,
 			conversationId: null,
 			interactions: [],
+			policy: {
+				enabled: false,
+				maxInterventionsPerMinute: 2,
+				minSecondsBetweenInterventions: 45,
+				challengeLevel: "easy",
+				explanationStyle: "short",
+				autoResume: false,
+				allowAutoPause: true,
+			},
 		});
 		vi.spyOn(shadowService, "getContext").mockResolvedValue(null);
 		const askSpy = vi.spyOn(shadowService, "askQuestion").mockResolvedValue({
@@ -122,6 +140,15 @@ describe("ShadowWatchPage", () => {
 						text: "Shadow explains the sentence at 0.0s.",
 					},
 				],
+				policy: {
+					enabled: false,
+					maxInterventionsPerMinute: 2,
+					minSecondsBetweenInterventions: 45,
+					challengeLevel: "easy",
+					explanationStyle: "short",
+					autoResume: false,
+					allowAutoPause: true,
+				},
 			},
 		});
 

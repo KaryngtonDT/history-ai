@@ -1,0 +1,50 @@
+.form {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.input {
+	width: 100%;
+	padding: 0.65rem 0.75rem;
+	border: 1px solid var(--color-border);
+	border-radius: 0.5rem;
+	background: var(--color-background);
+	color: inherit;
+	resize: vertical;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.primary,
+.secondary {
+	padding: 0.55rem 0.85rem;
+	border-radius: 0.5rem;
+	border: 1px solid transparent;
+	cursor: pointer;
+}
+
+.primary {
+	background: var(--color-primary);
+	color: var(--color-primary-contrast, #fff);
+}
+
+.secondary {
+	background: transparent;
+	border-color: var(--color-border);
+	color: inherit;
+}
+
+.primary:disabled,
+.secondary:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.voice {
+	font-size: 0.85rem;
+	color: var(--color-text-muted);
+}
