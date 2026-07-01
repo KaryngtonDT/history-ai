@@ -1,0 +1,68 @@
+.overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 100;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--space-4);
+	background: rgba(0, 0, 0, 0.45);
+}
+
+.panel {
+	width: min(32rem, 100%);
+	max-height: 85vh;
+	overflow-y: auto;
+	border: 1px solid var(--shell-border);
+	border-radius: var(--radius-lg);
+	padding: var(--space-6);
+	background: var(--shell-surface);
+}
+
+.title {
+	margin: 0 0 var(--space-2);
+	font-size: var(--font-xl);
+}
+
+.meta {
+	margin: 0 0 var(--space-4);
+	font-size: var(--font-xs);
+	color: var(--shell-text-muted);
+}
+
+.section {
+	margin-bottom: var(--space-4);
+}
+
+.sectionTitle {
+	margin: 0 0 var(--space-2);
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-semibold);
+}
+
+.sectionBody {
+	margin: 0;
+	font-size: var(--font-sm);
+	line-height: 1.5;
+	color: var(--shell-text-muted);
+}
+
+.close {
+	margin-top: var(--space-4);
+}
+
+.faqItem {
+	margin-bottom: var(--space-3);
+}
+
+.faqQuestion {
+	margin: 0 0 0.25rem;
+	font-size: var(--font-sm);
+	font-weight: var(--font-weight-medium);
+}
+
+.faqAnswer {
+	margin: 0;
+	font-size: var(--font-sm);
+	color: var(--shell-text-muted);
+}

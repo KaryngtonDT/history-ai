@@ -1,0 +1,1 @@
+export { FeatureAcademy } from "./FeatureAcademy";
