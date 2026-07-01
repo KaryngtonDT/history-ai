@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Application\Review;
 
+use App\Application\Collaboration\WorkspaceAuthorizationGuard;
 use App\Application\Review\DTO\ReviewResult;
 use App\Application\Review\Queries\GetReviewsQuery;
+use App\Domain\Collaboration\WorkspaceAction;
 use App\Domain\Review\ReviewRepositoryInterface;
 use App\Domain\Review\ReviewScore;
 use App\Domain\Video\VideoId;
@@ -14,6 +16,7 @@ final class GetReviewHandler
 {
     public function __construct(
         private readonly ReviewRepositoryInterface $reviewRepository,
+        private readonly WorkspaceAuthorizationGuard $authorizationGuard,
     ) {
     }
 
@@ -22,6 +25,12 @@ final class GetReviewHandler
      */
     public function __invoke(GetReviewsQuery $query): array
     {
+        $this->authorizationGuard->assertVideoAction(
+            $query->videoId,
+            $query->actorUserId,
+            WorkspaceAction::Read,
+        );
+
         $reviews = $this->reviewRepository->findByVideoId(new VideoId($query->videoId));
 
         return array_map(

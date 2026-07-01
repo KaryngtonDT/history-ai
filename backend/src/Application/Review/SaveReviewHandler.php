@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Application\Review;
 
+use App\Application\Collaboration\WorkspaceAuthorizationGuard;
 use App\Application\Review\Commands\SaveReviewCommand;
 use App\Application\Review\DTO\ReviewResult;
+use App\Domain\Collaboration\WorkspaceAction;
 use App\Domain\Review\Review;
 use App\Domain\Review\ReviewCategory;
 use App\Domain\Review\ReviewComment;
@@ -18,11 +20,18 @@ final class SaveReviewHandler
     public function __construct(
         private readonly ReviewRepositoryInterface $reviewRepository,
         private readonly BuildPreferenceProfileHandler $profileHandler,
+        private readonly WorkspaceAuthorizationGuard $authorizationGuard,
     ) {
     }
 
     public function __invoke(SaveReviewCommand $command): ReviewResult
     {
+        $this->authorizationGuard->assertVideoAction(
+            $command->videoId->value,
+            $command->actorUserId,
+            WorkspaceAction::Review,
+        );
+
         $scores = [];
 
         foreach (ReviewCategory::cases() as $category) {

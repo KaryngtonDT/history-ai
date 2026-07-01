@@ -6,7 +6,9 @@ namespace App\Presentation\Http\Controller\Project;
 
 use App\Application\Workspace\Commands\UpdateProjectCommand;
 use App\Application\Workspace\Handlers\UpdateProjectHandler;
+use App\Domain\Collaboration\Exception\InvalidWorkspaceMemberException;
 use App\Domain\Workspace\Exception\InvalidProjectException;
+use App\Presentation\Http\CollaboratorResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,7 +29,10 @@ final class UpdateProjectController extends AbstractController
         }
 
         try {
-            $result = $handler(new UpdateProjectCommand($id, $name));
+            $collaborator = CollaboratorResolver::fromRequest($request);
+            $result = $handler(new UpdateProjectCommand($id, $name, $collaborator->userId));
+        } catch (InvalidWorkspaceMemberException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_FORBIDDEN);
         } catch (InvalidProjectException) {
             return $this->json(['error' => 'Project not found'], Response::HTTP_NOT_FOUND);
         }

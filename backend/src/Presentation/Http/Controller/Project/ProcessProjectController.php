@@ -6,9 +6,11 @@ namespace App\Presentation\Http\Controller\Project;
 
 use App\Application\Workspace\Commands\ProcessProjectCommand;
 use App\Application\Workspace\Handlers\ProcessProjectHandler;
+use App\Domain\Collaboration\Exception\InvalidWorkspaceMemberException;
 use App\Domain\Orchestrator\ProcessingMode;
 use App\Domain\Orchestrator\ProcessingStrategy;
 use App\Domain\Workspace\Exception\InvalidProjectException;
+use App\Presentation\Http\CollaboratorResolver;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -64,7 +66,16 @@ final class ProcessProjectController extends AbstractController
         $strategy = null !== $strategyValue ? ProcessingStrategy::tryFrom($strategyValue) : null;
 
         try {
-            $result = $handler(new ProcessProjectCommand($id, $languages, $mode, $strategy));
+            $collaborator = CollaboratorResolver::fromRequest($request);
+            $result = $handler(new ProcessProjectCommand(
+                $id,
+                $languages,
+                $mode,
+                $strategy,
+                $collaborator->userId,
+            ));
+        } catch (InvalidWorkspaceMemberException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_FORBIDDEN);
         } catch (InvalidProjectException $exception) {
             $status = str_contains($exception->getMessage(), 'not found')
                 ? Response::HTTP_NOT_FOUND

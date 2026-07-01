@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Application\History;
 
+use App\Application\Collaboration\WorkspaceAuthorizationGuard;
 use App\Application\History\DTO\ComparisonResult;
 use App\Application\History\DTO\OptimizationDifference;
 use App\Application\History\DTO\ProviderDifference;
 use App\Application\History\DTO\QualityScoreDifference;
 use App\Application\History\Ports\ExecutionHistorySnapshotStoreInterface;
 use App\Application\History\Queries\CompareExecutionQuery;
+use App\Domain\Collaboration\WorkspaceAction;
 use App\Domain\History\Exception\InvalidExecutionHistoryException;
 use App\Domain\Video\VideoId;
 
@@ -17,11 +19,18 @@ final class CompareExecutionHandler
 {
     public function __construct(
         private readonly ExecutionHistorySnapshotStoreInterface $snapshotStore,
+        private readonly WorkspaceAuthorizationGuard $authorizationGuard,
     ) {
     }
 
     public function __invoke(CompareExecutionQuery $query): ComparisonResult
     {
+        $this->authorizationGuard->assertVideoAction(
+            $query->videoId,
+            $query->actorUserId,
+            WorkspaceAction::Compare,
+        );
+
         $videoId = new VideoId($query->videoId);
         $left = $this->snapshotStore->findByVideoIdAndVersion($videoId, $query->leftVersion);
         $right = $this->snapshotStore->findByVideoIdAndVersion($videoId, $query->rightVersion);

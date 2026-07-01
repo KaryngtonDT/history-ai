@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Application\History;
 
+use App\Application\Collaboration\WorkspaceAuthorizationGuard;
 use App\Application\History\Commands\RecordExecutionHistoryCommand;
 use App\Application\History\Commands\ReprocessExecutionCommand;
 use App\Application\Pipeline\PipelineConfigurationJsonMapper;
 use App\Application\Video\Ports\VideoProcessingQueueInterface;
+use App\Domain\Collaboration\WorkspaceAction;
 use App\Domain\History\Exception\InvalidExecutionHistoryException;
 use App\Domain\History\ExecutionReplayContextInterface;
 use App\Domain\Workspace\BatchJobId;
@@ -25,11 +27,18 @@ final class ReprocessExecutionHandler
         private readonly ExecutionReplayContextInterface $replayContext,
         private readonly PipelineConfigurationJsonMapper $pipelineMapper,
         private readonly VideoProcessingQueueInterface $videoProcessingQueue,
+        private readonly WorkspaceAuthorizationGuard $authorizationGuard,
     ) {
     }
 
     public function __invoke(ReprocessExecutionCommand $command): void
     {
+        $this->authorizationGuard->assertVideoAction(
+            $command->videoId,
+            $command->actorUserId,
+            WorkspaceAction::Reprocess,
+        );
+
         $videoId = new VideoId($command->videoId);
         $snapshot = $this->snapshotStore->findByVideoIdAndVersion($videoId, $command->versionNumber);
 

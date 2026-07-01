@@ -6,7 +6,9 @@ namespace App\Presentation\Http\Controller\History;
 
 use App\Application\History\Commands\ReprocessExecutionCommand;
 use App\Application\History\ReprocessExecutionHandler;
+use App\Domain\Collaboration\Exception\InvalidWorkspaceMemberException;
 use App\Domain\History\Exception\InvalidExecutionHistoryException;
+use App\Presentation\Http\CollaboratorResolver;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -59,7 +61,16 @@ final class ReprocessVideoHistoryController extends AbstractController
         $batchJobId = is_string($payload['batchJobId'] ?? null) ? $payload['batchJobId'] : null;
 
         try {
-            $handler(new ReprocessExecutionCommand($videoId, $version, $providerOverrides, $batchJobId));
+            $collaborator = CollaboratorResolver::fromRequest($request);
+            $handler(new ReprocessExecutionCommand(
+                $videoId,
+                $version,
+                $providerOverrides,
+                $batchJobId,
+                $collaborator->userId,
+            ));
+        } catch (InvalidWorkspaceMemberException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_FORBIDDEN);
         } catch (InvalidExecutionHistoryException $exception) {
             return $this->json(['error' => $exception->getMessage()], Response::HTTP_NOT_FOUND);
         }

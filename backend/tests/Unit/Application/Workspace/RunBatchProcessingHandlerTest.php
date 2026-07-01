@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Application\Workspace;
 use App\Application\Video\Ports\VideoProcessingQueueInterface;
 use App\Application\Workspace\Commands\RunBatchProcessingCommand;
 use App\Application\Workspace\RunBatchProcessingHandler;
+use App\Tests\Support\AllowAllAuthorizationGuardTrait;
 use App\Domain\Orchestrator\ProcessingMode;
 use App\Domain\Video\VideoId;
 use App\Domain\Video\VideoJob;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\TestCase;
 
 final class RunBatchProcessingHandlerTest extends TestCase
 {
+    use AllowAllAuthorizationGuardTrait;
     public function testProcessesAllProjectVideos(): void
     {
         $project = $this->sampleProject();
@@ -43,6 +45,7 @@ final class RunBatchProcessingHandlerTest extends TestCase
             $this->batchJobRepository(),
             $videoRepository,
             $queue,
+            $this->allowAllAuthorizationGuard(),
         );
 
         $result = $handler(new RunBatchProcessingCommand(
@@ -77,6 +80,7 @@ final class RunBatchProcessingHandlerTest extends TestCase
             $this->batchJobRepository(),
             $videoRepository,
             $queue,
+            $this->allowAllAuthorizationGuard(),
         );
 
         $result = $handler(new RunBatchProcessingCommand($project->id()->value, ['fr']));
@@ -100,6 +104,7 @@ final class RunBatchProcessingHandlerTest extends TestCase
             $this->batchJobRepository(),
             $videoRepository,
             $queue,
+            $this->allowAllAuthorizationGuard(),
         );
 
         $result = $handler(new RunBatchProcessingCommand($project->id()->value, ['fr']));
@@ -116,6 +121,7 @@ final class RunBatchProcessingHandlerTest extends TestCase
             $this->batchJobRepository(),
             $this->createMock(VideoRepositoryInterface::class),
             $this->createMock(VideoProcessingQueueInterface::class),
+            $this->allowAllAuthorizationGuard(),
         );
 
         $this->expectException(InvalidProjectException::class);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Doctrine\Workspace;
 
+use App\Domain\Video\VideoId;
 use App\Domain\Workspace\Project;
 use App\Domain\Workspace\ProjectId;
 use App\Domain\Workspace\ProjectRepositoryInterface;
@@ -35,6 +36,19 @@ final class DoctrineProjectRepository implements ProjectRepositoryInterface
         $record = $this->entityManager->find(ProjectRecord::class, $id->value);
 
         return $record?->toDomain();
+    }
+
+    public function findProjectIdByVideoId(VideoId $videoId): ?ProjectId
+    {
+        foreach ($this->findAll() as $project) {
+            foreach ($project->videos()->all() as $projectVideo) {
+                if ($projectVideo->videoId()->equals($videoId)) {
+                    return $project->id();
+                }
+            }
+        }
+
+        return null;
     }
 
     public function findAll(): array

@@ -6,7 +6,9 @@ namespace App\Presentation\Http\Controller\Project;
 
 use App\Application\Workspace\Commands\AddProjectVideoCommand;
 use App\Application\Workspace\Handlers\AddProjectVideoHandler;
+use App\Domain\Collaboration\Exception\InvalidWorkspaceMemberException;
 use App\Domain\Workspace\Exception\InvalidProjectException;
+use App\Presentation\Http\CollaboratorResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,7 +29,10 @@ final class AddProjectVideoController extends AbstractController
         }
 
         try {
-            $result = $handler(new AddProjectVideoCommand($id, $videoId));
+            $collaborator = CollaboratorResolver::fromRequest($request);
+            $result = $handler(new AddProjectVideoCommand($id, $videoId, $collaborator->userId));
+        } catch (InvalidWorkspaceMemberException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_FORBIDDEN);
         } catch (InvalidProjectException $exception) {
             $status = str_contains($exception->getMessage(), 'Video not found')
                 ? Response::HTTP_BAD_REQUEST

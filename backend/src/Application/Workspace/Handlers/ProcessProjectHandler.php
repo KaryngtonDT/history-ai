@@ -23,6 +23,7 @@ final class ProcessProjectHandler
             $command->targetLanguages,
             $command->processingMode,
             $command->strategy,
+            $command->actorUserId,
         ));
     }
 }

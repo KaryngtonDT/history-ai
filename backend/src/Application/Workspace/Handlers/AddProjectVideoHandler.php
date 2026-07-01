@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Application\Workspace\Handlers;
 
+use App\Application\Collaboration\WorkspaceAuthorizationGuard;
 use App\Application\Workspace\Commands\AddProjectVideoCommand;
 use App\Application\Workspace\DTO\ProjectResult;
+use App\Domain\Collaboration\WorkspaceAction;
 use App\Domain\Video\VideoId;
 use App\Domain\Video\VideoRepositoryInterface;
 use App\Domain\Workspace\Exception\InvalidProjectException;
@@ -18,11 +20,18 @@ final class AddProjectVideoHandler
     public function __construct(
         private readonly ProjectRepositoryInterface $projectRepository,
         private readonly VideoRepositoryInterface $videoRepository,
+        private readonly WorkspaceAuthorizationGuard $authorizationGuard,
     ) {
     }
 
     public function __invoke(AddProjectVideoCommand $command): ProjectResult
     {
+        $this->authorizationGuard->assertProjectAction(
+            $command->projectId,
+            $command->actorUserId,
+            WorkspaceAction::Upload,
+        );
+
         $projectId = new ProjectId($command->projectId);
         $project = $this->projectRepository->findById($projectId);
 

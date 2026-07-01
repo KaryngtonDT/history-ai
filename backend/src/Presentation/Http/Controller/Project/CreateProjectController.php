@@ -8,6 +8,7 @@ use App\Application\Workspace\Commands\CreateProjectCommand;
 use App\Application\Workspace\DTO\ProjectResult;
 use App\Application\Workspace\Handlers\CreateProjectHandler;
 use App\Domain\Workspace\Exception\InvalidProjectException;
+use App\Presentation\Http\CollaboratorResolver;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -45,7 +46,12 @@ final class CreateProjectController extends AbstractController
         }
 
         try {
-            $result = $handler(new CreateProjectCommand($name));
+            $collaborator = CollaboratorResolver::fromRequest($request);
+            $result = $handler(new CreateProjectCommand(
+                $name,
+                $collaborator->userId,
+                $collaborator->displayName,
+            ));
         } catch (InvalidProjectException) {
             return $this->json(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
         }

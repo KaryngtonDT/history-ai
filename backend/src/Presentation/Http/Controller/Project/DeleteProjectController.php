@@ -4,20 +4,27 @@ declare(strict_types=1);
 
 namespace App\Presentation\Http\Controller\Project;
 
+use App\Application\Workspace\Commands\DeleteProjectCommand;
 use App\Application\Workspace\Handlers\DeleteProjectHandler;
+use App\Domain\Collaboration\Exception\InvalidWorkspaceMemberException;
 use App\Domain\Workspace\Exception\InvalidProjectException;
+use App\Presentation\Http\CollaboratorResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class DeleteProjectController extends AbstractController
 {
     #[Route('/api/projects/{id}', name: 'api_projects_delete', methods: ['DELETE'])]
-    public function __invoke(string $id, DeleteProjectHandler $handler): JsonResponse
+    public function __invoke(string $id, Request $request, DeleteProjectHandler $handler): JsonResponse
     {
         try {
-            $handler($id);
+            $collaborator = CollaboratorResolver::fromRequest($request);
+            $handler(new DeleteProjectCommand($id, $collaborator->userId));
+        } catch (InvalidWorkspaceMemberException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_FORBIDDEN);
         } catch (InvalidProjectException) {
             return $this->json(['error' => 'Project not found'], Response::HTTP_NOT_FOUND);
         }

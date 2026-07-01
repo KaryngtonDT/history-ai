@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\History;
 
+use App\Application\Collaboration\WorkspaceAuthorizationGuard;
 use App\Application\History\Commands\ReprocessExecutionCommand;
 use App\Application\History\ReprocessExecutionHandler;
 use App\Application\Pipeline\PipelineConfigurationJsonMapper;
+use App\Tests\Support\AllowAllAuthorizationGuardTrait;
 use App\Domain\History\Exception\InvalidExecutionHistoryException;
 use App\Domain\History\ExecutionReplayContextInterface;
 use App\Domain\Orchestrator\ProcessingMode;
@@ -21,6 +23,8 @@ use PHPUnit\Framework\TestCase;
 
 final class ReprocessExecutionHandlerTest extends TestCase
 {
+    use AllowAllAuthorizationGuardTrait;
+
     private InMemoryExecutionHistoryStore $store;
 
     private ExecutionReplayContextInterface&MockObject $replayContext;
@@ -92,6 +96,7 @@ final class ReprocessExecutionHandlerTest extends TestCase
             $this->replayContext,
             new PipelineConfigurationJsonMapper(),
             $this->videoProcessingQueue,
+            $this->allowAllAuthorizationGuard(),
         );
     }
 

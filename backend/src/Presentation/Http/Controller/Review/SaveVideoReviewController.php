@@ -6,7 +6,9 @@ namespace App\Presentation\Http\Controller\Review;
 
 use App\Application\Review\Commands\SaveReviewCommand;
 use App\Application\Review\SaveReviewHandler;
+use App\Domain\Collaboration\Exception\InvalidWorkspaceMemberException;
 use App\Domain\Review\Exception\InvalidReviewException;
+use App\Presentation\Http\CollaboratorResolver;
 use App\Domain\Review\ReviewCategory;
 use App\Domain\Video\VideoId;
 use OpenApi\Attributes as OA;
@@ -64,12 +66,16 @@ final class SaveVideoReviewController extends AbstractController
         $comment = is_string($payload['comment'] ?? null) ? $payload['comment'] : '';
 
         try {
+            $collaborator = CollaboratorResolver::fromRequest($request);
             $result = $handler(new SaveReviewCommand(
                 new VideoId($videoId),
                 max(1, $executionVersion),
                 $scores,
                 $comment,
+                $collaborator->userId,
             ));
+        } catch (InvalidWorkspaceMemberException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_FORBIDDEN);
         } catch (InvalidReviewException $exception) {
             return $this->json(['error' => $exception->getMessage()], Response::HTTP_BAD_REQUEST);
         }

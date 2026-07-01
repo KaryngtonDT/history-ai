@@ -6,9 +6,11 @@ namespace App\Presentation\Http\Controller\Review;
 
 use App\Application\Review\GetReviewHandler;
 use App\Application\Review\Queries\GetReviewsQuery;
+use App\Presentation\Http\CollaboratorResolver;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class GetVideoReviewsController extends AbstractController
@@ -29,9 +31,10 @@ final class GetVideoReviewsController extends AbstractController
         ],
     )]
     #[Route('/api/videos/{videoId}/reviews', name: 'api_videos_reviews_list', methods: ['GET'])]
-    public function __invoke(string $videoId, GetReviewHandler $handler): JsonResponse
+    public function __invoke(string $videoId, Request $request, GetReviewHandler $handler): JsonResponse
     {
-        $reviews = $handler(new GetReviewsQuery($videoId));
+        $collaborator = CollaboratorResolver::fromRequest($request);
+        $reviews = $handler(new GetReviewsQuery($videoId, $collaborator->userId));
 
         return $this->json(array_map(
             static fn ($review): array => ReviewResponseFactory::fromResult($review),

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Application\Workspace;
 
+use App\Application\Collaboration\WorkspaceAuthorizationGuard;
 use App\Application\Video\Ports\VideoProcessingQueueInterface;
 use App\Application\Workspace\Commands\RunBatchProcessingCommand;
 use App\Application\Workspace\DTO\RunBatchProcessingResult;
+use App\Domain\Collaboration\WorkspaceAction;
 use App\Domain\Video\VideoRepositoryInterface;
 use App\Domain\Workspace\BatchJob;
 use App\Domain\Workspace\BatchJobId;
@@ -24,11 +26,18 @@ final class RunBatchProcessingHandler
         private readonly BatchJobRepositoryInterface $batchJobRepository,
         private readonly VideoRepositoryInterface $videoRepository,
         private readonly VideoProcessingQueueInterface $videoProcessingQueue,
+        private readonly WorkspaceAuthorizationGuard $authorizationGuard,
     ) {
     }
 
     public function __invoke(RunBatchProcessingCommand $command): RunBatchProcessingResult
     {
+        $this->authorizationGuard->assertProjectAction(
+            $command->projectId,
+            $command->actorUserId,
+            WorkspaceAction::Process,
+        );
+
         $projectId = new ProjectId($command->projectId);
         $project = $this->projectRepository->findById($projectId);
 

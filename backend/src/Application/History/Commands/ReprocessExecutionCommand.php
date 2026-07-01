@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Application\History\Commands;
 
+use App\Application\Collaboration\CollaboratorContext;
+
 final readonly class ReprocessExecutionCommand
 {
     /**
@@ -14,6 +16,7 @@ final readonly class ReprocessExecutionCommand
         public int $versionNumber,
         public array $providerOverrides = [],
         public ?string $batchJobId = null,
+        public string $actorUserId = CollaboratorContext::DEFAULT_USER_ID,
     ) {
     }
 }

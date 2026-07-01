@@ -10,6 +10,7 @@ use App\Application\Review\GetReviewHandler;
 use App\Application\Review\Queries\GetReviewsQuery;
 use App\Application\Review\SaveReviewHandler;
 use App\Domain\Review\LipSyncStrengthPreference;
+use App\Tests\Support\AllowAllAuthorizationGuardTrait;
 use App\Domain\Review\RenderingPresetPreference;
 use App\Domain\Review\Review;
 use App\Domain\Review\ReviewCategory;
@@ -27,11 +28,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ReviewHandlersTest extends TestCase
 {
+    use AllowAllAuthorizationGuardTrait;
+
     public function testFirstReviewCreatesProfile(): void
     {
         $store = new InMemoryReviewStore();
         $profileHandler = $this->createProfileHandler($store);
-        $handler = new SaveReviewHandler($store, $profileHandler);
+        $handler = new SaveReviewHandler($store, $profileHandler, $this->allowAllAuthorizationGuard());
 
         $result = $handler(new SaveReviewCommand(
             new VideoId('550e8400-e29b-41d4-a716-446655440001'),
@@ -52,7 +55,7 @@ final class ReviewHandlersTest extends TestCase
     {
         $store = new InMemoryReviewStore();
         $profileHandler = $this->createProfileHandler($store);
-        $handler = new SaveReviewHandler($store, $profileHandler);
+        $handler = new SaveReviewHandler($store, $profileHandler, $this->allowAllAuthorizationGuard());
 
         $handler(new SaveReviewCommand(
             new VideoId('550e8400-e29b-41d4-a716-446655440001'),
@@ -78,8 +81,8 @@ final class ReviewHandlersTest extends TestCase
     {
         $store = new InMemoryReviewStore();
         $profileHandler = $this->createProfileHandler($store);
-        $saveHandler = new SaveReviewHandler($store, $profileHandler);
-        $getHandler = new GetReviewHandler($store);
+        $saveHandler = new SaveReviewHandler($store, $profileHandler, $this->allowAllAuthorizationGuard());
+        $getHandler = new GetReviewHandler($store, $this->allowAllAuthorizationGuard());
 
         $saveHandler(new SaveReviewCommand(
             new VideoId('550e8400-e29b-41d4-a716-446655440001'),
@@ -98,7 +101,7 @@ final class ReviewHandlersTest extends TestCase
     {
         $store = new InMemoryReviewStore();
         $profileHandler = $this->createProfileHandler($store);
-        $handler = new SaveReviewHandler($store, $profileHandler);
+        $handler = new SaveReviewHandler($store, $profileHandler, $this->allowAllAuthorizationGuard());
 
         $handler(new SaveReviewCommand(
             new VideoId('550e8400-e29b-41d4-a716-446655440001'),

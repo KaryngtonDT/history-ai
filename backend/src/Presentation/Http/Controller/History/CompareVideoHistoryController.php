@@ -6,7 +6,9 @@ namespace App\Presentation\Http\Controller\History;
 
 use App\Application\History\CompareExecutionHandler;
 use App\Application\History\Queries\CompareExecutionQuery;
+use App\Domain\Collaboration\Exception\InvalidWorkspaceMemberException;
 use App\Domain\History\Exception\InvalidExecutionHistoryException;
+use App\Presentation\Http\CollaboratorResolver;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -41,7 +43,15 @@ final class CompareVideoHistoryController extends AbstractController
         }
 
         try {
-            $result = $handler(new CompareExecutionQuery($videoId, $leftVersion, $rightVersion));
+            $collaborator = CollaboratorResolver::fromRequest($request);
+            $result = $handler(new CompareExecutionQuery(
+                $videoId,
+                $leftVersion,
+                $rightVersion,
+                $collaborator->userId,
+            ));
+        } catch (InvalidWorkspaceMemberException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_FORBIDDEN);
         } catch (InvalidExecutionHistoryException) {
             return $this->json(['error' => 'Execution version not found'], Response::HTTP_NOT_FOUND);
         }

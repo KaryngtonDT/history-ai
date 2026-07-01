@@ -2,16 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Application\History\Queries;
+namespace App\Application\Workspace\Commands;
 
 use App\Application\Collaboration\CollaboratorContext;
 
-final readonly class CompareExecutionQuery
+final readonly class DeleteProjectCommand
 {
     public function __construct(
-        public string $videoId,
-        public int $leftVersion,
-        public int $rightVersion,
+        public string $projectId,
         public string $actorUserId = CollaboratorContext::DEFAULT_USER_ID,
     ) {
     }

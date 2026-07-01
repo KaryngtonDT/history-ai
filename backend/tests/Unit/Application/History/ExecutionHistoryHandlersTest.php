@@ -15,6 +15,7 @@ use App\Application\History\Queries\GetExecutionHistoryQuery;
 use App\Application\History\RecordExecutionHistoryHandler;
 use App\Application\Pipeline\PipelineConfigurationJsonMapper;
 use App\Application\Quality\QualityReportJsonMapper;
+use App\Tests\Support\AllowAllAuthorizationGuardTrait;
 use App\Domain\History\Exception\InvalidExecutionHistoryException;
 use App\Domain\History\ExecutionHistory;
 use App\Domain\History\ExecutionHistoryId;
@@ -44,6 +45,7 @@ use PHPUnit\Framework\TestCase;
 
 final class ExecutionHistoryHandlersTest extends TestCase
 {
+    use AllowAllAuthorizationGuardTrait;
     public function testRecordsFirstVersion(): void
     {
         $videoId = new VideoId('550e8400-e29b-41d4-a716-446655440001');
@@ -259,7 +261,7 @@ final class ExecutionHistoryHandlersTest extends TestCase
             new FinalVideoId('550e8400-e29b-41d4-a716-446655440023'),
         ));
 
-        $handler = new CompareExecutionHandler($store);
+        $handler = new CompareExecutionHandler($store, $this->allowAllAuthorizationGuard());
         $result = $handler(new CompareExecutionQuery($videoId->value, 1, 2));
 
         self::assertSame(1, $result->leftVersion);
@@ -272,7 +274,7 @@ final class ExecutionHistoryHandlersTest extends TestCase
 
     public function testCompareMissingVersionThrows(): void
     {
-        $handler = new CompareExecutionHandler(new InMemoryExecutionHistoryStore());
+        $handler = new CompareExecutionHandler(new InMemoryExecutionHistoryStore(), $this->allowAllAuthorizationGuard());
 
         $this->expectException(InvalidExecutionHistoryException::class);
 
