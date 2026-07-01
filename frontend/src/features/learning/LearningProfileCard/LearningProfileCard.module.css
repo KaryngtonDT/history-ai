@@ -1,0 +1,45 @@
+.card {
+	composes: card from "../LearningCenter/LearningCenter.module.css";
+}
+
+.title {
+	composes: cardTitle from "../LearningCenter/LearningCenter.module.css";
+}
+
+.description {
+	composes: cardDescription from "../LearningCenter/LearningCenter.module.css";
+}
+
+.stats {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.75rem 1rem;
+	margin: 0;
+}
+
+.stats dt {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--color-text-muted, #5c6773);
+}
+
+.stats dd {
+	margin: 0.15rem 0 0;
+	font-size: 1.1rem;
+	font-weight: 600;
+}
+
+.note {
+	margin: 1rem 0 0;
+	font-size: 0.9rem;
+	color: var(--color-text-muted, #5c6773);
+}
+
+.statusOn {
+	composes: statusOn from "../LearningCenter/LearningCenter.module.css";
+}
+
+.statusOff {
+	composes: statusOff from "../LearningCenter/LearningCenter.module.css";
+}

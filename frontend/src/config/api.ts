@@ -60,6 +60,12 @@ export const YOUTUBE_PATH = "/api/youtube";
 
 export const PREFERENCES_PATH = "/api/preferences";
 
+export const LEARNING_PROFILE_PATH = "/api/learning/profile";
+export const LEARNING_RECOMMENDATIONS_PATH = "/api/learning/recommendations";
+export const LEARNING_SIGNALS_PATH = "/api/learning/signals";
+export const LEARNING_RESET_PATH = "/api/learning/reset";
+export const LEARNING_PREFERENCES_PATH = "/api/learning/preferences";
+
 export function videoReviewsPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/reviews`;
 }

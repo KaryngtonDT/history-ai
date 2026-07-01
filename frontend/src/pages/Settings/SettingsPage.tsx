@@ -7,6 +7,7 @@ import styles from "./SettingsPage.module.css";
 const SETTINGS_LINKS = [
 	{ to: "/settings/ai", key: "aiEngines" },
 	{ to: "/settings/pipeline", key: "pipeline" },
+	{ to: "/settings/learning", key: "learning" },
 ] as const;
 
 export function SettingsPage() {

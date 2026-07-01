@@ -1,4 +1,7 @@
 import { type DeepStringRecord, mergeMessages } from "../localeUtils";
+import { learningDe } from "./sections/learning.de";
+import { learningEn } from "./sections/learning.en";
+import { learningFr } from "./sections/learning.fr";
 import { pipelineDe } from "./sections/pipeline.de";
 import { pipelineEn } from "./sections/pipeline.en";
 import { pipelineFr } from "./sections/pipeline.fr";
@@ -46,8 +49,11 @@ const baseEn = {
 } as const;
 
 export const en = mergeMessages(
-	mergeMessages(mergeMessages(baseEn, shellEn), pipelineEn),
-	workspaceEn,
+	mergeMessages(
+		mergeMessages(mergeMessages(baseEn, shellEn), pipelineEn),
+		workspaceEn,
+	),
+	learningEn,
 );
 
 export type Messages = DeepStringRecord<typeof en>;
@@ -89,8 +95,11 @@ const baseFr = {
 } as const satisfies DeepStringRecord<typeof baseEn>;
 
 export const fr = mergeMessages(
-	mergeMessages(mergeMessages(baseFr, shellFr), pipelineFr),
-	workspaceFr,
+	mergeMessages(
+		mergeMessages(mergeMessages(baseFr, shellFr), pipelineFr),
+		workspaceFr,
+	),
+	learningFr,
 ) satisfies Messages;
 
 const baseDe = {
@@ -130,6 +139,9 @@ const baseDe = {
 } as const satisfies DeepStringRecord<typeof baseEn>;
 
 export const de = mergeMessages(
-	mergeMessages(mergeMessages(baseDe, shellDe), pipelineDe),
-	workspaceDe,
+	mergeMessages(
+		mergeMessages(mergeMessages(baseDe, shellDe), pipelineDe),
+		workspaceDe,
+	),
+	learningDe,
 ) satisfies Messages;

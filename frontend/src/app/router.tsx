@@ -10,6 +10,7 @@ import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
 import { ImportPage } from "@/pages/Import/ImportPage";
 import { LibraryItemPage } from "@/pages/Library/LibraryItemPage";
 import { LibraryPage } from "@/pages/Library/LibraryPage";
+import { LearningSettingsPage } from "@/pages/LearningSettings/LearningSettingsPage";
 import { PipelineSettingsPage } from "@/pages/PipelineSettings/PipelineSettingsPage";
 import { ProcessingPage } from "@/pages/Processing/ProcessingPage";
 import { SettingsPage } from "@/pages/Settings/SettingsPage";
@@ -68,6 +69,7 @@ export function AppRouter() {
 				<Route path="/settings" element={<SettingsPage />} />
 				<Route path="/settings/ai" element={<AIEngineSettingsPage />} />
 				<Route path="/settings/pipeline" element={<PipelineSettingsPage />} />
+				<Route path="/settings/learning" element={<LearningSettingsPage />} />
 			</Route>
 		</Routes>
 	);
