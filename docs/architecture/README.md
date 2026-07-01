@@ -1221,6 +1221,24 @@ Verification: [Sprint50_5-Verification.md](../reports/Sprint50_5-Verification.md
 
 ---
 
+# Platform Sprint 51 — Source Processing Platform (Audio) (2026-07)
+
+Platform Sprint 51 introduces unified **source ingestion** with the first connector: **audio upload** (mp3, wav, flac, m4a, ogg). Pipeline reuses STT and translation; no video-only stages.
+
+| Slice | Deliverable | Status |
+| ----- | ----------- | ------ |
+| P51-SLICE-01 | Source domain | ✅ |
+| P51-SLICE-02 | Audio upload API | ✅ |
+| P51-SLICE-03 | Audio processing pipeline | ✅ |
+| P51-SLICE-04 | Frontend `/audio/upload`, `/audio/:id` | ✅ |
+| P51-SLICE-05 | Docs and verification | ✅ |
+
+See [SOURCE_PROCESSING_PLATFORM.md](./SOURCE_PROCESSING_PLATFORM.md).
+
+Verification: [Sprint51-Verification.md](../reports/Sprint51-Verification.md)
+
+---
+
 # Project architecture overview
 
 History AI is a **modular monolith** with three runtime applications and a shared domain story:
