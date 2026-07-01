@@ -1,6 +1,7 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it, vi } from "vitest";
+import { renderWithProviders } from "@/test/render";
 import { VoiceClonePanel } from "./VoiceClonePanel";
 
 vi.mock("@/services/translation/TranslationService", () => ({
@@ -35,7 +36,7 @@ vi.mock("@/services/voice/VoiceCloneService", () => ({
 
 describe("VoiceClonePanel", () => {
 	it("renders voice clone preview heading", async () => {
-		render(
+		renderWithProviders(
 			<MemoryRouter
 				initialEntries={[
 					"/video/550e8400-e29b-41d4-a716-446655440099/voice-clone",
@@ -56,7 +57,7 @@ describe("VoiceClonePanel", () => {
 	});
 
 	it("shows voice mode selector when prerequisites exist", async () => {
-		render(
+		renderWithProviders(
 			<MemoryRouter
 				initialEntries={[
 					"/video/550e8400-e29b-41d4-a716-446655440099/voice-clone",

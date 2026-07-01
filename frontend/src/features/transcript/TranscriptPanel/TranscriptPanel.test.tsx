@@ -1,9 +1,10 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import { TranscriptPanel } from "@/features/transcript/TranscriptPanel/TranscriptPanel";
 import { transcriptService } from "@/services/transcript/TranscriptService";
+import { renderWithProviders } from "@/test/render";
 
 describe("TranscriptPanel", () => {
 	it("renders transcript segments and highlights selection", async () => {
@@ -32,7 +33,7 @@ describe("TranscriptPanel", () => {
 
 		const user = userEvent.setup();
 
-		render(
+		renderWithProviders(
 			<MemoryRouter
 				initialEntries={[
 					"/video/550e8400-e29b-41d4-a716-446655440099/transcript",
@@ -64,7 +65,7 @@ describe("TranscriptPanel", () => {
 	it("shows empty state when transcript is unavailable", async () => {
 		vi.spyOn(transcriptService, "getTranscript").mockResolvedValue(null);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter
 				initialEntries={[
 					"/video/550e8400-e29b-41d4-a716-446655440099/transcript",

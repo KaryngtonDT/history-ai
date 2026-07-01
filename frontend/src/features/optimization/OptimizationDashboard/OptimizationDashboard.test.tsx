@@ -1,11 +1,14 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { MOCK_PREVIEW_OPTIMIZATION } from "@/services/optimization/MockOptimizationRepository";
+import { renderWithProviders } from "@/test/render";
 import { OptimizationDashboard } from "./OptimizationDashboard";
 
 describe("OptimizationDashboard", () => {
 	it("renders optimization profile, parameters, and explanations", () => {
-		render(<OptimizationDashboard optimization={MOCK_PREVIEW_OPTIMIZATION} />);
+		renderWithProviders(
+			<OptimizationDashboard optimization={MOCK_PREVIEW_OPTIMIZATION} />,
+		);
 
 		expect(screen.getByText("Automatic Optimization")).toBeInTheDocument();
 		expect(screen.getByText("Quality")).toBeInTheDocument();
@@ -18,7 +21,7 @@ describe("OptimizationDashboard", () => {
 	});
 
 	it("shows loading state", () => {
-		render(<OptimizationDashboard optimization={null} loading />);
+		renderWithProviders(<OptimizationDashboard optimization={null} loading />);
 
 		expect(
 			screen.getByText("Calculating execution optimization..."),

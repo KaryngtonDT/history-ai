@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { useTranslation } from "@/i18n/useTranslation";
 import { lipSyncService } from "@/services/lipsync/LipSyncService";
 import type {
 	VideoRender,
@@ -16,6 +17,7 @@ import { RenderSettings } from "../RenderSettings";
 import styles from "./FinalVideoPanel.module.css";
 
 export function FinalVideoPanel() {
+	const { t } = useTranslation();
 	const { videoId = "" } = useParams();
 	const [lipSyncAvailable, setLipSyncAvailable] = useState(false);
 	const [renderEntries, setRenderEntries] = useState<VideoRender[]>([]);
@@ -72,7 +74,7 @@ export function FinalVideoPanel() {
 			await loadData();
 			setActiveLanguage(selectedLanguage);
 		} catch {
-			setError("Final video rendering failed.");
+			setError(t("pipeline.render.failed"));
 		} finally {
 			setGenerating(false);
 		}
@@ -81,7 +83,7 @@ export function FinalVideoPanel() {
 	if (loading) {
 		return (
 			<div className={styles.root}>
-				<Spinner label="Loading final render" />
+				<Spinner label={t("pipeline.render.loading")} />
 			</div>
 		);
 	}
@@ -90,8 +92,8 @@ export function FinalVideoPanel() {
 		return (
 			<div className={styles.root}>
 				<EmptyState
-					title="Lip sync required"
-					description="Generate a lip-synced preview before rendering the final video."
+					title={t("pipeline.render.requiredTitle")}
+					description={t("pipeline.render.requiredDescription")}
 				/>
 			</div>
 		);
@@ -101,8 +103,10 @@ export function FinalVideoPanel() {
 		<div className={styles.root}>
 			<header className={styles.header}>
 				<div>
-					<h2 className={styles.title}>Final Render</h2>
-					<p className={styles.meta}>Video ID: {videoId}</p>
+					<h2 className={styles.title}>{t("pipeline.render.title")}</h2>
+					<p className={styles.meta}>
+						{t("pipeline.render.videoId")} {videoId}
+					</p>
 				</div>
 			</header>
 

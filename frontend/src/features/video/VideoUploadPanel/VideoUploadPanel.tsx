@@ -4,6 +4,7 @@ import { OptimizationDashboard } from "@/features/optimization";
 import { ProcessingModeSelector } from "@/features/orchestrator";
 import { QualityDashboard } from "@/features/quality";
 import { ProcessingResourceMonitor } from "@/features/scheduler";
+import { useTranslation } from "@/i18n/useTranslation";
 import type { VideoIntelligence } from "@/services/intelligence/types";
 import { videoIntelligenceService } from "@/services/intelligence/VideoIntelligenceService";
 import { optimizationService } from "@/services/optimization/OptimizationService";
@@ -26,10 +27,8 @@ import { VideoUploadProgress } from "../VideoUploadProgress";
 import { VideoUploadSuccess } from "../VideoUploadSuccess";
 import styles from "./VideoUploadPanel.module.css";
 
-const UPLOAD_FLOW_ERROR =
-	"Could not upload the video. Check that the backend is running and try again.";
-
 export function VideoUploadPanel() {
+	const { t } = useTranslation();
 	const [phase, setPhase] = useState<VideoUploadPhase>("idle");
 	const [fileName, setFileName] = useState("");
 	const [progress, setProgress] = useState(0);
@@ -127,7 +126,7 @@ export function VideoUploadPanel() {
 			if (error instanceof ValidationError) {
 				setErrorMessage(error.message);
 			} else {
-				setErrorMessage(UPLOAD_FLOW_ERROR);
+				setErrorMessage(t("pipeline.upload.videoErrorFallback"));
 			}
 			setPhase("error");
 		}

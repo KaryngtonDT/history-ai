@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import { API_BASE_URL } from "@/config/api";
+import { useTranslation } from "@/i18n/useTranslation";
 import { audioService } from "@/services/audio/AudioService";
 import {
 	AVAILABLE_VOICES,
@@ -26,6 +27,7 @@ import { VoiceSelector } from "../VoiceSelector";
 import styles from "./AudioPlayerPanel.module.css";
 
 export function AudioPlayerPanel() {
+	const { t } = useTranslation();
 	const { videoId = "" } = useParams();
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 	const [translationsAvailable, setTranslationsAvailable] = useState(false);
@@ -103,7 +105,7 @@ export function AudioPlayerPanel() {
 			});
 			await loadData();
 		} catch {
-			setError("Audio generation failed.");
+			setError(t("pipeline.audioPanel.failed"));
 		} finally {
 			setGenerating(false);
 		}
@@ -129,7 +131,7 @@ export function AudioPlayerPanel() {
 	if (loading) {
 		return (
 			<div className={styles.root}>
-				<Spinner label="Loading audio" />
+				<Spinner label={t("pipeline.audioPanel.loading")} />
 			</div>
 		);
 	}
@@ -138,8 +140,8 @@ export function AudioPlayerPanel() {
 		return (
 			<div className={styles.root}>
 				<EmptyState
-					title="Translation required"
-					description="Generate translations before creating audio."
+					title={t("pipeline.audioPanel.requiredTitle")}
+					description={t("pipeline.audioPanel.requiredDescription")}
 				/>
 			</div>
 		);
@@ -149,13 +151,17 @@ export function AudioPlayerPanel() {
 		<div className={styles.root}>
 			<header className={styles.header}>
 				<div>
-					<h2 className={styles.title}>Audio Preview</h2>
-					<p className={styles.meta}>Video ID: {videoId}</p>
+					<h2 className={styles.title}>{t("pipeline.audioPanel.title")}</h2>
+					<p className={styles.meta}>
+						{t("pipeline.audioPanel.videoId")} {videoId}
+					</p>
 				</div>
 			</header>
 
 			<Card className={styles.controls}>
-				<p className={styles.sectionLabel}>Translation languages</p>
+				<p className={styles.sectionLabel}>
+					{t("pipeline.audioPanel.translationLanguages")}
+				</p>
 				<div className={styles.checkboxGroup}>
 					{TARGET_TRANSLATION_LANGUAGES.map((language) => (
 						<label key={language} className={styles.checkboxLabel}>
@@ -170,7 +176,7 @@ export function AudioPlayerPanel() {
 				</div>
 
 				<label className={styles.field} htmlFor="audio-provider">
-					TTS engine
+					{t("pipeline.audioPanel.ttsEngine")}
 				</label>
 				<select
 					id="audio-provider"
@@ -188,7 +194,7 @@ export function AudioPlayerPanel() {
 				</select>
 
 				<label className={styles.field} htmlFor="audio-voice">
-					Voice
+					{t("pipeline.audioPanel.voice")}
 				</label>
 				<VoiceSelector
 					voices={AVAILABLE_VOICES}
@@ -201,7 +207,9 @@ export function AudioPlayerPanel() {
 					onClick={handleGenerate}
 					disabled={generating || selectedTargets.length === 0}
 				>
-					{generating ? "Generating..." : "Generate Audio"}
+					{generating
+						? t("pipeline.audioPanel.generating")
+						: t("pipeline.audioPanel.generateCta")}
 				</Button>
 
 				{error ? <p className={styles.error}>{error}</p> : null}
@@ -232,14 +240,16 @@ export function AudioPlayerPanel() {
 			{activeAudio && streamUrl ? (
 				<Card className={styles.preview}>
 					<div className={styles.previewHeader}>
-						<p className={styles.sectionLabel}>Audio Preview</p>
+						<p className={styles.sectionLabel}>
+							{t("pipeline.audioPanel.preview")}
+						</p>
 						<Badge variant="neutral">
 							{formatTextToSpeechProviderLabel(activeAudio.provider)}
 						</Badge>
 					</div>
 
 					<p className={styles.voiceMeta}>
-						Voice: {activeAudio.voiceDisplayName}
+						{t("pipeline.audioPanel.voiceLabel")} {activeAudio.voiceDisplayName}
 					</p>
 
 					<audio ref={audioRef} src={streamUrl} preload="metadata">
@@ -248,18 +258,24 @@ export function AudioPlayerPanel() {
 
 					<div className={styles.playerControls}>
 						<Button type="button" onClick={togglePlayback}>
-							{isPlaying ? "Pause" : "Play"}
+							{isPlaying
+								? t("pipeline.audioPanel.pause")
+								: t("pipeline.audioPanel.play")}
 						</Button>
-						<span>Duration {formatAudioDuration(activeAudio.duration)}</span>
+						<span>
+							{t("pipeline.audioPanel.duration", {
+								duration: formatAudioDuration(activeAudio.duration),
+							})}
+						</span>
 						<a href={streamUrl} download className={styles.downloadLink}>
-							Download WAV
+							{t("pipeline.audioPanel.downloadWav")}
 						</a>
 					</div>
 				</Card>
 			) : (
 				<EmptyState
-					title="No audio yet"
-					description="Select languages, choose a voice, and generate audio."
+					title={t("pipeline.audioPanel.emptyTitle")}
+					description={t("pipeline.audioPanel.emptyDescription")}
 				/>
 			)}
 		</div>

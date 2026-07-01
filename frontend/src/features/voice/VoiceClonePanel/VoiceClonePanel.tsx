@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import { API_BASE_URL } from "@/config/api";
+import { useTranslation } from "@/i18n/useTranslation";
 import { audioService } from "@/services/audio/AudioService";
 import { translationService } from "@/services/translation/TranslationService";
 import {
@@ -27,6 +28,7 @@ import { VoiceModeSelector } from "../VoiceModeSelector";
 import styles from "./VoiceClonePanel.module.css";
 
 export function VoiceClonePanel() {
+	const { t } = useTranslation();
 	const { videoId = "" } = useParams();
 	const originalRef = useRef<HTMLAudioElement | null>(null);
 	const clonedRef = useRef<HTMLAudioElement | null>(null);
@@ -112,7 +114,7 @@ export function VoiceClonePanel() {
 
 	const handleGenerate = async () => {
 		if (voiceMode !== "clone") {
-			setError("Switch to Clone Original Voice to generate cloned audio.");
+			setError(t("pipeline.voiceClone.invalidModeError"));
 			return;
 		}
 
@@ -127,7 +129,7 @@ export function VoiceClonePanel() {
 			});
 			await loadData();
 		} catch {
-			setError("Voice clone generation failed.");
+			setError(t("pipeline.voiceClone.failed"));
 		} finally {
 			setGenerating(false);
 		}
@@ -174,7 +176,7 @@ export function VoiceClonePanel() {
 	if (loading) {
 		return (
 			<div className={styles.root}>
-				<Spinner label="Loading voice clone" />
+				<Spinner label={t("pipeline.voiceClone.loading")} />
 			</div>
 		);
 	}
@@ -183,8 +185,8 @@ export function VoiceClonePanel() {
 		return (
 			<div className={styles.root}>
 				<EmptyState
-					title="Translation required"
-					description="Generate translations before cloning voice."
+					title={t("pipeline.voiceClone.requiredTranslationTitle")}
+					description={t("pipeline.voiceClone.requiredTranslationDescription")}
 				/>
 			</div>
 		);
@@ -194,8 +196,8 @@ export function VoiceClonePanel() {
 		return (
 			<div className={styles.root}>
 				<EmptyState
-					title="Generic audio required"
-					description="Generate F5-TTS audio before cloning the speaker voice."
+					title={t("pipeline.voiceClone.requiredAudioTitle")}
+					description={t("pipeline.voiceClone.requiredAudioDescription")}
 				/>
 			</div>
 		);
@@ -205,15 +207,19 @@ export function VoiceClonePanel() {
 		<div className={styles.root}>
 			<header className={styles.header}>
 				<div>
-					<h2 className={styles.title}>Voice Clone Preview</h2>
-					<p className={styles.meta}>Video ID: {videoId}</p>
+					<h2 className={styles.title}>{t("pipeline.voiceClone.title")}</h2>
+					<p className={styles.meta}>
+						{t("pipeline.voiceClone.videoId")} {videoId}
+					</p>
 				</div>
 			</header>
 
 			<Card className={styles.controls}>
 				<VoiceModeSelector value={voiceMode} onChange={setVoiceMode} />
 
-				<p className={styles.sectionLabel}>Translation languages</p>
+				<p className={styles.sectionLabel}>
+					{t("pipeline.voiceClone.translationLanguages")}
+				</p>
 				<div className={styles.checkboxGroup}>
 					{TARGET_TRANSLATION_LANGUAGES.map((language) => (
 						<label key={language} className={styles.checkboxLabel}>
@@ -228,7 +234,7 @@ export function VoiceClonePanel() {
 				</div>
 
 				<label className={styles.field} htmlFor="voice-clone-provider">
-					Voice Clone Engine
+					{t("pipeline.voiceClone.engine")}
 				</label>
 				<select
 					id="voice-clone-provider"
@@ -253,7 +259,9 @@ export function VoiceClonePanel() {
 						generating || selectedTargets.length === 0 || voiceMode !== "clone"
 					}
 				>
-					{generating ? "Generating..." : "Generate Cloned Audio"}
+					{generating
+						? t("pipeline.voiceClone.generating")
+						: t("pipeline.voiceClone.generateCta")}
 				</Button>
 
 				{error ? <p className={styles.error}>{error}</p> : null}
@@ -285,7 +293,9 @@ export function VoiceClonePanel() {
 			{activeClone && originalStreamUrl && clonedStreamUrl ? (
 				<Card className={styles.preview}>
 					<div className={styles.previewHeader}>
-						<p className={styles.sectionLabel}>Preview</p>
+						<p className={styles.sectionLabel}>
+							{t("pipeline.voiceClone.preview")}
+						</p>
 						<Badge variant="neutral">
 							{formatVoiceCloneProviderLabel(activeClone.provider)}
 						</Badge>
@@ -297,14 +307,16 @@ export function VoiceClonePanel() {
 							checked={compareMode}
 							onChange={(event) => setCompareMode(event.target.checked)}
 						/>
-						Compare mode
+						{t("pipeline.voiceClone.compareMode")}
 					</label>
 
 					<div
 						className={compareMode ? styles.compareGrid : styles.singleColumn}
 					>
 						<div className={styles.playerBlock}>
-							<p className={styles.playerLabel}>Original (generic)</p>
+							<p className={styles.playerLabel}>
+								{t("pipeline.voiceClone.originalGeneric")}
+							</p>
 							<audio
 								ref={originalRef}
 								src={originalStreamUrl}
@@ -313,29 +325,37 @@ export function VoiceClonePanel() {
 								<track kind="captions" />
 							</audio>
 							<Button type="button" onClick={toggleOriginalPlayback}>
-								{playingOriginal ? "Pause" : "Play"}
+								{playingOriginal
+									? t("pipeline.voiceClone.pause")
+									: t("pipeline.voiceClone.play")}
 							</Button>
 						</div>
 
 						<div className={styles.playerBlock}>
-							<p className={styles.playerLabel}>Cloned</p>
+							<p className={styles.playerLabel}>
+								{t("pipeline.voiceClone.cloned")}
+							</p>
 							<audio ref={clonedRef} src={clonedStreamUrl} preload="metadata">
 								<track kind="captions" />
 							</audio>
 							<Button type="button" onClick={toggleClonedPlayback}>
-								{playingCloned ? "Pause" : "Play"}
+								{playingCloned
+									? t("pipeline.voiceClone.pause")
+									: t("pipeline.voiceClone.play")}
 							</Button>
 						</div>
 					</div>
 
 					<p className={styles.durationMeta}>
-						Duration {formatVoiceCloneDuration(activeClone.duration)}
+						{t("pipeline.voiceClone.duration", {
+							duration: formatVoiceCloneDuration(activeClone.duration),
+						})}
 					</p>
 				</Card>
 			) : (
 				<EmptyState
-					title="No cloned audio yet"
-					description="Select Clone Original Voice and generate cloned audio."
+					title={t("pipeline.voiceClone.emptyTitle")}
+					description={t("pipeline.voiceClone.emptyDescription")}
 				/>
 			)}
 		</div>

@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it, vi } from "vitest";
+import { renderWithProviders } from "@/test/render";
 import { AudioPlayerPanel } from "./AudioPlayerPanel";
 
 vi.mock("@/services/translation/TranslationService", () => ({
@@ -25,7 +26,7 @@ vi.mock("@/services/audio/AudioService", () => ({
 
 describe("AudioPlayerPanel", () => {
 	it("renders generate controls when translations exist", async () => {
-		render(
+		renderWithProviders(
 			<MemoryRouter
 				initialEntries={["/video/550e8400-e29b-41d4-a716-446655440099/audio"]}
 			>
@@ -44,7 +45,7 @@ describe("AudioPlayerPanel", () => {
 	});
 
 	it("shows empty state when no audio exists", async () => {
-		render(
+		renderWithProviders(
 			<MemoryRouter
 				initialEntries={["/video/550e8400-e29b-41d4-a716-446655440099/audio"]}
 			>
@@ -63,7 +64,7 @@ describe("AudioPlayerPanel", () => {
 		const { audioService } = await import("@/services/audio/AudioService");
 		const user = userEvent.setup();
 
-		render(
+		renderWithProviders(
 			<MemoryRouter
 				initialEntries={["/video/550e8400-e29b-41d4-a716-446655440099/audio"]}
 			>

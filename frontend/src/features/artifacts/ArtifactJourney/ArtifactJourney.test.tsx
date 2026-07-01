@@ -1,11 +1,12 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
+import { renderWithProviders } from "@/test/render";
 import { ArtifactJourney } from "./ArtifactJourney";
 
 describe("ArtifactJourney", () => {
 	it("renders full pipeline when videoId is provided", () => {
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<ArtifactJourney videoId="vid-123" />
 			</MemoryRouter>,
@@ -22,7 +23,7 @@ describe("ArtifactJourney", () => {
 	});
 
 	it("shows upload prompt when no video is selected", () => {
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<ArtifactJourney videoId={null} />
 			</MemoryRouter>,

@@ -1,5 +1,5 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import type { ProcessingMode } from "@/services/orchestrator/types";
-import { PROCESSING_MODE_LABELS } from "@/services/orchestrator/types";
 import styles from "./ProcessingModeSelector.module.css";
 
 interface ProcessingModeSelectorProps {
@@ -11,9 +11,11 @@ export function ProcessingModeSelector({
 	mode,
 	onChange,
 }: ProcessingModeSelectorProps) {
+	const { t } = useTranslation();
+
 	return (
 		<div className={styles.processingModeSelector}>
-			<p className={styles.title}>Processing Mode</p>
+			<p className={styles.title}>{t("pipeline.mode.title")}</p>
 			<div className={styles.options}>
 				<label className={styles.option}>
 					<input
@@ -23,7 +25,7 @@ export function ProcessingModeSelector({
 						checked={mode === "manual"}
 						onChange={() => onChange("manual")}
 					/>
-					{PROCESSING_MODE_LABELS.manual}
+					{t("pipeline.mode.manual")}
 				</label>
 				<label className={styles.option}>
 					<input
@@ -33,8 +35,10 @@ export function ProcessingModeSelector({
 						checked={mode === "automatic"}
 						onChange={() => onChange("automatic")}
 					/>
-					{PROCESSING_MODE_LABELS.automatic}
-					<span className={styles.recommended}>Recommended</span>
+					{t("pipeline.mode.automatic")}
+					<span className={styles.recommended}>
+						{t("pipeline.mode.recommended")}
+					</span>
 				</label>
 			</div>
 		</div>

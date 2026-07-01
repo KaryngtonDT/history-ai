@@ -1,11 +1,14 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+import { renderWithProviders } from "@/test/render";
 import { ProcessingModeSelector } from "./ProcessingModeSelector";
 
 describe("ProcessingModeSelector", () => {
 	it("renders manual and automatic options", () => {
-		render(<ProcessingModeSelector mode="manual" onChange={vi.fn()} />);
+		renderWithProviders(
+			<ProcessingModeSelector mode="manual" onChange={vi.fn()} />,
+		);
 
 		expect(screen.getByText("Processing Mode")).toBeInTheDocument();
 		expect(screen.getByRole("radio", { name: /Manual/ })).toBeInTheDocument();
@@ -18,7 +21,9 @@ describe("ProcessingModeSelector", () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 
-		render(<ProcessingModeSelector mode="manual" onChange={onChange} />);
+		renderWithProviders(
+			<ProcessingModeSelector mode="manual" onChange={onChange} />,
+		);
 
 		await user.click(screen.getByRole("radio", { name: /Automatic/ }));
 

@@ -1,7 +1,12 @@
 import type { ReactNode } from "react";
 import { useParams } from "react-router";
 import { ArtifactJourney } from "@/features/artifacts";
-import { AUDIO_PIPELINE_STEPS, type AudioPipelineStepId } from "../audioRoutes";
+import { useTranslation } from "@/i18n/useTranslation";
+import {
+	AUDIO_PIPELINE_STEPS,
+	type AudioPipelineStepId,
+	getAudioPipelineStepLabel,
+} from "../audioRoutes";
 import { PageIntroduction } from "../PageIntroduction";
 import styles from "./AudioPipelinePageLayout.module.css";
 
@@ -14,18 +19,27 @@ export function AudioPipelinePageLayout({
 	stepId,
 	children,
 }: AudioPipelinePageLayoutProps) {
+	const { t } = useTranslation();
 	const { audioId = "" } = useParams();
 	const step = AUDIO_PIPELINE_STEPS.find((entry) => entry.id === stepId);
+	const stepLabel = step
+		? getAudioPipelineStepLabel(t, step.id)
+		: t("pipeline.layouts.stepFallback");
 
 	return (
 		<div className={styles.root}>
 			<PageIntroduction
-				eyebrow="Audio pipeline"
-				title={step?.label ?? "Pipeline step"}
-				description={`Work on ${step?.label?.toLowerCase() ?? "this step"} for your audio source.`}
-				whatCanIDo="Review generated output and continue to the next pipeline step from the overview."
+				eyebrow={t("pipeline.layouts.audioEyebrow")}
+				title={stepLabel}
+				description={t("pipeline.layouts.audioDescription", {
+					step: stepLabel.toLowerCase(),
+				})}
+				whatCanIDo={t("pipeline.layouts.audioWhatCanIDo")}
 			/>
-			<ArtifactJourney videoId={audioId || null} title="Processing progress" />
+			<ArtifactJourney
+				videoId={audioId || null}
+				title={t("pipeline.layouts.journeyProcessing")}
+			/>
 			<div className={styles.content}>{children}</div>
 		</div>
 	);

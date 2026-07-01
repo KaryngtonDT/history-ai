@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import { schedulerService } from "@/services/scheduler/SchedulerService";
 import type { ExecutionSchedule } from "@/services/scheduler/types";
 import { ResourceQueueBadge } from "../ResourceQueueBadge";
@@ -13,10 +14,12 @@ export function ProcessingResourceMonitor({
 	schedule,
 	loading = false,
 }: ProcessingResourceMonitorProps) {
+	const { t } = useTranslation();
+
 	if (loading) {
 		return (
 			<div className={styles.panel}>
-				<p className={styles.loading}>Building execution schedule...</p>
+				<p className={styles.loading}>{t("pipeline.scheduler.loading")}</p>
 			</div>
 		);
 	}
@@ -24,9 +27,7 @@ export function ProcessingResourceMonitor({
 	if (!schedule) {
 		return (
 			<div className={styles.panel}>
-				<p className={styles.fallback}>
-					Schedule preview unavailable. Processing will continue sequentially.
-				</p>
+				<p className={styles.fallback}>{t("pipeline.scheduler.fallback")}</p>
 			</div>
 		);
 	}
@@ -34,19 +35,21 @@ export function ProcessingResourceMonitor({
 	return (
 		<div className={styles.panel}>
 			<div className={styles.header}>
-				<p className={styles.title}>Processing Resources</p>
-				<span className={styles.badge}>Scheduler</span>
+				<p className={styles.title}>{t("pipeline.scheduler.title")}</p>
+				<span className={styles.badge}>{t("pipeline.scheduler.badge")}</span>
 			</div>
 
 			<div className={styles.summary}>
 				<div>
-					<p className={styles.label}>Resource mode</p>
+					<p className={styles.label}>{t("pipeline.scheduler.resourceMode")}</p>
 					<p className={styles.value}>
 						{schedulerService.formatStrategy(schedule.strategy)}
 					</p>
 				</div>
 				<div>
-					<p className={styles.label}>Estimated completion</p>
+					<p className={styles.label}>
+						{t("pipeline.scheduler.estimatedCompletion")}
+					</p>
 					<p className={styles.value}>
 						{schedulerService.formatEstimatedCompletion(
 							schedule.estimatedCompletionSeconds,
@@ -55,7 +58,9 @@ export function ProcessingResourceMonitor({
 				</div>
 				{schedule.currentStage ? (
 					<div>
-						<p className={styles.label}>Current stage</p>
+						<p className={styles.label}>
+							{t("pipeline.scheduler.currentStage")}
+						</p>
 						<p className={styles.value}>
 							{schedulerService.formatStageLabel(schedule.currentStage)}
 						</p>

@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { useTranslation } from "@/i18n/useTranslation";
 import { buildArtifactJourney } from "../journeyModel";
 import styles from "./ArtifactJourney.module.css";
 
@@ -21,29 +22,31 @@ function statusClass(status: string): string {
 	return `${base} ${styles.badgeLocked}`;
 }
 
-function actionLabel(status: string): string {
+function actionLabel(
+	status: string,
+	t: (key: string, params?: Record<string, string | number>) => string,
+): string {
 	if (status === "open") {
-		return "Open";
+		return t("pipeline.artifactJourney.actionOpen");
 	}
 
 	if (status === "generate") {
-		return "Start";
+		return t("pipeline.artifactJourney.actionStart");
 	}
 
-	return "Locked";
+	return t("pipeline.artifactJourney.actionLocked");
 }
 
-export function ArtifactJourney({
-	videoId,
-	title = "Artifact journey",
-}: ArtifactJourneyProps) {
-	const steps = buildArtifactJourney(videoId);
+export function ArtifactJourney({ videoId, title }: ArtifactJourneyProps) {
+	const { t } = useTranslation();
+	const resolvedTitle = title ?? t("pipeline.artifactJourney.defaultTitle");
+	const steps = buildArtifactJourney(videoId, t);
 
 	return (
-		<section className={styles.root} aria-label={title}>
-			<h2 className={styles.title}>{title}</h2>
+		<section className={styles.root} aria-label={resolvedTitle}>
+			<h2 className={styles.title}>{resolvedTitle}</h2>
 			<p className={styles.subtitle}>
-				Follow the pipeline from video upload to final quality report.
+				{t("pipeline.artifactJourney.subtitle")}
 			</p>
 			<div className={styles.track}>
 				{steps.map((step, index) => (
@@ -51,17 +54,23 @@ export function ArtifactJourney({
 						<article className={styles.card}>
 							<div className={styles.cardHeader}>
 								<h3 className={styles.cardTitle}>{step.label}</h3>
-								<span className={statusClass(step.status)}>{step.status}</span>
+								<span className={statusClass(step.status)}>
+									{t(
+										`pipeline.artifactJourney.status${step.status.charAt(0).toUpperCase()}${step.status.slice(1)}`,
+									)}
+								</span>
 							</div>
 							<p className={styles.cardDescription}>{step.description}</p>
 							{step.dependsOnLabel ? (
 								<p className={styles.dependency}>
-									Depends on: {step.dependsOnLabel}
+									{t("pipeline.artifactJourney.dependsOn", {
+										step: step.dependsOnLabel,
+									})}
 								</p>
 							) : null}
 							{step.path && step.status !== "locked" ? (
 								<Link to={step.path} className={styles.action}>
-									{actionLabel(step.status)} →
+									{actionLabel(step.status, t)} →
 								</Link>
 							) : null}
 						</article>

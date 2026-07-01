@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { useTranslation } from "@/i18n/useTranslation";
 import {
 	VIDEO_RENDER_FORMATS,
 	VIDEO_RENDER_PROVIDERS,
@@ -44,12 +45,16 @@ export function RenderSettings({
 	onQualityChange,
 	onGenerate,
 }: RenderSettingsProps) {
+	const { t } = useTranslation();
+
 	return (
 		<Card className={styles.root}>
-			<h3 className={styles.heading}>Final Render</h3>
+			<h3 className={styles.heading}>{t("pipeline.render.settingsHeading")}</h3>
 
 			<label className={styles.field} htmlFor="render-language">
-				<span className={styles.sectionLabel}>Language</span>
+				<span className={styles.sectionLabel}>
+					{t("pipeline.render.language")}
+				</span>
 				<select
 					id="render-language"
 					className={styles.select}
@@ -67,14 +72,16 @@ export function RenderSettings({
 			</label>
 
 			<p className={styles.sourceStatus}>
-				Source:{" "}
+				{t("pipeline.render.sourceLabel")}{" "}
 				{lipSyncAvailable
-					? "✓ Lip-synced preview available"
-					: "Lip-sync required before rendering"}
+					? t("pipeline.render.sourceReady")
+					: t("pipeline.render.sourceMissing")}
 			</p>
 
 			<label className={styles.field} htmlFor="render-provider">
-				<span className={styles.sectionLabel}>Provider</span>
+				<span className={styles.sectionLabel}>
+					{t("pipeline.render.provider")}
+				</span>
 				<select
 					id="render-provider"
 					className={styles.select}
@@ -96,7 +103,9 @@ export function RenderSettings({
 			</label>
 
 			<label className={styles.field} htmlFor="render-format">
-				<span className={styles.sectionLabel}>Output</span>
+				<span className={styles.sectionLabel}>
+					{t("pipeline.render.output")}
+				</span>
 				<select
 					id="render-format"
 					className={styles.select}
@@ -114,7 +123,9 @@ export function RenderSettings({
 			</label>
 
 			<label className={styles.field} htmlFor="render-quality">
-				<span className={styles.sectionLabel}>Quality</span>
+				<span className={styles.sectionLabel}>
+					{t("pipeline.render.quality")}
+				</span>
 				<select
 					id="render-quality"
 					className={styles.select}
@@ -136,7 +147,9 @@ export function RenderSettings({
 				onClick={onGenerate}
 				disabled={generating || !lipSyncAvailable}
 			>
-				{generating ? "Rendering..." : "Render Final Video"}
+				{generating
+					? t("pipeline.render.rendering")
+					: t("pipeline.render.renderCta")}
 			</Button>
 
 			{error ? <p className={styles.error}>{error}</p> : null}

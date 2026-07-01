@@ -1,10 +1,11 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import { TranslationPanel } from "@/features/translation/TranslationPanel/TranslationPanel";
 import { transcriptService } from "@/services/transcript/TranscriptService";
 import { translationService } from "@/services/translation/TranslationService";
+import { renderWithProviders } from "@/test/render";
 
 describe("TranslationPanel", () => {
 	it("renders translations and provider badge", async () => {
@@ -47,7 +48,7 @@ describe("TranslationPanel", () => {
 			],
 		});
 
-		render(
+		renderWithProviders(
 			<MemoryRouter
 				initialEntries={[
 					"/video/550e8400-e29b-41d4-a716-446655440099/translations",
@@ -89,7 +90,7 @@ describe("TranslationPanel", () => {
 
 		const user = userEvent.setup();
 
-		render(
+		renderWithProviders(
 			<MemoryRouter
 				initialEntries={[
 					"/video/550e8400-e29b-41d4-a716-446655440099/translations",

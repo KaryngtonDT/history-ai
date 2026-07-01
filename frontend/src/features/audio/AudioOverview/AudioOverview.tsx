@@ -4,12 +4,17 @@ import { Card } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { ArtifactJourney } from "@/features/artifacts";
 import { PageIntroduction } from "@/features/product";
-import { AUDIO_PIPELINE_STEPS } from "@/features/product/audioRoutes";
+import {
+	AUDIO_PIPELINE_STEPS,
+	getAudioPipelineStepLabel,
+} from "@/features/product/audioRoutes";
+import { useTranslation } from "@/i18n/useTranslation";
 import { audioSourceService } from "@/services/audioSource/AudioSourceService";
 import type { AudioSource } from "@/services/audioSource/types";
 import styles from "./AudioOverview.module.css";
 
 export function AudioOverview() {
+	const { t } = useTranslation();
 	const { audioId = "" } = useParams();
 	const [source, setSource] = useState<AudioSource | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -35,29 +40,37 @@ export function AudioOverview() {
 		};
 	}, [audioId]);
 
-	const title = source?.title ?? `Audio ${audioId.slice(0, 8)}…`;
+	const title =
+		source?.title ??
+		t("pipeline.audioOverview.title", { id: audioId.slice(0, 8) });
 
 	return (
 		<div className={styles.root}>
 			<PageIntroduction
-				eyebrow="Audio"
+				eyebrow={t("pipeline.audioOverview.eyebrow")}
 				title={title}
-				description="Central hub for this audio source — transcript, translation, and knowledge outputs."
-				whatCanIDo="Open any step below or continue processing from Home."
+				description={t("pipeline.audioOverview.description")}
+				whatCanIDo={t("pipeline.audioOverview.whatCanIDo")}
 			/>
 
-			{loading ? <Spinner label="Loading audio source" /> : null}
+			{loading ? (
+				<Spinner label={t("pipeline.audioOverview.loadingSource")} />
+			) : null}
 
 			{source ? (
 				<Card className={styles.statusCard}>
 					<p>
-						Status: <strong>{source.status}</strong>
+						{t("pipeline.audioOverview.statusLabel")}{" "}
+						<strong>{source.status}</strong>
 					</p>
 					<p className={styles.muted}>{source.originalFilename}</p>
 				</Card>
 			) : null}
 
-			<nav className={styles.tabs} aria-label="Audio sections">
+			<nav
+				className={styles.tabs}
+				aria-label={t("pipeline.audioOverview.sectionsAria")}
+			>
 				<NavLink
 					to={`/audio/${audioId}`}
 					end
@@ -65,7 +78,7 @@ export function AudioOverview() {
 						isActive ? `${styles.tab} ${styles.tabActive}` : styles.tab
 					}
 				>
-					Overview
+					{t("pipeline.steps.overview")}
 				</NavLink>
 				{AUDIO_PIPELINE_STEPS.map((step) => (
 					<NavLink
@@ -75,24 +88,29 @@ export function AudioOverview() {
 							isActive ? `${styles.tab} ${styles.tabActive}` : styles.tab
 						}
 					>
-						{step.label}
+						{getAudioPipelineStepLabel(t, step.id)}
 					</NavLink>
 				))}
 				<Link to="/library" className={styles.tab}>
-					Library
+					{t("pipeline.audioOverview.library")}
 				</Link>
 			</nav>
 
-			<ArtifactJourney videoId={audioId} title="Processing progress" />
+			<ArtifactJourney
+				videoId={audioId}
+				title={t("pipeline.audioOverview.journeyTitle")}
+			/>
 
 			<Card className={styles.nextAction}>
-				<h2 className={styles.panelTitle}>Next action</h2>
+				<h2 className={styles.panelTitle}>
+					{t("pipeline.audioOverview.nextAction")}
+				</h2>
 				<Link
 					to={`/audio/${audioId}/transcript`}
 					className={styles.primaryLink}
-					aria-label="Open transcript"
+					aria-label={t("pipeline.audioOverview.openTranscriptAria")}
 				>
-					Open transcript →
+					{t("pipeline.audioOverview.openTranscript")}
 				</Link>
 			</Card>
 		</div>

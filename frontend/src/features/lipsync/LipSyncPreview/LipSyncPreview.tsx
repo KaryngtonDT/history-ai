@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { API_BASE_URL } from "@/config/api";
+import { useTranslation } from "@/i18n/useTranslation";
 import {
 	formatLipSyncDuration,
 	formatLipSyncProviderLabel,
@@ -28,6 +29,7 @@ export function LipSyncPreview({
 	onSelectLanguage,
 	onCompareModeChange,
 }: LipSyncPreviewProps) {
+	const { t } = useTranslation();
 	const syncedRef = useRef<HTMLVideoElement | null>(null);
 
 	const activeEntry =
@@ -36,8 +38,8 @@ export function LipSyncPreview({
 	if (entries.length === 0) {
 		return (
 			<EmptyState
-				title="No lip-synced video yet"
-				description="Generate lip sync after voice cloning is complete."
+				title={t("pipeline.lipSync.emptyTitle")}
+				description={t("pipeline.lipSync.emptyDescription")}
 			/>
 		);
 	}
@@ -87,7 +89,7 @@ export function LipSyncPreview({
 
 			<Card className={styles.preview}>
 				<div className={styles.previewHeader}>
-					<p className={styles.sectionLabel}>Preview</p>
+					<p className={styles.sectionLabel}>{t("pipeline.lipSync.preview")}</p>
 					<Badge variant="neutral">
 						{formatLipSyncProviderLabel(activeEntry.provider)}
 					</Badge>
@@ -99,13 +101,15 @@ export function LipSyncPreview({
 						checked={compareMode}
 						onChange={(event) => onCompareModeChange(event.target.checked)}
 					/>
-					Before / after comparison
+					{t("pipeline.lipSync.beforeAfter")}
 				</label>
 
 				<div className={compareMode ? styles.compareGrid : styles.singleColumn}>
 					{compareMode ? (
 						<div className={styles.playerBlock}>
-							<p className={styles.playerLabel}>Original video</p>
+							<p className={styles.playerLabel}>
+								{t("pipeline.lipSync.originalVideo")}
+							</p>
 							<video
 								className={styles.video}
 								src={originalUrl}
@@ -119,7 +123,9 @@ export function LipSyncPreview({
 
 					<div className={styles.playerBlock}>
 						<p className={styles.playerLabel}>
-							{compareMode ? "Lip-synced" : "Synced video"}
+							{compareMode
+								? t("pipeline.lipSync.lipSynced")
+								: t("pipeline.lipSync.syncedVideo")}
 						</p>
 						<video
 							ref={syncedRef}
@@ -132,14 +138,16 @@ export function LipSyncPreview({
 						</video>
 						<div className={styles.actions}>
 							<Button type="button" onClick={() => void replaySynced()}>
-								Replay
+								{t("pipeline.lipSync.replay")}
 							</Button>
 						</div>
 					</div>
 				</div>
 
 				<p className={styles.durationMeta}>
-					Duration {formatLipSyncDuration(activeEntry.duration)}
+					{t("pipeline.lipSync.duration", {
+						duration: formatLipSyncDuration(activeEntry.duration),
+					})}
 				</p>
 			</Card>
 		</>

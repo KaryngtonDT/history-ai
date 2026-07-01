@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { useTranslation } from "@/i18n/useTranslation";
 import { lipSyncService } from "@/services/lipsync/LipSyncService";
 import type { LipSyncProvider, VideoLipSync } from "@/services/lipsync/types";
 import type { TranslationLanguage } from "@/services/translation/types";
@@ -11,6 +12,7 @@ import { LipSyncSettings } from "../LipSyncSettings";
 import styles from "./LipSyncPanel.module.css";
 
 export function LipSyncPanel() {
+	const { t } = useTranslation();
 	const { videoId = "" } = useParams();
 	const [voiceCloneAvailable, setVoiceCloneAvailable] = useState(false);
 	const [lipSyncEntries, setLipSyncEntries] = useState<VideoLipSync[]>([]);
@@ -72,7 +74,7 @@ export function LipSyncPanel() {
 			});
 			await loadData();
 		} catch {
-			setError("Lip sync generation failed.");
+			setError(t("pipeline.lipSync.failed"));
 		} finally {
 			setGenerating(false);
 		}
@@ -81,7 +83,7 @@ export function LipSyncPanel() {
 	if (loading) {
 		return (
 			<div className={styles.root}>
-				<Spinner label="Loading lip sync" />
+				<Spinner label={t("pipeline.lipSync.loading")} />
 			</div>
 		);
 	}
@@ -90,8 +92,8 @@ export function LipSyncPanel() {
 		return (
 			<div className={styles.root}>
 				<EmptyState
-					title="Voice clone required"
-					description="Generate cloned audio before lip sync."
+					title={t("pipeline.lipSync.requiredTitle")}
+					description={t("pipeline.lipSync.requiredDescription")}
 				/>
 			</div>
 		);
@@ -101,8 +103,10 @@ export function LipSyncPanel() {
 		<div className={styles.root}>
 			<header className={styles.header}>
 				<div>
-					<h2 className={styles.title}>Lip Sync</h2>
-					<p className={styles.meta}>Video ID: {videoId}</p>
+					<h2 className={styles.title}>{t("pipeline.lipSync.title")}</h2>
+					<p className={styles.meta}>
+						{t("pipeline.lipSync.videoId")} {videoId}
+					</p>
 				</div>
 			</header>
 

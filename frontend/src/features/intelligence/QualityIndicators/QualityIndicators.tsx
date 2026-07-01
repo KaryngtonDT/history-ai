@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import { videoIntelligenceService } from "@/services/intelligence/VideoIntelligenceService";
 import type { PipelineRecommendation } from "@/services/orchestrator/types";
 import { PROCESSING_STRATEGY_LABELS } from "@/services/orchestrator/types";
@@ -12,17 +13,23 @@ export function QualityIndicators({
 	recommendation,
 	confidence,
 }: QualityIndicatorsProps) {
+	const { t } = useTranslation();
+
 	return (
 		<div className={styles.root}>
 			<div>
-				<p className={styles.label}>STT Confidence</p>
+				<p className={styles.label}>
+					{t("pipeline.intelligence.sttConfidence")}
+				</p>
 				<p className={styles.value}>
 					{videoIntelligenceService.formatConfidence(confidence)}
 				</p>
 			</div>
 			{recommendation ? (
 				<div>
-					<p className={styles.label}>Recommendation</p>
+					<p className={styles.label}>
+						{t("pipeline.intelligence.recommendation")}
+					</p>
 					<p className={styles.stars}>
 						{videoIntelligenceService.formatQualityStars(
 							recommendation.estimatedQuality,

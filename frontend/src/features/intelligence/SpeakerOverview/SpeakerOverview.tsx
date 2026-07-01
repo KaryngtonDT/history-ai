@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import {
 	EMOTION_LABELS,
 	type VideoIntelligence,
@@ -9,9 +10,11 @@ interface SpeakerOverviewProps {
 }
 
 export function SpeakerOverview({ intelligence }: SpeakerOverviewProps) {
+	const { t } = useTranslation();
+
 	return (
 		<div className={styles.root}>
-			<p className={styles.label}>Speakers</p>
+			<p className={styles.label}>{t("pipeline.intelligence.speakers")}</p>
 			<p className={styles.value}>{intelligence.audio.speakerCount}</p>
 			<ul className={styles.list}>
 				{intelligence.speakers.map((speaker) => (
@@ -19,7 +22,7 @@ export function SpeakerOverview({ intelligence }: SpeakerOverviewProps) {
 				))}
 			</ul>
 			<p className={styles.meta}>
-				Emotion:{" "}
+				{t("pipeline.intelligence.emotion")}:{" "}
 				{EMOTION_LABELS[intelligence.speech.dominantEmotion] ??
 					intelligence.speech.dominantEmotion}
 			</p>

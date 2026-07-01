@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { API_BASE_URL } from "@/config/api";
+import { useTranslation } from "@/i18n/useTranslation";
 import {
 	formatFileSize,
 	formatVideoRenderDuration,
@@ -23,14 +24,15 @@ export function FinalVideoPlayer({
 	activeLanguage,
 	onSelectLanguage,
 }: FinalVideoPlayerProps) {
+	const { t } = useTranslation();
 	const activeEntry =
 		entries.find((entry) => entry.targetLanguage === activeLanguage) ?? null;
 
 	if (entries.length === 0) {
 		return (
 			<EmptyState
-				title="No final video yet"
-				description="Render a lip-synced video to produce a downloadable MP4."
+				title={t("pipeline.render.emptyTitle")}
+				description={t("pipeline.render.emptyDescription")}
 			/>
 		);
 	}
@@ -69,7 +71,9 @@ export function FinalVideoPlayer({
 
 			<Card className={styles.preview}>
 				<div className={styles.previewHeader}>
-					<p className={styles.sectionLabel}>Final Video</p>
+					<p className={styles.sectionLabel}>
+						{t("pipeline.render.finalVideo")}
+					</p>
 					<Badge variant="neutral">
 						{formatVideoRenderProviderLabel(activeEntry.provider)}
 					</Badge>
@@ -89,14 +93,16 @@ export function FinalVideoPlayer({
 						{activeEntry.format.toUpperCase()} · {activeEntry.quality}
 					</span>
 					<span>
-						Duration {formatVideoRenderDuration(activeEntry.duration)}
+						{t("pipeline.render.duration", {
+							duration: formatVideoRenderDuration(activeEntry.duration),
+						})}
 					</span>
 					<span>{formatFileSize(activeEntry.fileSizeBytes)}</span>
 				</div>
 
 				<div className={styles.actions}>
 					<a className={styles.downloadLink} href={downloadUrl} download>
-						Download MP4
+						{t("pipeline.render.downloadMp4")}
 					</a>
 				</div>
 			</Card>

@@ -1,12 +1,14 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import styles from "./VideoUploadHeader.module.css";
 
 export function VideoUploadHeader() {
+	const { t } = useTranslation();
+
 	return (
 		<header className={styles.header}>
-			<h2 className={styles.title}>Upload Video</h2>
+			<h2 className={styles.title}>{t("shell.nav.items.upload.label")}</h2>
 			<p className={styles.description}>
-				Upload a video file to start localization. Supported formats: MP4, MOV,
-				and MKV.
+				{t("pipeline.upload.videoDropDescription")}
 			</p>
 		</header>
 	);

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -12,6 +12,7 @@ import { MOCK_PREVIEW_SCHEDULE } from "@/services/scheduler/MockSchedulerReposit
 import { schedulerService } from "@/services/scheduler/SchedulerService";
 import { videoService } from "@/services/video/VideoService";
 import { ValidationError } from "@/shared/errors";
+import { renderWithProviders } from "@/test/render";
 
 describe("VideoUploadPanel", () => {
 	afterEach(() => {
@@ -42,7 +43,7 @@ describe("VideoUploadPanel", () => {
 	});
 
 	it("rejects unsupported files", () => {
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<VideoUploadPanel />
 			</MemoryRouter>,
@@ -68,7 +69,7 @@ describe("VideoUploadPanel", () => {
 		});
 		const user = userEvent.setup();
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<VideoUploadPanel />
 			</MemoryRouter>,
@@ -97,7 +98,7 @@ describe("VideoUploadPanel", () => {
 		);
 		const user = userEvent.setup();
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<VideoUploadPanel />
 			</MemoryRouter>,

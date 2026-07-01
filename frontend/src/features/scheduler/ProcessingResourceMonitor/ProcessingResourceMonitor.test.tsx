@@ -1,11 +1,14 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { MOCK_PREVIEW_SCHEDULE } from "@/services/scheduler/MockSchedulerRepository";
+import { renderWithProviders } from "@/test/render";
 import { ProcessingResourceMonitor } from "./ProcessingResourceMonitor";
 
 describe("ProcessingResourceMonitor", () => {
 	it("renders queue badges, current stage, and timeline", () => {
-		render(<ProcessingResourceMonitor schedule={MOCK_PREVIEW_SCHEDULE} />);
+		renderWithProviders(
+			<ProcessingResourceMonitor schedule={MOCK_PREVIEW_SCHEDULE} />,
+		);
 
 		expect(screen.getByText("Processing Resources")).toBeInTheDocument();
 		expect(screen.getByText("Balanced")).toBeInTheDocument();
@@ -17,7 +20,7 @@ describe("ProcessingResourceMonitor", () => {
 	});
 
 	it("shows fallback when schedule is unavailable", () => {
-		render(<ProcessingResourceMonitor schedule={null} />);
+		renderWithProviders(<ProcessingResourceMonitor schedule={null} />);
 
 		expect(
 			screen.getByText(/Schedule preview unavailable/i),

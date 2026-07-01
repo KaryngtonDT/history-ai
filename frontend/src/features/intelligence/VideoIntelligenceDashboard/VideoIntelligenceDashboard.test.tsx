@@ -1,11 +1,12 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { MOCK_PREVIEW_INTELLIGENCE } from "@/services/intelligence/MockVideoIntelligenceRepository";
+import { renderWithProviders } from "@/test/render";
 import { VideoIntelligenceDashboard } from "./VideoIntelligenceDashboard";
 
 describe("VideoIntelligenceDashboard", () => {
 	it("renders intelligence metrics and recommendation reasons", () => {
-		render(
+		renderWithProviders(
 			<VideoIntelligenceDashboard
 				intelligence={MOCK_PREVIEW_INTELLIGENCE}
 				recommendation={{

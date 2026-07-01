@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import type { VoiceMode } from "@/services/voice/types";
 import styles from "./VoiceModeSelector.module.css";
 
@@ -7,9 +8,13 @@ interface VoiceModeSelectorProps {
 }
 
 export function VoiceModeSelector({ value, onChange }: VoiceModeSelectorProps) {
+	const { t } = useTranslation();
+
 	return (
 		<fieldset className={styles.fieldset}>
-			<legend className={styles.legend}>Voice Mode</legend>
+			<legend className={styles.legend}>
+				{t("pipeline.voiceClone.modeTitle")}
+			</legend>
 			<label className={styles.option}>
 				<input
 					type="radio"
@@ -18,7 +23,7 @@ export function VoiceModeSelector({ value, onChange }: VoiceModeSelectorProps) {
 					checked={value === "generic"}
 					onChange={() => onChange("generic")}
 				/>
-				Generic Voice
+				{t("pipeline.voiceClone.modeGeneric")}
 			</label>
 			<label className={styles.option}>
 				<input
@@ -28,7 +33,7 @@ export function VoiceModeSelector({ value, onChange }: VoiceModeSelectorProps) {
 					checked={value === "clone"}
 					onChange={() => onChange("clone")}
 				/>
-				Clone Original Voice
+				{t("pipeline.voiceClone.modeClone")}
 			</label>
 		</fieldset>
 	);

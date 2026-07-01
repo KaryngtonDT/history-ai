@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { useTranslation } from "@/i18n/useTranslation";
 import styles from "./VideoDropzone.module.css";
 
 interface VideoDropzoneProps {
@@ -14,6 +15,7 @@ export function VideoDropzone({
 	disabled,
 }: VideoDropzoneProps) {
 	const inputRef = useRef<HTMLInputElement>(null);
+	const { t } = useTranslation();
 
 	const handleFile = (file: File | undefined) => {
 		if (file) {
@@ -25,7 +27,7 @@ export function VideoDropzone({
 		<Card className={styles.card}>
 			<fieldset
 				className={styles.dropzone}
-				aria-label="Video drop zone"
+				aria-label={t("pipeline.upload.videoDropzoneAria")}
 				disabled={disabled}
 				onDragOver={(event) => {
 					event.preventDefault();
@@ -39,8 +41,8 @@ export function VideoDropzone({
 				}}
 			>
 				<EmptyState
-					title="Drop your video here"
-					description="Or select MP4, MOV, or MKV from your device."
+					title={t("pipeline.upload.videoDropTitle")}
+					description={t("pipeline.upload.videoDropDescription")}
 					action={
 						<>
 							<input
@@ -56,7 +58,7 @@ export function VideoDropzone({
 								disabled={disabled}
 								onClick={() => inputRef.current?.click()}
 							>
-								Select video
+								{t("pipeline.upload.videoSelectCta")}
 							</Button>
 						</>
 					}

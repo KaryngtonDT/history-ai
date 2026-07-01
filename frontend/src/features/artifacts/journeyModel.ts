@@ -1,4 +1,7 @@
-import type { VideoPipelineStepId } from "@/features/product/videoRoutes";
+import {
+	getVideoPipelineStepLabel,
+	type VideoPipelineStepId,
+} from "@/features/product/videoRoutes";
 
 export type ArtifactStatus = "open" | "generate" | "locked" | "unknown";
 
@@ -11,57 +14,63 @@ export interface ArtifactJourneyStep {
 	dependsOnLabel?: string;
 }
 
+type TranslateFn = (
+	key: string,
+	params?: Record<string, string | number>,
+) => string;
+
 export function buildArtifactJourney(
 	videoId: string | null,
+	t: TranslateFn,
 ): ArtifactJourneyStep[] {
 	const base = videoId
 		? [
 				{
 					id: "transcript" as const,
-					label: "Transcript",
-					description: "Speech-to-text output",
+					label: getVideoPipelineStepLabel(t, "transcript"),
+					description: t("pipeline.artifactJourney.transcriptDescription"),
 					status: "open" as const,
 					path: `/video/${videoId}/transcript`,
 				},
 				{
 					id: "translations" as const,
-					label: "Translations",
-					description: "Translated text",
+					label: getVideoPipelineStepLabel(t, "translations"),
+					description: t("pipeline.artifactJourney.translationsDescription"),
 					status: "open" as const,
 					path: `/video/${videoId}/translations`,
-					dependsOnLabel: "Transcript",
+					dependsOnLabel: getVideoPipelineStepLabel(t, "transcript"),
 				},
 				{
 					id: "audio" as const,
-					label: "Audio",
-					description: "Generated speech",
+					label: getVideoPipelineStepLabel(t, "audio"),
+					description: t("pipeline.artifactJourney.audioDescription"),
 					status: "open" as const,
 					path: `/video/${videoId}/audio`,
-					dependsOnLabel: "Translations",
+					dependsOnLabel: getVideoPipelineStepLabel(t, "translations"),
 				},
 				{
 					id: "voice-clone" as const,
-					label: "Voice Clone",
-					description: "Cloned speaker voice",
+					label: getVideoPipelineStepLabel(t, "voice-clone"),
+					description: t("pipeline.artifactJourney.voiceCloneDescription"),
 					status: "open" as const,
 					path: `/video/${videoId}/voice-clone`,
-					dependsOnLabel: "Audio",
+					dependsOnLabel: getVideoPipelineStepLabel(t, "audio"),
 				},
 				{
 					id: "lip-sync" as const,
-					label: "Lip Sync",
-					description: "Aligned video",
+					label: getVideoPipelineStepLabel(t, "lip-sync"),
+					description: t("pipeline.artifactJourney.lipSyncDescription"),
 					status: "open" as const,
 					path: `/video/${videoId}/lip-sync`,
-					dependsOnLabel: "Voice Clone",
+					dependsOnLabel: getVideoPipelineStepLabel(t, "voice-clone"),
 				},
 				{
 					id: "render" as const,
-					label: "Final Render",
-					description: "Downloadable MP4",
+					label: getVideoPipelineStepLabel(t, "render"),
+					description: t("pipeline.artifactJourney.renderDescription"),
 					status: "open" as const,
 					path: `/video/${videoId}/render`,
-					dependsOnLabel: "Lip Sync",
+					dependsOnLabel: getVideoPipelineStepLabel(t, "lip-sync"),
 				},
 			]
 		: [];
@@ -69,19 +78,19 @@ export function buildArtifactJourney(
 	return [
 		{
 			id: "video",
-			label: "Video",
-			description: "Source upload",
+			label: t("pipeline.artifactJourney.videoLabel"),
+			description: t("pipeline.artifactJourney.videoDescription"),
 			status: videoId ? "open" : "generate",
 			path: videoId ? undefined : "/video/upload",
 		},
 		...base,
 		{
 			id: "quality",
-			label: "Quality",
-			description: "Publication readiness score",
+			label: t("pipeline.artifactJourney.qualityLabel"),
+			description: t("pipeline.artifactJourney.qualityDescription"),
 			status: videoId ? "open" : "locked",
 			path: videoId ? `/video/${videoId}` : undefined,
-			dependsOnLabel: "Final Video",
+			dependsOnLabel: getVideoPipelineStepLabel(t, "render"),
 		},
 	];
 }

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { useTranslation } from "@/i18n/useTranslation";
 import { transcriptService } from "@/services/transcript/TranscriptService";
 import type { VideoTranscript } from "@/services/transcript/types";
 import { formatTranscriptTimestamp } from "@/services/transcript/types";
@@ -22,6 +23,7 @@ import { TranslationLanguageTabs } from "../TranslationLanguageTabs";
 import styles from "./TranslationPanel.module.css";
 
 export function TranslationPanel() {
+	const { t } = useTranslation();
 	const { videoId = "", audioId = "" } = useParams();
 	const resourceId = videoId || audioId;
 	const [transcript, setTranscript] = useState<VideoTranscript | null>(null);
@@ -87,7 +89,7 @@ export function TranslationPanel() {
 			});
 			await loadData();
 		} catch {
-			setError("Translation generation failed.");
+			setError(t("pipeline.translation.failed"));
 		} finally {
 			setGenerating(false);
 		}
@@ -96,7 +98,7 @@ export function TranslationPanel() {
 	if (loading) {
 		return (
 			<div className={styles.root}>
-				<Spinner label="Loading translations" />
+				<Spinner label={t("pipeline.translation.loading")} />
 			</div>
 		);
 	}
@@ -105,8 +107,8 @@ export function TranslationPanel() {
 		return (
 			<div className={styles.root}>
 				<EmptyState
-					title="Transcript required"
-					description="Generate a transcript before creating translations."
+					title={t("pipeline.translation.requiredTitle")}
+					description={t("pipeline.translation.requiredDescription")}
 				/>
 			</div>
 		);
@@ -120,16 +122,21 @@ export function TranslationPanel() {
 		<div className={styles.root}>
 			<header className={styles.header}>
 				<div>
-					<h2 className={styles.title}>Translation</h2>
-					<p className={styles.meta}>Video ID: {transcript.videoId}</p>
+					<h2 className={styles.title}>{t("pipeline.translation.title")}</h2>
+					<p className={styles.meta}>
+						{t("pipeline.translation.videoId")} {transcript.videoId}
+					</p>
 				</div>
 				<Badge variant="info">
-					Detected: {formatTranslationLanguageLabel(transcript.language)}
+					{t("pipeline.translation.detected")}{" "}
+					{formatTranslationLanguageLabel(transcript.language)}
 				</Badge>
 			</header>
 
 			<Card className={styles.controls}>
-				<p className={styles.sectionLabel}>Target languages</p>
+				<p className={styles.sectionLabel}>
+					{t("pipeline.translation.targetLanguages")}
+				</p>
 				<div className={styles.checkboxGroup}>
 					{TARGET_TRANSLATION_LANGUAGES.map((language) => (
 						<label key={language} className={styles.checkboxLabel}>
@@ -144,7 +151,7 @@ export function TranslationPanel() {
 				</div>
 
 				<label className={styles.field} htmlFor="translation-provider">
-					Translation engine
+					{t("pipeline.translation.engine")}
 				</label>
 				<select
 					id="translation-provider"
@@ -166,7 +173,9 @@ export function TranslationPanel() {
 					onClick={handleGenerate}
 					disabled={generating || selectedTargets.length === 0}
 				>
-					{generating ? "Generating..." : "Generate Translation"}
+					{generating
+						? t("pipeline.translation.generating")
+						: t("pipeline.translation.generateCta")}
 				</Button>
 
 				{error ? <p className={styles.error}>{error}</p> : null}
@@ -193,11 +202,15 @@ export function TranslationPanel() {
 						{activeTranslation.segments.map((segment) => (
 							<div key={segment.index} className={styles.segmentRow}>
 								<div className={styles.sourceColumn}>
-									<span className={styles.segmentLabel}>Source</span>
+									<span className={styles.segmentLabel}>
+										{t("pipeline.translation.sourceLabel")}
+									</span>
 									<p>{segment.sourceText}</p>
 								</div>
 								<div className={styles.targetColumn}>
-									<span className={styles.segmentLabel}>Translation</span>
+									<span className={styles.segmentLabel}>
+										{t("pipeline.translation.translationLabel")}
+									</span>
 									<p>{segment.translatedText}</p>
 								</div>
 							</div>
@@ -205,14 +218,16 @@ export function TranslationPanel() {
 					</div>
 
 					<p className={styles.summaryMeta}>
-						{activeTranslation.segmentCount} segments ·{" "}
-						{formatTranscriptTimestamp(transcript.duration)} source duration
+						{t("pipeline.translation.sourceDuration", {
+							count: activeTranslation.segmentCount,
+							duration: formatTranscriptTimestamp(transcript.duration),
+						})}
 					</p>
 				</Card>
 			) : (
 				<EmptyState
-					title="No translations yet"
-					description="Select target languages and generate translations."
+					title={t("pipeline.translation.emptyTitle")}
+					description={t("pipeline.translation.emptyDescription")}
 				/>
 			)}
 		</div>

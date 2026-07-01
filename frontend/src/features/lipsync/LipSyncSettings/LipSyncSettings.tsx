@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { useTranslation } from "@/i18n/useTranslation";
 import {
 	LIP_SYNC_PROVIDERS,
 	type LipSyncProvider,
@@ -30,9 +31,11 @@ export function LipSyncSettings({
 	onProviderChange,
 	onGenerate,
 }: LipSyncSettingsProps) {
+	const { t } = useTranslation();
+
 	return (
 		<Card className={styles.root}>
-			<p className={styles.sectionLabel}>Provider</p>
+			<p className={styles.sectionLabel}>{t("pipeline.lipSync.provider")}</p>
 			<select
 				id="lip-sync-provider"
 				className={styles.select}
@@ -53,7 +56,9 @@ export function LipSyncSettings({
 				))}
 			</select>
 
-			<p className={styles.sectionLabel}>Cloned audio languages</p>
+			<p className={styles.sectionLabel}>
+				{t("pipeline.lipSync.clonedAudioLanguages")}
+			</p>
 			<div className={styles.checkboxGroup}>
 				{TARGET_TRANSLATION_LANGUAGES.map((language) => (
 					<label key={language} className={styles.checkboxLabel}>
@@ -72,7 +77,9 @@ export function LipSyncSettings({
 				onClick={onGenerate}
 				disabled={generating || selectedTargets.length === 0}
 			>
-				{generating ? "Generating..." : "Generate Lip Sync"}
+				{generating
+					? t("pipeline.lipSync.generating")
+					: t("pipeline.lipSync.generateCta")}
 			</Button>
 
 			{error ? <p className={styles.error}>{error}</p> : null}

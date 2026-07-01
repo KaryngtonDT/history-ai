@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it, vi } from "vitest";
+import { renderWithProviders } from "@/test/render";
 import { LipSyncPanel } from "./LipSyncPanel";
 
 vi.mock("@/services/voice/VoiceCloneService", () => ({
@@ -23,7 +24,7 @@ vi.mock("@/services/lipsync/LipSyncService", () => ({
 
 describe("LipSyncPanel", () => {
 	it("renders lip sync controls when voice clone exists", async () => {
-		render(
+		renderWithProviders(
 			<MemoryRouter
 				initialEntries={[
 					"/video/550e8400-e29b-41d4-a716-446655440099/lip-sync",

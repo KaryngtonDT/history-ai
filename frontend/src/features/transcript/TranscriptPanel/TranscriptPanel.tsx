@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { useTranslation } from "@/i18n/useTranslation";
 import { transcriptService } from "@/services/transcript/TranscriptService";
 import type { VideoTranscript } from "@/services/transcript/types";
 import { formatTranscriptTimestamp } from "@/services/transcript/types";
@@ -11,6 +12,7 @@ import { TranscriptTimeline } from "../TranscriptTimeline";
 import styles from "./TranscriptPanel.module.css";
 
 export function TranscriptPanel() {
+	const { t } = useTranslation();
 	const { videoId = "", audioId = "" } = useParams();
 	const resourceId = videoId || audioId;
 	const [transcript, setTranscript] = useState<VideoTranscript | null>(null);
@@ -39,7 +41,7 @@ export function TranscriptPanel() {
 	if (loading) {
 		return (
 			<div className={styles.root}>
-				<Spinner label="Loading transcript" />
+				<Spinner label={t("pipeline.transcript.loading")} />
 			</div>
 		);
 	}
@@ -48,8 +50,8 @@ export function TranscriptPanel() {
 		return (
 			<div className={styles.root}>
 				<EmptyState
-					title="Transcript unavailable"
-					description="No transcript was found for this video yet."
+					title={t("pipeline.transcript.unavailableTitle")}
+					description={t("pipeline.transcript.unavailableDescription")}
 				/>
 			</div>
 		);
@@ -59,9 +61,9 @@ export function TranscriptPanel() {
 		<div className={styles.root}>
 			<header className={styles.header}>
 				<div>
-					<h2 className={styles.title}>Transcript</h2>
+					<h2 className={styles.title}>{t("pipeline.transcript.title")}</h2>
 					<p className={styles.meta}>
-						Video ID:{" "}
+						{t("pipeline.transcript.videoId")}{" "}
 						<span className={styles.videoId}>{transcript.videoId}</span>
 					</p>
 				</div>
@@ -69,11 +71,15 @@ export function TranscriptPanel() {
 			</header>
 
 			<Card className={styles.summary}>
-				<p className={styles.summaryLabel}>Full text</p>
+				<p className={styles.summaryLabel}>
+					{t("pipeline.transcript.fullText")}
+				</p>
 				<p className={styles.summaryText}>{transcript.text}</p>
 				<p className={styles.summaryMeta}>
-					{transcript.segmentCount} segments ·{" "}
-					{formatTranscriptTimestamp(transcript.duration)} duration
+					{t("pipeline.transcript.segmentsDuration", {
+						count: transcript.segmentCount,
+						duration: formatTranscriptTimestamp(transcript.duration),
+					})}
 				</p>
 			</Card>
 

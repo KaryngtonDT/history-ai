@@ -1,11 +1,12 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { MOCK_PREVIEW_QUALITY } from "@/services/quality/MockQualityRepository";
+import { renderWithProviders } from "@/test/render";
 import { QualityDashboard } from "./QualityDashboard";
 
 describe("QualityDashboard", () => {
 	it("renders overall score and category metrics", () => {
-		render(<QualityDashboard report={MOCK_PREVIEW_QUALITY} />);
+		renderWithProviders(<QualityDashboard report={MOCK_PREVIEW_QUALITY} />);
 
 		expect(screen.getByText("Quality Report")).toBeInTheDocument();
 		expect(screen.getByText("94")).toBeInTheDocument();
@@ -14,7 +15,7 @@ describe("QualityDashboard", () => {
 	});
 
 	it("shows loading state", () => {
-		render(<QualityDashboard report={null} loading />);
+		renderWithProviders(<QualityDashboard report={null} loading />);
 
 		expect(
 			screen.getByText("Running quality assessment..."),

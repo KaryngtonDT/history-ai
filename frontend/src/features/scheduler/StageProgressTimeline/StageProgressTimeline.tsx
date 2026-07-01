@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import { schedulerService } from "@/services/scheduler/SchedulerService";
 import type { ScheduledStage } from "@/services/scheduler/types";
 import styles from "./StageProgressTimeline.module.css";
@@ -7,6 +8,8 @@ interface StageProgressTimelineProps {
 }
 
 export function StageProgressTimeline({ stages }: StageProgressTimelineProps) {
+	const { t } = useTranslation();
+
 	return (
 		<ul className={styles.timeline}>
 			{stages.map((stage) => (
@@ -22,7 +25,10 @@ export function StageProgressTimeline({ stages }: StageProgressTimelineProps) {
 							{schedulerService.formatResourceType(
 								stage.requirements[0]?.type ?? "cpu",
 							)}{" "}
-							· {stage.estimatedDurationSeconds}s
+							·{" "}
+							{t("pipeline.scheduler.secondsCompact", {
+								seconds: stage.estimatedDurationSeconds,
+							})}
 						</p>
 					</div>
 				</li>

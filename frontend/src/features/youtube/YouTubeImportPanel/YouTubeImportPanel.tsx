@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ProcessingModeSelector } from "@/features/orchestrator";
 import { PageIntroduction } from "@/features/product";
+import { useTranslation } from "@/i18n/useTranslation";
 import type { ProcessingMode } from "@/services/orchestrator/types";
 import type { YouTubeMetadata } from "@/services/youtubeSource/types";
 import { formatDuration } from "@/services/youtubeSource/types";
@@ -14,6 +15,7 @@ import styles from "./YouTubeImportPanel.module.css";
 type Phase = "idle" | "previewing" | "importing" | "success" | "error";
 
 export function YouTubeImportPanel() {
+	const { t } = useTranslation();
 	const [url, setUrl] = useState("");
 	const [phase, setPhase] = useState<Phase>("idle");
 	const [metadata, setMetadata] = useState<YouTubeMetadata | null>(null);
@@ -35,7 +37,7 @@ export function YouTubeImportPanel() {
 			setErrorMessage(
 				error instanceof ValidationError
 					? error.message
-					: "Could not preview this YouTube video.",
+					: t("pipeline.youtube.previewFailed"),
 			);
 			setPhase("error");
 		}
@@ -56,7 +58,7 @@ export function YouTubeImportPanel() {
 			setErrorMessage(
 				error instanceof ValidationError
 					? error.message
-					: "Could not import this YouTube video.",
+					: t("pipeline.youtube.importFailed"),
 			);
 			setPhase("error");
 		}
@@ -65,21 +67,21 @@ export function YouTubeImportPanel() {
 	return (
 		<div className={styles.root}>
 			<PageIntroduction
-				eyebrow="Create"
-				title="Import from YouTube"
-				description="Paste any public YouTube link. History AI downloads the video and runs the same localization pipeline as uploaded files."
-				whatCanIDo="Preview metadata, choose AI mode, then import to open the video overview."
+				eyebrow={t("pipeline.youtube.eyebrow")}
+				title={t("pipeline.youtube.title")}
+				description={t("pipeline.youtube.description")}
+				whatCanIDo={t("pipeline.youtube.whatCanIDo")}
 			/>
 
 			<Card className={styles.formCard}>
 				<label className={styles.label} htmlFor="youtube-url">
-					YouTube URL
+					{t("pipeline.youtube.urlLabel")}
 				</label>
 				<input
 					id="youtube-url"
 					className={styles.input}
 					type="url"
-					placeholder="https://www.youtube.com/watch?v=..."
+					placeholder={t("pipeline.youtube.urlPlaceholder")}
 					value={url}
 					onChange={(event) => setUrl(event.target.value)}
 				/>
@@ -89,14 +91,14 @@ export function YouTubeImportPanel() {
 						disabled={!url || phase === "previewing" || phase === "importing"}
 						onClick={() => void handlePreview()}
 					>
-						Preview
+						{t("pipeline.youtube.previewCta")}
 					</Button>
 					<Button
 						variant="primary"
 						disabled={!url || phase === "importing"}
 						onClick={() => void handleImport()}
 					>
-						Import video
+						{t("pipeline.youtube.importCta")}
 					</Button>
 				</div>
 			</Card>
@@ -126,18 +128,18 @@ export function YouTubeImportPanel() {
 			) : null}
 
 			{phase === "importing" ? (
-				<p role="status">Importing and queuing pipeline…</p>
+				<p role="status">{t("pipeline.youtube.importingStatus")}</p>
 			) : null}
 
 			{phase === "success" ? (
 				<Card className={styles.successCard}>
-					<p>Video imported. Pipeline queued.</p>
+					<p>{t("pipeline.youtube.importSuccess")}</p>
 					<Link
 						to={`/video/${videoId}`}
 						className={styles.primaryLink}
-						aria-label="Open video overview"
+						aria-label={t("pipeline.youtube.openVideoOverviewAria")}
 					>
-						Open video overview →
+						{t("pipeline.youtube.openVideoOverview")}
 					</Link>
 				</Card>
 			) : null}
