@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n";
 import type { Project } from "@/services/workspace/types";
 import styles from "./ProjectCard.module.css";
 
@@ -12,12 +13,20 @@ export function ProjectCard({
 	selected = false,
 	onSelect,
 }: ProjectCardProps) {
+	const { t } = useTranslation();
+	const videoCountLabel =
+		project.videos.length === 1
+			? t("workspace.projectCard.videoCountOne", {
+					count: project.videos.length,
+				})
+			: t("workspace.projectCard.videoCountOther", {
+					count: project.videos.length,
+				});
+
 	const content = (
 		<>
 			<h3 className={styles.title}>{project.name}</h3>
-			<p className={styles.meta}>
-				{project.videos.length} video{project.videos.length === 1 ? "" : "s"}
-			</p>
+			<p className={styles.meta}>{videoCountLabel}</p>
 		</>
 	);
 

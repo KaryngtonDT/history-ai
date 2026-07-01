@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n";
 import { collaborationService } from "@/services/collaboration/CollaborationService";
 import type {
 	WorkspaceMember,
@@ -19,8 +20,10 @@ export function WorkspaceMembers({
 	onRemove,
 	busy = false,
 }: WorkspaceMembersProps) {
+	const { t } = useTranslation();
+
 	if (members.length === 0) {
-		return <p className={styles.empty}>No members yet.</p>;
+		return <p className={styles.empty}>{t("workspace.team.noMembersYet")}</p>;
 	}
 
 	return (
@@ -39,7 +42,7 @@ export function WorkspaceMembers({
 					<div className={styles.actions}>
 						{member.role === "owner" ? (
 							<span className={styles.roleBadge}>
-								{collaborationService.formatRole(member.role)}
+								{t("workspace.team.roles.owner")}
 							</span>
 						) : (
 							<RoleSelector
@@ -56,7 +59,7 @@ export function WorkspaceMembers({
 								disabled={busy}
 								onClick={() => onRemove(member.id)}
 							>
-								Remove
+								{t("workspace.team.remove")}
 							</button>
 						) : null}
 					</div>

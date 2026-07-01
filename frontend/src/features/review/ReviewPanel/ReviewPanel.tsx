@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "@/i18n";
 import { reviewService } from "@/services/review/ReviewService";
 import type { ReviewCategory, ReviewScores } from "@/services/review/types";
 import { REVIEW_CATEGORIES } from "@/services/review/types";
@@ -15,6 +16,7 @@ export function ReviewPanel({
 	executionVersionNumber = 1,
 	onSaved,
 }: ReviewPanelProps) {
+	const { t } = useTranslation();
 	const [scores, setScores] = useState<ReviewScores>(
 		reviewService.defaultScores(),
 	);
@@ -44,11 +46,11 @@ export function ReviewPanel({
 				comment,
 			})
 			.then(() => {
-				setMessage("Feedback saved.");
+				setMessage(t("workspace.review.feedbackSaved"));
 				onSaved?.();
 			})
 			.catch(() => {
-				setMessage("Could not save feedback.");
+				setMessage(t("workspace.review.feedbackSaveFailed"));
 			})
 			.finally(() => {
 				setSaving(false);
@@ -58,14 +60,14 @@ export function ReviewPanel({
 	return (
 		<section className={styles.reviewPanel}>
 			<div className={styles.header}>
-				<h2 className={styles.title}>Review</h2>
+				<h2 className={styles.title}>{t("workspace.review.title")}</h2>
 			</div>
 
 			<div className={styles.categories}>
 				{REVIEW_CATEGORIES.map((category) => (
 					<div className={styles.categoryRow} key={category}>
 						<span className={styles.categoryLabel}>
-							{reviewService.formatCategory(category)}
+							{t(`workspace.review.categoryLabels.${category}`)}
 						</span>
 						<div className={styles.stars}>
 							{[1, 2, 3, 4, 5].map((score) => (
@@ -78,7 +80,10 @@ export function ReviewPanel({
 									onClick={() => {
 										handleScoreChange(category, score);
 									}}
-									aria-label={`${reviewService.formatCategory(category)} ${score} stars`}
+									aria-label={t("workspace.review.starsAria", {
+										category: t(`workspace.review.categoryLabels.${category}`),
+										score,
+									})}
 								>
 									★
 								</button>
@@ -88,7 +93,9 @@ export function ReviewPanel({
 				))}
 			</div>
 
-			<label htmlFor={`review-comment-${videoId}`}>Comment</label>
+			<label htmlFor={`review-comment-${videoId}`}>
+				{t("workspace.review.comment")}
+			</label>
 			<textarea
 				id={`review-comment-${videoId}`}
 				className={styles.commentField}
@@ -96,7 +103,7 @@ export function ReviewPanel({
 				onChange={(event) => {
 					setComment(event.target.value);
 				}}
-				placeholder="The cloned voice is slightly too robotic."
+				placeholder={t("workspace.review.commentPlaceholder")}
 			/>
 
 			<div className={styles.actions}>
@@ -106,7 +113,9 @@ export function ReviewPanel({
 					onClick={handleSave}
 					disabled={saving}
 				>
-					{saving ? "Saving..." : "Save Feedback"}
+					{saving
+						? t("workspace.review.saving")
+						: t("workspace.review.saveFeedback")}
 				</button>
 			</div>
 

@@ -1,10 +1,11 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CollectionsPage } from "@/pages/Collections/CollectionsPage";
 import { collectionService } from "@/services/collection/CollectionService";
 import type { Collection } from "@/services/collection/types";
+import { renderWithProviders } from "@/test/render";
 
 const mockCollections: Collection[] = [
 	{
@@ -31,7 +32,7 @@ describe("CollectionsPage", () => {
 			new Promise(() => {}),
 		);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<CollectionsPage />
 			</MemoryRouter>,
@@ -47,7 +48,7 @@ describe("CollectionsPage", () => {
 			mockCollections,
 		);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<CollectionsPage />
 			</MemoryRouter>,
@@ -70,7 +71,7 @@ describe("CollectionsPage", () => {
 	it("shows EmptyState when there are no collections", async () => {
 		vi.spyOn(collectionService, "listCollections").mockResolvedValue([]);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<CollectionsPage />
 			</MemoryRouter>,
@@ -86,7 +87,7 @@ describe("CollectionsPage", () => {
 			new Error("network"),
 		);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<CollectionsPage />
 			</MemoryRouter>,
@@ -128,7 +129,7 @@ describe("CreateCollectionDialog", () => {
 				createdAt: "2026-06-27T13:00:00+00:00",
 			});
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<CollectionsPage />
 			</MemoryRouter>,
@@ -171,7 +172,7 @@ describe("CreateCollectionDialog", () => {
 			new Error("failed"),
 		);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<CollectionsPage />
 			</MemoryRouter>,
@@ -217,7 +218,7 @@ describe("AssignToCollectionDialog", () => {
 		);
 		const onClose = vi.fn();
 
-		render(
+		renderWithProviders(
 			<AssignToCollectionDialog
 				open
 				onClose={onClose}
@@ -258,7 +259,7 @@ describe("AssignToCollectionDialog", () => {
 			"@/features/collection/AssignToCollectionDialog"
 		);
 
-		render(
+		renderWithProviders(
 			<AssignToCollectionDialog
 				open
 				onClose={vi.fn()}
@@ -296,7 +297,7 @@ describe("AssignToCollectionDialog", () => {
 			"@/features/collection/AssignToCollectionDialog"
 		);
 
-		render(
+		renderWithProviders(
 			<AssignToCollectionDialog
 				open
 				onClose={vi.fn()}

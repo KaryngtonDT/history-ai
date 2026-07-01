@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useTranslation } from "@/i18n";
 import { contentService } from "@/services/content/ContentService";
 import { processingService } from "@/services/processing/ProcessingService";
 import { ImportHeader } from "../ImportHeader";
@@ -9,10 +10,8 @@ import { UploadError } from "../UploadError";
 import { UploadProgress } from "../UploadProgress";
 import styles from "./Import.module.css";
 
-const IMPORT_FLOW_ERROR =
-	"Could not start processing. Check that the backend is running and try again.";
-
 export function Import() {
+	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const [phase, setPhase] = useState<ImportPhase>("idle");
 	const [fileName, setFileName] = useState("");
@@ -52,7 +51,7 @@ export function Import() {
 
 			navigate(`/processing/${job.id}`);
 		} catch {
-			setErrorMessage(IMPORT_FLOW_ERROR);
+			setErrorMessage(t("workspace.import.couldNotStartProcessing"));
 			setPhase("error");
 		}
 	};

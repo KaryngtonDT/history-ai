@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n";
 import type {
 	ExecutionMetric,
 	PipelineTelemetry,
@@ -14,6 +15,7 @@ interface PerformanceSample {
 }
 
 export function PerformanceCharts({ records }: PerformanceChartsProps) {
+	const { t } = useTranslation();
 	const samples: PerformanceSample[] = records
 		.map((record) => ({
 			id: record.id,
@@ -25,7 +27,11 @@ export function PerformanceCharts({ records }: PerformanceChartsProps) {
 		.slice(0, 5);
 
 	if (samples.length === 0) {
-		return <p className={styles.empty}>No performance samples yet.</p>;
+		return (
+			<p className={styles.empty}>
+				{t("workspace.analytics.noPerformanceSamples")}
+			</p>
+		);
 	}
 
 	const maxValue = Math.max(...samples.map((sample) => sample.metric.value), 1);
@@ -34,7 +40,9 @@ export function PerformanceCharts({ records }: PerformanceChartsProps) {
 		<div className={styles.chart}>
 			{samples.map((sample, index) => (
 				<div key={sample.id} className={styles.row}>
-					<span className={styles.label}>Run {index + 1}</span>
+					<span className={styles.label}>
+						{t("workspace.analytics.runLabel", { index: index + 1 })}
+					</span>
 					<div className={styles.barTrack}>
 						<div
 							className={styles.barFill}

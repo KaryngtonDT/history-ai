@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n";
 import { historyService } from "@/services/history/HistoryService";
 import type { ExecutionVersion } from "@/services/history/types";
 import styles from "./VersionTimeline.module.css";
@@ -13,8 +14,14 @@ export function VersionTimeline({
 	selectedVersion,
 	onSelect,
 }: VersionTimelineProps) {
+	const { t } = useTranslation();
+
 	if (versions.length === 0) {
-		return <p className={styles.empty}>No execution history recorded yet.</p>;
+		return (
+			<p className={styles.empty}>
+				{t("workspace.history.noExecutionHistory")}
+			</p>
+		);
 	}
 
 	return (
@@ -31,11 +38,19 @@ export function VersionTimeline({
 							}
 							onClick={() => onSelect(version.versionNumber)}
 						>
-							<span className={styles.version}>V{version.versionNumber}</span>
+							<span className={styles.version}>
+								{t("workspace.history.versionLabel", {
+									version: version.versionNumber,
+								})}
+							</span>
 							<span className={styles.profile}>
 								{historyService.formatProfile(version.optimizationProfile)}
 							</span>
-							<span className={styles.score}>Score {version.qualityScore}</span>
+							<span className={styles.score}>
+								{t("workspace.history.scoreLabel", {
+									score: version.qualityScore,
+								})}
+							</span>
 						</button>
 					</li>
 				);

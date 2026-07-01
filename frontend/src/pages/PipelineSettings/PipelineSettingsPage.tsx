@@ -1,15 +1,18 @@
 import { ExplainThisButton } from "@/features/help";
 import { PipelineBuilder } from "@/features/pipeline";
 import { PageIntroduction } from "@/features/product";
+import { useTranslation } from "@/i18n";
 
 export function PipelineSettingsPage() {
+	const { t } = useTranslation();
+
 	return (
 		<section>
 			<PageIntroduction
-				eyebrow="Settings"
-				title="Pipeline Configuration"
-				description="Assign AI engines to each processing stage."
-				whatCanIDo="Map providers to transcript, translation, audio, voice clone, lip sync, and render steps. Changes apply on the next run."
+				eyebrow={t("workspace.settings.pipeline.eyebrow")}
+				title={t("workspace.settings.pipeline.title")}
+				description={t("workspace.settings.pipeline.description")}
+				whatCanIDo={t("workspace.settings.pipeline.whatCanIDo")}
 				secondaryActions={<ExplainThisButton featureId="pipeline" />}
 			/>
 			<PipelineBuilder />

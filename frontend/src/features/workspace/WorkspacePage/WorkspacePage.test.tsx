@@ -1,21 +1,22 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 import { MOCK_PREVIEW_PROJECT } from "@/services/workspace/MockWorkspaceRepository";
+import { renderWithProviders } from "@/test/render";
 import { BatchProgress } from "../BatchProgress";
 import { ProjectCard } from "../ProjectCard";
 import { VideoGrid } from "../VideoGrid";
 
 describe("Workspace feature components", () => {
 	it("renders project card with video count", () => {
-		render(<ProjectCard project={MOCK_PREVIEW_PROJECT} />);
+		renderWithProviders(<ProjectCard project={MOCK_PREVIEW_PROJECT} />);
 
 		expect(screen.getByText("Marketing Campaign")).toBeInTheDocument();
 		expect(screen.getByText("3 videos")).toBeInTheDocument();
 	});
 
 	it("renders video grid with filenames and pipeline links", () => {
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<VideoGrid videos={MOCK_PREVIEW_PROJECT.videos} />
 			</MemoryRouter>,
@@ -30,7 +31,7 @@ describe("Workspace feature components", () => {
 	});
 
 	it("renders batch progress bar and percentage", () => {
-		render(
+		renderWithProviders(
 			<BatchProgress
 				progress={MOCK_PREVIEW_PROJECT.batchProgress}
 				status={MOCK_PREVIEW_PROJECT.batchStatus}

@@ -1,10 +1,11 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { renderWithProviders } from "@/test/render";
 import { AnalyticsDashboard } from "./AnalyticsDashboard";
 
 describe("AnalyticsDashboard", () => {
 	it("renders workspace analytics metrics", () => {
-		render(
+		renderWithProviders(
 			<AnalyticsDashboard
 				analytics={{
 					processedVideos: 328,

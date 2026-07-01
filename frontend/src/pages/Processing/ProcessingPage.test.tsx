@@ -1,8 +1,9 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import { MOCK_SUMMARY, MOCK_TRANSCRIPT } from "@/mock/artifact";
 import { ProcessingPage } from "@/pages/Processing/ProcessingPage";
+import { renderWithProviders as render } from "@/test/render";
 
 describe("ProcessingPage — S1-SLICE-06 simulated progress", () => {
 	it("renders processing simulation for a known job", async () => {

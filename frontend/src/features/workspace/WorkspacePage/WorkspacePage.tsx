@@ -17,6 +17,7 @@ import {
 	ReviewPanel,
 	ReviewSummary,
 } from "@/features/review";
+import { useTranslation } from "@/i18n";
 import { reviewService } from "@/services/review/ReviewService";
 import type { PreferenceProfile, Review } from "@/services/review/types";
 import { telemetryService } from "@/services/telemetry/TelemetryService";
@@ -36,6 +37,7 @@ import styles from "./WorkspacePage.module.css";
 const POLL_INTERVAL_MS = 2000;
 
 export function WorkspacePage() {
+	const { t } = useTranslation();
 	const [projects, setProjects] = useState<Project[] | null>(null);
 	const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
 		null,
@@ -63,30 +65,33 @@ export function WorkspacePage() {
 
 	const selectedVideoId = selectedProject?.videos[0]?.videoId ?? null;
 
-	const loadAnalyticsData = useCallback(async (workspaceId: string) => {
-		setAnalyticsLoading(true);
-		setAnalyticsError(null);
+	const loadAnalyticsData = useCallback(
+		async (workspaceId: string) => {
+			setAnalyticsLoading(true);
+			setAnalyticsError(null);
 
-		try {
-			const [loadedAnalytics, loadedProviders, loadedTelemetry] =
-				await Promise.all([
-					telemetryService.loadAnalytics(workspaceId),
-					telemetryService.loadProviderStatistics(workspaceId),
-					telemetryService.loadTelemetry(workspaceId),
-				]);
+			try {
+				const [loadedAnalytics, loadedProviders, loadedTelemetry] =
+					await Promise.all([
+						telemetryService.loadAnalytics(workspaceId),
+						telemetryService.loadProviderStatistics(workspaceId),
+						telemetryService.loadTelemetry(workspaceId),
+					]);
 
-			setAnalytics(loadedAnalytics);
-			setProviderStatistics(loadedProviders);
-			setTelemetryRecords(loadedTelemetry);
-		} catch {
-			setAnalytics(null);
-			setProviderStatistics(null);
-			setTelemetryRecords([]);
-			setAnalyticsError("Could not load workspace analytics.");
-		} finally {
-			setAnalyticsLoading(false);
-		}
-	}, []);
+				setAnalytics(loadedAnalytics);
+				setProviderStatistics(loadedProviders);
+				setTelemetryRecords(loadedTelemetry);
+			} catch {
+				setAnalytics(null);
+				setProviderStatistics(null);
+				setTelemetryRecords([]);
+				setAnalyticsError(t("workspace.page.backendUnavailable"));
+			} finally {
+				setAnalyticsLoading(false);
+			}
+		},
+		[t],
+	);
 
 	const loadReviewData = useCallback(async (videoId: string | null) => {
 		if (!videoId) {
@@ -125,11 +130,9 @@ export function WorkspacePage() {
 			})
 			.catch(() => {
 				setProjects([]);
-				setLoadError(
-					"Could not reach the server. Check that the backend is running.",
-				);
+				setLoadError(t("workspace.page.backendUnavailable"));
 			});
-	}, []);
+	}, [t]);
 
 	const refreshSelectedProject = useCallback(async (projectId: string) => {
 		const project = await workspaceService.getProject(projectId);
@@ -236,27 +239,55 @@ export function WorkspacePage() {
 			});
 	};
 
+	const processButtonLabel = workspaceService.canProcess(
+		selectedProject?.videos.length ?? 0,
+		selectedLanguages,
+	)
+		? (selectedProject?.videos.length ?? 0) === 1
+			? t("workspace.batch.processButtonOne", {
+					count: selectedProject?.videos.length ?? 0,
+				})
+			: t("workspace.batch.processButtonOther", {
+					count: selectedProject?.videos.length ?? 0,
+				})
+		: selectedProject
+			? t("workspace.batch.processButtonOther", {
+					count: selectedProject.videos.length,
+				})
+			: t("workspace.batch.processButtonOther", { count: 0 });
+
+	const languageLabel = (language: string): string => {
+		if (["en", "fr", "de"].includes(language)) {
+			return t(`language.${language}`);
+		}
+
+		return workspaceService.formatLanguage(language);
+	};
+
 	if (projects === null) {
 		return (
 			<div className={styles.loading}>
-				<Spinner label="Loading workspace" />
+				<Spinner label={t("workspace.page.loadingWorkspace")} />
 			</div>
 		);
 	}
 
 	if (loadError !== null) {
 		return (
-			<EmptyState title="Unable to load workspace" description={loadError} />
+			<EmptyState
+				title={t("workspace.page.unableToLoadWorkspace")}
+				description={loadError}
+			/>
 		);
 	}
 
 	return (
 		<div className={styles.root}>
 			<PageIntroduction
-				eyebrow="Workspace"
-				title="Project Workspace"
-				description="Organize videos, run batch processing, and review team output."
-				whatCanIDo="Create projects, add videos, choose languages, process batches, and review analytics, history, and team activity."
+				eyebrow={t("workspace.page.eyebrow")}
+				title={t("workspace.page.title")}
+				description={t("workspace.page.description")}
+				whatCanIDo={t("workspace.page.whatCanIDo")}
 				secondaryActions={<ExplainThisButton featureId="workspace" />}
 			/>
 
@@ -265,9 +296,9 @@ export function WorkspacePage() {
 					type="text"
 					value={newProjectName}
 					onChange={(event) => setNewProjectName(event.target.value)}
-					placeholder="New project name"
+					placeholder={t("workspace.page.newProjectNamePlaceholder")}
 					className={styles.input}
-					aria-label="New project name"
+					aria-label={t("workspace.page.newProjectNameAria")}
 				/>
 				<button
 					type="button"
@@ -275,15 +306,17 @@ export function WorkspacePage() {
 					onClick={handleCreateProject}
 					disabled={creating || newProjectName.trim() === ""}
 				>
-					Create project
+					{t("workspace.page.createProject")}
 				</button>
 			</div>
 
 			<div className={styles.layout}>
 				<section className={styles.sidebar}>
-					<h2 className={styles.sectionTitle}>Projects</h2>
+					<h2 className={styles.sectionTitle}>
+						{t("workspace.page.projects")}
+					</h2>
 					{projects.length === 0 ? (
-						<p className={styles.empty}>No projects yet.</p>
+						<p className={styles.empty}>{t("workspace.page.noProjectsYet")}</p>
 					) : (
 						<div className={styles.projectList}>
 							{projects.map((project) => (
@@ -312,17 +345,23 @@ export function WorkspacePage() {
 							/>
 
 							<div className={styles.section}>
-								<h2 className={styles.sectionTitle}>Provider Statistics</h2>
+								<h2 className={styles.sectionTitle}>
+									{t("workspace.page.providerStatistics")}
+								</h2>
 								<ProviderStatistics statistics={providerStatistics} />
 							</div>
 
 							<div className={styles.section}>
-								<h2 className={styles.sectionTitle}>Performance</h2>
+								<h2 className={styles.sectionTitle}>
+									{t("workspace.page.performance")}
+								</h2>
 								<PerformanceCharts records={telemetryRecords} />
 							</div>
 
 							<div className={styles.section}>
-								<h2 className={styles.sectionTitle}>Quality Trend</h2>
+								<h2 className={styles.sectionTitle}>
+									{t("workspace.page.qualityTrend")}
+								</h2>
 								<QualityTrend
 									records={telemetryRecords}
 									recentErrors={analytics?.recentErrors ?? []}
@@ -330,19 +369,23 @@ export function WorkspacePage() {
 							</div>
 
 							<div className={styles.section}>
-								<h2 className={styles.sectionTitle}>Videos</h2>
+								<h2 className={styles.sectionTitle}>
+									{t("workspace.page.videos")}
+								</h2>
 								<VideoGrid videos={selectedProject.videos} />
 							</div>
 
 							{selectedVideoId ? (
 								<ArtifactJourney
 									videoId={selectedVideoId}
-									title="Selected video pipeline"
+									title={t("workspace.page.selectedVideoPipeline")}
 								/>
 							) : null}
 
 							<div className={styles.section}>
-								<h2 className={styles.sectionTitle}>Languages</h2>
+								<h2 className={styles.sectionTitle}>
+									{t("workspace.page.languages")}
+								</h2>
 								<ul className={styles.languageList}>
 									{WORKSPACE_TARGET_LANGUAGES.map((language) => {
 										const selected = selectedLanguages.includes(language);
@@ -357,7 +400,7 @@ export function WorkspacePage() {
 													/>
 													<span>
 														{selected ? "✓ " : ""}
-														{workspaceService.formatLanguage(language)}
+														{languageLabel(language)}
 													</span>
 												</label>
 											</li>
@@ -378,9 +421,7 @@ export function WorkspacePage() {
 									)
 								}
 							>
-								{workspaceService.processButtonLabel(
-									selectedProject.videos.length,
-								)}
+								{processButtonLabel}
 							</button>
 
 							<BatchProgress
@@ -402,14 +443,16 @@ export function WorkspacePage() {
 							<PreferenceProfileCard profile={preferenceProfile} />
 
 							<div className={styles.section}>
-								<h2 className={styles.sectionTitle}>Review History</h2>
+								<h2 className={styles.sectionTitle}>
+									{t("workspace.page.reviewHistory")}
+								</h2>
 								<ReviewSummary reviews={reviews} />
 							</div>
 						</>
 					) : (
 						<EmptyState
-							title="Select a project"
-							description="Create or choose a project to manage videos and batch processing."
+							title={t("workspace.page.selectProjectTitle")}
+							description={t("workspace.page.selectProjectDescription")}
 						/>
 					)}
 				</section>

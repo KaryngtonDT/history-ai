@@ -19,6 +19,7 @@ import {
 } from "@/features/processing/artifactRenderers";
 import { SeeAlsoRecommendationsPanel } from "@/features/recommendation/SeeAlsoRecommendationsPanel";
 import { SemanticSearchPanel } from "@/features/semantic/SemanticSearchPanel";
+import { useTranslation } from "@/i18n";
 import { artifactService } from "@/services/artifact/ArtifactService";
 import type { Artifact } from "@/services/artifact/types";
 import { resolveChatContentId } from "@/shared/contentId";
@@ -36,6 +37,7 @@ function findArtifactByType(
 }
 
 export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
+	const { t } = useTranslation();
 	const [artifacts, setArtifacts] = useState<Artifact[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [loadError, setLoadError] = useState<string | null>(null);
@@ -83,9 +85,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 			})
 			.catch(() => {
 				if (!cancelled) {
-					setLoadError(
-						"Could not load artifacts. Check that the backend is running.",
-					);
+					setLoadError(t("workspace.page.backendUnavailable"));
 					setArtifacts([]);
 					setIsEmpty(false);
 				}
@@ -99,7 +99,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 		return () => {
 			cancelled = true;
 		};
-	}, [contentId]);
+	}, [contentId, t]);
 
 	const chatContentId = useMemo(
 		() => resolveChatContentId(contentId, artifacts),
@@ -124,7 +124,7 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 		return (
 			<div className={styles.list}>
 				<div className={styles.loading}>
-					<Spinner label="Loading artifacts" />
+					<Spinner label={t("workspace.processing.loadingArtifacts")} />
 				</div>
 				{chatSection}
 			</div>
@@ -134,7 +134,10 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 	if (loadError !== null) {
 		return (
 			<div className={styles.list}>
-				<EmptyState title="Unable to load artifacts" description={loadError} />
+				<EmptyState
+					title={t("workspace.processing.unableToLoadArtifacts")}
+					description={loadError}
+				/>
 				{chatSection}
 			</div>
 		);
@@ -144,8 +147,8 @@ export function ProcessingArtifacts({ contentId }: ProcessingArtifactsProps) {
 		return (
 			<div className={styles.list}>
 				<EmptyState
-					title="No artifacts yet"
-					description="Generated learning artifacts will appear here once processing output is available."
+					title={t("workspace.processing.noArtifactsYet")}
+					description={t("workspace.processing.noArtifactsDescription")}
 				/>
 				{chatSection}
 			</div>

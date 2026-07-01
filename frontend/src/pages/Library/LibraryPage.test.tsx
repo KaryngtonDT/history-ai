@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -7,6 +7,7 @@ import { collectionService } from "@/services/collection/CollectionService";
 import { CollectionAssignmentConflictError } from "@/services/collection/MockCollectionRepository";
 import { libraryService } from "@/services/library/LibraryService";
 import { searchService } from "@/services/search/SearchService";
+import { renderWithProviders } from "@/test/render";
 
 describe("LibraryPage", () => {
 	afterEach(() => {
@@ -16,7 +17,7 @@ describe("LibraryPage", () => {
 	it("shows the normal library list when the search query is empty", async () => {
 		const searchSpy = vi.spyOn(searchService, "searchLibrary");
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -51,7 +52,7 @@ describe("LibraryPage", () => {
 				},
 			]);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -84,7 +85,7 @@ describe("LibraryPage", () => {
 			},
 		]);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -113,7 +114,7 @@ describe("LibraryPage", () => {
 		const user = userEvent.setup();
 		vi.spyOn(searchService, "searchLibrary").mockResolvedValue([]);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -143,7 +144,7 @@ describe("LibraryPage", () => {
 			new Error("network"),
 		);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -159,7 +160,9 @@ describe("LibraryPage", () => {
 		);
 
 		await waitFor(() => {
-			expect(screen.getByText("Unable to search library")).toBeInTheDocument();
+			expect(
+				screen.getAllByText("Unable to search library").length,
+			).toBeGreaterThan(0);
 		});
 	});
 
@@ -176,7 +179,7 @@ describe("LibraryPage", () => {
 			},
 		]);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -219,7 +222,7 @@ describe("LibraryPage", () => {
 			},
 		]);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -248,7 +251,7 @@ describe("LibraryPage", () => {
 	});
 
 	it("displays library items from the service layer", async () => {
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -274,7 +277,7 @@ describe("LibraryPage", () => {
 	it("shows EmptyState when the library is empty", async () => {
 		vi.spyOn(libraryService, "listItems").mockResolvedValue([]);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -290,7 +293,7 @@ describe("LibraryPage", () => {
 			new Error("network"),
 		);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -302,7 +305,7 @@ describe("LibraryPage", () => {
 	});
 
 	it("links library cards to the item details page", async () => {
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -318,7 +321,7 @@ describe("LibraryPage", () => {
 	});
 
 	it("shows Add to Collection action on library item cards", async () => {
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -344,7 +347,7 @@ describe("LibraryPage", () => {
 			},
 		]);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -383,7 +386,7 @@ describe("LibraryPage", () => {
 			createdAt: "2026-06-27T13:00:00+00:00",
 		});
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -424,7 +427,7 @@ describe("LibraryPage", () => {
 			new CollectionAssignmentConflictError(),
 		);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter>
 				<LibraryPage />
 			</MemoryRouter>,
@@ -459,7 +462,7 @@ describe("LibraryPage", () => {
 			},
 		]);
 
-		render(
+		renderWithProviders(
 			<MemoryRouter initialEntries={["/library"]}>
 				<LibraryPage />
 			</MemoryRouter>,

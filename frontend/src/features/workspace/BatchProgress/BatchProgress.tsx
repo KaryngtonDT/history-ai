@@ -1,5 +1,5 @@
+import { useTranslation } from "@/i18n";
 import type { BatchJobStatus } from "@/services/workspace/types";
-import { workspaceService } from "@/services/workspace/WorkspaceService";
 import styles from "./BatchProgress.module.css";
 
 interface BatchProgressProps {
@@ -13,10 +13,20 @@ export function BatchProgress({
 	status,
 	loading = false,
 }: BatchProgressProps) {
+	const { t } = useTranslation();
+
+	const formatStatus = (value: BatchJobStatus | null): string => {
+		if (value === null) {
+			return t("workspace.batch.status.idle");
+		}
+
+		return t(`workspace.batch.status.${value}`);
+	};
+
 	if (loading) {
 		return (
 			<div className={styles.panel}>
-				<p className={styles.loading}>Starting batch processing...</p>
+				<p className={styles.loading}>{t("workspace.batch.starting")}</p>
 			</div>
 		);
 	}
@@ -30,10 +40,8 @@ export function BatchProgress({
 	return (
 		<div className={styles.panel}>
 			<div className={styles.header}>
-				<p className={styles.title}>Overall Progress</p>
-				<span className={styles.status}>
-					{workspaceService.formatBatchStatus(status)}
-				</span>
+				<p className={styles.title}>{t("workspace.batch.overallProgress")}</p>
+				<span className={styles.status}>{formatStatus(status)}</span>
 			</div>
 			<div
 				className={styles.barTrack}
@@ -41,7 +49,7 @@ export function BatchProgress({
 				aria-valuenow={clampedProgress}
 				aria-valuemin={0}
 				aria-valuemax={100}
-				aria-label="Batch progress"
+				aria-label={t("workspace.batch.progressAria")}
 			>
 				<div
 					className={styles.barFill}

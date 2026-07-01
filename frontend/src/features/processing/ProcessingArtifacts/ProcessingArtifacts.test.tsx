@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ProcessingArtifacts } from "@/features/processing/ProcessingArtifacts";
@@ -6,6 +6,7 @@ import { artifactService } from "@/services/artifact/ArtifactService";
 import { graphService } from "@/services/graph/GraphService";
 import { libraryService } from "@/services/library/LibraryService";
 import { relationService } from "@/services/relation/RelationService";
+import { renderWithProviders as render } from "@/test/render";
 
 const {
 	mockStreamQuestion,

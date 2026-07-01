@@ -5,6 +5,9 @@ import { pipelineFr } from "./sections/pipeline.fr";
 import { shellDe } from "./sections/shell.de";
 import { shellEn } from "./sections/shell.en";
 import { shellFr } from "./sections/shell.fr";
+import { workspaceDe } from "./sections/workspace.de";
+import { workspaceEn } from "./sections/workspace.en";
+import { workspaceFr } from "./sections/workspace.fr";
 
 const baseEn = {
 	common: {
@@ -42,7 +45,10 @@ const baseEn = {
 	},
 } as const;
 
-export const en = mergeMessages(mergeMessages(baseEn, shellEn), pipelineEn);
+export const en = mergeMessages(
+	mergeMessages(mergeMessages(baseEn, shellEn), pipelineEn),
+	workspaceEn,
+);
 
 export type Messages = DeepStringRecord<typeof en>;
 
@@ -83,8 +89,8 @@ const baseFr = {
 } as const satisfies DeepStringRecord<typeof baseEn>;
 
 export const fr = mergeMessages(
-	mergeMessages(baseFr, shellFr),
-	pipelineFr,
+	mergeMessages(mergeMessages(baseFr, shellFr), pipelineFr),
+	workspaceFr,
 ) satisfies Messages;
 
 const baseDe = {
@@ -124,6 +130,6 @@ const baseDe = {
 } as const satisfies DeepStringRecord<typeof baseEn>;
 
 export const de = mergeMessages(
-	mergeMessages(baseDe, shellDe),
-	pipelineDe,
+	mergeMessages(mergeMessages(baseDe, shellDe), pipelineDe),
+	workspaceDe,
 ) satisfies Messages;

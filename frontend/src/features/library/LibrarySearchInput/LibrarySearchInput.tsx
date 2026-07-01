@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n";
 import styles from "./LibrarySearchInput.module.css";
 
 interface LibrarySearchInputProps {
@@ -9,16 +10,18 @@ export function LibrarySearchInput({
 	value,
 	onChange,
 }: LibrarySearchInputProps) {
+	const { t } = useTranslation();
+
 	return (
 		<label className={styles.field}>
-			<span className={styles.label}>Search library</span>
+			<span className={styles.label}>{t("workspace.library.searchLabel")}</span>
 			<input
 				type="search"
 				className={styles.input}
 				value={value}
 				onChange={(event) => onChange(event.target.value)}
-				placeholder="Search by title…"
-				aria-label="Search library"
+				placeholder={t("workspace.library.searchPlaceholder")}
+				aria-label={t("workspace.library.searchLabel")}
 			/>
 		</label>
 	);

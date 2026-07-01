@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n";
 import type {
 	PipelineTelemetry,
 	RecentTelemetryError,
@@ -10,6 +11,7 @@ interface QualityTrendProps {
 }
 
 export function QualityTrend({ records, recentErrors }: QualityTrendProps) {
+	const { t } = useTranslation();
 	const qualityRecords = records.filter(
 		(record) => record.qualityScore !== null,
 	);
@@ -17,7 +19,9 @@ export function QualityTrend({ records, recentErrors }: QualityTrendProps) {
 	return (
 		<div>
 			{qualityRecords.length === 0 ? (
-				<p className={styles.empty}>No quality trend data yet.</p>
+				<p className={styles.empty}>
+					{t("workspace.analytics.noQualityTrendData")}
+				</p>
 			) : (
 				<ul className={styles.list}>
 					{qualityRecords.slice(0, 5).map((record) => (
@@ -34,7 +38,9 @@ export function QualityTrend({ records, recentErrors }: QualityTrendProps) {
 
 			{recentErrors.length > 0 ? (
 				<div className={styles.errors}>
-					<h3 className={styles.errorsTitle}>Last Errors</h3>
+					<h3 className={styles.errorsTitle}>
+						{t("workspace.analytics.lastErrors")}
+					</h3>
 					{recentErrors.map((error) => (
 						<div
 							key={`${error.message}-${error.recordedAt}`}

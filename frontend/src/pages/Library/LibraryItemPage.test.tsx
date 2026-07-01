@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MOCK_SUMMARY, MOCK_TIMELINE } from "@/mock/artifact";
@@ -7,6 +7,7 @@ import { artifactService } from "@/services/artifact/ArtifactService";
 import type { Artifact } from "@/services/artifact/types";
 import { libraryService } from "@/services/library/LibraryService";
 import type { LibraryItem } from "@/services/library/types";
+import { renderWithProviders as render } from "@/test/render";
 
 const summaryLibraryItem: LibraryItem = {
 	id: "library-item-1",

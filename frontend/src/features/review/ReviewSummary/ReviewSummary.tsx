@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n";
 import type { Review } from "@/services/review/types";
 import { REVIEW_CATEGORIES } from "@/services/review/types";
 import styles from "./ReviewSummary.module.css";
@@ -7,8 +8,10 @@ interface ReviewSummaryProps {
 }
 
 export function ReviewSummary({ reviews }: ReviewSummaryProps) {
+	const { t } = useTranslation();
+
 	if (reviews.length === 0) {
-		return <p className={styles.empty}>No reviews yet.</p>;
+		return <p className={styles.empty}>{t("workspace.review.noReviewsYet")}</p>;
 	}
 
 	return (
@@ -16,13 +19,15 @@ export function ReviewSummary({ reviews }: ReviewSummaryProps) {
 			{reviews.map((review) => (
 				<article className={styles.reviewCard} key={review.id}>
 					<p className={styles.reviewMeta}>
-						Version {review.executionVersionNumber} ·{" "}
-						{new Date(review.createdAt).toLocaleString()}
+						{t("workspace.review.historyVersion", {
+							version: review.executionVersionNumber,
+						})}{" "}
+						· {new Date(review.createdAt).toLocaleString()}
 					</p>
 					<p className={styles.reviewMeta}>
 						{REVIEW_CATEGORIES.map(
 							(category) =>
-								`${category.replace("_", " ")} ${review.scores[category]}/5`,
+								`${t(`workspace.review.categoryLabels.${category}`)} ${review.scores[category]}/5`,
 						).join(" · ")}
 					</p>
 					{review.comment ? (

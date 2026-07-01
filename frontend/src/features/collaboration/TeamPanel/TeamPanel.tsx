@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "@/i18n";
 import { collaborationService } from "@/services/collaboration/CollaborationService";
 import type {
 	WorkspaceInvitation,
@@ -15,6 +16,7 @@ interface TeamPanelProps {
 }
 
 export function TeamPanel({ workspaceId }: TeamPanelProps) {
+	const { t } = useTranslation();
 	const [members, setMembers] = useState<WorkspaceMember[]>([]);
 	const [invitations, setInvitations] = useState<WorkspaceInvitation[]>([]);
 	const [email, setEmail] = useState("");
@@ -42,9 +44,9 @@ export function TeamPanel({ workspaceId }: TeamPanelProps) {
 		}
 
 		void loadTeam(workspaceId).catch(() => {
-			setError("Could not load team members.");
+			setError(t("workspace.team.errors.loadMembers"));
 		});
-	}, [workspaceId, loadTeam]);
+	}, [workspaceId, loadTeam, t]);
 
 	const handleInvite = (): void => {
 		if (!workspaceId || email.trim() === "") {
@@ -61,7 +63,7 @@ export function TeamPanel({ workspaceId }: TeamPanelProps) {
 				return loadTeam(workspaceId);
 			})
 			.catch(() => {
-				setError("Could not send invitation.");
+				setError(t("workspace.team.errors.sendInvitation"));
 			})
 			.finally(() => {
 				setBusy(false);
@@ -83,7 +85,7 @@ export function TeamPanel({ workspaceId }: TeamPanelProps) {
 			.updateMemberRole(workspaceId, memberId, { role: nextRole })
 			.then(() => loadTeam(workspaceId))
 			.catch(() => {
-				setError("Could not update member role.");
+				setError(t("workspace.team.errors.updateMemberRole"));
 			})
 			.finally(() => {
 				setBusy(false);
@@ -102,7 +104,7 @@ export function TeamPanel({ workspaceId }: TeamPanelProps) {
 			.removeMember(workspaceId, memberId)
 			.then(() => loadTeam(workspaceId))
 			.catch(() => {
-				setError("Could not remove member.");
+				setError(t("workspace.team.errors.removeMember"));
 			})
 			.finally(() => {
 				setBusy(false);
@@ -117,8 +119,8 @@ export function TeamPanel({ workspaceId }: TeamPanelProps) {
 		<section className={styles.root}>
 			<div className={styles.header}>
 				<div>
-					<p className={styles.eyebrow}>Team</p>
-					<h2 className={styles.title}>Members</h2>
+					<p className={styles.eyebrow}>{t("workspace.team.eyebrow")}</p>
+					<h2 className={styles.title}>{t("workspace.team.title")}</h2>
 				</div>
 			</div>
 
@@ -132,14 +134,16 @@ export function TeamPanel({ workspaceId }: TeamPanelProps) {
 			<InvitationList invitations={invitations} />
 
 			<div className={styles.inviteForm}>
-				<h3 className={styles.inviteTitle}>Invite member</h3>
+				<h3 className={styles.inviteTitle}>
+					{t("workspace.team.inviteMember")}
+				</h3>
 				<input
 					type="email"
 					value={email}
 					onChange={(event) => setEmail(event.target.value)}
-					placeholder="Email address"
+					placeholder={t("workspace.team.emailAddressPlaceholder")}
 					className={styles.input}
-					aria-label="Member email"
+					aria-label={t("workspace.team.memberEmailAria")}
 				/>
 				<RoleSelector
 					value={role}
@@ -153,7 +157,7 @@ export function TeamPanel({ workspaceId }: TeamPanelProps) {
 					disabled={busy || email.trim() === ""}
 					onClick={handleInvite}
 				>
-					Send invitation
+					{t("workspace.team.sendInvitation")}
 				</button>
 			</div>
 

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { useTranslation } from "@/i18n";
 import { collectionService } from "@/services/collection/CollectionService";
 import { CollectionAssignmentConflictError } from "@/services/collection/MockCollectionRepository";
 import type { Collection } from "@/services/collection/types";
@@ -37,6 +38,7 @@ export function AssignToCollectionDialog({
 	onClose,
 	libraryItemId,
 }: AssignToCollectionDialogProps) {
+	const { t } = useTranslation();
 	const [collections, setCollections] = useState<Collection[]>([]);
 	const [selectedCollectionId, setSelectedCollectionId] = useState("");
 	const [state, setState] = useState<AssignmentState>({ status: "idle" });
@@ -61,10 +63,10 @@ export function AssignToCollectionDialog({
 			.catch(() => {
 				setState({
 					status: "error",
-					message: "Could not load collections. Please try again.",
+					message: t("workspace.collections.assignDialog.loadCollectionsError"),
 				});
 			});
-	}, [open]);
+	}, [open, t]);
 
 	const handleClose = () => {
 		onClose();
@@ -90,7 +92,7 @@ export function AssignToCollectionDialog({
 
 				setState({
 					status: "error",
-					message: "Could not assign the library item. Please try again.",
+					message: t("workspace.collections.assignDialog.assignError"),
 				});
 			});
 	};
@@ -99,12 +101,14 @@ export function AssignToCollectionDialog({
 		<Dialog
 			open={open}
 			onClose={handleClose}
-			title="Assign to collection"
-			description="Choose a collection for this library item."
+			title={t("workspace.collections.assignDialog.title")}
+			description={t("workspace.collections.assignDialog.description")}
 		>
 			{state.status === "loading-collections" ? (
 				<div className={styles.loading}>
-					<Spinner label="Loading collections" />
+					<Spinner
+						label={t("workspace.collections.assignDialog.loadingCollections")}
+					/>
 				</div>
 			) : null}
 
@@ -112,12 +116,14 @@ export function AssignToCollectionDialog({
 				<div className={styles.form}>
 					{collections.length === 0 ? (
 						<EmptyState
-							title="No collections yet"
-							description="Create a collection first, then assign library items to it."
+							title={t("workspace.collections.noCollectionsYet")}
+							description={t("workspace.collections.noCollectionsDescription")}
 						/>
 					) : (
 						<label className={styles.field}>
-							<span className={styles.label}>Collection</span>
+							<span className={styles.label}>
+								{t("workspace.collections.assignDialog.collection")}
+							</span>
 							<select
 								className={styles.select}
 								value={selectedCollectionId}
@@ -141,7 +147,7 @@ export function AssignToCollectionDialog({
 							onClick={handleClose}
 							disabled={state.status === "assigning"}
 						>
-							Cancel
+							{t("common.cancel")}
 						</Button>
 						<Button
 							type="button"
@@ -154,11 +160,15 @@ export function AssignToCollectionDialog({
 						>
 							{state.status === "assigning" ? (
 								<span className={styles.submitting}>
-									<Spinner label="Assigning to collection" />
-									Assigning…
+									<Spinner
+										label={t(
+											"workspace.collections.assignDialog.assigningCollection",
+										)}
+									/>
+									{t("workspace.collections.assignDialog.assigning")}
 								</span>
 							) : (
-								"Assign"
+								t("workspace.collections.assignDialog.assign")
 							)}
 						</Button>
 					</div>
@@ -167,9 +177,11 @@ export function AssignToCollectionDialog({
 
 			{state.status === "success" ? (
 				<div className={styles.feedback}>
-					<p className={styles.success}>Library item assigned successfully.</p>
+					<p className={styles.success}>
+						{t("workspace.collections.assignDialog.success")}
+					</p>
 					<Button type="button" onClick={handleClose}>
-						Done
+						{t("workspace.collections.assignDialog.done")}
 					</Button>
 				</div>
 			) : null}
@@ -177,10 +189,10 @@ export function AssignToCollectionDialog({
 			{state.status === "duplicate" ? (
 				<div className={styles.feedback}>
 					<p className={styles.warning}>
-						This library item is already in the selected collection.
+						{t("workspace.collections.assignDialog.duplicate")}
 					</p>
 					<Button type="button" variant="secondary" onClick={handleClose}>
-						Close
+						{t("common.close")}
 					</Button>
 				</div>
 			) : null}
@@ -189,7 +201,7 @@ export function AssignToCollectionDialog({
 				<div className={styles.feedback}>
 					<p className={styles.error}>{state.message}</p>
 					<Button type="button" variant="secondary" onClick={handleClose}>
-						Close
+						{t("common.close")}
 					</Button>
 				</div>
 			) : null}

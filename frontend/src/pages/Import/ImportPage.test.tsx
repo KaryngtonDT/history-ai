@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -6,6 +6,7 @@ import { ImportPage } from "@/pages/Import/ImportPage";
 import { ProcessingPage } from "@/pages/Processing/ProcessingPage";
 import { contentService } from "@/services/content/ContentService";
 import { processingService } from "@/services/processing/ProcessingService";
+import { renderWithProviders as render } from "@/test/render";
 
 describe("ImportPage — S4-SLICE-04 end-to-end processing flow", () => {
 	afterEach(() => {

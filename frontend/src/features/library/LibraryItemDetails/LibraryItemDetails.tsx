@@ -4,6 +4,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import { getArtifactRenderer } from "@/features/processing/artifactRenderers";
 import { SeeAlsoRecommendationsPanel } from "@/features/recommendation/SeeAlsoRecommendationsPanel";
+import { useTranslation } from "@/i18n";
 import { artifactService } from "@/services/artifact/ArtifactService";
 import type { Artifact } from "@/services/artifact/types";
 import { libraryService } from "@/services/library/LibraryService";
@@ -16,6 +17,7 @@ interface LoadedLibraryItemDetails {
 }
 
 export function LibraryItemDetails() {
+	const { t } = useTranslation();
 	const { libraryItemId } = useParams();
 	const [details, setDetails] = useState<LoadedLibraryItemDetails | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -78,9 +80,7 @@ export function LibraryItemDetails() {
 			})
 			.catch(() => {
 				if (!cancelled) {
-					setLoadError(
-						"Could not reach the server. Check that the backend is running.",
-					);
+					setLoadError(t("workspace.page.backendUnavailable"));
 					setLoading(false);
 				}
 			});
@@ -88,12 +88,12 @@ export function LibraryItemDetails() {
 		return () => {
 			cancelled = true;
 		};
-	}, [libraryItemId]);
+	}, [libraryItemId, t]);
 
 	if (loading) {
 		return (
 			<div className={styles.loading}>
-				<Spinner label="Loading library item" />
+				<Spinner label={t("workspace.library.itemDetails.loading")} />
 			</div>
 		);
 	}
@@ -101,8 +101,8 @@ export function LibraryItemDetails() {
 	if (itemNotFound) {
 		return (
 			<EmptyState
-				title="Library item not found"
-				description="Return to the library to browse saved items."
+				title={t("workspace.library.itemDetails.notFoundTitle")}
+				description={t("workspace.library.itemDetails.notFoundDescription")}
 			/>
 		);
 	}
@@ -110,15 +110,20 @@ export function LibraryItemDetails() {
 	if (artifactNotFound) {
 		return (
 			<EmptyState
-				title="Artifact not found"
-				description="The linked artifact is no longer available for this library item."
+				title={t("workspace.library.itemDetails.artifactNotFoundTitle")}
+				description={t(
+					"workspace.library.itemDetails.artifactNotFoundDescription",
+				)}
 			/>
 		);
 	}
 
 	if (loadError !== null) {
 		return (
-			<EmptyState title="Unable to load library item" description={loadError} />
+			<EmptyState
+				title={t("workspace.library.itemDetails.unableToLoad")}
+				description={loadError}
+			/>
 		);
 	}
 
@@ -132,7 +137,7 @@ export function LibraryItemDetails() {
 		<div className={styles.root}>
 			<header className={styles.header}>
 				<Link to="/library" className={styles.backLink}>
-					Back to Library
+					{t("workspace.library.itemDetails.backToLibrary")}
 				</Link>
 				<h2 className={styles.title}>{details.item.title}</h2>
 			</header>

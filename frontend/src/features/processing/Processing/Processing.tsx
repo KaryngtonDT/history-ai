@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { useTranslation } from "@/i18n";
 import { isTerminalProcessingStatus } from "@/services/processing/ProcessingMonitor";
 import { processingService } from "@/services/processing/ProcessingService";
 import type { ProcessingData } from "@/services/processing/types";
@@ -13,6 +14,7 @@ import { ProcessingTimeline } from "../ProcessingTimeline";
 import styles from "./Processing.module.css";
 
 export function Processing() {
+	const { t } = useTranslation();
 	const { id } = useParams();
 	const [data, setData] = useState<ProcessingData | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -59,9 +61,7 @@ export function Processing() {
 						},
 						() => {
 							if (!cancelled) {
-								setLoadError(
-									"Could not reach the server. Check that the backend is running.",
-								);
+								setLoadError(t("workspace.page.backendUnavailable"));
 								setData(null);
 								setNotFound(false);
 							}
@@ -71,9 +71,7 @@ export function Processing() {
 			})
 			.catch(() => {
 				if (!cancelled) {
-					setLoadError(
-						"Could not reach the server. Check that the backend is running.",
-					);
+					setLoadError(t("workspace.page.backendUnavailable"));
 					setData(null);
 					setNotFound(false);
 					setLoading(false);
@@ -84,12 +82,12 @@ export function Processing() {
 			cancelled = true;
 			unsubscribe?.();
 		};
-	}, [id]);
+	}, [id, t]);
 
 	if (loading) {
 		return (
 			<div className={styles.loading}>
-				<Spinner label="Loading processing status" />
+				<Spinner label={t("workspace.processing.loadingStatus")} />
 			</div>
 		);
 	}
@@ -97,15 +95,18 @@ export function Processing() {
 	if (notFound) {
 		return (
 			<EmptyState
-				title="Processing job not found"
-				description="Return to the dashboard to continue."
+				title={t("workspace.processing.jobNotFound")}
+				description={t("workspace.processing.returnToDashboard")}
 			/>
 		);
 	}
 
 	if (loadError !== null) {
 		return (
-			<EmptyState title="Unable to load processing" description={loadError} />
+			<EmptyState
+				title={t("workspace.processing.unableToLoad")}
+				description={loadError}
+			/>
 		);
 	}
 

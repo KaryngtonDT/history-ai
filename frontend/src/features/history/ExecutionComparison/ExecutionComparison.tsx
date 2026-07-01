@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n";
 import { historyService } from "@/services/history/HistoryService";
 import type { ComparisonResult } from "@/services/history/types";
 import styles from "./ExecutionComparison.module.css";
@@ -11,10 +12,14 @@ export function ExecutionComparison({
 	comparison,
 	loading = false,
 }: ExecutionComparisonProps) {
+	const { t } = useTranslation();
+
 	if (loading) {
 		return (
 			<div className={styles.panel}>
-				<p className={styles.loading}>Comparing versions...</p>
+				<p className={styles.loading}>
+					{t("workspace.history.comparingVersions")}
+				</p>
 			</div>
 		);
 	}
@@ -27,13 +32,18 @@ export function ExecutionComparison({
 		<div className={styles.panel}>
 			<div className={styles.header}>
 				<p className={styles.title}>
-					Compare V{comparison.leftVersion} vs V{comparison.rightVersion}
+					{t("workspace.history.compareVersions", {
+						left: comparison.leftVersion,
+						right: comparison.rightVersion,
+					})}
 				</p>
 			</div>
 
 			{comparison.providerDifferences.length > 0 ? (
 				<div className={styles.section}>
-					<p className={styles.sectionTitle}>Provider differences</p>
+					<p className={styles.sectionTitle}>
+						{t("workspace.history.providerDifferences")}
+					</p>
 					<ul>
 						{comparison.providerDifferences.map((difference) => (
 							<li key={difference.stage}>
@@ -47,7 +57,9 @@ export function ExecutionComparison({
 
 			{comparison.optimizationDifference ? (
 				<div className={styles.section}>
-					<p className={styles.sectionTitle}>Optimization</p>
+					<p className={styles.sectionTitle}>
+						{t("workspace.history.optimization")}
+					</p>
 					<p>
 						{historyService.formatProfile(
 							comparison.optimizationDifference.leftProfile,
@@ -62,7 +74,9 @@ export function ExecutionComparison({
 
 			{comparison.qualityScoreDifference ? (
 				<div className={styles.section}>
-					<p className={styles.sectionTitle}>Quality score</p>
+					<p className={styles.sectionTitle}>
+						{t("workspace.history.qualityScore")}
+					</p>
 					<p>
 						{comparison.qualityScoreDifference.leftScore} →{" "}
 						{comparison.qualityScoreDifference.rightScore} (

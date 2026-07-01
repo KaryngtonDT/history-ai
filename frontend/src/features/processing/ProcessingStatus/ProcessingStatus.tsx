@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/Progress";
 import { Spinner } from "@/components/ui/Spinner";
+import { useTranslation } from "@/i18n";
 import type { ProcessingData } from "@/services/processing/types";
 import styles from "./ProcessingStatus.module.css";
 
@@ -24,39 +25,44 @@ function statusBadgeVariant(
 	return "neutral";
 }
 
-function statusLabel(status: ProcessingData["status"]): string {
+function statusKey(status: ProcessingData["status"]): string {
 	if (status === "completed") {
-		return "Completed";
+		return "workspace.processing.status.completed";
 	}
 	if (status === "running") {
-		return "Running";
+		return "workspace.processing.status.running";
 	}
 	if (status === "failed") {
-		return "Failed";
+		return "workspace.processing.status.failed";
 	}
 	if (status === "cancelled") {
-		return "Cancelled";
+		return "workspace.processing.status.cancelled";
 	}
-	return "Pending";
+	return "workspace.processing.status.pending";
 }
 
 export function ProcessingStatus({ data }: ProcessingStatusProps) {
+	const { t } = useTranslation();
 	const isRunning = data.status === "running";
 
 	return (
 		<Card className={styles.card}>
 			<div className={styles.header}>
-				<p className={styles.label}>Progress</p>
+				<p className={styles.label}>{t("workspace.processing.progress")}</p>
 				<Badge variant={statusBadgeVariant(data.status)}>
-					{statusLabel(data.status)}
+					{t(statusKey(data.status))}
 				</Badge>
 			</div>
 			<Progress value={data.progress} />
 			<p className={styles.percent}>{data.progress} %</p>
 			<div className={styles.currentStep}>
-				<p className={styles.currentLabel}>Current step</p>
+				<p className={styles.currentLabel}>
+					{t("workspace.processing.currentStep")}
+				</p>
 				<div className={styles.currentValue}>
-					{isRunning ? <Spinner label="Processing step" /> : null}
+					{isRunning ? (
+						<Spinner label={t("workspace.processing.processingStep")} />
+					) : null}
 					<p className={styles.currentText}>{data.currentStep}</p>
 				</div>
 			</div>

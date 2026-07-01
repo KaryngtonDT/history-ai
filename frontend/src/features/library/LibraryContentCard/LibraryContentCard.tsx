@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { useTranslation } from "@/i18n";
 import type { LibraryItem } from "@/services/library/types";
 import styles from "./LibraryContentCard.module.css";
 
@@ -11,22 +12,15 @@ interface LibraryContentCardProps {
 }
 
 function typeLabel(type: LibraryItem["type"]): string {
-	const labels: Record<LibraryItem["type"], string> = {
-		summary: "Summary",
-		quiz: "Quiz",
-		flashcards: "Flashcards",
-		transcript: "Transcript",
-		timeline: "Timeline",
-		podcast: "Podcast",
-	};
-
-	return labels[type];
+	return `workspace.library.typeLabels.${type}`;
 }
 
 export function LibraryContentCard({
 	item,
 	onAssignClick,
 }: LibraryContentCardProps) {
+	const { t } = useTranslation();
+
 	return (
 		<Card className={styles.card}>
 			<div className={styles.header}>
@@ -34,7 +28,7 @@ export function LibraryContentCard({
 					<h3 className={styles.title}>{item.title}</h3>
 				</Link>
 				<div className={styles.badges}>
-					<Badge variant="neutral">{typeLabel(item.type)}</Badge>
+					<Badge variant="neutral">{t(typeLabel(item.type))}</Badge>
 				</div>
 			</div>
 			<div className={styles.actions}>
@@ -44,7 +38,7 @@ export function LibraryContentCard({
 					size="sm"
 					onClick={onAssignClick}
 				>
-					Add to Collection
+					{t("workspace.library.addToCollection")}
 				</Button>
 			</div>
 		</Card>

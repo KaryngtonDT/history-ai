@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { MOCK_PREVIEW_HISTORY } from "@/services/history/MockHistoryRepository";
+import { renderWithProviders as render } from "@/test/render";
 import { ExecutionComparison } from "../ExecutionComparison";
 import { VersionTimeline } from "../VersionTimeline";
 

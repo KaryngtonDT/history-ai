@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { useTranslation } from "@/i18n";
 import type { ProjectVideo } from "@/services/workspace/types";
 import styles from "./VideoGrid.module.css";
 
@@ -13,12 +14,10 @@ export function VideoGrid({
 	onRemoveVideo,
 	removingVideoId = null,
 }: VideoGridProps) {
+	const { t } = useTranslation();
+
 	if (videos.length === 0) {
-		return (
-			<p className={styles.empty}>
-				Add videos to this project to start batch processing.
-			</p>
-		);
+		return <p className={styles.empty}>{t("workspace.videoGrid.empty")}</p>;
 	}
 
 	return (
@@ -30,7 +29,7 @@ export function VideoGrid({
 					</span>
 					<span className={styles.filename}>{video.filename}</span>
 					<Link to={`/video/${video.videoId}`} className={styles.pipelineLink}>
-						Open pipeline →
+						{t("workspace.videoGrid.openPipeline")}
 					</Link>
 					{onRemoveVideo ? (
 						<button
@@ -38,9 +37,11 @@ export function VideoGrid({
 							className={styles.removeButton}
 							onClick={() => onRemoveVideo(video.videoId)}
 							disabled={removingVideoId === video.videoId}
-							aria-label={`Remove ${video.filename}`}
+							aria-label={t("workspace.videoGrid.removeAria", {
+								filename: video.filename,
+							})}
 						>
-							Remove
+							{t("workspace.videoGrid.remove")}
 						</button>
 					) : null}
 				</li>

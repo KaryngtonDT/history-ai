@@ -2,6 +2,7 @@ import { type FormEvent, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { Spinner } from "@/components/ui/Spinner";
+import { useTranslation } from "@/i18n";
 import { collectionService } from "@/services/collection/CollectionService";
 import styles from "./CreateCollectionDialog.module.css";
 
@@ -16,6 +17,7 @@ export function CreateCollectionDialog({
 	onClose,
 	onCreated,
 }: CreateCollectionDialogProps) {
+	const { t } = useTranslation();
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [submitting, setSubmitting] = useState(false);
@@ -47,7 +49,7 @@ export function CreateCollectionDialog({
 			})
 			.catch(() => {
 				setSubmitting(false);
-				setError("Could not create the collection. Please try again.");
+				setError(t("workspace.collections.createDialog.error"));
 			});
 	};
 
@@ -55,12 +57,14 @@ export function CreateCollectionDialog({
 		<Dialog
 			open={open}
 			onClose={handleClose}
-			title="Create collection"
-			description="Give your collection a name and optional description."
+			title={t("workspace.collections.createDialog.title")}
+			description={t("workspace.collections.createDialog.description")}
 		>
 			<form className={styles.form} onSubmit={handleSubmit}>
 				<label className={styles.field}>
-					<span className={styles.label}>Name</span>
+					<span className={styles.label}>
+						{t("workspace.collections.createDialog.name")}
+					</span>
 					<input
 						className={styles.input}
 						value={name}
@@ -70,7 +74,9 @@ export function CreateCollectionDialog({
 					/>
 				</label>
 				<label className={styles.field}>
-					<span className={styles.label}>Description</span>
+					<span className={styles.label}>
+						{t("workspace.collections.createDialog.descriptionLabel")}
+					</span>
 					<textarea
 						className={styles.textarea}
 						value={description}
@@ -87,16 +93,20 @@ export function CreateCollectionDialog({
 						onClick={handleClose}
 						disabled={submitting}
 					>
-						Cancel
+						{t("common.cancel")}
 					</Button>
 					<Button type="submit" disabled={submitting || name.trim() === ""}>
 						{submitting ? (
 							<span className={styles.submitting}>
-								<Spinner label="Creating collection" />
-								Creating…
+								<Spinner
+									label={t(
+										"workspace.collections.createDialog.creatingCollection",
+									)}
+								/>
+								{t("workspace.collections.createDialog.creating")}
 							</span>
 						) : (
-							"Create"
+							t("workspace.collections.createDialog.create")
 						)}
 					</Button>
 				</div>

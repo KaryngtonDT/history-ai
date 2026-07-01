@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n";
 import type { PreferenceProfile } from "@/services/review/types";
 import styles from "./PreferenceProfileCard.module.css";
 
@@ -6,12 +7,16 @@ interface PreferenceProfileCardProps {
 }
 
 export function PreferenceProfileCard({ profile }: PreferenceProfileCardProps) {
+	const { t } = useTranslation();
+
 	if (!profile) {
 		return (
 			<section className={styles.card}>
-				<h3 className={styles.title}>Preference Profile</h3>
+				<h3 className={styles.title}>
+					{t("workspace.review.preferenceProfile.title")}
+				</h3>
 				<p className={styles.empty}>
-					Submit reviews to build your adaptive preference profile.
+					{t("workspace.review.preferenceProfile.empty")}
 				</p>
 			</section>
 		);
@@ -19,22 +24,32 @@ export function PreferenceProfileCard({ profile }: PreferenceProfileCardProps) {
 
 	return (
 		<section className={styles.card}>
-			<h3 className={styles.title}>Preference Profile</h3>
+			<h3 className={styles.title}>
+				{t("workspace.review.preferenceProfile.title")}
+			</h3>
 			<div className={styles.grid}>
 				<div className={styles.row}>
-					<span className={styles.label}>Translation style</span>
+					<span className={styles.label}>
+						{t("workspace.review.preferenceProfile.translationStyle")}
+					</span>
 					<span>{profile.translationStyle}</span>
 				</div>
 				<div className={styles.row}>
-					<span className={styles.label}>Voice stability</span>
+					<span className={styles.label}>
+						{t("workspace.review.preferenceProfile.voiceStability")}
+					</span>
 					<span>{profile.voiceStability}</span>
 				</div>
 				<div className={styles.row}>
-					<span className={styles.label}>Rendering preset</span>
+					<span className={styles.label}>
+						{t("workspace.review.preferenceProfile.renderingPreset")}
+					</span>
 					<span>{profile.renderingPreset}</span>
 				</div>
 				<div className={styles.row}>
-					<span className={styles.label}>Lip sync strength</span>
+					<span className={styles.label}>
+						{t("workspace.review.preferenceProfile.lipSyncStrength")}
+					</span>
 					<span>{profile.lipSyncStrength}</span>
 				</div>
 			</div>

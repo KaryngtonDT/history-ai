@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { useTranslation } from "@/i18n";
 import { collectionService } from "@/services/collection/CollectionService";
 import type { Collection } from "@/services/collection/types";
 import { CollectionHeader } from "../CollectionHeader";
@@ -9,6 +10,7 @@ import { CreateCollectionDialog } from "../CreateCollectionDialog";
 import styles from "./Collections.module.css";
 
 export function Collections() {
+	const { t } = useTranslation();
 	const [collections, setCollections] = useState<Collection[] | null>(null);
 	const [loadError, setLoadError] = useState<string | null>(null);
 	const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -25,11 +27,9 @@ export function Collections() {
 			})
 			.catch(() => {
 				setCollections([]);
-				setLoadError(
-					"Could not reach the server. Check that the backend is running.",
-				);
+				setLoadError(t("workspace.page.backendUnavailable"));
 			});
-	}, []);
+	}, [t]);
 
 	useEffect(() => {
 		loadCollections();
@@ -40,17 +40,17 @@ export function Collections() {
 			<CollectionHeader onCreateClick={() => setCreateDialogOpen(true)} />
 			{collections === null ? (
 				<div className={styles.loading}>
-					<Spinner label="Loading collections" />
+					<Spinner label={t("workspace.collections.loadingCollections")} />
 				</div>
 			) : loadError !== null ? (
 				<EmptyState
-					title="Unable to load collections"
+					title={t("workspace.collections.unableToLoadCollections")}
 					description={loadError}
 				/>
 			) : collections.length === 0 ? (
 				<EmptyState
-					title="No collections yet"
-					description="Create your first collection to organize library items."
+					title={t("workspace.collections.noCollectionsYet")}
+					description={t("workspace.collections.noCollectionsDescription")}
 				/>
 			) : (
 				<CollectionList collections={collections} />

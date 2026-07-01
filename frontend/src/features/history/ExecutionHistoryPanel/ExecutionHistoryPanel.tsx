@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "@/i18n";
 import { historyService } from "@/services/history/HistoryService";
 import type {
 	ComparisonResult,
@@ -13,6 +14,7 @@ interface ExecutionHistoryPanelProps {
 }
 
 export function ExecutionHistoryPanel({ videoId }: ExecutionHistoryPanelProps) {
+	const { t } = useTranslation();
 	const [history, setHistory] = useState<ExecutionHistory | null>(null);
 	const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
 	const [compareVersion, setCompareVersion] = useState<number | null>(null);
@@ -91,11 +93,15 @@ export function ExecutionHistoryPanel({ videoId }: ExecutionHistoryPanelProps) {
 	return (
 		<section className={styles.panel}>
 			<div className={styles.header}>
-				<h2 className={styles.title}>Version History</h2>
+				<h2 className={styles.title}>
+					{t("workspace.history.versionHistory")}
+				</h2>
 			</div>
 
 			{loading ? (
-				<p className={styles.loading}>Loading execution history...</p>
+				<p className={styles.loading}>
+					{t("workspace.history.loadingExecutionHistory")}
+				</p>
 			) : (
 				<>
 					<VersionTimeline
@@ -114,7 +120,7 @@ export function ExecutionHistoryPanel({ videoId }: ExecutionHistoryPanelProps) {
 								!historyService.canCompare(selectedVersion, compareVersion)
 							}
 						>
-							Compare
+							{t("workspace.history.compare")}
 						</button>
 						<button
 							type="button"
@@ -122,7 +128,7 @@ export function ExecutionHistoryPanel({ videoId }: ExecutionHistoryPanelProps) {
 							onClick={handleReprocess}
 							disabled={reprocessing || selectedVersion === null}
 						>
-							Reprocess
+							{t("workspace.history.reprocess")}
 						</button>
 					</div>
 
