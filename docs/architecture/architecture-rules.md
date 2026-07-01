@@ -8,7 +8,7 @@ Status: Active
 
 # Purpose
 
-This document defines **enforceable dependency rules** for History AI. Rules are checked automatically by architecture tests in backend, worker, and frontend.
+This document defines **enforceable dependency rules** for **Lumen** (repository package names may still use `history-ai`). Rules are checked automatically by architecture tests in backend, worker, and frontend.
 
 When a rule is violated, the corresponding test suite **fails in CI**.
 
@@ -1440,6 +1440,23 @@ import { HttpSemanticSearchRepository } from "@/services/semantic/HttpSemanticSe
 ```
 
 **Fix:** import `semanticSearchService` from `@/services/semantic/SemanticSearchService`.
+
+---
+
+# Sprint 54 — Product layout (frontend UX)
+
+These rules are **product conventions**, not automated architecture tests:
+
+| Rule | Implementation |
+| ---- | -------------- |
+| User-visible brand is **Lumen** | `frontend/src/config/app.ts`, i18n `shell.brand` |
+| Create pages use compact two-column layout | `CreatePageLayout`, `CompactPageIntroduction` |
+| Optional panels collapsed by default | `CollapsibleSection` (`<details>`) |
+| Workspace uses local tabs, no new routes | `WorkspacePage` tab state |
+| Heavy panels lazy per tab | Analytics/reviews load on tab activation |
+| Empty/disabled UI must guide next action | `EmptyState`, `shell.nav.empty.{id}` |
+
+Do **not** rename backend namespaces, database tables, or package names as part of UX sprints unless an ADR approves migration.
 
 ---
 

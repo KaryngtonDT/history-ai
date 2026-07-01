@@ -8,7 +8,7 @@ Status: Active
 
 # Purpose
 
-This folder records **Architecture Decision Records (ADRs)** for History AI — the major structural choices made during Sprints 1–10.
+This folder records **Architecture Decision Records (ADRs)** for **Lumen** (public product name; repository identifiers may still use `history-ai`) — the major structural choices made during Sprints 1–10.
 
 ADRs complement:
 
@@ -1275,9 +1275,29 @@ Verification: [Sprint53-Verification.md](../reports/Sprint53-Verification.md) ·
 
 ---
 
+# Sprint 54 — Lumen Rebrand & Compact Product Layout (2026-06)
+
+| Slice | Focus | Status |
+|-------|-------|--------|
+| P54-SLICE-01 | User-visible rebrand to **Lumen** | ✅ |
+| P54-SLICE-02 | Compact create layouts (`CreatePageLayout`, collapsed help) | ✅ |
+| P54-SLICE-03 | Workspace local tabs + sticky batch bar | ✅ |
+| P54-SLICE-04 | Guided empty states + sidebar disabled hints | ✅ |
+| P54-SLICE-05 | Documentation + verification | ✅ |
+
+- **Brand:** Lumen in UI; backend namespaces / DB names unchanged.
+- **UX:** Create pages use two-column layout; workspace uses lazy-loaded tabs.
+- **No backend changes** in this sprint.
+
+Verification: [Sprint54-Verification.md](../reports/Sprint54-Verification.md)
+
+Product IA updates: [PRODUCT_INFORMATION_ARCHITECTURE.md](./PRODUCT_INFORMATION_ARCHITECTURE.md)
+
+---
+
 # Project architecture overview
 
-History AI is a **modular monolith** with three runtime applications and a shared domain story:
+**Lumen** is a **modular monolith** with three runtime applications and a shared domain story:
 
 ```mermaid
 flowchart TB

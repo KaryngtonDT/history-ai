@@ -8,7 +8,7 @@ Status: Accepted
 
 ## Vision
 
-History AI follows one product flow:
+**Lumen** (public product name) follows one product flow:
 
 ```text
 Knowledge In → AI Processing → Knowledge / Media Out
@@ -102,7 +102,41 @@ Public API should expose **WorkItem** concepts matching the UI, not raw internal
 
 ---
 
+## Sprint 54 — Compact layouts & workspace tabs
+
+### Product name
+
+- User-facing brand: **Lumen**
+- Tagline: *AI video and knowledge localization platform.*
+- Technical repo/DB identifiers remain `history-ai` until a dedicated migration sprint.
+
+### Create page layout
+
+| Route | Primary (left) | Secondary (right, collapsed by default) |
+|-------|----------------|-------------------------------------------|
+| `/video/upload` | Mode + dropzone | AI Director previews, help |
+| `/audio/upload` | Mode + dropzone | Pipeline explanation, help |
+| `/youtube/import` | URL + preview + import | What happens next, help |
+| `/import` | PDF dropzone | Next steps, supported files, help |
+
+Use `CompactPageIntroduction` + `CreatePageLayout` from `frontend/src/features/product/`.
+
+### Workspace
+
+`/workspace` uses **local tabs** (not new routes): Projects, Team, Analytics, History, Reviews, Preferences.
+
+- Analytics/history/review data loads only when the tab is active.
+- Projects tab includes a **sticky batch bar** (video count, languages, process CTA, progress).
+
+### Empty states
+
+Disabled sidebar items and empty panels must state what is missing, why it matters, and the next action (`EmptyState` + `shell.nav.empty.*` i18n keys).
+
+---
+
 ## Related docs
+
+- [Sprint 54 Verification](../reports/Sprint54-Verification.md)
 
 - [Sprint 50 PX Verification](../reports/Sprint50-PX-Verification.md)
 - [Sprint 50.5 Verification](../reports/Sprint50_5-Verification.md)
