@@ -1,23 +1,26 @@
-import type { PipelineTelemetry } from "@/services/telemetry/types";
+import type {
+	ExecutionMetric,
+	PipelineTelemetry,
+} from "@/services/telemetry/types";
 import styles from "./PerformanceCharts.module.css";
 
 interface PerformanceChartsProps {
 	records: PipelineTelemetry[];
 }
 
+interface PerformanceSample {
+	id: string;
+	metric: ExecutionMetric;
+}
+
 export function PerformanceCharts({ records }: PerformanceChartsProps) {
-	const samples = records
+	const samples: PerformanceSample[] = records
 		.map((record) => ({
 			id: record.id,
 			metric: record.metrics.find((entry) => entry.type === "processing_time"),
 		}))
 		.filter(
-			(
-				sample,
-			): sample is {
-				id: string;
-				metric: NonNullable<(typeof samples)[number]["metric"]>;
-			} => sample.metric !== undefined,
+			(sample): sample is PerformanceSample => sample.metric !== undefined,
 		)
 		.slice(0, 5);
 
