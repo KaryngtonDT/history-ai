@@ -8,7 +8,8 @@ export const shadowRelationshipEn = {
 			"Inspect the relationship portrait, edit traits, review the timeline, teach Shadow with natural language, and approve pending changes.",
 		portrait: {
 			title: "Shadow knows you",
-			description: "Explainable relationship score based on confirmed and active traits.",
+			description:
+				"Explainable relationship score based on confirmed and active traits.",
 			score: "{{score}}%",
 			confirmed: "What Shadow knows with confidence",
 			hypotheses: "Hypotheses",
@@ -32,8 +33,7 @@ export const shadowRelationshipEn = {
 			title: "Teach Shadow about you",
 			description:
 				"Tell Shadow what to remember. Inferred changes always require your approval.",
-			placeholder:
-				"Example: Shadow, remember that I like football analogies.",
+			placeholder: "Example: Shadow, remember that I like football analogies.",
 			preview: "Preview change",
 			apply: "Apply",
 		},
