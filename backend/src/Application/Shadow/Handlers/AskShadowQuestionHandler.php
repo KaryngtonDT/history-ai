@@ -14,6 +14,7 @@ use App\Application\Shadow\ShadowSessionResolver;
 use App\Application\Shadow\SessionLearning\SessionLearningCoordinator;
 use App\Application\ShadowRelationship\RelationshipProfileBuilder;
 use App\Application\ShadowMemory\MemoryBuilder;
+use App\Application\ShadowTeaching\TeachingBuilder;
 use App\Application\Shadow\ShadowWatchAnswerer;
 use App\Domain\Shadow\SessionLearning\TeachingStrategy;
 use App\Domain\Shadow\Exception\InvalidShadowSessionException;
@@ -34,6 +35,7 @@ final class AskShadowQuestionHandler
         private readonly SessionLearningCoordinator $sessionLearningCoordinator,
         private readonly RelationshipProfileBuilder $relationshipProfileBuilder,
         private readonly MemoryBuilder $memoryBuilder,
+        private readonly TeachingBuilder $teachingBuilder,
     ) {
     }
 
@@ -120,6 +122,13 @@ final class AskShadowQuestionHandler
                 'videoId' => $command->videoId,
                 'timeSeconds' => $command->currentTimeSeconds,
             ],
+        ]);
+
+        $this->teachingBuilder->recordQuestion('default', [
+            'question' => $command->question,
+            'sessionId' => $command->sessionId,
+            'videoId' => $command->videoId,
+            'timeSeconds' => $command->currentTimeSeconds,
         ]);
 
         return ShadowAnswerResult::fromSession($session, $answer->text(), $voice);

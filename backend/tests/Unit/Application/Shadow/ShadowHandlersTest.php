@@ -40,6 +40,15 @@ use App\Application\ShadowMemory\MemoryEvolutionEngine;
 use App\Application\Shadow\ShadowWatchAnswerer;
 use App\Application\Shadow\ShadowWatchPromptBuilder;
 use App\Application\Shadow\TimelineContextBuilder;
+use App\Application\ShadowTeaching\CheckpointGenerator;
+use App\Application\ShadowTeaching\ExercisePlanner;
+use App\Application\ShadowTeaching\LearningObjectiveResolver;
+use App\Application\ShadowTeaching\LearningPathBuilder;
+use App\Application\ShadowTeaching\RevisionPlanner;
+use App\Application\ShadowTeaching\TeachingAdvisor;
+use App\Application\ShadowTeaching\TeachingBuilder;
+use App\Application\ShadowTeaching\TeachingPlanner;
+use App\Application\ShadowTeaching\TeachingProgressUpdater;
 use App\Domain\Chat\ChatProviderInterface;
 use App\Domain\Chat\ChatRequest;
 use App\Domain\Chat\ChatResponse;
@@ -62,6 +71,7 @@ use App\Infrastructure\Shadow\InMemoryShadowSessionRepository;
 use App\Infrastructure\Shadow\SessionLearning\InMemorySessionLearningStateRepository;
 use App\Infrastructure\ShadowRelationship\InMemoryShadowRelationshipRepository;
 use App\Infrastructure\ShadowMemory\InMemoryShadowMemoryRepository;
+use App\Infrastructure\ShadowTeaching\InMemoryShadowTeachingRepository;
 use PHPUnit\Framework\TestCase;
 
 final class ShadowHandlersTest extends TestCase
@@ -203,6 +213,7 @@ final class ShadowHandlersTest extends TestCase
             $this->sessionLearningCoordinator(),
             $this->relationshipProfileBuilder(),
             $this->memoryBuilder(),
+            $this->teachingBuilder(),
         );
     }
 
@@ -231,6 +242,22 @@ final class ShadowHandlersTest extends TestCase
                 new ConversationStyleDetector(),
                 new RelationshipTraitResolver(),
             ),
+        );
+    }
+
+    private function teachingBuilder(): TeachingBuilder
+    {
+        return new TeachingBuilder(
+            new InMemoryShadowTeachingRepository(),
+            $this->memoryBuilder(),
+            new TeachingPlanner(
+                new LearningPathBuilder(new LearningObjectiveResolver()),
+                new ExercisePlanner(),
+                new RevisionPlanner(),
+                new CheckpointGenerator(),
+                new TeachingAdvisor(),
+            ),
+            new TeachingProgressUpdater(),
         );
     }
 

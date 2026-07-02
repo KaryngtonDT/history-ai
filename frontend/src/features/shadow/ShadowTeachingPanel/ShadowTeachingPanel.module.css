@@ -1,0 +1,45 @@
+.panel {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 1rem;
+	border: 1px solid var(--color-border, #d8dee9);
+	border-radius: 0.75rem;
+	background: var(--color-surface, #fff);
+}
+
+.header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 0.75rem;
+}
+
+.header h3 {
+	margin: 0;
+	font-size: 1rem;
+}
+
+.refreshing {
+	font-size: 0.75rem;
+	color: var(--color-muted, #5c6773);
+}
+
+.card {
+	padding: 0.65rem 0.75rem;
+	border-radius: 0.6rem;
+	border: 1px solid var(--color-border, #d8dee9);
+	display: grid;
+	gap: 0.3rem;
+}
+
+.label {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--color-muted, #5c6773);
+}
+
+.value {
+	font-size: 0.9rem;
+}

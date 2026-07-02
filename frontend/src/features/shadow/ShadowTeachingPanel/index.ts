@@ -1,0 +1,1 @@
+export { ShadowTeachingPanel } from "./ShadowTeachingPanel";

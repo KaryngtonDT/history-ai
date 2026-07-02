@@ -1,0 +1,1 @@
+export { ShadowTeachingCenter } from "./ShadowTeachingCenter";

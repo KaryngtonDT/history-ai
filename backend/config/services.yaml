@@ -281,6 +281,9 @@ services:
     App\Domain\ShadowMemory\ShadowMemoryRepositoryInterface:
         alias: App\Infrastructure\ShadowMemory\FileShadowMemoryRepository
 
+    App\Domain\ShadowTeaching\ShadowTeachingRepositoryInterface:
+        alias: App\Infrastructure\ShadowTeaching\FileShadowTeachingRepository
+
     app.storage.learning:
         class: App\Infrastructure\Storage\JsonFileStore
         arguments:
@@ -311,6 +314,11 @@ services:
         arguments:
             $directory: '%storage.root%/shadow/memory'
 
+    app.storage.shadow_teaching:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/shadow/teaching'
+
     App\Infrastructure\Learning\FileLearningProfileRepository:
         arguments:
             $store: '@app.storage.learning'
@@ -335,6 +343,14 @@ services:
         arguments:
             $store: '@app.storage.shadow_memory'
 
+    App\Infrastructure\ShadowTeaching\FileShadowTeachingRepository:
+        arguments:
+            $store: '@app.storage.shadow_teaching'
+
+    App\Application\Shadow\Handlers\AskShadowQuestionHandler:
+        arguments:
+            $teachingBuilder: '@App\Application\ShadowTeaching\TeachingBuilder'
+
     App\Application\Platform\PlatformHealthCheckerInterface:
         alias: App\Infrastructure\Platform\PlatformHealthChecker
 
@@ -352,6 +368,7 @@ services:
             $identityBehaviorResolver: '@App\Application\ShadowIdentity\ShadowIdentityBehaviorResolver'
             $relationshipContextComposer: '@App\Application\ShadowRelationship\RelationshipContextComposer'
             $memoryContextComposer: '@App\Application\ShadowMemory\MemoryContextComposer'
+            $teachingContextComposer: '@App\Application\ShadowTeaching\TeachingContextComposer'
 
     App\Domain\Shadow\ShadowConversationContextInterface:
         alias: App\Infrastructure\Shadow\NullShadowConversationContext

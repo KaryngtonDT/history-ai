@@ -14,6 +14,9 @@ import { shadowMemoryFr } from "./sections/shadowMemory.fr";
 import { shadowRelationshipDe } from "./sections/shadowRelationship.de";
 import { shadowRelationshipEn } from "./sections/shadowRelationship.en";
 import { shadowRelationshipFr } from "./sections/shadowRelationship.fr";
+import { shadowTeachingDe } from "./sections/shadowTeaching.de";
+import { shadowTeachingEn } from "./sections/shadowTeaching.en";
+import { shadowTeachingFr } from "./sections/shadowTeaching.fr";
 import { shellDe } from "./sections/shell.de";
 import { shellEn } from "./sections/shell.en";
 import { shellFr } from "./sections/shell.fr";
@@ -68,7 +71,10 @@ export const en = mergeMessages(
 		),
 		shadowIdentityEn,
 	),
-	mergeMessages(shadowRelationshipEn, shadowMemoryEn),
+	mergeMessages(
+		mergeMessages(shadowRelationshipEn, shadowMemoryEn),
+		shadowTeachingEn,
+	),
 );
 
 export type Messages = DeepStringRecord<typeof en>;
@@ -120,7 +126,10 @@ export const fr = mergeMessages(
 		),
 		shadowIdentityFr,
 	),
-	mergeMessages(shadowRelationshipFr, shadowMemoryFr),
+	mergeMessages(
+		mergeMessages(shadowRelationshipFr, shadowMemoryFr),
+		shadowTeachingFr,
+	),
 ) satisfies Messages;
 
 const baseDe = {
@@ -170,5 +179,8 @@ export const de = mergeMessages(
 		),
 		shadowIdentityDe,
 	),
-	mergeMessages(shadowRelationshipDe, shadowMemoryDe),
+	mergeMessages(
+		mergeMessages(shadowRelationshipDe, shadowMemoryDe),
+		shadowTeachingDe,
+	),
 ) satisfies Messages;

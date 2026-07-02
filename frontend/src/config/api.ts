@@ -112,6 +112,26 @@ export const SHADOW_MEMORY_JOURNEY_PATH = "/api/shadow/memory/journey";
 export const SHADOW_MEMORY_SEARCH_PATH = "/api/shadow/memory/search";
 export const SHADOW_MEMORY_RESET_PATH = "/api/shadow/memory/reset";
 
+export const SHADOW_TEACHING_PATH_PATH = "/api/shadow/teaching/path";
+export const SHADOW_TEACHING_CURRENT_PATH = "/api/shadow/teaching/current";
+export const SHADOW_TEACHING_OBJECTIVES_PATH =
+	"/api/shadow/teaching/objectives";
+export const SHADOW_TEACHING_REVISIONS_PATH = "/api/shadow/teaching/revisions";
+export const SHADOW_TEACHING_EXERCISES_PATH = "/api/shadow/teaching/exercises";
+export function SHADOW_TEACHING_EXERCISE_ANSWER_PATH(
+	exerciseId: string,
+): string {
+	return `/api/shadow/teaching/exercise/${exerciseId}/answer`;
+}
+export function SHADOW_TEACHING_CHECKPOINT_COMPLETE_PATH(
+	checkpointId: string,
+): string {
+	return `/api/shadow/teaching/checkpoint/${checkpointId}/complete`;
+}
+export const SHADOW_TEACHING_PREFERENCES_PATH =
+	"/api/shadow/teaching/preferences";
+export const SHADOW_TEACHING_RESET_PATH = "/api/shadow/teaching/reset";
+
 export function videoReviewsPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/reviews`;
 }

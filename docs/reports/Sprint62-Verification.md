@@ -1,5 +1,22 @@
 # Sprint 62 Verification — Shadow Memory Timeline & Knowledge Recall
 
+## Validation gate (required)
+
+Sprint is **not** officially validated until the full Docker suite is green (`make test-all` + `composer architecture` + `npm run check`).
+
+| Check | Result | Details |
+|-------|--------|---------|
+| Backend PHPUnit | PASS | 1697 tests |
+| Backend architecture | PASS | 36 tests |
+| Frontend build | PASS | `tsc -b && vite build` |
+| Frontend Vitest | PASS | 678 tests |
+| Frontend Biome | PASS | 1131 files |
+| Worker pytest | PASS | 127 tests |
+| Worker ruff | PASS | All checks |
+| Health `/health` `/ready` `/live` | PASS | prod-like stack |
+
+Validated: 2026-06-26 (Docker prod-like stack).
+
 ## Backend
 
 - [x] `Domain/ShadowMemory` timeline, entries, knowledge items, connections, recall

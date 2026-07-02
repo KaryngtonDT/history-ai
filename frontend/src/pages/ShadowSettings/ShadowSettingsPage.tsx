@@ -4,12 +4,13 @@ import { PageIntroduction } from "@/features/product";
 import { ShadowIdentityCenter } from "@/features/shadowIdentity/ShadowIdentityCenter";
 import { ShadowMemoryCenter } from "@/features/shadowMemory/ShadowMemoryCenter";
 import { ShadowRelationshipCenter } from "@/features/shadowRelationship/ShadowRelationshipCenter";
+import { ShadowTeachingCenter } from "@/features/shadowTeaching/ShadowTeachingCenter";
 import { useTranslation } from "@/i18n";
 import { shadowIdentityService } from "@/services/shadowIdentity/ShadowIdentityService";
 import type { ShadowIdentityProfile } from "@/services/shadowIdentity/types";
 import styles from "./ShadowSettingsPage.module.css";
 
-type ShadowTab = "identity" | "relationship" | "memory";
+type ShadowTab = "identity" | "relationship" | "memory" | "teaching";
 
 function resolveTab(pathname: string): ShadowTab {
 	if (pathname.endsWith("/relationship")) {
@@ -18,6 +19,10 @@ function resolveTab(pathname: string): ShadowTab {
 
 	if (pathname.endsWith("/memory")) {
 		return "memory";
+	}
+
+	if (pathname.endsWith("/teaching")) {
+		return "teaching";
 	}
 
 	return "identity";
@@ -50,21 +55,27 @@ export function ShadowSettingsPage() {
 			? t("shadowRelationship.title")
 			: activeTab === "memory"
 				? t("shadowMemory.title")
-				: t("shadowIdentity.title");
+				: activeTab === "teaching"
+					? t("shadowTeaching.title")
+					: t("shadowIdentity.title");
 
 	const description =
 		activeTab === "relationship"
 			? t("shadowRelationship.description")
 			: activeTab === "memory"
 				? t("shadowMemory.description")
-				: t("shadowIdentity.description");
+				: activeTab === "teaching"
+					? t("shadowTeaching.description")
+					: t("shadowIdentity.description");
 
 	const whatCanIDo =
 		activeTab === "relationship"
 			? t("shadowRelationship.whatCanIDo")
 			: activeTab === "memory"
 				? t("shadowMemory.whatCanIDo")
-				: t("shadowIdentity.whatCanIDo");
+				: activeTab === "teaching"
+					? t("shadowTeaching.whatCanIDo")
+					: t("shadowIdentity.whatCanIDo");
 
 	return (
 		<section>
@@ -95,12 +106,20 @@ export function ShadowSettingsPage() {
 				>
 					{t("shadowMemory.tabs.memory")}
 				</Link>
+				<Link
+					to="/settings/shadow/teaching"
+					className={activeTab === "teaching" ? styles.tabActive : styles.tab}
+				>
+					{t("shadowTeaching.tabs.teaching")}
+				</Link>
 			</div>
 			{error ? <p role="alert">{error}</p> : null}
 			{activeTab === "relationship" ? (
 				<ShadowRelationshipCenter />
 			) : activeTab === "memory" ? (
 				<ShadowMemoryCenter />
+			) : activeTab === "teaching" ? (
+				<ShadowTeachingCenter />
 			) : profile ? (
 				<ShadowIdentityCenter
 					profile={profile}

@@ -155,6 +155,11 @@ when@test:
             arguments:
                 $directory: '%kernel.cache_dir%/shadow-memory'
 
+        app.storage.shadow_teaching:
+            class: App\Infrastructure\Storage\JsonFileStore
+            arguments:
+                $directory: '%kernel.cache_dir%/shadow-teaching'
+
     parameters:
         storage.root: '%kernel.cache_dir%/storage'
         models.root: '%kernel.cache_dir%/models'
