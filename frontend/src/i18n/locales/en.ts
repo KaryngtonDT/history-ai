@@ -5,6 +5,9 @@ import { learningFr } from "./sections/learning.fr";
 import { pipelineDe } from "./sections/pipeline.de";
 import { pipelineEn } from "./sections/pipeline.en";
 import { pipelineFr } from "./sections/pipeline.fr";
+import { shadowIdentityDe } from "./sections/shadowIdentity.de";
+import { shadowIdentityEn } from "./sections/shadowIdentity.en";
+import { shadowIdentityFr } from "./sections/shadowIdentity.fr";
 import { shellDe } from "./sections/shell.de";
 import { shellEn } from "./sections/shell.en";
 import { shellFr } from "./sections/shell.fr";
@@ -50,10 +53,13 @@ const baseEn = {
 
 export const en = mergeMessages(
 	mergeMessages(
-		mergeMessages(mergeMessages(baseEn, shellEn), pipelineEn),
-		workspaceEn,
+		mergeMessages(
+			mergeMessages(mergeMessages(baseEn, shellEn), pipelineEn),
+			workspaceEn,
+		),
+		learningEn,
 	),
-	learningEn,
+	shadowIdentityEn,
 );
 
 export type Messages = DeepStringRecord<typeof en>;
@@ -96,10 +102,13 @@ const baseFr = {
 
 export const fr = mergeMessages(
 	mergeMessages(
-		mergeMessages(mergeMessages(baseFr, shellFr), pipelineFr),
-		workspaceFr,
+		mergeMessages(
+			mergeMessages(mergeMessages(baseFr, shellFr), pipelineFr),
+			workspaceFr,
+		),
+		learningFr,
 	),
-	learningFr,
+	shadowIdentityFr,
 ) satisfies Messages;
 
 const baseDe = {
@@ -140,8 +149,11 @@ const baseDe = {
 
 export const de = mergeMessages(
 	mergeMessages(
-		mergeMessages(mergeMessages(baseDe, shellDe), pipelineDe),
-		workspaceDe,
+		mergeMessages(
+			mergeMessages(mergeMessages(baseDe, shellDe), pipelineDe),
+			workspaceDe,
+		),
+		learningDe,
 	),
-	learningDe,
+	shadowIdentityDe,
 ) satisfies Messages;

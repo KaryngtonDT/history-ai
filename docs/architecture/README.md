@@ -1373,6 +1373,27 @@ Verification: [Sprint57-Verification.md](../reports/Sprint57-Verification.md)
 
 ---
 
+# Sprint 58 — Shadow Identity, Voice Studio & Conversational Configuration (2026-07)
+
+| Slice | Focus | Status |
+|-------|-------|--------|
+| P58-SLICE-01 | Shadow Identity domain | ✅ |
+| P58-SLICE-02 | Voice Studio | ✅ |
+| P58-SLICE-03 | Conversational configuration | ✅ |
+| P58-SLICE-04 | Language composer | ✅ |
+| P58-SLICE-05 | Narrative intelligence | ✅ |
+| P58-SLICE-06 | Shadow Identity Center UI | ✅ |
+
+- Persona, voice, language, and teaching preferences above Adaptive Learning (Sprint 57).
+- Deterministic conversational configuration — no LLM for config decisions.
+- UI at `/settings/shadow`; API under `/api/shadow/identity/*` and `/api/shadow/voice/*`.
+
+Architecture: [SHADOW_IDENTITY.md](./SHADOW_IDENTITY.md)
+
+Verification: [Sprint58-Verification.md](../reports/Sprint58-Verification.md)
+
+---
+
 # Project architecture overview
 
 **Lumen** is a **modular monolith** with three runtime applications and a shared domain story:

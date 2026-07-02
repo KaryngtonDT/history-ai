@@ -8,6 +8,7 @@ const SETTINGS_LINKS = [
 	{ to: "/settings/ai", key: "aiEngines" },
 	{ to: "/settings/pipeline", key: "pipeline" },
 	{ to: "/settings/learning", key: "learning" },
+	{ to: "/settings/shadow", key: "shadow" },
 ] as const;
 
 export function SettingsPage() {

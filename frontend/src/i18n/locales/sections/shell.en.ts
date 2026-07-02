@@ -287,6 +287,11 @@ export const shellEn = {
 			title: "Adaptive Learning",
 			description: "Review and control Lumen's deterministic learning profile.",
 		},
+		shadow: {
+			title: "Shadow Identity",
+			description:
+				"Persona, voice studio, language composer, and teach-by-voice controls.",
+		},
 	},
 	workItem: {
 		types: {

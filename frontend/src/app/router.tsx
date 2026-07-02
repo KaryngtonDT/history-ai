@@ -14,6 +14,7 @@ import { LibraryPage } from "@/pages/Library/LibraryPage";
 import { PipelineSettingsPage } from "@/pages/PipelineSettings/PipelineSettingsPage";
 import { ProcessingPage } from "@/pages/Processing/ProcessingPage";
 import { SettingsPage } from "@/pages/Settings/SettingsPage";
+import { ShadowSettingsPage } from "@/pages/ShadowSettings/ShadowSettingsPage";
 import { VideoAudioPage } from "@/pages/VideoAudio/VideoAudioPage";
 import { VideoLipSyncPage } from "@/pages/VideoLipSync/VideoLipSyncPage";
 import { VideoOverviewPage } from "@/pages/VideoOverview/VideoOverviewPage";
@@ -70,6 +71,7 @@ export function AppRouter() {
 				<Route path="/settings/ai" element={<AIEngineSettingsPage />} />
 				<Route path="/settings/pipeline" element={<PipelineSettingsPage />} />
 				<Route path="/settings/learning" element={<LearningSettingsPage />} />
+				<Route path="/settings/shadow" element={<ShadowSettingsPage />} />
 			</Route>
 		</Routes>
 	);

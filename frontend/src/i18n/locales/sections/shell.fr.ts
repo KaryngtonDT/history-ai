@@ -303,6 +303,11 @@ export const shellFr: ShellMessages = {
 			description:
 				"Consultez et contrôlez le profil d'apprentissage déterministe de Lumen.",
 		},
+		shadow: {
+			title: "Identité Shadow",
+			description:
+				"Persona, studio vocal, compositeur linguistique et commandes vocales.",
+		},
 	},
 	workItem: {
 		types: {

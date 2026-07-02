@@ -294,6 +294,11 @@ export const shellDe: ShellMessages = {
 			title: "Adaptives Lernen",
 			description: "Lumens deterministisches Lernprofil ansehen und steuern.",
 		},
+		shadow: {
+			title: "Shadow-Identität",
+			description:
+				"Persona, Sprachstudio, Sprachkomponist und Sprachbefehle.",
+		},
 	},
 	workItem: {
 		types: {
