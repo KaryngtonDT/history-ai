@@ -399,6 +399,21 @@ export const pipelineDe: PipelineMessages = {
 			interventionThinking: "Shadow denkt nach...",
 			resumePrompt: "Bereit, weiterzuschauen?",
 			continueWatching: "Video fortsetzen",
+			voiceStudio: {
+				title: "Sprachstudio",
+				description:
+					"Wählen Sie Shadow-Engine, Sammlung und Sprechstil. Sofortige Vorschau im Browser.",
+				collectionsTitle: "Stimmsammlungen",
+				allCollections: "Alle Stimmen",
+				voiceLabel: "Stimme",
+				speedLabel: "Geschwindigkeit",
+				warmthLabel: "Wärme",
+				energyLabel: "Energie",
+				previewButton: "Stimme anhören",
+				loadFailed: "Sprachbibliothek konnte nicht geladen werden.",
+				previewFailed: "Diese Stimme konnte nicht angehört werden.",
+				presetFailed: "Sprachpreset konnte nicht angewendet werden.",
+			},
 		},
 		create: {
 			videoEyebrow: "Erstellen",

@@ -182,6 +182,7 @@ export interface SpeakShadowAnswerResult {
 export function speakShadowAnswer(
 	text: string,
 	speechLanguage = "en",
+	rate = 1,
 ): SpeakShadowAnswerResult {
 	if (!isSpeechSynthesisSupported()) {
 		return { spoken: false, fallbackUsed: true };
@@ -192,6 +193,7 @@ export function speakShadowAnswer(
 	const voice = pickBrowserVoice(speechLanguage);
 
 	utterance.lang = getBcp47ForLanguage(speechLanguage);
+	utterance.rate = Math.min(2, Math.max(0.5, rate));
 
 	if (voice) {
 		utterance.voice = voice;
@@ -203,4 +205,12 @@ export function speakShadowAnswer(
 		spoken: true,
 		fallbackUsed: voice === null,
 	};
+}
+
+export function speakShadowPreview(
+	text: string,
+	language: string,
+	speed = 1,
+): SpeakShadowAnswerResult {
+	return speakShadowAnswer(text, language, speed);
 }

@@ -399,6 +399,21 @@ export const pipelineFr: PipelineMessages = {
 			interventionThinking: "Shadow réfléchit...",
 			resumePrompt: "Prêt à reprendre la vidéo ?",
 			continueWatching: "Continuer la vidéo",
+			voiceStudio: {
+				title: "Studio vocal",
+				description:
+					"Choisissez le moteur vocal, la collection et le style de Shadow. Prévisualisez instantanément dans le navigateur.",
+				collectionsTitle: "Collections de voix",
+				allCollections: "Toutes les voix",
+				voiceLabel: "Voix",
+				speedLabel: "Vitesse",
+				warmthLabel: "Chaleur",
+				energyLabel: "Énergie",
+				previewButton: "Prévisualiser la voix",
+				loadFailed: "Impossible de charger la bibliothèque vocale.",
+				previewFailed: "Impossible de prévisualiser cette voix.",
+				presetFailed: "Impossible d'appliquer le préréglage vocal.",
+			},
 		},
 		create: {
 			videoEyebrow: "Créer",

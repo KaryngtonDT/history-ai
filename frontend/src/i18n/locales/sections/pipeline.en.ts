@@ -389,6 +389,21 @@ export const pipelineEn = {
 			interventionThinking: "Shadow is thinking...",
 			resumePrompt: "Ready to continue watching?",
 			continueWatching: "Continue watching",
+			voiceStudio: {
+				title: "Voice Studio",
+				description:
+					"Choose Shadow's voice engine, collection, and speaking style. Preview instantly in your browser.",
+				collectionsTitle: "Voice collections",
+				allCollections: "All voices",
+				voiceLabel: "Voice",
+				speedLabel: "Speed",
+				warmthLabel: "Warmth",
+				energyLabel: "Energy",
+				previewButton: "Preview Voice",
+				loadFailed: "Unable to load voice library.",
+				previewFailed: "Unable to preview this voice.",
+				presetFailed: "Unable to apply voice preset.",
+			},
 		},
 		create: {
 			videoEyebrow: "Create",

@@ -1,0 +1,99 @@
+.root {
+	display: grid;
+	gap: 1.5rem;
+}
+
+.card {
+	background: var(--surface-elevated, #fff);
+	border: 1px solid var(--border-subtle, #e5e7eb);
+	border-radius: 12px;
+	padding: 1.25rem;
+}
+
+.title {
+	margin: 0 0 0.5rem;
+	font-size: 1.125rem;
+}
+
+.description {
+	margin: 0 0 1rem;
+	color: var(--text-muted, #6b7280);
+}
+
+.grid {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.field {
+	display: grid;
+	gap: 0.35rem;
+}
+
+.label {
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+.select,
+.rangeValue {
+	width: 100%;
+}
+
+.collectionList {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.collectionCard {
+	border: 1px solid var(--border-subtle, #e5e7eb);
+	border-radius: 10px;
+	padding: 0.875rem;
+	cursor: pointer;
+	background: transparent;
+	text-align: left;
+}
+
+.collectionCardActive {
+	border-color: var(--accent, #2563eb);
+	background: color-mix(in srgb, var(--accent, #2563eb) 8%, transparent);
+}
+
+.presetList {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.presetButton,
+.previewButton {
+	border: 1px solid var(--border-subtle, #e5e7eb);
+	border-radius: 999px;
+	padding: 0.45rem 0.9rem;
+	background: var(--surface, #fff);
+	cursor: pointer;
+}
+
+.previewButton {
+	background: var(--accent, #2563eb);
+	border-color: var(--accent, #2563eb);
+	color: #fff;
+	font-weight: 600;
+}
+
+.meta {
+	font-size: 0.8125rem;
+	color: var(--text-muted, #6b7280);
+}
+
+.actions {
+	display: flex;
+	gap: 0.75rem;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.error {
+	color: #b91c1c;
+}
