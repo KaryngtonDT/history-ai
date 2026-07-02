@@ -1,5 +1,5 @@
-import { createShadowVoiceRepository } from "./ShadowVoiceRepositoryFactory";
 import type { ShadowVoiceRepository } from "./ShadowVoiceRepository";
+import { createShadowVoiceRepository } from "./ShadowVoiceRepositoryFactory";
 import type {
 	ShadowVoiceCollectionsResponse,
 	ShadowVoiceLibraryResponse,
@@ -11,7 +11,9 @@ import type {
 export class ShadowVoiceService {
 	private readonly repository: ShadowVoiceRepository;
 
-	constructor(repository: ShadowVoiceRepository = createShadowVoiceRepository()) {
+	constructor(
+		repository: ShadowVoiceRepository = createShadowVoiceRepository(),
+	) {
 		this.repository = repository;
 	}
 

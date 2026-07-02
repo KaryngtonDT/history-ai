@@ -296,8 +296,7 @@ export const shellDe: ShellMessages = {
 		},
 		shadow: {
 			title: "Shadow-Identität",
-			description:
-				"Persona, Sprachstudio, Sprachkomponist und Sprachbefehle.",
+			description: "Persona, Sprachstudio, Sprachkomponist und Sprachbefehle.",
 		},
 	},
 	workItem: {

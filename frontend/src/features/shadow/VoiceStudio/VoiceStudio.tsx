@@ -27,9 +27,9 @@ export function VoiceStudio() {
 	const [collections, setCollections] = useState<ShadowVoiceCollection[]>([]);
 	const [presets, setPresets] = useState<ShadowVoicePreset[]>([]);
 	const [selectedVoiceId, setSelectedVoiceId] = useState("browser-default");
-	const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(
-		null,
-	);
+	const [selectedCollectionId, setSelectedCollectionId] = useState<
+		string | null
+	>(null);
 	const [parameters, setParameters] =
 		useState<VoiceStudioParameters>(DEFAULT_PARAMETERS);
 	const [error, setError] = useState<string | null>(null);
@@ -216,7 +216,8 @@ export function VoiceStudio() {
 
 					<label className={styles.field}>
 						<span className={styles.label}>
-							{t("pipeline.shadow.voiceStudio.warmthLabel")} ({parameters.warmth})
+							{t("pipeline.shadow.voiceStudio.warmthLabel")} (
+							{parameters.warmth})
 						</span>
 						<input
 							type="range"
@@ -232,7 +233,8 @@ export function VoiceStudio() {
 
 					<label className={styles.field}>
 						<span className={styles.label}>
-							{t("pipeline.shadow.voiceStudio.energyLabel")} ({parameters.energy})
+							{t("pipeline.shadow.voiceStudio.energyLabel")} (
+							{parameters.energy})
 						</span>
 						<input
 							type="range"

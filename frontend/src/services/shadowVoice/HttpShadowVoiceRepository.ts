@@ -8,7 +8,8 @@ import type {
 } from "./types";
 
 const API_BASE =
-	import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? "http://localhost:8000";
+	import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ??
+	"http://localhost:8000";
 
 export class HttpShadowVoiceRepository implements ShadowVoiceRepository {
 	private readonly baseUrl: string;
@@ -18,7 +19,9 @@ export class HttpShadowVoiceRepository implements ShadowVoiceRepository {
 	}
 
 	getLibrary(): Promise<ShadowVoiceLibraryResponse> {
-		return this.request<ShadowVoiceLibraryResponse>("/api/shadow/voice/library");
+		return this.request<ShadowVoiceLibraryResponse>(
+			"/api/shadow/voice/library",
+		);
 	}
 
 	getCollections(): Promise<ShadowVoiceCollectionsResponse> {

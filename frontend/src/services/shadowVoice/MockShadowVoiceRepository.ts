@@ -25,7 +25,8 @@ const MOCK_VOICES: ShadowVoiceLibraryResponse = {
 			accent: "American",
 			quality: "high",
 			latency: "low",
-			preview: "Let me tell you a story about how ideas travel across centuries.",
+			preview:
+				"Let me tell you a story about how ideas travel across centuries.",
 			collection: "great_storytellers",
 			collectionLabel: "Great Storytellers",
 			available: true,
@@ -53,7 +54,8 @@ const MOCK_COLLECTIONS: ShadowVoiceCollectionsResponse = {
 		{
 			id: "great_storytellers",
 			label: "Great Storytellers",
-			description: "Warm narrative voices for storytelling and history content.",
+			description:
+				"Warm narrative voices for storytelling and history content.",
 			voiceIds: ["storyteller-warm-en"],
 		},
 	],

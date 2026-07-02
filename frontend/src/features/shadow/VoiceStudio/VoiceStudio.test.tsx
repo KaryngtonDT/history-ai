@@ -67,7 +67,9 @@ describe("VoiceStudio", () => {
 			expect(screen.getByText("Voice Studio")).toBeInTheDocument();
 		});
 
-		expect(screen.getByRole("button", { name: "Preview Voice" })).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: "Preview Voice" }),
+		).toBeInTheDocument();
 	});
 
 	it("previews selected voice", async () => {

@@ -9,6 +9,8 @@ import type {
 export interface ShadowVoiceRepository {
 	getLibrary(): Promise<ShadowVoiceLibraryResponse>;
 	getCollections(): Promise<ShadowVoiceCollectionsResponse>;
-	preview(request: ShadowVoicePreviewRequest): Promise<ShadowVoicePreviewResponse>;
+	preview(
+		request: ShadowVoicePreviewRequest,
+	): Promise<ShadowVoicePreviewResponse>;
 	applyPreset(preset: string): Promise<ShadowVoicePresetResponse>;
 }
