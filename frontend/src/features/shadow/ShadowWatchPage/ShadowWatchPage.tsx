@@ -3,6 +3,7 @@ import { useParams } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import { API_BASE_URL } from "@/config/api";
+import { KnowledgeDiffPanel } from "@/features/shadowBrain/KnowledgeDiffPanel";
 import { ExecutiveWatchBar } from "@/features/shadowExecutive/ExecutiveWatchBar";
 import { useTranslation } from "@/i18n/useTranslation";
 import { resolveVideoRenderStreamUrl } from "@/services/render/types";
@@ -556,6 +557,7 @@ export function ShadowWatchPage() {
 					<ShadowKnowledgePanel />
 					<ShadowMentorPanel />
 					<ExecutiveWatchBar />
+					<KnowledgeDiffPanel resourceType="video" resourceId={videoId} />
 					{activeIntervention ? (
 						<ShadowInterventionCard
 							intervention={activeIntervention}

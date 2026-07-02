@@ -66,9 +66,9 @@ ShadowWatchPromptBuilder
 | Executive dashboard | `/settings/shadow/executive` |
 | Watch executive bar | `/video/{id}/watch` — `ExecutiveWatchBar` |
 
-## Post-S66
+## Post-S66: Shadow intelligence stack is **feature-complete for v1**. Phase 7 makes it **visible and daily-useful** — starting with Second Brain (S67).
 
-Sprint 66 closes Shadow's functional architecture. Further work targets **Lumen platform** (security, public API, SDK, enterprise) — not new Shadow bounded contexts.
+See [SECOND_BRAIN.md](SECOND_BRAIN.md) and [ROADMAP.md](ROADMAP.md).
 
 ## API
 

@@ -96,6 +96,7 @@ export function AppRouter() {
 					path="/settings/shadow/executive"
 					element={<ShadowSettingsPage />}
 				/>
+				<Route path="/settings/shadow/brain" element={<ShadowSettingsPage />} />
 			</Route>
 		</Routes>
 	);

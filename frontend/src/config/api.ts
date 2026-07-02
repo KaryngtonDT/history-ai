@@ -171,6 +171,21 @@ export function shadowExecutiveDecisionDeferPath(id: string): string {
 	return `/api/shadow/executive/decision/${id}/defer`;
 }
 
+export const SHADOW_BRAIN_PATH = "/api/shadow/brain";
+export const SHADOW_BRAIN_CONCEPTS_PATH = "/api/shadow/brain/concepts";
+export const SHADOW_BRAIN_SEARCH_PATH = "/api/shadow/brain/search";
+export const SHADOW_BRAIN_TIMELINE_PATH = "/api/shadow/brain/timeline";
+export const SHADOW_BRAIN_DIFF_PATH = "/api/shadow/brain/diff";
+export const SHADOW_BRAIN_BOOKMARK_PATH = "/api/shadow/brain/bookmark";
+export const SHADOW_BRAIN_NOTE_PATH = "/api/shadow/brain/note";
+export const SHADOW_BRAIN_REBUILD_PATH = "/api/shadow/brain/rebuild";
+export function shadowBrainConceptPath(id: string): string {
+	return `/api/shadow/brain/concept/${id}`;
+}
+export function shadowBrainBookmarkPath(id: string): string {
+	return `/api/shadow/brain/bookmark/${id}`;
+}
+
 export function videoReviewsPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/reviews`;
 }

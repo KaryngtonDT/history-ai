@@ -1,0 +1,287 @@
+.shadowBrain {
+	display: grid;
+	gap: 1rem;
+	min-height: 520px;
+}
+
+.toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	align-items: center;
+	padding: 0.75rem 1rem;
+	border-radius: 10px;
+	border: 1px solid var(--color-border, #d8dee9);
+	background: var(--color-surface, #fff);
+}
+
+.searchForm {
+	display: flex;
+	flex: 1;
+	min-width: 220px;
+	gap: 0.5rem;
+}
+
+.searchInput {
+	flex: 1;
+	padding: 0.45rem 0.65rem;
+	border-radius: 8px;
+	border: 1px solid var(--color-border, #d8dee9);
+}
+
+.toolbarActions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.toolbarButton {
+	padding: 0.45rem 0.75rem;
+	border-radius: 8px;
+	border: 1px solid var(--color-border, #d8dee9);
+	background: #f8fafc;
+	cursor: pointer;
+	font-size: 0.875rem;
+}
+
+.toolbarButtonActive {
+	background: #eef2ff;
+	border-color: #c7d2fe;
+}
+
+.mainGrid {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+	min-height: 360px;
+}
+
+.explorerPanel,
+.detailPanel {
+	display: grid;
+	gap: 0.75rem;
+	padding: 0.85rem 1rem;
+	border-radius: 10px;
+	border: 1px solid var(--color-border, #d8dee9);
+	background: var(--color-surface, #fff);
+	overflow: auto;
+}
+
+.panelTitle {
+	margin: 0;
+	font-size: 0.95rem;
+}
+
+.treeList {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 0.25rem;
+}
+
+.treeItem {
+	display: grid;
+	gap: 0.15rem;
+}
+
+.treeButton {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.5rem;
+	width: 100%;
+	padding: 0.4rem 0.55rem;
+	border-radius: 8px;
+	border: 1px solid transparent;
+	background: transparent;
+	text-align: left;
+	cursor: pointer;
+	font-size: 0.9rem;
+}
+
+.treeButton:hover {
+	background: #f8fafc;
+}
+
+.treeButtonActive {
+	background: #eef2ff;
+	border-color: #c7d2fe;
+}
+
+.treeCount {
+	font-size: 0.75rem;
+	color: var(--color-muted, #5c6773);
+}
+
+.treeChildren {
+	margin: 0.15rem 0 0.15rem 0.85rem;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 0.15rem;
+}
+
+.meta {
+	margin: 0;
+	color: var(--color-muted, #5c6773);
+	font-size: 0.875rem;
+}
+
+.masteryBar {
+	height: 8px;
+	border-radius: 999px;
+	background: #e2e8f0;
+	overflow: hidden;
+}
+
+.masteryFill {
+	display: block;
+	height: 100%;
+	background: linear-gradient(90deg, #6366f1, #8b5cf6);
+}
+
+.section {
+	display: grid;
+	gap: 0.5rem;
+}
+
+.section h4 {
+	margin: 0;
+	font-size: 0.85rem;
+}
+
+.tagList {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+}
+
+.tag {
+	padding: 0.2rem 0.55rem;
+	border-radius: 999px;
+	background: #f5f3ff;
+	font-size: 0.85rem;
+}
+
+.sourceList,
+.relatedList,
+.noteList,
+.bookmarkList,
+.insightList,
+.revisionList,
+.searchResults,
+.timelineList {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 0.5rem;
+}
+
+.card {
+	padding: 0.65rem 0.75rem;
+	border-radius: 8px;
+	border: 1px solid var(--color-border, #d8dee9);
+	display: grid;
+	gap: 0.25rem;
+}
+
+.evolutionGrid {
+	display: grid;
+	gap: 0.5rem;
+	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.evolutionStat {
+	padding: 0.55rem 0.65rem;
+	border-radius: 8px;
+	border: 1px solid var(--color-border, #d8dee9);
+	display: grid;
+	gap: 0.15rem;
+}
+
+.evolutionValue {
+	font-size: 1.1rem;
+	font-weight: 700;
+}
+
+.heatmap {
+	display: grid;
+	gap: 0.45rem;
+}
+
+.heatmapRow {
+	display: grid;
+	grid-template-columns: 100px 1fr 40px;
+	gap: 0.5rem;
+	align-items: center;
+	font-size: 0.85rem;
+}
+
+.heatmapTrack {
+	height: 10px;
+	border-radius: 999px;
+	background: #e2e8f0;
+	overflow: hidden;
+}
+
+.heatmapFill {
+	display: block;
+	height: 100%;
+	background: linear-gradient(90deg, #0ea5e9, #6366f1);
+}
+
+.bottomStrip {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.bottomPanel {
+	display: grid;
+	gap: 0.65rem;
+	padding: 0.85rem 1rem;
+	border-radius: 10px;
+	border: 1px solid var(--color-border, #d8dee9);
+	background: var(--color-surface, #fff);
+}
+
+.statsGrid {
+	display: grid;
+	gap: 0.5rem;
+	grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+}
+
+.statCard {
+	padding: 0.55rem 0.65rem;
+	border-radius: 8px;
+	border: 1px solid var(--color-border, #d8dee9);
+	text-align: center;
+	display: grid;
+	gap: 0.15rem;
+}
+
+.statValue {
+	font-size: 1.15rem;
+	font-weight: 700;
+}
+
+.message {
+	margin: 0;
+	font-size: 0.875rem;
+}
+
+.error {
+	color: #b91c1c;
+}
+
+.success {
+	color: #047857;
+}
+
+@media (max-width: 900px) {
+	.mainGrid {
+		grid-template-columns: 1fr;
+	}
+}

@@ -13,6 +13,7 @@ Shadow is Lumen's AI learning companion — voice, watch sync, memory, relations
 | Knowledge | `/settings/shadow/knowledge` |
 | Mentor | `/settings/shadow/mentor` |
 | Executive | `/settings/shadow/executive` |
+| Second Brain | `/settings/shadow/brain` |
 | Watch companion | `/video/{id}/watch` |
 
 ## Documentation map
@@ -27,6 +28,7 @@ Shadow is Lumen's AI learning companion — voice, watch sync, memory, relations
 - [Knowledge](KNOWLEDGE.md)
 - [Mentor](MENTOR.md)
 - [Executive](EXECUTIVE.md)
+- [Second Brain](SECOND_BRAIN.md)
 - [Roadmap](ROADMAP.md)
 - [API](API.md)
 

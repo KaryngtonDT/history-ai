@@ -1,0 +1,1 @@
+export { KnowledgeDiffPanel } from "./KnowledgeDiffPanel";

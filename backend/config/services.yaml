@@ -296,6 +296,12 @@ services:
     App\Domain\ShadowExecutive\ShadowExecutiveRepositoryInterface:
         alias: App\Infrastructure\ShadowExecutive\FileShadowExecutiveRepository
 
+    App\Domain\ShadowSecondBrain\KnowledgeWorkspaceRepositoryInterface:
+        alias: App\Infrastructure\ShadowSecondBrain\FileShadowSecondBrainRepository
+
+    App\Domain\ShadowSecondBrain\ShadowSecondBrainRepositoryInterface:
+        alias: App\Infrastructure\ShadowSecondBrain\FileShadowSecondBrainRepository
+
     app.storage.learning:
         class: App\Infrastructure\Storage\JsonFileStore
         arguments:
@@ -351,6 +357,11 @@ services:
         arguments:
             $directory: '%storage.root%/shadow/executive'
 
+    app.storage.shadow_brain:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/shadow/brain'
+
     App\Infrastructure\Learning\FileLearningProfileRepository:
         arguments:
             $store: '@app.storage.learning'
@@ -394,6 +405,10 @@ services:
     App\Infrastructure\ShadowExecutive\FileShadowExecutiveRepository:
         arguments:
             $store: '@app.storage.shadow_executive'
+
+    App\Infrastructure\ShadowSecondBrain\FileShadowSecondBrainRepository:
+        arguments:
+            $store: '@app.storage.shadow_brain'
 
     App\Application\Shadow\Handlers\AskShadowQuestionHandler:
         arguments:

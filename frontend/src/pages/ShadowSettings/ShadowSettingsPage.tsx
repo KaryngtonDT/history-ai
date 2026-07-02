@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { PageIntroduction } from "@/features/product";
+import { SecondBrainCenter } from "@/features/shadowBrain/SecondBrainCenter";
 import { ExecutiveCenter } from "@/features/shadowExecutive/ExecutiveCenter";
 import { ShadowIdentityCenter } from "@/features/shadowIdentity/ShadowIdentityCenter";
 import { ShadowKnowledgeCenter } from "@/features/shadowKnowledge/ShadowKnowledgeCenter";
@@ -20,7 +21,8 @@ type ShadowTab =
 	| "teaching"
 	| "knowledge"
 	| "mentor"
-	| "executive";
+	| "executive"
+	| "brain";
 
 function resolveTab(pathname: string): ShadowTab {
 	if (pathname.endsWith("/relationship")) {
@@ -45,6 +47,10 @@ function resolveTab(pathname: string): ShadowTab {
 
 	if (pathname.endsWith("/executive")) {
 		return "executive";
+	}
+
+	if (pathname.endsWith("/brain")) {
+		return "brain";
 	}
 
 	return "identity";
@@ -85,7 +91,9 @@ export function ShadowSettingsPage() {
 							? t("shadowMentor.title")
 							: activeTab === "executive"
 								? t("shadowExecutive.title")
-								: t("shadowIdentity.title");
+								: activeTab === "brain"
+									? t("shadowBrain.title")
+									: t("shadowIdentity.title");
 
 	const description =
 		activeTab === "relationship"
@@ -100,7 +108,9 @@ export function ShadowSettingsPage() {
 							? t("shadowMentor.description")
 							: activeTab === "executive"
 								? t("shadowExecutive.description")
-								: t("shadowIdentity.description");
+								: activeTab === "brain"
+									? t("shadowBrain.description")
+									: t("shadowIdentity.description");
 
 	const whatCanIDo =
 		activeTab === "relationship"
@@ -115,7 +125,9 @@ export function ShadowSettingsPage() {
 							? t("shadowMentor.whatCanIDo")
 							: activeTab === "executive"
 								? t("shadowExecutive.whatCanIDo")
-								: t("shadowIdentity.whatCanIDo");
+								: activeTab === "brain"
+									? t("shadowBrain.whatCanIDo")
+									: t("shadowIdentity.whatCanIDo");
 
 	return (
 		<section>
@@ -170,6 +182,12 @@ export function ShadowSettingsPage() {
 				>
 					{t("shadowExecutive.tabs.executive")}
 				</Link>
+				<Link
+					to="/settings/shadow/brain"
+					className={activeTab === "brain" ? styles.tabActive : styles.tab}
+				>
+					{t("shadowBrain.tabs.brain")}
+				</Link>
 			</div>
 			{error ? <p role="alert">{error}</p> : null}
 			{activeTab === "relationship" ? (
@@ -184,6 +202,8 @@ export function ShadowSettingsPage() {
 				<MentorCenter />
 			) : activeTab === "executive" ? (
 				<ExecutiveCenter />
+			) : activeTab === "brain" ? (
+				<SecondBrainCenter />
 			) : profile ? (
 				<ShadowIdentityCenter
 					profile={profile}
