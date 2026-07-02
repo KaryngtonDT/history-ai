@@ -12,9 +12,9 @@ Status: Complete
 | ----- | ------ | ------- |
 | 01 | `542b0b1` | feat(shadow): add shadow identity domain |
 | 02 | `f9f7f07` | feat(shadow): add voice studio |
-| 03–05 | pending | feat(shadow): add conversational configuration, language composer, narrative intelligence |
-| 06 | pending | feat(frontend): add shadow identity center |
-| docs | pending | docs(shadow): document identity and voice studio |
+| 03–05 | `c924b4c` | feat(shadow): add conversational configuration, language composer and narrative intelligence |
+| 06 | `52c8a1d` | feat(frontend): add shadow identity center |
+| docs | `52c8a1d` | docs included in frontend commit |
 
 ---
 
