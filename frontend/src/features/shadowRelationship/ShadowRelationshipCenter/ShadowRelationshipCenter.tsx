@@ -5,7 +5,7 @@ import type {
 	RelationshipPortrait,
 	RelationshipProfile,
 } from "@/services/shadowRelationship/types";
-import styles from "./shadowRelationship.module.css";
+import styles from "../shadowRelationship.module.css";
 
 function strengthLevel(strength: string): number {
 	switch (strength) {
