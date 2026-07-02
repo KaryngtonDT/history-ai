@@ -3,6 +3,7 @@ import type {
 	RelationshipConfigureResult,
 	RelationshipPortrait,
 	RelationshipProfile,
+	UpdateRelationshipPreferencesRequest,
 } from "./types";
 
 const defaultProfile: RelationshipProfile = {
@@ -120,7 +121,7 @@ export class MockShadowRelationshipRepository
 		return this.getProfile();
 	}
 
-	updatePreferences(request) {
+	updatePreferences(request: UpdateRelationshipPreferencesRequest) {
 		if (typeof request.adaptiveEnabled === "boolean") {
 			this.profile.preferences.adaptiveEnabled = request.adaptiveEnabled;
 		}

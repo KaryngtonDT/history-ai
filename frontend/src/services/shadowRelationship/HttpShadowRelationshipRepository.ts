@@ -41,16 +41,37 @@ export class HttpShadowRelationshipRepository
 		);
 	}
 
-	getTimeline(scopeKey?: string) {
+	getTimeline(
+		scopeKey?: string,
+	): Promise<{ scopeKey: string; timeline: RelationshipProfile["timeline"] }> {
 		const query = scopeKey ? `?scopeKey=${encodeURIComponent(scopeKey)}` : "";
 
-		return this.httpClient.get(`${SHADOW_RELATIONSHIP_TIMELINE_PATH}${query}`);
+		return this.httpClient.get<{
+			scopeKey: string;
+			timeline: RelationshipProfile["timeline"];
+		}>(`${SHADOW_RELATIONSHIP_TIMELINE_PATH}${query}`);
 	}
 
-	getInterests(scopeKey?: string) {
+	getInterests(scopeKey?: string): Promise<{
+		scopeKey: string;
+		interests: Array<{
+			key: string;
+			label: string;
+			strength: string;
+			confirmed: boolean;
+		}>;
+	}> {
 		const query = scopeKey ? `?scopeKey=${encodeURIComponent(scopeKey)}` : "";
 
-		return this.httpClient.get(`${SHADOW_RELATIONSHIP_INTERESTS_PATH}${query}`);
+		return this.httpClient.get<{
+			scopeKey: string;
+			interests: Array<{
+				key: string;
+				label: string;
+				strength: string;
+				confirmed: boolean;
+			}>;
+		}>(`${SHADOW_RELATIONSHIP_INTERESTS_PATH}${query}`);
 	}
 
 	recordSignal(
@@ -89,15 +110,33 @@ export class HttpShadowRelationshipRepository
 		);
 	}
 
-	approveChange(changeId: string, scopeKey?: string) {
-		return this.httpClient.post(
+	approveChange(
+		changeId: string,
+		scopeKey?: string,
+	): Promise<{
+		profile: RelationshipProfile;
+		portrait: RelationshipPortrait;
+	}> {
+		return this.httpClient.post<{
+			profile: RelationshipProfile;
+			portrait: RelationshipPortrait;
+		}>(
 			SHADOW_RELATIONSHIP_APPROVE_CHANGE_PATH(changeId),
 			scopeKey ? { scopeKey } : {},
 		);
 	}
 
-	rejectChange(changeId: string, scopeKey?: string) {
-		return this.httpClient.post(
+	rejectChange(
+		changeId: string,
+		scopeKey?: string,
+	): Promise<{
+		profile: RelationshipProfile;
+		portrait: RelationshipPortrait;
+	}> {
+		return this.httpClient.post<{
+			profile: RelationshipProfile;
+			portrait: RelationshipPortrait;
+		}>(
 			SHADOW_RELATIONSHIP_REJECT_CHANGE_PATH(changeId),
 			scopeKey ? { scopeKey } : {},
 		);
