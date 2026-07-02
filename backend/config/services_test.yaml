@@ -141,8 +141,8 @@ when@test:
                 $directory: '%kernel.cache_dir%/shadow-sessions'
 
     parameters:
-        storage.root: '%kernel.project_dir%/storage'
-        models.root: '/models'
+        storage.root: '%kernel.cache_dir%/storage'
+        models.root: '%kernel.cache_dir%/models'
         video.storage_dir: '%kernel.cache_dir%/video-storage'
         audio.source_storage_dir: '%kernel.cache_dir%/audio-source-storage'
         youtube.download_dir: '%kernel.cache_dir%/youtube-downloads'
