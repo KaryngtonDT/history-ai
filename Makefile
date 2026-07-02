@@ -1,6 +1,6 @@
 .PHONY: help install up down ps logs config \
 	dev dev-stop prod prod-stop prod-rebuild prod-fresh prod-restart \
-	prod-backend prod-frontend prod-worker prod-migrate prod-logs \
+	prod-backend prod-frontend prod-worker prod-migrate prod-prune-backend-run prod-logs \
 	test test-backend test-frontend test-worker test-all ci \
 	backup restore verify-backup health doctor status migrate shell-backend
 
@@ -116,18 +116,22 @@ prod-frontend:
 prod-worker:
 	$(COMPOSE_PROD) up -d --build worker
 
-prod-migrate:
-	$(BACKEND_EXEC) php bin/console doctrine:migrations:migrate --no-interaction
+prod-prune-backend-run:
+	@ids=$$(docker ps -aq --filter "name=history-ai-backend-run-"); \
+	if [ -n "$$ids" ]; then docker rm -f $$ids; fi
+
+prod-migrate: prod-prune-backend-run
+	$(COMPOSE_PROD) exec -T backend php bin/console doctrine:migrations:migrate --no-interaction
 
 prod-logs:
 	$(COMPOSE_PROD) logs -f
 
 migrate: prod-migrate
 
-shell-backend:
+shell-backend: prod-prune-backend-run
 	$(BACKEND_EXEC) sh
 
-test-backend:
+test-backend: prod-prune-backend-run
 	$(BACKEND_EXEC) php bin/phpunit
 
 test-frontend:
