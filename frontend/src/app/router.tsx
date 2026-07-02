@@ -76,6 +76,10 @@ export function AppRouter() {
 					path="/settings/shadow/relationship"
 					element={<ShadowSettingsPage />}
 				/>
+				<Route
+					path="/settings/shadow/memory"
+					element={<ShadowSettingsPage />}
+				/>
 			</Route>
 		</Routes>
 	);

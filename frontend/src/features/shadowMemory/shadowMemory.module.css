@@ -1,0 +1,82 @@
+.shadowMemory {
+	display: grid;
+	gap: 1.5rem;
+}
+
+.section {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.card {
+	padding: 1rem 1.25rem;
+	border: 1px solid var(--color-border, #d8dee9);
+	border-radius: 12px;
+	background: var(--color-surface, #fff);
+}
+
+.journeyGrid {
+	display: grid;
+	gap: 0.75rem;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.journeyStep {
+	padding: 0.75rem 1rem;
+	border-radius: 10px;
+	border: 1px solid var(--color-border, #d8dee9);
+}
+
+.progressBar {
+	height: 0.45rem;
+	border-radius: 999px;
+	background: #e5e7eb;
+	overflow: hidden;
+}
+
+.progressBar span {
+	display: block;
+	height: 100%;
+	background: #4f46e5;
+}
+
+.list {
+	display: grid;
+	gap: 0.75rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.listItem {
+	padding: 0.75rem 1rem;
+	border-radius: 10px;
+	border: 1px solid var(--color-border, #d8dee9);
+}
+
+.meta {
+	color: #6b7280;
+	font-size: 0.875rem;
+}
+
+.searchBox {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.searchBox input {
+	padding: 0.75rem;
+	border-radius: 10px;
+	border: 1px solid var(--color-border, #d8dee9);
+}
+
+.actions {
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.connectionArrow {
+	color: #4f46e5;
+	font-weight: 600;
+}

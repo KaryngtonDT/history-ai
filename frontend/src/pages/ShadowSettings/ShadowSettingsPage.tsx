@@ -2,16 +2,31 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { PageIntroduction } from "@/features/product";
 import { ShadowIdentityCenter } from "@/features/shadowIdentity/ShadowIdentityCenter";
+import { ShadowMemoryCenter } from "@/features/shadowMemory/ShadowMemoryCenter";
 import { ShadowRelationshipCenter } from "@/features/shadowRelationship/ShadowRelationshipCenter";
 import { useTranslation } from "@/i18n";
 import { shadowIdentityService } from "@/services/shadowIdentity/ShadowIdentityService";
 import type { ShadowIdentityProfile } from "@/services/shadowIdentity/types";
 import styles from "./ShadowSettingsPage.module.css";
 
+type ShadowTab = "identity" | "relationship" | "memory";
+
+function resolveTab(pathname: string): ShadowTab {
+	if (pathname.endsWith("/relationship")) {
+		return "relationship";
+	}
+
+	if (pathname.endsWith("/memory")) {
+		return "memory";
+	}
+
+	return "identity";
+}
+
 export function ShadowSettingsPage() {
 	const { t } = useTranslation();
 	const location = useLocation();
-	const isRelationship = location.pathname.endsWith("/relationship");
+	const activeTab = resolveTab(location.pathname);
 	const [profile, setProfile] = useState<ShadowIdentityProfile | null>(null);
 	const [isUpdating] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -23,48 +38,69 @@ export function ShadowSettingsPage() {
 	}, []);
 
 	useEffect(() => {
-		void load().catch(() => {
-			setError(t("shadowIdentity.errors.loadFailed"));
-		});
-	}, [load, t]);
+		if (activeTab === "identity") {
+			void load().catch(() => {
+				setError(t("shadowIdentity.errors.loadFailed"));
+			});
+		}
+	}, [activeTab, load, t]);
+
+	const title =
+		activeTab === "relationship"
+			? t("shadowRelationship.title")
+			: activeTab === "memory"
+				? t("shadowMemory.title")
+				: t("shadowIdentity.title");
+
+	const description =
+		activeTab === "relationship"
+			? t("shadowRelationship.description")
+			: activeTab === "memory"
+				? t("shadowMemory.description")
+				: t("shadowIdentity.description");
+
+	const whatCanIDo =
+		activeTab === "relationship"
+			? t("shadowRelationship.whatCanIDo")
+			: activeTab === "memory"
+				? t("shadowMemory.whatCanIDo")
+				: t("shadowIdentity.whatCanIDo");
 
 	return (
 		<section>
 			<PageIntroduction
 				eyebrow={t("shadowIdentity.eyebrow")}
-				title={
-					isRelationship
-						? t("shadowRelationship.title")
-						: t("shadowIdentity.title")
-				}
-				description={
-					isRelationship
-						? t("shadowRelationship.description")
-						: t("shadowIdentity.description")
-				}
-				whatCanIDo={
-					isRelationship
-						? t("shadowRelationship.whatCanIDo")
-						: t("shadowIdentity.whatCanIDo")
-				}
+				title={title}
+				description={description}
+				whatCanIDo={whatCanIDo}
 			/>
 			<div className={styles.tabs}>
 				<Link
 					to="/settings/shadow"
-					className={isRelationship ? styles.tab : styles.tabActive}
+					className={activeTab === "identity" ? styles.tabActive : styles.tab}
 				>
 					{t("shadowRelationship.tabs.identity")}
 				</Link>
 				<Link
 					to="/settings/shadow/relationship"
-					className={isRelationship ? styles.tabActive : styles.tab}
+					className={
+						activeTab === "relationship" ? styles.tabActive : styles.tab
+					}
 				>
 					{t("shadowRelationship.tabs.relationship")}
 				</Link>
+				<Link
+					to="/settings/shadow/memory"
+					className={activeTab === "memory" ? styles.tabActive : styles.tab}
+				>
+					{t("shadowMemory.tabs.memory")}
+				</Link>
 			</div>
 			{error ? <p role="alert">{error}</p> : null}
-			{isRelationship ? (
+			{activeTab === "relationship" ? (
 				<ShadowRelationshipCenter />
+			) : activeTab === "memory" ? (
+				<ShadowMemoryCenter />
 			) : profile ? (
 				<ShadowIdentityCenter
 					profile={profile}

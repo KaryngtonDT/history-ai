@@ -8,6 +8,9 @@ import { pipelineFr } from "./sections/pipeline.fr";
 import { shadowIdentityDe } from "./sections/shadowIdentity.de";
 import { shadowIdentityEn } from "./sections/shadowIdentity.en";
 import { shadowIdentityFr } from "./sections/shadowIdentity.fr";
+import { shadowMemoryDe } from "./sections/shadowMemory.de";
+import { shadowMemoryEn } from "./sections/shadowMemory.en";
+import { shadowMemoryFr } from "./sections/shadowMemory.fr";
 import { shadowRelationshipDe } from "./sections/shadowRelationship.de";
 import { shadowRelationshipEn } from "./sections/shadowRelationship.en";
 import { shadowRelationshipFr } from "./sections/shadowRelationship.fr";
@@ -65,7 +68,7 @@ export const en = mergeMessages(
 		),
 		shadowIdentityEn,
 	),
-	shadowRelationshipEn,
+	mergeMessages(shadowRelationshipEn, shadowMemoryEn),
 );
 
 export type Messages = DeepStringRecord<typeof en>;
@@ -117,7 +120,7 @@ export const fr = mergeMessages(
 		),
 		shadowIdentityFr,
 	),
-	shadowRelationshipFr,
+	mergeMessages(shadowRelationshipFr, shadowMemoryFr),
 ) satisfies Messages;
 
 const baseDe = {
@@ -167,5 +170,5 @@ export const de = mergeMessages(
 		),
 		shadowIdentityDe,
 	),
-	shadowRelationshipDe,
+	mergeMessages(shadowRelationshipDe, shadowMemoryDe),
 ) satisfies Messages;

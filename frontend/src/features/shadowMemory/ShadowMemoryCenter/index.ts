@@ -1,0 +1,1 @@
+export { ShadowMemoryCenter } from "./ShadowMemoryCenter";

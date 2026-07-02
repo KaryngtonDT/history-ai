@@ -103,6 +103,15 @@ export function SHADOW_RELATIONSHIP_REJECT_CHANGE_PATH(
 	return `/api/shadow/relationship/changes/${changeId}/reject`;
 }
 
+export const SHADOW_MEMORY_TIMELINE_PATH = "/api/shadow/memory/timeline";
+export const SHADOW_MEMORY_CONCEPTS_PATH = "/api/shadow/memory/concepts";
+export const SHADOW_MEMORY_VOCABULARY_PATH = "/api/shadow/memory/vocabulary";
+export const SHADOW_MEMORY_MILESTONES_PATH = "/api/shadow/memory/milestones";
+export const SHADOW_MEMORY_CONNECTIONS_PATH = "/api/shadow/memory/connections";
+export const SHADOW_MEMORY_JOURNEY_PATH = "/api/shadow/memory/journey";
+export const SHADOW_MEMORY_SEARCH_PATH = "/api/shadow/memory/search";
+export const SHADOW_MEMORY_RESET_PATH = "/api/shadow/memory/reset";
+
 export function videoReviewsPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/reviews`;
 }

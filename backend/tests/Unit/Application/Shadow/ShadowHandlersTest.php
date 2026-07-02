@@ -32,6 +32,11 @@ use App\Application\ShadowRelationship\RelationshipEvolutionEngine;
 use App\Application\ShadowRelationship\RelationshipProfileBuilder;
 use App\Application\ShadowRelationship\RelationshipSignalCollector;
 use App\Application\ShadowRelationship\RelationshipTraitResolver;
+use App\Application\ShadowMemory\KnowledgeConnectionBuilder;
+use App\Application\ShadowMemory\KnowledgeSimilarityResolver;
+use App\Application\ShadowMemory\MemoryBuilder;
+use App\Application\ShadowMemory\MemoryCollector;
+use App\Application\ShadowMemory\MemoryEvolutionEngine;
 use App\Application\Shadow\ShadowWatchAnswerer;
 use App\Application\Shadow\ShadowWatchPromptBuilder;
 use App\Application\Shadow\TimelineContextBuilder;
@@ -56,6 +61,7 @@ use App\Infrastructure\Learning\InMemoryLearningProfileRepository;
 use App\Infrastructure\Shadow\InMemoryShadowSessionRepository;
 use App\Infrastructure\Shadow\SessionLearning\InMemorySessionLearningStateRepository;
 use App\Infrastructure\ShadowRelationship\InMemoryShadowRelationshipRepository;
+use App\Infrastructure\ShadowMemory\InMemoryShadowMemoryRepository;
 use PHPUnit\Framework\TestCase;
 
 final class ShadowHandlersTest extends TestCase
@@ -196,6 +202,20 @@ final class ShadowHandlersTest extends TestCase
             new LearningAdaptiveVoiceResolver(),
             $this->sessionLearningCoordinator(),
             $this->relationshipProfileBuilder(),
+            $this->memoryBuilder(),
+        );
+    }
+
+    private function memoryBuilder(): MemoryBuilder
+    {
+        return new MemoryBuilder(
+            new InMemoryShadowMemoryRepository(),
+            new MemoryCollector(),
+            new MemoryEvolutionEngine(
+                new KnowledgeSimilarityResolver(),
+                new KnowledgeConnectionBuilder(),
+            ),
+            new InMemoryShadowRelationshipRepository(),
         );
     }
 
