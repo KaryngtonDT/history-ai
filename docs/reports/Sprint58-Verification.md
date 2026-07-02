@@ -15,6 +15,7 @@ Status: Complete
 | 03–05 | `c924b4c` | feat(shadow): add conversational configuration, language composer and narrative intelligence |
 | 06 | `52c8a1d` | feat(frontend): add shadow identity center |
 | docs | `52c8a1d` | docs included in frontend commit |
+| fix | `240aa48` | fix(frontend): apply biome formatting in voice studio |
 
 ---
 
