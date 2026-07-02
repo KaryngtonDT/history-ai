@@ -16,7 +16,7 @@ describe("Sprint 1 — app shell", () => {
 		);
 
 		expect(
-			screen.getByText("AI video and knowledge localization platform."),
+			screen.getByText("AI-guided comprehension"),
 		).toBeInTheDocument();
 		expect(
 			screen.getByText("Transform knowledge into understanding."),
