@@ -9,6 +9,7 @@ use App\Domain\Chat\ChatProviderOptions;
 use App\Domain\Chat\ChatRequest;
 use App\Domain\Chat\ChatSourceCollection;
 use App\Application\Shadow\DTO\ShadowAnswerVoiceMetadata;
+use App\Domain\Shadow\SessionLearning\TeachingStrategy;
 use App\Domain\Shadow\ShadowAnswer;
 use App\Domain\Shadow\ShadowExplanationStyle;
 use App\Domain\Shadow\ShadowQuestion;
@@ -29,9 +30,16 @@ final class ShadowWatchAnswerer
         ShadowQuestion $question,
         ShadowAnswerVoiceMetadata $voice,
         ?ShadowExplanationStyle $explanationStyleHint = null,
+        ?TeachingStrategy $teachingStrategy = null,
     ): ShadowAnswer {
         try {
-            $prompt = $this->promptBuilder->build($context, $question, $voice->answerLanguage, $explanationStyleHint);
+            $prompt = $this->promptBuilder->build(
+                $context,
+                $question,
+                $voice->answerLanguage,
+                $explanationStyleHint,
+                $teachingStrategy,
+            );
             $response = $this->chatProvider->answer(ChatRequest::create(
                 $prompt,
                 ChatSourceCollection::empty(),

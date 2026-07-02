@@ -445,4 +445,71 @@ export class MockShadowRepository implements ShadowRepository {
 
 		return next;
 	}
+
+	private mockSessionLearning(sessionId: string): import("./types").SessionLearningState {
+		return {
+			sessionId,
+			adaptiveEnabled: true,
+			attention: "medium",
+			confidence: "stable",
+			fatigue: "low",
+			pace: "normal",
+			energy: "medium",
+			difficulty: "intermediate",
+			strategyKind: "balanced",
+			speakingPace: "normal",
+			voiceStyle: "neutral",
+			adjustments: [],
+		};
+	}
+
+	async getSessionLearning(_videoId: string, sessionId: string) {
+		return this.mockSessionLearning(sessionId);
+	}
+
+	async getSessionStrategy(_videoId: string, _sessionId: string) {
+		return {
+			kind: "balanced",
+			attention: "medium",
+			confidence: "stable",
+			fatigue: "low",
+			difficulty: "intermediate",
+			speakingPace: "normal",
+			voiceStyle: "neutral",
+			explanationStyle: "detailed",
+			challengeLevel: "normal",
+			useExamples: true,
+			useAnalogies: false,
+			offerPausePrompt: false,
+			summary: "Balanced strategy with normal pace and neutral voice.",
+		};
+	}
+
+	async updateSessionLearningPreferences(
+		_videoId: string,
+		sessionId: string,
+		request: import("./types").UpdateSessionLearningPreferencesRequest,
+	) {
+		return {
+			...this.mockSessionLearning(sessionId),
+			adaptiveEnabled: request.adaptiveEnabled,
+		};
+	}
+
+	async recordSessionObservation(
+		_videoId: string,
+		sessionId: string,
+		request: import("./types").RecordSessionObservationRequest,
+	) {
+		return {
+			...this.mockSessionLearning(sessionId),
+			adjustments: [
+				{
+					timeSeconds: request.timeSeconds,
+					label: `Observation: ${request.type}`,
+					reason: request.detail ?? "Recorded in mock repository.",
+				},
+			],
+		};
+	}
 }

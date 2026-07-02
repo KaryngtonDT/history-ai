@@ -14,6 +14,10 @@ import type {
 	UpdateShadowInterventionPolicyRequest,
 	UpdateShadowVoicePreferenceRequest,
 	WatchContext,
+	SessionLearningState,
+	SessionTeachingStrategy,
+	UpdateSessionLearningPreferencesRequest,
+	RecordSessionObservationRequest,
 } from "./types";
 
 const UUID_PATTERN =
@@ -173,6 +177,60 @@ export class ShadowService {
 		}
 
 		return this.repository.updateVoicePreference(
+			videoId.trim(),
+			sessionId,
+			request,
+		);
+	}
+
+	getSessionLearning(
+		videoId: string,
+		sessionId: string,
+	): Promise<SessionLearningState> {
+		if (!this.isValidVideoId(videoId) || sessionId.trim() === "") {
+			return Promise.reject(new Error("Invalid shadow session request"));
+		}
+
+		return this.repository.getSessionLearning(videoId.trim(), sessionId);
+	}
+
+	getSessionStrategy(
+		videoId: string,
+		sessionId: string,
+	): Promise<SessionTeachingStrategy> {
+		if (!this.isValidVideoId(videoId) || sessionId.trim() === "") {
+			return Promise.reject(new Error("Invalid shadow session request"));
+		}
+
+		return this.repository.getSessionStrategy(videoId.trim(), sessionId);
+	}
+
+	updateSessionLearningPreferences(
+		videoId: string,
+		sessionId: string,
+		request: UpdateSessionLearningPreferencesRequest,
+	): Promise<SessionLearningState> {
+		if (!this.isValidVideoId(videoId) || sessionId.trim() === "") {
+			return Promise.reject(new Error("Invalid shadow session request"));
+		}
+
+		return this.repository.updateSessionLearningPreferences(
+			videoId.trim(),
+			sessionId,
+			request,
+		);
+	}
+
+	recordSessionObservation(
+		videoId: string,
+		sessionId: string,
+		request: RecordSessionObservationRequest,
+	): Promise<SessionLearningState> {
+		if (!this.isValidVideoId(videoId) || sessionId.trim() === "") {
+			return Promise.reject(new Error("Invalid shadow session request"));
+		}
+
+		return this.repository.recordSessionObservation(
 			videoId.trim(),
 			sessionId,
 			request,

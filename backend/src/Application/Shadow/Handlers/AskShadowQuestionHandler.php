@@ -11,7 +11,9 @@ use App\Application\Shadow\DTO\ShadowAnswerResult;
 use App\Application\Shadow\ShadowAnswerLanguageResolver;
 use App\Application\Shadow\ShadowContextFactory;
 use App\Application\Shadow\ShadowSessionResolver;
+use App\Application\Shadow\SessionLearning\SessionLearningCoordinator;
 use App\Application\Shadow\ShadowWatchAnswerer;
+use App\Domain\Shadow\SessionLearning\TeachingStrategy;
 use App\Domain\Shadow\Exception\InvalidShadowSessionException;
 use App\Domain\Shadow\ShadowQuestion;
 use App\Domain\Shadow\ShadowSessionRepositoryInterface;
@@ -27,6 +29,7 @@ final class AskShadowQuestionHandler
         private readonly ShadowAnswerLanguageResolver $languageResolver,
         private readonly LearningAdaptiveAdvisor $learningAdvisor,
         private readonly LearningAdaptiveVoiceResolver $adaptiveVoiceResolver,
+        private readonly SessionLearningCoordinator $sessionLearningCoordinator,
     ) {
     }
 
@@ -78,16 +81,33 @@ final class AskShadowQuestionHandler
             $explicitLanguage,
         );
 
+        $learningState = $this->sessionLearningCoordinator->analyzeAndSave($session);
+        $teachingStrategy = $this->sessionLearningCoordinator->resolveStrategy($learningState);
+        $explanationStyle = $this->resolveExplanationStyle($hints, $teachingStrategy, $learningState->preferences()->adaptiveEnabled());
+
         $answer = $this->shadowWatchAnswerer->answer(
             $context,
             $question,
             $voice,
-            $hints->explanationStyle,
+            $explanationStyle,
+            $learningState->preferences()->adaptiveEnabled() ? $teachingStrategy : null,
         );
         $session = $session->recordAnswer($answer);
 
         $this->sessionRepository->save($session);
 
         return ShadowAnswerResult::fromSession($session, $answer->text(), $voice);
+    }
+
+    private function resolveExplanationStyle(
+        \App\Application\Learning\DTO\LearningAdaptiveHints $hints,
+        TeachingStrategy $teachingStrategy,
+        bool $adaptiveEnabled,
+    ): ?\App\Domain\Shadow\ShadowExplanationStyle {
+        if ($adaptiveEnabled) {
+            return $teachingStrategy->explanationStyle();
+        }
+
+        return $hints->explanationStyle;
     }
 }

@@ -6,6 +6,7 @@ namespace App\Application\Shadow\Handlers;
 
 use App\Application\Shadow\Commands\StartShadowSessionCommand;
 use App\Application\Shadow\DTO\ShadowSessionResult;
+use App\Application\Shadow\SessionLearning\SessionLearningCoordinator;
 use App\Application\Shadow\ShadowSessionResolver;
 use App\Domain\Content\Exception\InvalidContentIdException;
 use App\Domain\Chat\Exception\InvalidConversationIdException;
@@ -23,6 +24,7 @@ final class StartShadowSessionHandler
         private readonly ShadowSessionRepositoryInterface $sessionRepository,
         private readonly TranscriptRepositoryInterface $transcriptRepository,
         private readonly ShadowSessionResolver $sessionResolver,
+        private readonly SessionLearningCoordinator $sessionLearningCoordinator,
     ) {
     }
 
@@ -61,6 +63,7 @@ final class StartShadowSessionHandler
         );
 
         $this->sessionRepository->save($session);
+        $this->sessionLearningCoordinator->ensureState($session);
 
         return ShadowSessionResult::fromDomain($session);
     }

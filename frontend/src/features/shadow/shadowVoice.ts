@@ -179,6 +179,27 @@ export interface SpeakShadowAnswerResult {
 	fallbackUsed: boolean;
 }
 
+export function voiceRateForStrategy(
+	speakingPace?: string,
+	voiceStyle?: string,
+): number {
+	let rate = 1;
+
+	if (speakingPace === "slow") {
+		rate = 0.85;
+	} else if (speakingPace === "fast") {
+		rate = 1.15;
+	}
+
+	if (voiceStyle === "calm") {
+		rate *= 0.95;
+	} else if (voiceStyle === "dynamic") {
+		rate *= 1.05;
+	}
+
+	return Math.min(2, Math.max(0.5, rate));
+}
+
 export function speakShadowAnswer(
 	text: string,
 	speechLanguage = "en",

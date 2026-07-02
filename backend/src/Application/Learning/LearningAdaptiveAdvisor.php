@@ -80,6 +80,7 @@ final class LearningAdaptiveAdvisor
             LearningRecommendationType::UseNaturalTranslation => $translationStyle = 'natural',
             LearningRecommendationType::PreferVoiceLanguage => $voiceLanguage = $this->extractVoiceLanguage($recommendation->explanation()),
             LearningRecommendationType::PreferProvider => $preferredProvider = $this->extractProviderId($recommendation->explanation()),
+            LearningRecommendationType::SlowDownPlayback => $explanationStyle = ShadowExplanationStyle::Short,
             default => null,
         };
     }

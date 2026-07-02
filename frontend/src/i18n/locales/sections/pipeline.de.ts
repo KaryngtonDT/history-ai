@@ -399,6 +399,16 @@ export const pipelineDe: PipelineMessages = {
 			interventionThinking: "Shadow denkt nach...",
 			resumePrompt: "Bereit, weiterzuschauen?",
 			continueWatching: "Video fortsetzen",
+			sessionLearning: {
+				title: "Shadow-Lernen",
+				adaptive: "Adaptive Lehre",
+				attention: "Aufmerksamkeit",
+				confidence: "Sicherheit",
+				currentStrategy: "Aktuelle Strategie",
+				difficulty: "Schwierigkeit",
+				speakingPace: "Sprechtempo",
+				historyTitle: "Lernsitzung",
+			},
 			voiceStudio: {
 				title: "Sprachstudio",
 				description:

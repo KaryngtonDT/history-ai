@@ -272,6 +272,9 @@ services:
     App\Domain\ShadowIdentity\ShadowIdentityRepositoryInterface:
         alias: App\Infrastructure\ShadowIdentity\FileShadowIdentityRepository
 
+    App\Domain\Shadow\SessionLearning\SessionLearningStateRepositoryInterface:
+        alias: App\Infrastructure\Shadow\SessionLearning\FileSessionLearningStateRepository
+
     app.storage.learning:
         class: App\Infrastructure\Storage\JsonFileStore
         arguments:
@@ -287,6 +290,11 @@ services:
         arguments:
             $directory: '%storage.root%/shadow/sessions'
 
+    app.storage.shadow_session_learning:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/shadow/session-learning'
+
     App\Infrastructure\Learning\FileLearningProfileRepository:
         arguments:
             $store: '@app.storage.learning'
@@ -298,6 +306,10 @@ services:
     App\Infrastructure\Shadow\FileShadowSessionRepository:
         arguments:
             $store: '@app.storage.shadow_sessions'
+
+    App\Infrastructure\Shadow\SessionLearning\FileSessionLearningStateRepository:
+        arguments:
+            $store: '@app.storage.shadow_session_learning'
 
     App\Application\Platform\PlatformHealthCheckerInterface:
         alias: App\Infrastructure\Platform\PlatformHealthChecker

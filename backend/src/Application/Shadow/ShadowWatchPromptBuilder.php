@@ -6,6 +6,7 @@ namespace App\Application\Shadow;
 
 use App\Application\ShadowIdentity\ShadowIdentityBehaviorResolver;
 use App\Domain\Chat\ChatPrompt;
+use App\Domain\Shadow\SessionLearning\TeachingStrategy;
 use App\Domain\Shadow\ShadowExplanationStyle;
 use App\Domain\Shadow\ShadowVoiceLanguage;
 use App\Domain\Shadow\ShadowQuestion;
@@ -22,18 +23,46 @@ final class ShadowWatchPromptBuilder
         ShadowQuestion $question,
         ShadowVoiceLanguage $answerLanguage,
         ?ShadowExplanationStyle $explanationStyleHint = null,
+        ?TeachingStrategy $teachingStrategy = null,
     ): ChatPrompt {
         $lines = [
             'You are Shadow, the Lumen AI watch companion. Answer using the current video moment.',
             sprintf('Respond in %s.', $answerLanguage->label()),
         ];
 
-        if (null !== $explanationStyleHint) {
-            $lines[] = match ($explanationStyleHint) {
+        $styleHint = $explanationStyleHint;
+
+        if (null !== $teachingStrategy) {
+            $styleHint = $teachingStrategy->explanationStyle();
+        }
+
+        if (null !== $styleHint) {
+            $lines[] = match ($styleHint) {
                 ShadowExplanationStyle::Short => 'Keep the answer concise and practical.',
                 ShadowExplanationStyle::Detailed => 'Provide a detailed, step-by-step explanation.',
                 ShadowExplanationStyle::ExampleFirst => 'Lead with a concrete example, then explain.',
             };
+        }
+
+        if (null !== $teachingStrategy) {
+            if ($teachingStrategy->useExamples()) {
+                $lines[] = 'Include at least one concrete example tied to the current video moment.';
+            }
+
+            if ($teachingStrategy->useAnalogies()) {
+                $lines[] = 'Use a simple analogy if the concept is abstract.';
+            }
+
+            if ($teachingStrategy->offerPausePrompt()) {
+                $lines[] = 'Offer a brief pause or recap option before continuing.';
+            }
+
+            $lines[] = sprintf(
+                'Teaching strategy: %s (pace=%s, difficulty=%s).',
+                $teachingStrategy->kind()->value,
+                $teachingStrategy->speakingPace()->value,
+                $teachingStrategy->difficulty()->value,
+            );
         }
 
         $lines[] = sprintf('Current playback time: %.1f seconds', $context->currentTimeSeconds);

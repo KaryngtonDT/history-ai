@@ -9,6 +9,10 @@ import {
 	videoShadowSessionResumePath,
 	videoShadowSessionsPath,
 	videoShadowSessionVoicePath,
+	videoShadowSessionLearningPath,
+	videoShadowSessionStrategyPath,
+	videoShadowSessionLearningPreferencesPath,
+	videoShadowSessionLearningObservationsPath,
 } from "@/config/api";
 import type { HttpClient } from "@/services/http/HttpClient";
 import { ApiError } from "@/shared/errors";
@@ -31,6 +35,10 @@ import {
 	type StartShadowSessionRequest,
 	type UpdateShadowInterventionPolicyRequest,
 	type UpdateShadowVoicePreferenceRequest,
+	type SessionLearningState,
+	type SessionTeachingStrategy,
+	type UpdateSessionLearningPreferencesRequest,
+	type RecordSessionObservationRequest,
 	type WatchContextApiDto,
 } from "./types";
 
@@ -188,5 +196,39 @@ export class HttpShadowRepository implements ShadowRepository {
 		}>(videoShadowSessionVoicePath(videoId, sessionId), request);
 
 		return dto.voicePreference ?? DEFAULT_SHADOW_VOICE_PREFERENCE;
+	}
+
+	async getSessionLearning(videoId: string, sessionId: string) {
+		return this.httpClient.get<SessionLearningState>(
+			videoShadowSessionLearningPath(videoId, sessionId),
+		);
+	}
+
+	async getSessionStrategy(videoId: string, sessionId: string) {
+		return this.httpClient.get<SessionTeachingStrategy>(
+			videoShadowSessionStrategyPath(videoId, sessionId),
+		);
+	}
+
+	async updateSessionLearningPreferences(
+		videoId: string,
+		sessionId: string,
+		request: UpdateSessionLearningPreferencesRequest,
+	) {
+		return this.httpClient.put<SessionLearningState>(
+			videoShadowSessionLearningPreferencesPath(videoId, sessionId),
+			request,
+		);
+	}
+
+	async recordSessionObservation(
+		videoId: string,
+		sessionId: string,
+		request: RecordSessionObservationRequest,
+	) {
+		return this.httpClient.post<SessionLearningState>(
+			videoShadowSessionLearningObservationsPath(videoId, sessionId),
+			request,
+		);
 	}
 }

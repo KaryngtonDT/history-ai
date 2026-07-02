@@ -14,6 +14,8 @@ import type {
 	ShadowInterventionFrequency,
 	ShadowSession,
 	ShadowTutorMode,
+	SessionLearningState,
+	SessionTeachingStrategy,
 	WatchContext,
 } from "@/services/shadow/types";
 import { transcriptService } from "@/services/transcript/TranscriptService";
@@ -38,12 +40,15 @@ import {
 	selectedLanguageFromPreference,
 	speakShadowAnswer,
 	toVoicePreferencePayload,
+	voiceRateForStrategy,
 } from "../shadowVoice";
 import { VocabularyPanel } from "../VocabularyPanel";
+import { ShadowLearningPanel } from "../ShadowLearningPanel";
 import styles from "./ShadowWatchPage.module.css";
 
 const CONTEXT_DEBOUNCE_MS = 400;
 const INTERVENTION_DEBOUNCE_MS = 900;
+const LEARNING_POLL_MS = 5000;
 const DEFAULT_TARGET_LANGUAGE = "fr";
 
 export function ShadowWatchPage() {
@@ -71,6 +76,10 @@ export function ShadowWatchPage() {
 		null,
 	);
 	const [showResumePrompt, setShowResumePrompt] = useState(false);
+	const [sessionLearning, setSessionLearning] =
+		useState<SessionLearningState | null>(null);
+	const [sessionStrategy, setSessionStrategy] =
+		useState<SessionTeachingStrategy | null>(null);
 
 	const refreshContext = useCallback(
 		async (time: number, activeSession: ShadowSession) => {
@@ -136,6 +145,35 @@ export function ShadowWatchPage() {
 			cancelled = true;
 		};
 	}, [videoId, refreshContext]);
+
+	const refreshSessionLearning = useCallback(
+		async (activeSession: ShadowSession) => {
+			const [learning, strategy] = await Promise.all([
+				shadowService.getSessionLearning(videoId, activeSession.sessionId),
+				shadowService.getSessionStrategy(videoId, activeSession.sessionId),
+			]);
+
+			setSessionLearning(learning);
+			setSessionStrategy(strategy);
+		},
+		[videoId],
+	);
+
+	useEffect(() => {
+		if (!session) {
+			return;
+		}
+
+		void refreshSessionLearning(session);
+
+		const intervalId = window.setInterval(() => {
+			void refreshSessionLearning(session);
+		}, LEARNING_POLL_MS);
+
+		return () => {
+			window.clearInterval(intervalId);
+		};
+	}, [session, refreshSessionLearning]);
 
 	const handleTimeUpdate = (time: number) => {
 		setCurrentTime(time);
@@ -254,6 +292,11 @@ export function ShadowWatchPage() {
 		? selectedLanguageFromPreference(session.voicePreference)
 		: "auto";
 
+	const speechRate = voiceRateForStrategy(
+		sessionStrategy?.speakingPace ?? sessionLearning?.speakingPace,
+		sessionStrategy?.voiceStyle ?? sessionLearning?.voiceStyle,
+	);
+
 	const handleVoiceLanguageChange = async (language: ShadowSpeechLanguage) => {
 		if (!session) {
 			return;
@@ -298,6 +341,7 @@ export function ShadowWatchPage() {
 			speakShadowAnswer(
 				result.reply,
 				resolveSpeechLanguageFromAnswer(result.speechLanguage),
+				speechRate,
 			);
 			setShowResumePrompt(result.recommendResume);
 		} finally {
@@ -356,6 +400,12 @@ export function ShadowWatchPage() {
 				currentTime,
 			);
 			setSession(updated);
+			await shadowService.recordSessionObservation(
+				videoId,
+				session.sessionId,
+				{ type: "pause", timeSeconds: currentTime },
+			);
+			await refreshSessionLearning(updated);
 		} finally {
 			setIsBusy(false);
 		}
@@ -381,6 +431,19 @@ export function ShadowWatchPage() {
 		}
 	};
 
+	const handleAdaptiveToggle = async (enabled: boolean) => {
+		if (!session) {
+			return;
+		}
+
+		const learning = await shadowService.updateSessionLearningPreferences(
+			videoId,
+			session.sessionId,
+			{ adaptiveEnabled: enabled },
+		);
+		setSessionLearning(learning);
+	};
+
 	const handleAsk = async () => {
 		if (!session || question.trim() === "") {
 			return;
@@ -404,7 +467,9 @@ export function ShadowWatchPage() {
 			speakShadowAnswer(
 				result.answer,
 				resolveSpeechLanguageFromAnswer(result.speechLanguage),
+				speechRate,
 			);
+			await refreshSessionLearning(result.session);
 		} finally {
 			setIsBusy(false);
 		}
@@ -477,6 +542,12 @@ export function ShadowWatchPage() {
 						policy={session.policy}
 						disabled={isBusy}
 						onChange={(update) => void handlePolicyChange(update)}
+					/>
+					<ShadowLearningPanel
+						learning={sessionLearning}
+						strategy={sessionStrategy}
+						disabled={isBusy}
+						onAdaptiveToggle={(enabled) => void handleAdaptiveToggle(enabled)}
 					/>
 					{activeIntervention ? (
 						<ShadowInterventionCard

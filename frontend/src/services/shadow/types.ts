@@ -177,6 +177,53 @@ export interface AskShadowQuestionRequest {
 	interfaceLanguage?: string;
 }
 
+export interface SessionLearningAdjustment {
+	timeSeconds: number;
+	label: string;
+	reason: string;
+}
+
+export interface SessionLearningState {
+	sessionId: string;
+	adaptiveEnabled: boolean;
+	attention: string;
+	confidence: string;
+	fatigue: string;
+	pace: string;
+	energy: string;
+	difficulty: string;
+	strategyKind: string;
+	speakingPace: string;
+	voiceStyle: string;
+	adjustments: SessionLearningAdjustment[];
+}
+
+export interface SessionTeachingStrategy {
+	kind: string;
+	attention: string;
+	confidence: string;
+	fatigue: string;
+	difficulty: string;
+	speakingPace: string;
+	voiceStyle: string;
+	explanationStyle: string;
+	challengeLevel: string;
+	useExamples: boolean;
+	useAnalogies: boolean;
+	offerPausePrompt: boolean;
+	summary: string;
+}
+
+export interface UpdateSessionLearningPreferencesRequest {
+	adaptiveEnabled: boolean;
+}
+
+export interface RecordSessionObservationRequest {
+	type: string;
+	timeSeconds: number;
+	detail?: string;
+}
+
 export type WatchContextApiDto = WatchContext;
 export type ShadowSessionApiDto = ShadowSession;
 export type ShadowAnswerApiDto = ShadowAnswer;

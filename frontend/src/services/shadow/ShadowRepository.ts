@@ -12,6 +12,10 @@ import type {
 	UpdateShadowInterventionPolicyRequest,
 	UpdateShadowVoicePreferenceRequest,
 	WatchContext,
+	SessionLearningState,
+	SessionTeachingStrategy,
+	UpdateSessionLearningPreferencesRequest,
+	RecordSessionObservationRequest,
 } from "./types";
 
 export interface ShadowRepository {
@@ -76,4 +80,26 @@ export interface ShadowRepository {
 		sessionId: string,
 		request: UpdateShadowVoicePreferenceRequest,
 	): Promise<ShadowVoicePreference>;
+
+	getSessionLearning(
+		videoId: string,
+		sessionId: string,
+	): Promise<SessionLearningState>;
+
+	getSessionStrategy(
+		videoId: string,
+		sessionId: string,
+	): Promise<SessionTeachingStrategy>;
+
+	updateSessionLearningPreferences(
+		videoId: string,
+		sessionId: string,
+		request: UpdateSessionLearningPreferencesRequest,
+	): Promise<SessionLearningState>;
+
+	recordSessionObservation(
+		videoId: string,
+		sessionId: string,
+		request: RecordSessionObservationRequest,
+	): Promise<SessionLearningState>;
 }

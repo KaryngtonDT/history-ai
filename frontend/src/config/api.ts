@@ -249,6 +249,34 @@ export function videoShadowSessionVoicePath(
 	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/voice`;
 }
 
+export function videoShadowSessionLearningPath(
+	videoId: string,
+	sessionId: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/learning`;
+}
+
+export function videoShadowSessionStrategyPath(
+	videoId: string,
+	sessionId: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/strategy`;
+}
+
+export function videoShadowSessionLearningPreferencesPath(
+	videoId: string,
+	sessionId: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/learning/preferences`;
+}
+
+export function videoShadowSessionLearningObservationsPath(
+	videoId: string,
+	sessionId: string,
+): string {
+	return `${VIDEOS_PATH}/${videoId}/shadow/sessions/${sessionId}/learning/observations`;
+}
+
 export function timelinePath(artifactId: string): string {
 	return `/api/timeline/${artifactId}`;
 }

@@ -389,6 +389,16 @@ export const pipelineEn = {
 			interventionThinking: "Shadow is thinking...",
 			resumePrompt: "Ready to continue watching?",
 			continueWatching: "Continue watching",
+			sessionLearning: {
+				title: "Shadow Learning",
+				adaptive: "Adaptive teaching",
+				attention: "Attention",
+				confidence: "Confidence",
+				currentStrategy: "Current strategy",
+				difficulty: "Difficulty",
+				speakingPace: "Speaking pace",
+				historyTitle: "Learning session",
+			},
 			voiceStudio: {
 				title: "Voice Studio",
 				description:
