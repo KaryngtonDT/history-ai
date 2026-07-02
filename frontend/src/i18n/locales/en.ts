@@ -57,12 +57,14 @@ const baseEn = {
 export const en = mergeMessages(
 	mergeMessages(
 		mergeMessages(
-			mergeMessages(mergeMessages(baseEn, shellEn), pipelineEn),
-			workspaceEn,
+			mergeMessages(
+				mergeMessages(mergeMessages(baseEn, shellEn), pipelineEn),
+				workspaceEn,
+			),
+			learningEn,
 		),
-		learningEn,
+		shadowIdentityEn,
 	),
-	shadowIdentityEn,
 	shadowRelationshipEn,
 );
 
@@ -107,12 +109,14 @@ const baseFr = {
 export const fr = mergeMessages(
 	mergeMessages(
 		mergeMessages(
-			mergeMessages(mergeMessages(baseFr, shellFr), pipelineFr),
-			workspaceFr,
+			mergeMessages(
+				mergeMessages(mergeMessages(baseFr, shellFr), pipelineFr),
+				workspaceFr,
+			),
+			learningFr,
 		),
-		learningFr,
+		shadowIdentityFr,
 	),
-	shadowIdentityFr,
 	shadowRelationshipFr,
 ) satisfies Messages;
 
@@ -155,11 +159,13 @@ const baseDe = {
 export const de = mergeMessages(
 	mergeMessages(
 		mergeMessages(
-			mergeMessages(mergeMessages(baseDe, shellDe), pipelineDe),
-			workspaceDe,
+			mergeMessages(
+				mergeMessages(mergeMessages(baseDe, shellDe), pipelineDe),
+				workspaceDe,
+			),
+			learningDe,
 		),
-		learningDe,
+		shadowIdentityDe,
 	),
-	shadowIdentityDe,
 	shadowRelationshipDe,
 ) satisfies Messages;

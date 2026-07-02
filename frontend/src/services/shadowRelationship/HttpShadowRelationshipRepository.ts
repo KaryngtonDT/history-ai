@@ -23,7 +23,11 @@ import type {
 export class HttpShadowRelationshipRepository
 	implements ShadowRelationshipRepository
 {
-	constructor(private readonly httpClient: HttpClient) {}
+	private readonly httpClient: HttpClient;
+
+	constructor(httpClient: HttpClient) {
+		this.httpClient = httpClient;
+	}
 
 	getProfile(scopeKey?: string): Promise<RelationshipProfile> {
 		const query = scopeKey ? `?scopeKey=${encodeURIComponent(scopeKey)}` : "";
