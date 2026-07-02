@@ -11,10 +11,13 @@ parameters:
     video.upload_max_bytes_default: 524288000
 
     video.upload_max_bytes: '%env(int:default:video.upload_max_bytes_default:VIDEO_UPLOAD_MAX_BYTES)%'
-    video.storage_dir: '%kernel.project_dir%/var/video-storage'
+    storage.root: '%kernel.project_dir%/storage'
+    models.root: '%env(default:models.root_default:MODELS_ROOT)%'
+    models.root_default: '/models'
+    video.storage_dir: '%storage.root%/uploads/video'
     audio.upload_max_bytes: '%env(int:default:video.upload_max_bytes_default:AUDIO_UPLOAD_MAX_BYTES)%'
-    audio.source_storage_dir: '%kernel.project_dir%/var/audio-source-storage'
-    youtube.download_dir: '%kernel.project_dir%/var/youtube-downloads'
+    audio.source_storage_dir: '%storage.root%/uploads/audio'
+    youtube.download_dir: '%storage.root%/temp/youtube'
     youtube.yt_dlp.binary_default: 'yt-dlp'
     stt.provider_default: 'faster_whisper'
     stt.faster_whisper.binary_default: 'faster-whisper'
@@ -27,25 +30,25 @@ parameters:
     tts.f5.binary_default: 'f5-tts'
     tts.f5.model_default: 'F5-TTS'
     tts.f5.base_path_default: '/models/f5'
-    tts.output_dir: '%kernel.project_dir%/var/audio-storage'
+    tts.output_dir: '%storage.root%/artifacts/audio'
     tts.generate_audio_default: false
     voice_clone.provider_default: 'openvoice'
     voice_clone.openvoice.binary_default: 'openvoice'
     voice_clone.openvoice.model_default: 'openvoice_v2'
     voice_clone.openvoice.base_path_default: '/models/openvoice'
-    voice_clone.output_dir: '%kernel.project_dir%/var/voice-clone-storage'
+    voice_clone.output_dir: '%storage.root%/artifacts/voiceclone'
     voice_clone.generate_default: false
     lip_sync.provider_default: 'latentsync'
     lip_sync.latentsync.binary_default: 'latentsync'
     lip_sync.latentsync.model_default: 'latentsync'
     lip_sync.latentsync.base_path_default: '/models/latentsync'
-    lip_sync.output_dir: '%kernel.project_dir%/var/lip-sync-storage'
+    lip_sync.output_dir: '%storage.root%/artifacts/lipsync'
     lip_sync.generate_default: false
     video_render.provider_default: 'ffmpeg'
     video_render.ffmpeg.binary_default: 'ffmpeg'
     video_render.format_default: 'mp4'
     video_render.quality_default: 'standard'
-    video_render.output_dir: '%kernel.project_dir%/var/final-video-storage'
+    video_render.output_dir: '%storage.root%/artifacts/render'
     video_render.generate_default: false
     orchestrator.gpu_available_default: true
     orchestrator.vram_gb_default: 8.0
@@ -261,13 +264,52 @@ services:
         alias: App\Infrastructure\Persistence\Doctrine\Review\DoctrineUserPreferenceProfileRepository
 
     App\Domain\Shadow\ShadowSessionRepositoryInterface:
-        alias: App\Infrastructure\Shadow\InMemoryShadowSessionRepository
+        alias: App\Infrastructure\Shadow\FileShadowSessionRepository
 
     App\Domain\Learning\LearningProfileRepositoryInterface:
-        alias: App\Infrastructure\Learning\InMemoryLearningProfileRepository
+        alias: App\Infrastructure\Learning\FileLearningProfileRepository
 
     App\Domain\ShadowIdentity\ShadowIdentityRepositoryInterface:
-        alias: App\Infrastructure\ShadowIdentity\InMemoryShadowIdentityRepository
+        alias: App\Infrastructure\ShadowIdentity\FileShadowIdentityRepository
+
+    app.storage.learning:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/learning'
+
+    app.storage.shadow_identity:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/shadow/identity'
+
+    app.storage.shadow_sessions:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/shadow/sessions'
+
+    App\Infrastructure\Learning\FileLearningProfileRepository:
+        arguments:
+            $store: '@app.storage.learning'
+
+    App\Infrastructure\ShadowIdentity\FileShadowIdentityRepository:
+        arguments:
+            $store: '@app.storage.shadow_identity'
+
+    App\Infrastructure\Shadow\FileShadowSessionRepository:
+        arguments:
+            $store: '@app.storage.shadow_sessions'
+
+    App\Application\Platform\PlatformHealthCheckerInterface:
+        alias: App\Infrastructure\Platform\PlatformHealthChecker
+
+    App\Infrastructure\Platform\PlatformHealthChecker:
+        arguments:
+            $learningStore: '@app.storage.learning'
+            $shadowIdentityStore: '@app.storage.shadow_identity'
+            $shadowSessionStore: '@app.storage.shadow_sessions'
+            $storageRoot: '%storage.root%'
+            $modelsRoot: '%models.root%'
+            $workerBaseUrl: '%worker.base_url%'
 
     App\Application\Shadow\ShadowWatchPromptBuilder:
         arguments:

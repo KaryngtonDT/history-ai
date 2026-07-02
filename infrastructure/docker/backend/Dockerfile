@@ -35,8 +35,8 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-s
 COPY backend/ .
 
 RUN composer run-script post-install-cmd --no-interaction \
-    && mkdir -p var/cache var/log \
-    && chown -R www-data:www-data var
+    && mkdir -p var/cache var/log storage \
+    && chown -R www-data:www-data var storage
 
 COPY infrastructure/docker/backend/nginx.conf /etc/nginx/http.d/default.conf
 COPY infrastructure/docker/backend/entrypoint.sh /entrypoint.sh

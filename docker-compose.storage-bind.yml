@@ -1,0 +1,17 @@
+# Optional bind-mount override for Linux/macOS hosts.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.storage-bind.yml up -d
+#
+# On Windows with spaces in the project path, prefer named volumes (default).
+
+name: history-ai
+
+services:
+  backend:
+    volumes:
+      - ./storage:/var/www/html/storage
+      - ./models:/models
+
+  worker:
+    volumes:
+      - ./storage:/app/storage
+      - ./models:/models

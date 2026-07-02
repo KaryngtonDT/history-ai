@@ -1394,6 +1394,29 @@ Verification: [Sprint58-Verification.md](../reports/Sprint58-Verification.md)
 
 ---
 
+# Sprint 59 — Deployment Readiness & Disaster Recovery (2026-06)
+
+| Slice | Focus | Status |
+|-------|-------|--------|
+| P59-SLICE-01 | Storage architecture | ✅ |
+| P59-SLICE-02 | Docker prod-like + Makefile | ✅ |
+| P59-SLICE-03 | File persistence (Shadow, Learning) | ✅ |
+| P59-SLICE-04 | Backup engine | ✅ |
+| P59-SLICE-05 | Restore validation | ✅ |
+| P59-SLICE-06 | Health monitoring + doctor | ✅ |
+| P59-SLICE-07 | Operations documentation | ✅ |
+
+- Unified `storage/` bind mount; AI models in `./models` (never in images).
+- File-backed Learning, Shadow Identity, and Shadow Session repositories.
+- `docker-compose.prod-like.yml`, Makefile Command Center, backup/restore scripts.
+- `/ready`, `/live`, `/api/platform/readiness` endpoints.
+
+Architecture: [DEPLOYMENT_READINESS.md](./DEPLOYMENT_READINESS.md)
+
+Verification: [Sprint59-Verification.md](../reports/Sprint59-Verification.md)
+
+---
+
 # Project architecture overview
 
 **Lumen** is a **modular monolith** with three runtime applications and a shared domain story:

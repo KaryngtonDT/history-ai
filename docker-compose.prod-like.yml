@@ -1,5 +1,5 @@
-# History AI — local development stack (infrastructure only).
-# Application frameworks are added in TASK-0003 through TASK-0005.
+# Lumen — production-like stack (no dev bind mounts on application source).
+# Use: docker compose -f docker-compose.prod-like.yml up -d --build
 
 name: history-ai
 
@@ -67,10 +67,10 @@ services:
       dockerfile: infrastructure/docker/backend/Dockerfile
     restart: unless-stopped
     environment:
-      APP_ENV: ${APP_ENV:-dev}
+      APP_ENV: ${APP_ENV:-prod}
       APP_SECRET: ${APP_SECRET:-change-me}
       DATABASE_URL: ${DATABASE_URL:-postgresql://history_ai:history_ai@postgres:5432/history_ai?serverVersion=17&charset=utf8}
-      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=0}
+      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-redis://redis:6379/messages}
       WORKER_BASE_URL: ${WORKER_BASE_URL:-http://worker:8001}
       MODELS_ROOT: /models
     volumes:
@@ -86,11 +86,11 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/health"]
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/ready"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 15s
+      start_period: 20s
 
   frontend:
     build:
@@ -150,17 +150,17 @@ services:
 
 networks:
   history-ai:
-    name: history-ai
+    name: history-ai-prod-like
     driver: bridge
 
 volumes:
   postgres_data:
-    name: history-ai-postgres-data
+    name: history-ai-prod-like-postgres-data
   redis_data:
-    name: history-ai-redis-data
+    name: history-ai-prod-like-redis-data
   minio_data:
-    name: history-ai-minio-data
+    name: history-ai-prod-like-minio-data
   lumen_storage:
-    name: history-ai-lumen-storage
+    name: history-ai-prod-like-lumen-storage
   lumen_models:
-    name: history-ai-lumen-models
+    name: history-ai-prod-like-lumen-models

@@ -125,8 +125,26 @@ when@test:
             alias: App\Infrastructure\Persistence\Doctrine\YouTube\DoctrineYouTubeVideoRepository
             public: true
 
+        app.storage.learning:
+            class: App\Infrastructure\Storage\JsonFileStore
+            arguments:
+                $directory: '%kernel.cache_dir%/learning'
+
+        app.storage.shadow_identity:
+            class: App\Infrastructure\Storage\JsonFileStore
+            arguments:
+                $directory: '%kernel.cache_dir%/shadow-identity'
+
+        app.storage.shadow_sessions:
+            class: App\Infrastructure\Storage\JsonFileStore
+            arguments:
+                $directory: '%kernel.cache_dir%/shadow-sessions'
+
     parameters:
+        storage.root: '%kernel.project_dir%/storage'
+        models.root: '/models'
         video.storage_dir: '%kernel.cache_dir%/video-storage'
+        audio.source_storage_dir: '%kernel.cache_dir%/audio-source-storage'
         youtube.download_dir: '%kernel.cache_dir%/youtube-downloads'
         tts.output_dir: '%kernel.cache_dir%/audio-storage'
         voice_clone.output_dir: '%kernel.cache_dir%/voice-clone-storage'

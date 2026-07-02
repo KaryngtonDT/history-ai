@@ -37,5 +37,15 @@ Thumbs.db
 # Docker
 *.log
 
+# Persistent data (keep structure, ignore contents)
+/storage/**
+!/storage/README.md
+!/storage/**/.gitkeep
+/models/**
+!/models/README.md
+!/models/**/.gitkeep
+/backups/**
+!/backups/**/.gitkeep
+
 # Build artifacts
 *.cache
