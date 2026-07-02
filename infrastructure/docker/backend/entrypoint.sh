@@ -11,6 +11,8 @@ mkdir -p \
   /var/www/html/storage/shadow/memory \
   /var/www/html/storage/shadow/teaching \
   /var/www/html/storage/shadow/knowledge \
+  /var/www/html/storage/shadow/goals \
+  /var/www/html/storage/shadow/mentor \
   /var/www/html/storage/learning /var/www/html/storage/workspace /var/www/html/storage/logs /var/www/html/storage/temp /var/www/html/storage/cache
 
 chown -R www-data:www-data /var/www/html/storage

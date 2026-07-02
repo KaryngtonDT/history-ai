@@ -13,7 +13,7 @@ use App\Application\Shadow\ShadowContextFactory;
 use App\Application\Shadow\ShadowSessionResolver;
 use App\Application\Shadow\SessionLearning\SessionLearningCoordinator;
 use App\Application\ShadowRelationship\RelationshipProfileBuilder;
-use App\Application\ShadowKnowledge\KnowledgeBuilder;
+use App\Application\ShadowMentor\MentorBuilder;
 use App\Application\Shadow\ShadowWatchAnswerer;
 use App\Domain\Shadow\SessionLearning\TeachingStrategy;
 use App\Domain\Shadow\Exception\InvalidShadowSessionException;
@@ -33,7 +33,7 @@ final class AskShadowQuestionHandler
         private readonly LearningAdaptiveVoiceResolver $adaptiveVoiceResolver,
         private readonly SessionLearningCoordinator $sessionLearningCoordinator,
         private readonly RelationshipProfileBuilder $relationshipProfileBuilder,
-        private readonly KnowledgeBuilder $knowledgeBuilder,
+        private readonly MentorBuilder $mentorBuilder,
     ) {
     }
 
@@ -111,7 +111,7 @@ final class AskShadowQuestionHandler
             ],
         ]);
 
-        $this->knowledgeBuilder->recordQuestion('default', [
+        $this->mentorBuilder->recordQuestion('default', [
             'question' => $command->question,
             'sessionId' => $command->sessionId,
             'videoId' => $command->videoId,

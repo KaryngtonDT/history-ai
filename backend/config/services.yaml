@@ -287,6 +287,12 @@ services:
     App\Domain\ShadowKnowledge\ShadowKnowledgeRepositoryInterface:
         alias: App\Infrastructure\ShadowKnowledge\FileShadowKnowledgeRepository
 
+    App\Domain\ShadowGoals\ShadowGoalsRepositoryInterface:
+        alias: App\Infrastructure\ShadowGoals\FileShadowGoalsRepository
+
+    App\Domain\ShadowMentor\ShadowMentorRepositoryInterface:
+        alias: App\Infrastructure\ShadowMentor\FileShadowMentorRepository
+
     app.storage.learning:
         class: App\Infrastructure\Storage\JsonFileStore
         arguments:
@@ -327,6 +333,16 @@ services:
         arguments:
             $directory: '%storage.root%/shadow/knowledge'
 
+    app.storage.shadow_goals:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/shadow/goals'
+
+    app.storage.shadow_mentor:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/shadow/mentor'
+
     App\Infrastructure\Learning\FileLearningProfileRepository:
         arguments:
             $store: '@app.storage.learning'
@@ -359,9 +375,17 @@ services:
         arguments:
             $store: '@app.storage.shadow_knowledge'
 
+    App\Infrastructure\ShadowGoals\FileShadowGoalsRepository:
+        arguments:
+            $store: '@app.storage.shadow_goals'
+
+    App\Infrastructure\ShadowMentor\FileShadowMentorRepository:
+        arguments:
+            $store: '@app.storage.shadow_mentor'
+
     App\Application\Shadow\Handlers\AskShadowQuestionHandler:
         arguments:
-            $knowledgeBuilder: '@App\Application\ShadowKnowledge\KnowledgeBuilder'
+            $mentorBuilder: '@App\Application\ShadowMentor\MentorBuilder'
 
     App\Application\Platform\PlatformHealthCheckerInterface:
         alias: App\Infrastructure\Platform\PlatformHealthChecker
@@ -382,6 +406,7 @@ services:
             $memoryContextComposer: '@App\Application\ShadowMemory\MemoryContextComposer'
             $teachingContextComposer: '@App\Application\ShadowTeaching\TeachingContextComposer'
             $knowledgeContextComposer: '@App\Application\ShadowKnowledge\KnowledgeContextComposer'
+            $mentorContextComposer: '@App\Application\ShadowMentor\MentorContextComposer'
 
     App\Domain\Shadow\ShadowConversationContextInterface:
         alias: App\Infrastructure\Shadow\NullShadowConversationContext

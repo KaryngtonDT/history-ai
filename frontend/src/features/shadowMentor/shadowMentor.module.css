@@ -1,0 +1,107 @@
+.shadowMentor {
+	display: grid;
+	gap: 1.5rem;
+}
+
+.section {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.cardGrid {
+	display: grid;
+	gap: 0.75rem;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.card {
+	padding: 0.85rem 1rem;
+	border-radius: 10px;
+	border: 1px solid var(--color-border, #d8dee9);
+	background: var(--color-surface, #fff);
+	display: grid;
+	gap: 0.4rem;
+}
+
+.list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 0.75rem;
+}
+
+.listItem {
+	padding: 0.75rem 1rem;
+	border-radius: 10px;
+	border: 1px solid var(--color-border, #d8dee9);
+	display: grid;
+	gap: 0.35rem;
+}
+
+.meta {
+	color: var(--color-muted, #5c6773);
+	font-size: 0.875rem;
+}
+
+.progressBar {
+	height: 0.45rem;
+	border-radius: 999px;
+	background: #e5e7eb;
+	overflow: hidden;
+}
+
+.progressBar span {
+	display: block;
+	height: 100%;
+	background: #7c3aed;
+}
+
+.actions {
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.roadmapSteps {
+	display: grid;
+	gap: 0.65rem;
+}
+
+.roadmapStep {
+	padding: 0.75rem 1rem;
+	border-radius: 10px;
+	border: 1px solid var(--color-border, #d8dee9);
+	display: grid;
+	gap: 0.25rem;
+}
+
+.horizon {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--color-muted, #5c6773);
+}
+
+.skillRow {
+	display: grid;
+	gap: 0.35rem;
+}
+
+.tagList {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+}
+
+.tag {
+	padding: 0.2rem 0.55rem;
+	border-radius: 999px;
+	background: #f5f3ff;
+	font-size: 0.85rem;
+}
+
+.adaptationPending {
+	color: #b45309;
+	font-size: 0.875rem;
+}

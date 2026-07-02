@@ -11,6 +11,8 @@ Shadow Identity (S58) ──► Voice & persona
         │
         ▼
 Shadow Teaching (S63) ──► Paths, exercises, revisions, checkpoints
+Shadow Knowledge (S64) ──► Graph, prerequisites, gaps, reasoning
+Shadow Mentor (S65) ──► Goals, roadmap, missions, weekly review
         │
         ▼
 ShadowWatchPromptBuilder ──► Chat provider
@@ -18,6 +20,6 @@ ShadowWatchPromptBuilder ──► Chat provider
 
 Bounded contexts live under `backend/src/Domain/Shadow*`.
 
-Persistence: `storage/shadow/{identity,sessions,relationship,memory,teaching}/`.
+Persistence: `storage/shadow/{identity,sessions,relationship,memory,teaching,knowledge,goals,mentor}/`.
 
 See also `docs/architecture/SHADOW_TEACHING_ENGINE.md`.

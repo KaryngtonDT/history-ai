@@ -26,6 +26,7 @@ import { ShadowConversation } from "../ShadowConversation";
 import { ShadowInterventionCard } from "../ShadowInterventionCard";
 import { ShadowKnowledgePanel } from "../ShadowKnowledgePanel";
 import { ShadowLearningPanel } from "../ShadowLearningPanel";
+import { ShadowMentorPanel } from "../ShadowMentorPanel";
 import { ShadowPlayer } from "../ShadowPlayer";
 import { ShadowResumePrompt } from "../ShadowResumePrompt";
 import { ShadowTeachingPanel } from "../ShadowTeachingPanel";
@@ -552,6 +553,7 @@ export function ShadowWatchPage() {
 					/>
 					<ShadowTeachingPanel />
 					<ShadowKnowledgePanel />
+					<ShadowMentorPanel />
 					{activeIntervention ? (
 						<ShadowInterventionCard
 							intervention={activeIntervention}

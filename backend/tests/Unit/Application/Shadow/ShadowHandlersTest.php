@@ -49,10 +49,16 @@ use App\Application\ShadowTeaching\TeachingAdvisor;
 use App\Application\ShadowTeaching\TeachingBuilder;
 use App\Application\ShadowTeaching\TeachingPlanner;
 use App\Application\ShadowTeaching\TeachingProgressUpdater;
-use App\Application\ShadowKnowledge\GraphConceptResolver;
 use App\Application\ShadowKnowledge\KnowledgeBuilder;
 use App\Application\ShadowKnowledge\KnowledgeEdgeResolver;
 use App\Application\ShadowKnowledge\KnowledgeGraphBuilder;
+use App\Application\ShadowMentor\GoalPlanner;
+use App\Application\ShadowMentor\GoalProgressCalculator;
+use App\Application\ShadowMentor\LearningMissionBuilder;
+use App\Application\ShadowMentor\MentorBuilder;
+use App\Application\ShadowMentor\MilestoneResolver;
+use App\Application\ShadowMentor\MultiGoalOrchestrator;
+use App\Application\ShadowMentor\RoadmapBuilder;
 use App\Domain\Chat\ChatProviderInterface;
 use App\Domain\Chat\ChatRequest;
 use App\Domain\Chat\ChatResponse;
@@ -77,6 +83,8 @@ use App\Infrastructure\ShadowRelationship\InMemoryShadowRelationshipRepository;
 use App\Infrastructure\ShadowMemory\InMemoryShadowMemoryRepository;
 use App\Infrastructure\ShadowTeaching\InMemoryShadowTeachingRepository;
 use App\Infrastructure\ShadowKnowledge\InMemoryShadowKnowledgeRepository;
+use App\Infrastructure\ShadowGoals\InMemoryShadowGoalsRepository;
+use App\Infrastructure\ShadowMentor\InMemoryShadowMentorRepository;
 use PHPUnit\Framework\TestCase;
 
 final class ShadowHandlersTest extends TestCase
@@ -217,7 +225,24 @@ final class ShadowHandlersTest extends TestCase
             new LearningAdaptiveVoiceResolver(),
             $this->sessionLearningCoordinator(),
             $this->relationshipProfileBuilder(),
+            $this->mentorBuilder(),
+        );
+    }
+
+    private function mentorBuilder(): MentorBuilder
+    {
+        return new MentorBuilder(
+            new InMemoryShadowGoalsRepository(),
+            new InMemoryShadowMentorRepository(),
+            new GoalPlanner(
+                new RoadmapBuilder(),
+                new LearningMissionBuilder(),
+                new GoalProgressCalculator(),
+                new MilestoneResolver(),
+                new MultiGoalOrchestrator(),
+            ),
             $this->knowledgeBuilder(),
+            new GoalProgressCalculator(),
         );
     }
 

@@ -165,6 +165,22 @@ when@test:
             arguments:
                 $directory: '%kernel.cache_dir%/shadow-knowledge'
 
+        app.storage.shadow_goals:
+            class: App\Infrastructure\Storage\JsonFileStore
+            arguments:
+                $directory: '%kernel.cache_dir%/shadow-goals'
+
+        app.storage.shadow_mentor:
+            class: App\Infrastructure\Storage\JsonFileStore
+            arguments:
+                $directory: '%kernel.cache_dir%/shadow-mentor'
+
+        App\Domain\ShadowGoals\ShadowGoalsRepositoryInterface:
+            alias: App\Infrastructure\ShadowGoals\InMemoryShadowGoalsRepository
+
+        App\Domain\ShadowMentor\ShadowMentorRepositoryInterface:
+            alias: App\Infrastructure\ShadowMentor\InMemoryShadowMentorRepository
+
     parameters:
         storage.root: '%kernel.cache_dir%/storage'
         models.root: '%kernel.cache_dir%/models'

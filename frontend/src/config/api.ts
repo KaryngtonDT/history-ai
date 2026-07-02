@@ -143,6 +143,18 @@ export const SHADOW_KNOWLEDGE_SEARCH_PATH = "/api/shadow/knowledge/search";
 export const SHADOW_KNOWLEDGE_REBUILD_PATH = "/api/shadow/knowledge/rebuild";
 export const SHADOW_KNOWLEDGE_RESET_PATH = "/api/shadow/knowledge/reset";
 
+export const SHADOW_GOALS_PATH = "/api/shadow/goals";
+export const SHADOW_GOALS_RESET_PATH = "/api/shadow/goals/reset";
+export function shadowGoalPath(id: string): string {
+	return `/api/shadow/goals/${id}`;
+}
+export const SHADOW_MENTOR_PATH = "/api/shadow/mentor";
+export const SHADOW_MISSIONS_PATH = "/api/shadow/missions";
+export function SHADOW_MISSION_COMPLETE_PATH(missionId: string): string {
+	return `/api/shadow/missions/${missionId}/complete`;
+}
+export const SHADOW_ROADMAP_PATH = "/api/shadow/roadmap";
+
 export function videoReviewsPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/reviews`;
 }
