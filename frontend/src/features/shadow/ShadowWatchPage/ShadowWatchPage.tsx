@@ -8,14 +8,14 @@ import { resolveVideoRenderStreamUrl } from "@/services/render/types";
 import { videoRenderService } from "@/services/render/VideoRenderService";
 import { shadowService } from "@/services/shadow/ShadowService";
 import type {
+	SessionLearningState,
+	SessionTeachingStrategy,
 	ShadowChallengeLevel,
 	ShadowExplanationStyle,
 	ShadowIntervention,
 	ShadowInterventionFrequency,
 	ShadowSession,
 	ShadowTutorMode,
-	SessionLearningState,
-	SessionTeachingStrategy,
 	WatchContext,
 } from "@/services/shadow/types";
 import { transcriptService } from "@/services/transcript/TranscriptService";
@@ -24,6 +24,7 @@ import { CurrentContextCard } from "../CurrentContextCard";
 import { ShadowControls } from "../ShadowControls";
 import { ShadowConversation } from "../ShadowConversation";
 import { ShadowInterventionCard } from "../ShadowInterventionCard";
+import { ShadowLearningPanel } from "../ShadowLearningPanel";
 import { ShadowPlayer } from "../ShadowPlayer";
 import { ShadowResumePrompt } from "../ShadowResumePrompt";
 import { ShadowTranscriptPanel } from "../ShadowTranscriptPanel";
@@ -43,7 +44,6 @@ import {
 	voiceRateForStrategy,
 } from "../shadowVoice";
 import { VocabularyPanel } from "../VocabularyPanel";
-import { ShadowLearningPanel } from "../ShadowLearningPanel";
 import styles from "./ShadowWatchPage.module.css";
 
 const CONTEXT_DEBOUNCE_MS = 400;
@@ -400,11 +400,10 @@ export function ShadowWatchPage() {
 				currentTime,
 			);
 			setSession(updated);
-			await shadowService.recordSessionObservation(
-				videoId,
-				session.sessionId,
-				{ type: "pause", timeSeconds: currentTime },
-			);
+			await shadowService.recordSessionObservation(videoId, session.sessionId, {
+				type: "pause",
+				timeSeconds: currentTime,
+			});
 			await refreshSessionLearning(updated);
 		} finally {
 			setIsBusy(false);

@@ -48,9 +48,7 @@ function Meter({ label, value }: { label: string; value: string }) {
 				{Array.from({ length: 4 }, (_, index) => (
 					<span
 						key={label + String(index)}
-						className={
-							index < level ? styles.meterFill : styles.meterEmpty
-						}
+						className={index < level ? styles.meterFill : styles.meterEmpty}
 					/>
 				))}
 			</div>

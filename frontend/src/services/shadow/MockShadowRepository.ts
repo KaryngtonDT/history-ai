@@ -446,7 +446,9 @@ export class MockShadowRepository implements ShadowRepository {
 		return next;
 	}
 
-	private mockSessionLearning(sessionId: string): import("./types").SessionLearningState {
+	private mockSessionLearning(
+		sessionId: string,
+	): import("./types").SessionLearningState {
 		return {
 			sessionId,
 			adaptiveEnabled: true,
