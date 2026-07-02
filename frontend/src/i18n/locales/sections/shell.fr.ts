@@ -8,8 +8,8 @@ export const shellFr: ShellMessages = {
 		brand: {
 			title: "Lumen",
 			subtitle:
-				"Plateforme de localisation vidéo et de connaissances par l'IA.",
-			tagline: "Localisation vidéo guidée",
+				"Plateforme IA pour transformer vos contenus en connaissance et compréhension.",
+			tagline: "Compréhension guidée par l'IA",
 		},
 		sidebar: {
 			ariaLabel: "Navigation produit",
@@ -99,7 +99,7 @@ export const shellFr: ShellMessages = {
 				},
 				translations: {
 					reason: "Pas encore de traductions.",
-					why: "Les traductions localisent votre contenu pour chaque langue cible.",
+					why: "Les traductions adaptent votre contenu à chaque langue cible.",
 					action: "Ouvrir une vidéo",
 				},
 				audio: {
@@ -119,7 +119,7 @@ export const shellFr: ShellMessages = {
 				},
 				render: {
 					reason: "Pas encore de vidéo finale.",
-					why: "Le rendu final produit un MP4 localisé téléchargeable.",
+					why: "Le rendu final produit un MP4 multilingue téléchargeable.",
 					action: "Lancer le pipeline",
 				},
 				shadow: {
@@ -167,7 +167,7 @@ export const shellFr: ShellMessages = {
 			youtube: {
 				label: "YouTube",
 				description: "Liez une source YouTube pour traitement.",
-				nextStep: "Exécute le pipeline complet de localisation vidéo.",
+				nextStep: "Exécute le pipeline complet de traitement vidéo.",
 			},
 		},
 		continue: {
@@ -238,7 +238,7 @@ export const shellFr: ShellMessages = {
 			},
 			upload: {
 				label: "Téléverser une vidéo",
-				description: "Démarrer le pipeline de localisation vidéo",
+				description: "Démarrer le pipeline de traitement vidéo par l'IA",
 			},
 			workspace: {
 				label: "Espace de travail",

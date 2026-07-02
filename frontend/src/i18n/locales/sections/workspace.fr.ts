@@ -56,7 +56,7 @@ export const workspaceFr: WorkspaceMessages = {
 		videoGrid: {
 			emptyTitle: "Aucune vidéo dans ce projet",
 			emptyDescription:
-				"Ajoutez des vidéos pour lancer la localisation par lot dans les langues cibles.",
+				"Ajoutez des vidéos pour lancer le traitement par lot dans les langues cibles.",
 			emptyAction: "Téléverser une vidéo",
 			empty:
 				"Ajoutez des vidéos à ce projet pour démarrer le traitement par lot.",

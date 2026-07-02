@@ -7,8 +7,9 @@ export const shellDe: ShellMessages = {
 	shell: {
 		brand: {
 			title: "Lumen",
-			subtitle: "KI-Plattform für Video- und Wissenslokalisierung.",
-			tagline: "Geführte Videolokalisierung",
+			subtitle:
+				"KI-Plattform, die Inhalte in Wissen und Verständnis verwandelt.",
+			tagline: "KI-gestütztes Verstehen",
 		},
 		sidebar: {
 			ariaLabel: "Produktnavigation",

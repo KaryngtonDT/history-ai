@@ -2,8 +2,9 @@ export const shellEn = {
 	shell: {
 		brand: {
 			title: "Lumen",
-			subtitle: "AI video and knowledge localization platform.",
-			tagline: "Guided video localization",
+			subtitle:
+				"AI platform to transform your content into knowledge and understanding.",
+			tagline: "AI-guided comprehension",
 		},
 		sidebar: {
 			ariaLabel: "Product navigation",

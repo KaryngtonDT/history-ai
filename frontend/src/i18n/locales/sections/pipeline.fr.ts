@@ -60,7 +60,7 @@ export const pipelineFr: PipelineMessages = {
 			eyebrow: "Créer",
 			title: "Importer depuis YouTube",
 			description:
-				"Collez un lien YouTube public. Lumen télécharge la vidéo et exécute le même pipeline de localisation que pour les fichiers téléversés.",
+				"Collez un lien YouTube public. Lumen télécharge la vidéo et exécute le même pipeline de traitement que pour les fichiers téléversés.",
 			whatCanIDo:
 				"Prévisualisez les métadonnées, choisissez le mode IA, puis importez pour ouvrir la vue d'ensemble vidéo.",
 			urlLabel: "URL YouTube",
@@ -75,7 +75,7 @@ export const pipelineFr: PipelineMessages = {
 		videoOverview: {
 			eyebrow: "Vidéo",
 			title: "Vidéo {{id}}…",
-			description: "Hub central du pipeline de localisation de cette vidéo.",
+			description: "Hub central du pipeline de traitement de cette vidéo.",
 			whatCanIDo:
 				"Suivez la progression du pipeline, ouvrez une étape ou passez à l'action suivante.",
 			sectionsAria: "Sections vidéo",
@@ -429,7 +429,7 @@ export const pipelineFr: PipelineMessages = {
 			videoEyebrow: "Créer",
 			videoTitle: "Téléverser une vidéo",
 			videoDescription:
-				"Démarrez le pipeline de localisation IA en téléversant votre vidéo source.",
+				"Démarrez le pipeline IA en téléversant votre vidéo source.",
 			videoWhatCanIDo:
 				"Choisissez le mode manuel ou automatique, téléversez une vidéo, puis suivez le pipeline de la transcription au rendu final.",
 			audioEyebrow: "Créer",
@@ -441,7 +441,7 @@ export const pipelineFr: PipelineMessages = {
 			audioPipelineExplanation:
 				"L'audio est transcrit, traduit et indexé pour la recherche de connaissances. Le mode de traitement contrôle le niveau d'automatisation avant votre revue.",
 			youtubeWhatHappensNext:
-				"Lumen télécharge la vidéo, crée un job de pipeline et ouvre la vue d'ensemble. Vous pourrez ensuite générer transcription, traductions et sorties localisées.",
+				"Lumen télécharge la vidéo, crée un job de pipeline et ouvre la vue d'ensemble. Vous pourrez ensuite générer transcription, traductions et sorties multilingues.",
 			whatHappensNext: "Étapes suivantes",
 			pipelineExplanation: "Fonctionnement du traitement",
 		},
