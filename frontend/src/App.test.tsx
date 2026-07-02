@@ -15,9 +15,7 @@ describe("Sprint 1 — app shell", () => {
 			</MemoryRouter>,
 		);
 
-		expect(
-			screen.getByText("AI-guided comprehension"),
-		).toBeInTheDocument();
+		expect(screen.getByText("AI-guided comprehension")).toBeInTheDocument();
 		expect(
 			screen.getByText("Transform knowledge into understanding."),
 		).toBeInTheDocument();
