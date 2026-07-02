@@ -17,9 +17,12 @@ use App\Application\Shadow\Handlers\ResumeShadowSessionHandler;
 use App\Application\Shadow\Handlers\StartShadowSessionHandler;
 use App\Application\Shadow\ShadowContextFactory;
 use App\Application\Shadow\ShadowSessionResolver;
+use App\Application\Shadow\SessionLearning\SessionLearningCoordinator;
+use App\Application\Shadow\SessionLearning\TeachingStrategyResolver;
 use App\Application\Shadow\ShadowWatchAnswerer;
 use App\Application\Shadow\ShadowWatchPromptBuilder;
 use App\Application\Shadow\TimelineContextBuilder;
+use App\Domain\Shadow\SessionLearning\SessionLearningState;
 use App\Domain\Chat\ChatProviderInterface;
 use App\Domain\Chat\ChatRequest;
 use App\Domain\Chat\ChatResponse;
@@ -59,6 +62,7 @@ final class ShadowHandlersTest extends TestCase
             $this->sessionRepository,
             $this->transcriptRepository(),
             new ShadowSessionResolver($this->sessionRepository),
+            $this->sessionLearningCoordinator(),
         );
 
         $result = $handler(new StartShadowSessionCommand(
@@ -152,6 +156,7 @@ final class ShadowHandlersTest extends TestCase
             $this->sessionRepository,
             $this->transcriptRepository(),
             new ShadowSessionResolver($this->sessionRepository),
+            $this->sessionLearningCoordinator(),
         );
 
         $result = $handler(new StartShadowSessionCommand(
@@ -175,7 +180,30 @@ final class ShadowHandlersTest extends TestCase
             new \App\Application\Shadow\ShadowAnswerLanguageResolver(),
             new LearningAdaptiveAdvisor(new InMemoryLearningProfileRepository()),
             new LearningAdaptiveVoiceResolver(),
+            $this->sessionLearningCoordinator(),
         );
+    }
+
+    private function sessionLearningCoordinator(): SessionLearningCoordinator
+    {
+        $coordinator = $this->createMock(SessionLearningCoordinator::class);
+        $coordinator
+            ->method('ensureState')
+            ->willReturnCallback(
+                fn (ShadowSession $session) => SessionLearningState::start($session->id(), $session->videoId()),
+            );
+        $coordinator
+            ->method('analyzeAndSave')
+            ->willReturnCallback(
+                fn (ShadowSession $session) => SessionLearningState::start($session->id(), $session->videoId()),
+            );
+        $coordinator
+            ->method('resolveStrategy')
+            ->willReturnCallback(
+                fn (SessionLearningState $state) => (new TeachingStrategyResolver())->resolve($state),
+            );
+
+        return $coordinator;
     }
 
     private function shadowContextFactory(): ShadowContextFactory

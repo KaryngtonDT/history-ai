@@ -4,15 +4,15 @@ import {
 	videoShadowSessionInterventionAnswerPath,
 	videoShadowSessionInterventionPath,
 	videoShadowSessionInterventionSkipPath,
+	videoShadowSessionLearningObservationsPath,
+	videoShadowSessionLearningPath,
+	videoShadowSessionLearningPreferencesPath,
 	videoShadowSessionPausePath,
 	videoShadowSessionPolicyPath,
 	videoShadowSessionResumePath,
+	videoShadowSessionStrategyPath,
 	videoShadowSessionsPath,
 	videoShadowSessionVoicePath,
-	videoShadowSessionLearningPath,
-	videoShadowSessionStrategyPath,
-	videoShadowSessionLearningPreferencesPath,
-	videoShadowSessionLearningObservationsPath,
 } from "@/config/api";
 import type { HttpClient } from "@/services/http/HttpClient";
 import { ApiError } from "@/shared/errors";
@@ -25,6 +25,9 @@ import {
 	mapShadowAnswerFromApi,
 	mapShadowSessionFromApi,
 	mapWatchContextFromApi,
+	type RecordSessionObservationRequest,
+	type SessionLearningState,
+	type SessionTeachingStrategy,
 	type ShadowAnswerApiDto,
 	type ShadowInterventionAnswer,
 	type ShadowInterventionCheck,
@@ -33,12 +36,9 @@ import {
 	type ShadowVoicePreference,
 	type SkipShadowInterventionRequest,
 	type StartShadowSessionRequest,
+	type UpdateSessionLearningPreferencesRequest,
 	type UpdateShadowInterventionPolicyRequest,
 	type UpdateShadowVoicePreferenceRequest,
-	type SessionLearningState,
-	type SessionTeachingStrategy,
-	type UpdateSessionLearningPreferencesRequest,
-	type RecordSessionObservationRequest,
 	type WatchContextApiDto,
 } from "./types";
 

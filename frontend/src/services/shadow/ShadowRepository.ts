@@ -1,6 +1,9 @@
 import type {
 	AnswerShadowInterventionRequest,
 	AskShadowQuestionRequest,
+	RecordSessionObservationRequest,
+	SessionLearningState,
+	SessionTeachingStrategy,
 	ShadowAnswer,
 	ShadowInterventionAnswer,
 	ShadowInterventionCheck,
@@ -9,13 +12,10 @@ import type {
 	ShadowVoicePreference,
 	SkipShadowInterventionRequest,
 	StartShadowSessionRequest,
+	UpdateSessionLearningPreferencesRequest,
 	UpdateShadowInterventionPolicyRequest,
 	UpdateShadowVoicePreferenceRequest,
 	WatchContext,
-	SessionLearningState,
-	SessionTeachingStrategy,
-	UpdateSessionLearningPreferencesRequest,
-	RecordSessionObservationRequest,
 } from "./types";
 
 export interface ShadowRepository {
