@@ -2,16 +2,21 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { PageIntroduction } from "@/features/product";
 import { ShadowIdentityCenter } from "@/features/shadowIdentity/ShadowIdentityCenter";
+import { ShadowKnowledgeCenter } from "@/features/shadowKnowledge/ShadowKnowledgeCenter";
 import { ShadowMemoryCenter } from "@/features/shadowMemory/ShadowMemoryCenter";
 import { ShadowRelationshipCenter } from "@/features/shadowRelationship/ShadowRelationshipCenter";
 import { ShadowTeachingCenter } from "@/features/shadowTeaching/ShadowTeachingCenter";
-import { ShadowKnowledgeCenter } from "@/features/shadowKnowledge/ShadowKnowledgeCenter";
 import { useTranslation } from "@/i18n";
 import { shadowIdentityService } from "@/services/shadowIdentity/ShadowIdentityService";
 import type { ShadowIdentityProfile } from "@/services/shadowIdentity/types";
 import styles from "./ShadowSettingsPage.module.css";
 
-type ShadowTab = "identity" | "relationship" | "memory" | "teaching" | "knowledge";
+type ShadowTab =
+	| "identity"
+	| "relationship"
+	| "memory"
+	| "teaching"
+	| "knowledge";
 
 function resolveTab(pathname: string): ShadowTab {
 	if (pathname.endsWith("/relationship")) {

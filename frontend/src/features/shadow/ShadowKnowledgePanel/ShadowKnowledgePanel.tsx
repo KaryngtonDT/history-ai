@@ -57,9 +57,7 @@ export function ShadowKnowledgePanel() {
 				) : null}
 			</header>
 			<div className={styles.card}>
-				<span className={styles.label}>
-					{t("shadowKnowledge.panel.goal")}
-				</span>
+				<span className={styles.label}>{t("shadowKnowledge.panel.goal")}</span>
 				<span className={styles.value}>
 					{radar?.goalLabel ?? t("shadowKnowledge.gaps.defaultGoal")}
 				</span>
@@ -79,9 +77,7 @@ export function ShadowKnowledgePanel() {
 				</span>
 			</div>
 			<div className={styles.card}>
-				<span className={styles.label}>
-					{t("shadowKnowledge.panel.nodes")}
-				</span>
+				<span className={styles.label}>{t("shadowKnowledge.panel.nodes")}</span>
 				<span className={styles.value}>{nodeCount}</span>
 			</div>
 		</section>

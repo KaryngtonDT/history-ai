@@ -64,9 +64,7 @@ function PathCard({ path }: { path: KnowledgePath }) {
 			<div className={styles.pathSteps}>
 				{path.steps.map((step, index) => (
 					<span key={step.key}>
-						{index > 0 ? (
-							<span className={styles.pathArrow}> → </span>
-						) : null}
+						{index > 0 ? <span className={styles.pathArrow}> → </span> : null}
 						<span className={styles.pathStep}>{step.label}</span>
 					</span>
 				))}
@@ -103,9 +101,8 @@ export function ShadowKnowledgeCenter() {
 	const [selectedKey, setSelectedKey] = useState<string | null>(null);
 	const [selectedDetail, setSelectedDetail] = useState<string | null>(null);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [searchResult, setSearchResult] = useState<KnowledgeSearchResult | null>(
-		null,
-	);
+	const [searchResult, setSearchResult] =
+		useState<KnowledgeSearchResult | null>(null);
 	const [message, setMessage] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 

@@ -20,7 +20,9 @@ import type {
 	KnowledgeSearchResult,
 } from "./types";
 
-export class HttpShadowKnowledgeRepository implements ShadowKnowledgeRepository {
+export class HttpShadowKnowledgeRepository
+	implements ShadowKnowledgeRepository
+{
 	private readonly httpClient: HttpClient;
 
 	constructor(httpClient: HttpClient) {
@@ -65,7 +67,10 @@ export class HttpShadowKnowledgeRepository implements ShadowKnowledgeRepository 
 		);
 	}
 
-	getRelated(key: string, scopeKey?: string): Promise<KnowledgeRelatedResponse> {
+	getRelated(
+		key: string,
+		scopeKey?: string,
+	): Promise<KnowledgeRelatedResponse> {
 		const params = new URLSearchParams({ key });
 		if (scopeKey) {
 			params.set("scopeKey", scopeKey);

@@ -82,7 +82,9 @@ const defaultGraph: KnowledgeGraph = {
 	],
 };
 
-export class MockShadowKnowledgeRepository implements ShadowKnowledgeRepository {
+export class MockShadowKnowledgeRepository
+	implements ShadowKnowledgeRepository
+{
 	getGraph(): Promise<KnowledgeGraph> {
 		return Promise.resolve(defaultGraph);
 	}
