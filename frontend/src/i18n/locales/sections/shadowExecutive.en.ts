@@ -1,0 +1,127 @@
+export const shadowExecutiveEn = {
+	shadowExecutive: {
+		eyebrow: "Shadow",
+		title: "Executive",
+		description:
+			"Pilot your learning journey: agenda, recommendations, and user-validated decisions.",
+		whatCanIDo:
+			"Review today's agenda, upcoming tasks, recommendations, pending decisions, decision history, and weekly executive review.",
+		tabs: {
+			executive: "Executive",
+		},
+		today: {
+			title: "Today",
+		},
+		upcoming: {
+			title: "Upcoming",
+		},
+		recommendations: {
+			title: "Recommendations",
+		},
+		pending: {
+			title: "Pending Decisions",
+			badge: "Pending approval",
+		},
+		history: {
+			title: "Decision History",
+			stats: {
+				approved: "Approved",
+				rejected: "Rejected",
+				deferred: "Deferred",
+				ignored: "Ignored",
+			},
+		},
+		weeklyReview: {
+			title: "Weekly Executive Review",
+			progress: "Goal progress: {{percent}}%",
+			knowledgeGrowth: "Knowledge growth: +{{value}} concepts",
+			completedMissions: "Completed missions: {{count}}",
+			missedReviews: "Missed reviews: {{count}}",
+			learningMinutes: "Learning time: {{minutes}} min",
+			nextWeekPlan: "Next week plan",
+		},
+		watchBar: {
+			title: "Executive Companion",
+			objective: "Current objective",
+			priority: "Priority",
+			mission: "Mission",
+			recommendedPause: "Recommended pause",
+			recommendedReview: "Recommended review",
+			nextTopic: "Next topic",
+		},
+		inspector: {
+			title: "Why?",
+			summary: "Decision",
+			reason: "Reason",
+			evidence: "Evidence",
+			impacts: "Impact dimensions",
+			goalLink: "Linked goal",
+			conceptLink: "Linked concept",
+		},
+		actions: {
+			title: "Actions",
+			approve: "Approve",
+			reject: "Reject",
+			defer: "Defer",
+			why: "Why?",
+		},
+		reset: {
+			action: "Reset executive plan",
+			success: "Executive plan reset.",
+		},
+		messages: {
+			approved: "Decision approved.",
+			rejected: "Decision rejected.",
+			deferred: "Decision deferred.",
+		},
+		taskTypes: {
+			review: "Review",
+			mission: "Mission",
+			watch: "Watch",
+			exercise: "Exercise",
+			checkpoint: "Checkpoint",
+			pause: "Pause",
+		},
+		evidenceSources: {
+			knowledge: "Knowledge graph",
+			memory: "Memory",
+			teaching: "Teaching",
+			mentor: "Mentor",
+			session: "Session",
+			unknown: "Source",
+		},
+		impacts: {
+			knowledge: "Knowledge",
+			goal: "Goal",
+			time: "Time",
+			difficulty: "Difficulty",
+			confidence: "Confidence",
+		},
+		decision: {
+			typeLabel: "Type: {{value}}",
+		},
+		priorityLabel: "Priority: {{value}}",
+		statusLabel: "Status: {{value}}",
+		empty: {
+			today: "No tasks scheduled for today.",
+			upcoming: "No upcoming tasks planned.",
+			recommendations: "No recommendations yet.",
+			pendingDecisions: "No pending decisions.",
+			history: "No decision history yet.",
+			historyList: "No resolved decisions yet.",
+			weeklyReview: "No weekly review available yet.",
+			evidence: "No evidence recorded.",
+			objective: "No current objective.",
+			priority: "No priority set.",
+			mission: "No active mission.",
+			pause: "No pause recommended.",
+			review: "No review recommended.",
+			nextTopic: "No next topic planned.",
+		},
+		errors: {
+			loadFailed: "Could not load executive dashboard.",
+			actionFailed: "Could not update decision.",
+			resetFailed: "Could not reset executive plan.",
+		},
+	},
+} as const;

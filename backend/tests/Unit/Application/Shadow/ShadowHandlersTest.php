@@ -52,8 +52,18 @@ use App\Application\ShadowTeaching\TeachingProgressUpdater;
 use App\Application\ShadowKnowledge\KnowledgeBuilder;
 use App\Application\ShadowKnowledge\KnowledgeEdgeResolver;
 use App\Application\ShadowKnowledge\KnowledgeGraphBuilder;
-use App\Application\ShadowMentor\GoalPlanner;
+use App\Application\ShadowExecutive\ExecutiveAgendaBuilder;
+use App\Application\ShadowExecutive\ExecutiveCoordinator;
+use App\Application\ShadowExecutive\ExecutiveDecisionBuilder;
+use App\Application\ShadowExecutive\ExecutivePlanner;
+use App\Application\ShadowExecutive\EnergyAwarePlanner;
+use App\Application\ShadowExecutive\LearningOpportunityDetector;
+use App\Application\ShadowExecutive\OpportunityEngine;
+use App\Application\ShadowExecutive\PriorityResolver;
+use App\Application\ShadowExecutive\ResourceRecommendationEngine;
+use App\Application\ShadowExecutive\ReviewScheduler;
 use App\Application\ShadowMentor\GoalProgressCalculator;
+use App\Application\ShadowMentor\GoalPlanner;
 use App\Application\ShadowMentor\LearningMissionBuilder;
 use App\Application\ShadowMentor\MentorBuilder;
 use App\Application\ShadowMentor\MilestoneResolver;
@@ -83,6 +93,7 @@ use App\Infrastructure\ShadowRelationship\InMemoryShadowRelationshipRepository;
 use App\Infrastructure\ShadowMemory\InMemoryShadowMemoryRepository;
 use App\Infrastructure\ShadowTeaching\InMemoryShadowTeachingRepository;
 use App\Infrastructure\ShadowKnowledge\InMemoryShadowKnowledgeRepository;
+use App\Infrastructure\ShadowExecutive\InMemoryShadowExecutiveRepository;
 use App\Infrastructure\ShadowGoals\InMemoryShadowGoalsRepository;
 use App\Infrastructure\ShadowMentor\InMemoryShadowMentorRepository;
 use PHPUnit\Framework\TestCase;
@@ -225,7 +236,26 @@ final class ShadowHandlersTest extends TestCase
             new LearningAdaptiveVoiceResolver(),
             $this->sessionLearningCoordinator(),
             $this->relationshipProfileBuilder(),
+            $this->executiveCoordinator(),
+        );
+    }
+
+    private function executiveCoordinator(): ExecutiveCoordinator
+    {
+        return new ExecutiveCoordinator(
             $this->mentorBuilder(),
+            new InMemoryShadowExecutiveRepository(),
+            new ExecutivePlanner(
+                new ReviewScheduler(),
+                new LearningOpportunityDetector(),
+                new ExecutiveDecisionBuilder(new PriorityResolver()),
+                new ExecutiveAgendaBuilder(),
+                new ResourceRecommendationEngine(),
+                new OpportunityEngine(new LearningOpportunityDetector()),
+                new EnergyAwarePlanner(),
+                $this->teachingBuilder(),
+            ),
+            $this->knowledgeBuilder(),
         );
     }
 

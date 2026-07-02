@@ -5,6 +5,9 @@ import { learningFr } from "./sections/learning.fr";
 import { pipelineDe } from "./sections/pipeline.de";
 import { pipelineEn } from "./sections/pipeline.en";
 import { pipelineFr } from "./sections/pipeline.fr";
+import { shadowExecutiveDe } from "./sections/shadowExecutive.de";
+import { shadowExecutiveEn } from "./sections/shadowExecutive.en";
+import { shadowExecutiveFr } from "./sections/shadowExecutive.fr";
 import { shadowIdentityDe } from "./sections/shadowIdentity.de";
 import { shadowIdentityEn } from "./sections/shadowIdentity.en";
 import { shadowIdentityFr } from "./sections/shadowIdentity.fr";
@@ -81,7 +84,7 @@ export const en = mergeMessages(
 		mergeMessages(shadowRelationshipEn, shadowMemoryEn),
 		mergeMessages(
 			mergeMessages(shadowTeachingEn, shadowKnowledgeEn),
-			shadowMentorEn,
+			mergeMessages(shadowMentorEn, shadowExecutiveEn),
 		),
 	),
 );
@@ -139,7 +142,7 @@ export const fr = mergeMessages(
 		mergeMessages(shadowRelationshipFr, shadowMemoryFr),
 		mergeMessages(
 			mergeMessages(shadowTeachingFr, shadowKnowledgeFr),
-			shadowMentorFr,
+			mergeMessages(shadowMentorFr, shadowExecutiveFr),
 		),
 	),
 ) satisfies Messages;
@@ -195,7 +198,7 @@ export const de = mergeMessages(
 		mergeMessages(shadowRelationshipDe, shadowMemoryDe),
 		mergeMessages(
 			mergeMessages(shadowTeachingDe, shadowKnowledgeDe),
-			shadowMentorDe,
+			mergeMessages(shadowMentorDe, shadowExecutiveDe),
 		),
 	),
 ) satisfies Messages;

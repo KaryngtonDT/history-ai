@@ -293,6 +293,9 @@ services:
     App\Domain\ShadowMentor\ShadowMentorRepositoryInterface:
         alias: App\Infrastructure\ShadowMentor\FileShadowMentorRepository
 
+    App\Domain\ShadowExecutive\ShadowExecutiveRepositoryInterface:
+        alias: App\Infrastructure\ShadowExecutive\FileShadowExecutiveRepository
+
     app.storage.learning:
         class: App\Infrastructure\Storage\JsonFileStore
         arguments:
@@ -343,6 +346,11 @@ services:
         arguments:
             $directory: '%storage.root%/shadow/mentor'
 
+    app.storage.shadow_executive:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/shadow/executive'
+
     App\Infrastructure\Learning\FileLearningProfileRepository:
         arguments:
             $store: '@app.storage.learning'
@@ -383,9 +391,23 @@ services:
         arguments:
             $store: '@app.storage.shadow_mentor'
 
+    App\Infrastructure\ShadowExecutive\FileShadowExecutiveRepository:
+        arguments:
+            $store: '@app.storage.shadow_executive'
+
     App\Application\Shadow\Handlers\AskShadowQuestionHandler:
         arguments:
-            $mentorBuilder: '@App\Application\ShadowMentor\MentorBuilder'
+            $executiveCoordinator: '@App\Application\ShadowExecutive\ExecutiveCoordinator'
+
+    App\Application\Shadow\ShadowWatchPromptBuilder:
+        arguments:
+            $identityBehaviorResolver: '@App\Application\ShadowIdentity\ShadowIdentityBehaviorResolver'
+            $relationshipContextComposer: '@App\Application\ShadowRelationship\RelationshipContextComposer'
+            $memoryContextComposer: '@App\Application\ShadowMemory\MemoryContextComposer'
+            $executiveContextComposer: '@App\Application\ShadowExecutive\ExecutiveContextComposer'
+            $mentorContextComposer: '@App\Application\ShadowMentor\MentorContextComposer'
+            $teachingContextComposer: '@App\Application\ShadowTeaching\TeachingContextComposer'
+            $knowledgeContextComposer: '@App\Application\ShadowKnowledge\KnowledgeContextComposer'
 
     App\Application\Platform\PlatformHealthCheckerInterface:
         alias: App\Infrastructure\Platform\PlatformHealthChecker
@@ -398,15 +420,6 @@ services:
             $storageRoot: '%storage.root%'
             $modelsRoot: '%models.root%'
             $workerBaseUrl: '%worker.base_url%'
-
-    App\Application\Shadow\ShadowWatchPromptBuilder:
-        arguments:
-            $identityBehaviorResolver: '@App\Application\ShadowIdentity\ShadowIdentityBehaviorResolver'
-            $relationshipContextComposer: '@App\Application\ShadowRelationship\RelationshipContextComposer'
-            $memoryContextComposer: '@App\Application\ShadowMemory\MemoryContextComposer'
-            $teachingContextComposer: '@App\Application\ShadowTeaching\TeachingContextComposer'
-            $knowledgeContextComposer: '@App\Application\ShadowKnowledge\KnowledgeContextComposer'
-            $mentorContextComposer: '@App\Application\ShadowMentor\MentorContextComposer'
 
     App\Domain\Shadow\ShadowConversationContextInterface:
         alias: App\Infrastructure\Shadow\NullShadowConversationContext

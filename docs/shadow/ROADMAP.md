@@ -2,7 +2,7 @@
 
 ## Phase 6 — Personal Mentor
 
-Sprints 55–64 made Shadow **intelligent**. Sprint 65 makes Shadow **goal-directed** — the mentor layer that is hard to replace.
+Sprints 55–64 made Shadow **intelligent**. Sprint 65 made Shadow **goal-directed**. Sprint 66 makes Shadow an **executive mentor** — the last major functional sprint for Shadow core.
 
 | Sprint | Capability |
 |--------|------------|
@@ -13,8 +13,13 @@ Sprints 55–64 made Shadow **intelligent**. Sprint 65 makes Shadow **goal-direc
 | 62 | Memory timeline & recall |
 | **63** | **Teaching engine** |
 | **64** | **Knowledge graph & reasoning** |
-| **65** | **Mentor & goal engine** ← Phase 6 |
-| 66 | Platform hardening (planned) |
-| 67 | Public API (planned) |
+| **65** | **Mentor & goal engine** ✅ |
+| **66** | **Executive function & learning orchestration** ✅ |
+| 67 | Platform hardening & security |
+| 68 | Public API |
+| 69 | SDK (TypeScript, PHP, Python) |
+| 70 | Cloud & enterprise readiness |
 
-See [MENTOR.md](MENTOR.md) for Phase 6 vision.
+After Sprint 66: **freeze Shadow core architecture**. Platform work only.
+
+See [MENTOR.md](MENTOR.md) and [EXECUTIVE.md](EXECUTIVE.md).

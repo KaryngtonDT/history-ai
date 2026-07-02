@@ -1,0 +1,127 @@
+export const shadowExecutiveDe = {
+	shadowExecutive: {
+		eyebrow: "Shadow",
+		title: "Executive",
+		description:
+			"Steuern Sie Ihren Lernweg: Agenda, Empfehlungen und vom Nutzer bestätigte Entscheidungen.",
+		whatCanIDo:
+			"Überprüfen Sie die heutige Agenda, anstehende Aufgaben, Empfehlungen, ausstehende Entscheidungen, Entscheidungshistorie und wöchentliche Executive-Übersicht.",
+		tabs: {
+			executive: "Executive",
+		},
+		today: {
+			title: "Heute",
+		},
+		upcoming: {
+			title: "Demnächst",
+		},
+		recommendations: {
+			title: "Empfehlungen",
+		},
+		pending: {
+			title: "Ausstehende Entscheidungen",
+			badge: "Genehmigung ausstehend",
+		},
+		history: {
+			title: "Entscheidungshistorie",
+			stats: {
+				approved: "Genehmigt",
+				rejected: "Abgelehnt",
+				deferred: "Verschoben",
+				ignored: "Ignoriert",
+			},
+		},
+		weeklyReview: {
+			title: "Wöchentliche Executive-Übersicht",
+			progress: "Zielfortschritt: {{percent}} %",
+			knowledgeGrowth: "Wissenswachstum: +{{value}} Konzepte",
+			completedMissions: "Abgeschlossene Missionen: {{count}}",
+			missedReviews: "Verpasste Wiederholungen: {{count}}",
+			learningMinutes: "Lernzeit: {{minutes}} Min.",
+			nextWeekPlan: "Plan für nächste Woche",
+		},
+		watchBar: {
+			title: "Executive-Begleiter",
+			objective: "Aktuelles Ziel",
+			priority: "Priorität",
+			mission: "Mission",
+			recommendedPause: "Empfohlene Pause",
+			recommendedReview: "Empfohlene Wiederholung",
+			nextTopic: "Nächstes Thema",
+		},
+		inspector: {
+			title: "Warum?",
+			summary: "Entscheidung",
+			reason: "Grund",
+			evidence: "Belege",
+			impacts: "Auswirkungsdimensionen",
+			goalLink: "Verknüpftes Ziel",
+			conceptLink: "Verknüpftes Konzept",
+		},
+		actions: {
+			title: "Aktionen",
+			approve: "Genehmigen",
+			reject: "Ablehnen",
+			defer: "Verschieben",
+			why: "Warum?",
+		},
+		reset: {
+			action: "Executive-Plan zurücksetzen",
+			success: "Executive-Plan zurückgesetzt.",
+		},
+		messages: {
+			approved: "Entscheidung genehmigt.",
+			rejected: "Entscheidung abgelehnt.",
+			deferred: "Entscheidung verschoben.",
+		},
+		taskTypes: {
+			review: "Wiederholung",
+			mission: "Mission",
+			watch: "Ansehen",
+			exercise: "Übung",
+			checkpoint: "Checkpoint",
+			pause: "Pause",
+		},
+		evidenceSources: {
+			knowledge: "Wissensgraph",
+			memory: "Gedächtnis",
+			teaching: "Lehre",
+			mentor: "Mentor",
+			session: "Sitzung",
+			unknown: "Quelle",
+		},
+		impacts: {
+			knowledge: "Wissen",
+			goal: "Ziel",
+			time: "Zeit",
+			difficulty: "Schwierigkeit",
+			confidence: "Vertrauen",
+		},
+		decision: {
+			typeLabel: "Typ: {{value}}",
+		},
+		priorityLabel: "Priorität: {{value}}",
+		statusLabel: "Status: {{value}}",
+		empty: {
+			today: "Keine Aufgaben für heute geplant.",
+			upcoming: "Keine anstehenden Aufgaben geplant.",
+			recommendations: "Noch keine Empfehlungen.",
+			pendingDecisions: "Keine ausstehenden Entscheidungen.",
+			history: "Noch keine Entscheidungshistorie.",
+			historyList: "Noch keine abgeschlossenen Entscheidungen.",
+			weeklyReview: "Noch keine wöchentliche Übersicht verfügbar.",
+			evidence: "Keine Belege erfasst.",
+			objective: "Kein aktuelles Ziel.",
+			priority: "Keine Priorität gesetzt.",
+			mission: "Keine aktive Mission.",
+			pause: "Keine Pause empfohlen.",
+			review: "Keine Wiederholung empfohlen.",
+			nextTopic: "Kein nächstes Thema geplant.",
+		},
+		errors: {
+			loadFailed: "Executive-Dashboard konnte nicht geladen werden.",
+			actionFailed: "Entscheidung konnte nicht aktualisiert werden.",
+			resetFailed: "Executive-Plan konnte nicht zurückgesetzt werden.",
+		},
+	},
+} as const;

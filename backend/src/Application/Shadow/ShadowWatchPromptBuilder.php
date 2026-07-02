@@ -9,6 +9,7 @@ use App\Application\ShadowMemory\MemoryContextComposer;
 use App\Application\ShadowRelationship\RelationshipContextComposer;
 use App\Application\ShadowTeaching\TeachingContextComposer;
 use App\Application\ShadowKnowledge\KnowledgeContextComposer;
+use App\Application\ShadowExecutive\ExecutiveContextComposer;
 use App\Application\ShadowMentor\MentorContextComposer;
 use App\Domain\Chat\ChatPrompt;
 use App\Domain\Shadow\SessionLearning\TeachingStrategy;
@@ -24,6 +25,7 @@ final class ShadowWatchPromptBuilder
         private readonly ?MemoryContextComposer $memoryContextComposer = null,
         private readonly ?TeachingContextComposer $teachingContextComposer = null,
         private readonly ?KnowledgeContextComposer $knowledgeContextComposer = null,
+        private readonly ?ExecutiveContextComposer $executiveContextComposer = null,
         private readonly ?MentorContextComposer $mentorContextComposer = null,
     ) {
     }
@@ -124,6 +126,10 @@ final class ShadowWatchPromptBuilder
 
         if (null !== $this->memoryContextComposer) {
             $lines = [...$lines, ...$this->memoryContextComposer->promptLines($question->text())];
+        }
+
+        if (null !== $this->executiveContextComposer) {
+            $lines = [...$lines, ...$this->executiveContextComposer->promptLines()];
         }
 
         if (null !== $this->mentorContextComposer) {

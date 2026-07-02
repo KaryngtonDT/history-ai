@@ -155,6 +155,22 @@ export function SHADOW_MISSION_COMPLETE_PATH(missionId: string): string {
 }
 export const SHADOW_ROADMAP_PATH = "/api/shadow/roadmap";
 
+export const SHADOW_EXECUTIVE_PATH = "/api/shadow/executive";
+export const SHADOW_EXECUTIVE_AGENDA_PATH = "/api/shadow/executive/agenda";
+export const SHADOW_EXECUTIVE_RECOMMENDATIONS_PATH =
+	"/api/shadow/executive/recommendations";
+export const SHADOW_EXECUTIVE_HISTORY_PATH = "/api/shadow/executive/history";
+export const SHADOW_EXECUTIVE_RESET_PATH = "/api/shadow/executive/reset";
+export function shadowExecutiveDecisionApprovePath(id: string): string {
+	return `/api/shadow/executive/decision/${id}/approve`;
+}
+export function shadowExecutiveDecisionRejectPath(id: string): string {
+	return `/api/shadow/executive/decision/${id}/reject`;
+}
+export function shadowExecutiveDecisionDeferPath(id: string): string {
+	return `/api/shadow/executive/decision/${id}/defer`;
+}
+
 export function videoReviewsPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/reviews`;
 }

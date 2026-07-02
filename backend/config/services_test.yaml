@@ -175,11 +175,19 @@ when@test:
             arguments:
                 $directory: '%kernel.cache_dir%/shadow-mentor'
 
+        app.storage.shadow_executive:
+            class: App\Infrastructure\Storage\JsonFileStore
+            arguments:
+                $directory: '%kernel.cache_dir%/shadow-executive'
+
         App\Domain\ShadowGoals\ShadowGoalsRepositoryInterface:
             alias: App\Infrastructure\ShadowGoals\InMemoryShadowGoalsRepository
 
         App\Domain\ShadowMentor\ShadowMentorRepositoryInterface:
             alias: App\Infrastructure\ShadowMentor\InMemoryShadowMentorRepository
+
+        App\Domain\ShadowExecutive\ShadowExecutiveRepositoryInterface:
+            alias: App\Infrastructure\ShadowExecutive\InMemoryShadowExecutiveRepository
 
     parameters:
         storage.root: '%kernel.cache_dir%/storage'

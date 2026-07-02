@@ -1,0 +1,127 @@
+export const shadowExecutiveFr = {
+	shadowExecutive: {
+		eyebrow: "Shadow",
+		title: "Exécutif",
+		description:
+			"Pilotez votre parcours d'apprentissage : agenda, recommandations et décisions validées par l'utilisateur.",
+		whatCanIDo:
+			"Consultez l'agenda du jour, les tâches à venir, les recommandations, les décisions en attente, l'historique des décisions et le bilan exécutif hebdomadaire.",
+		tabs: {
+			executive: "Exécutif",
+		},
+		today: {
+			title: "Aujourd'hui",
+		},
+		upcoming: {
+			title: "À venir",
+		},
+		recommendations: {
+			title: "Recommandations",
+		},
+		pending: {
+			title: "Décisions en attente",
+			badge: "En attente d'approbation",
+		},
+		history: {
+			title: "Historique des décisions",
+			stats: {
+				approved: "Approuvées",
+				rejected: "Rejetées",
+				deferred: "Reportées",
+				ignored: "Ignorées",
+			},
+		},
+		weeklyReview: {
+			title: "Bilan exécutif hebdomadaire",
+			progress: "Progression de l'objectif : {{percent}} %",
+			knowledgeGrowth: "Croissance des connaissances : +{{value}} concepts",
+			completedMissions: "Missions terminées : {{count}}",
+			missedReviews: "Révisions manquées : {{count}}",
+			learningMinutes: "Temps d'apprentissage : {{minutes}} min",
+			nextWeekPlan: "Plan de la semaine prochaine",
+		},
+		watchBar: {
+			title: "Compagnon exécutif",
+			objective: "Objectif actuel",
+			priority: "Priorité",
+			mission: "Mission",
+			recommendedPause: "Pause recommandée",
+			recommendedReview: "Révision recommandée",
+			nextTopic: "Prochain sujet",
+		},
+		inspector: {
+			title: "Pourquoi ?",
+			summary: "Décision",
+			reason: "Raison",
+			evidence: "Preuves",
+			impacts: "Dimensions d'impact",
+			goalLink: "Objectif lié",
+			conceptLink: "Concept lié",
+		},
+		actions: {
+			title: "Actions",
+			approve: "Approuver",
+			reject: "Rejeter",
+			defer: "Reporter",
+			why: "Pourquoi ?",
+		},
+		reset: {
+			action: "Réinitialiser le plan exécutif",
+			success: "Plan exécutif réinitialisé.",
+		},
+		messages: {
+			approved: "Décision approuvée.",
+			rejected: "Décision rejetée.",
+			deferred: "Décision reportée.",
+		},
+		taskTypes: {
+			review: "Révision",
+			mission: "Mission",
+			watch: "Visionnage",
+			exercise: "Exercice",
+			checkpoint: "Point de contrôle",
+			pause: "Pause",
+		},
+		evidenceSources: {
+			knowledge: "Graphe de connaissances",
+			memory: "Mémoire",
+			teaching: "Enseignement",
+			mentor: "Mentor",
+			session: "Session",
+			unknown: "Source",
+		},
+		impacts: {
+			knowledge: "Connaissances",
+			goal: "Objectif",
+			time: "Temps",
+			difficulty: "Difficulté",
+			confidence: "Confiance",
+		},
+		decision: {
+			typeLabel: "Type : {{value}}",
+		},
+		priorityLabel: "Priorité : {{value}}",
+		statusLabel: "Statut : {{value}}",
+		empty: {
+			today: "Aucune tâche prévue pour aujourd'hui.",
+			upcoming: "Aucune tâche à venir planifiée.",
+			recommendations: "Aucune recommandation pour l'instant.",
+			pendingDecisions: "Aucune décision en attente.",
+			history: "Aucun historique de décisions.",
+			historyList: "Aucune décision résolue.",
+			weeklyReview: "Aucun bilan hebdomadaire disponible.",
+			evidence: "Aucune preuve enregistrée.",
+			objective: "Aucun objectif actuel.",
+			priority: "Aucune priorité définie.",
+			mission: "Aucune mission active.",
+			pause: "Aucune pause recommandée.",
+			review: "Aucune révision recommandée.",
+			nextTopic: "Aucun prochain sujet planifié.",
+		},
+		errors: {
+			loadFailed: "Impossible de charger le tableau de bord exécutif.",
+			actionFailed: "Impossible de mettre à jour la décision.",
+			resetFailed: "Impossible de réinitialiser le plan exécutif.",
+		},
+	},
+} as const;
