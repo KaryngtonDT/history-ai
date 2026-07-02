@@ -266,6 +266,13 @@ services:
     App\Domain\Learning\LearningProfileRepositoryInterface:
         alias: App\Infrastructure\Learning\InMemoryLearningProfileRepository
 
+    App\Domain\ShadowIdentity\ShadowIdentityRepositoryInterface:
+        alias: App\Infrastructure\ShadowIdentity\InMemoryShadowIdentityRepository
+
+    App\Application\Shadow\ShadowWatchPromptBuilder:
+        arguments:
+            $identityBehaviorResolver: '@App\Application\ShadowIdentity\ShadowIdentityBehaviorResolver'
+
     App\Domain\Shadow\ShadowConversationContextInterface:
         alias: App\Infrastructure\Shadow\NullShadowConversationContext
 

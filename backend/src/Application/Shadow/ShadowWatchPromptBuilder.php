@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Shadow;
 
+use App\Application\ShadowIdentity\ShadowIdentityBehaviorResolver;
 use App\Domain\Chat\ChatPrompt;
 use App\Domain\Shadow\ShadowExplanationStyle;
 use App\Domain\Shadow\ShadowVoiceLanguage;
@@ -11,6 +12,11 @@ use App\Domain\Shadow\ShadowQuestion;
 
 final class ShadowWatchPromptBuilder
 {
+    public function __construct(
+        private readonly ?ShadowIdentityBehaviorResolver $identityBehaviorResolver = null,
+    ) {
+    }
+
     public function build(
         WatchContext $context,
         ShadowQuestion $question,
@@ -68,6 +74,10 @@ final class ShadowWatchPromptBuilder
         $lines[] = $question->text();
         $lines[] = '';
         $lines[] = 'Cite the timestamp or segment when relevant.';
+
+        if (null !== $this->identityBehaviorResolver) {
+            $lines = $this->identityBehaviorResolver->enrichPromptLines($lines);
+        }
 
         return new ChatPrompt(implode("\n", $lines));
     }
