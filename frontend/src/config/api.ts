@@ -66,6 +66,17 @@ export const LEARNING_SIGNALS_PATH = "/api/learning/signals";
 export const LEARNING_RESET_PATH = "/api/learning/reset";
 export const LEARNING_PREFERENCES_PATH = "/api/learning/preferences";
 
+export const SHADOW_VOICE_LIBRARY_PATH = "/api/shadow/voice/library";
+export const SHADOW_VOICE_COLLECTIONS_PATH = "/api/shadow/voice/collections";
+export const SHADOW_VOICE_PREVIEW_PATH = "/api/shadow/voice/preview";
+export const SHADOW_VOICE_PRESET_PATH = "/api/shadow/voice/preset";
+
+export const SHADOW_IDENTITY_PROFILE_PATH = "/api/shadow/identity/profile";
+export const SHADOW_IDENTITY_PREFERENCES_PATH =
+	"/api/shadow/identity/preferences";
+export const SHADOW_IDENTITY_RESET_PATH = "/api/shadow/identity/reset";
+export const SHADOW_IDENTITY_CONFIGURE_PATH = "/api/shadow/identity/configure";
+
 export function videoReviewsPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/reviews`;
 }
