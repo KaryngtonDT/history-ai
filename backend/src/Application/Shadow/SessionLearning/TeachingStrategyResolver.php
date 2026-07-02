@@ -32,7 +32,7 @@ final class TeachingStrategyResolver
         $challengeLevel = match ($state->difficulty()) {
             \App\Domain\Shadow\SessionLearning\PedagogicalDifficulty::Easy => ShadowChallengeLevel::Easy,
             \App\Domain\Shadow\SessionLearning\PedagogicalDifficulty::Advanced => ShadowChallengeLevel::Hard,
-            default => ShadowChallengeLevel::Medium,
+            default => ShadowChallengeLevel::Normal,
         };
 
         $useExamples = in_array($state->strategyKind(), [
@@ -81,7 +81,7 @@ final class TeachingStrategyResolver
             SpeakingPaceKind::Normal,
             SessionVoiceStyleKind::Neutral,
             ShadowExplanationStyle::Detailed,
-            ShadowChallengeLevel::Medium,
+            ShadowChallengeLevel::Normal,
             true,
             false,
             false,
