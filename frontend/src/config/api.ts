@@ -132,6 +132,17 @@ export const SHADOW_TEACHING_PREFERENCES_PATH =
 	"/api/shadow/teaching/preferences";
 export const SHADOW_TEACHING_RESET_PATH = "/api/shadow/teaching/reset";
 
+export const SHADOW_KNOWLEDGE_GRAPH_PATH = "/api/shadow/knowledge/graph";
+export function SHADOW_KNOWLEDGE_NODE_PATH(id: string): string {
+	return `/api/shadow/knowledge/node/${id}`;
+}
+export const SHADOW_KNOWLEDGE_PATH_PATH = "/api/shadow/knowledge/path";
+export const SHADOW_KNOWLEDGE_GAPS_PATH = "/api/shadow/knowledge/gaps";
+export const SHADOW_KNOWLEDGE_RELATED_PATH = "/api/shadow/knowledge/related";
+export const SHADOW_KNOWLEDGE_SEARCH_PATH = "/api/shadow/knowledge/search";
+export const SHADOW_KNOWLEDGE_REBUILD_PATH = "/api/shadow/knowledge/rebuild";
+export const SHADOW_KNOWLEDGE_RESET_PATH = "/api/shadow/knowledge/reset";
+
 export function videoReviewsPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/reviews`;
 }

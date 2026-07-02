@@ -2,6 +2,21 @@
 
 Base prefix: `/api/shadow/`
 
+## Knowledge (S64)
+
+```text
+GET  /api/shadow/knowledge/graph
+GET  /api/shadow/knowledge/node/{id}
+GET  /api/shadow/knowledge/path
+GET  /api/shadow/knowledge/gaps
+GET  /api/shadow/knowledge/related
+POST /api/shadow/knowledge/search
+POST /api/shadow/knowledge/rebuild
+POST /api/shadow/knowledge/reset
+```
+
+See [KNOWLEDGE.md](KNOWLEDGE.md).
+
 ## Teaching (S63)
 
 ```text

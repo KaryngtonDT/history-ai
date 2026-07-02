@@ -8,6 +8,7 @@ use App\Application\ShadowIdentity\ShadowIdentityBehaviorResolver;
 use App\Application\ShadowMemory\MemoryContextComposer;
 use App\Application\ShadowRelationship\RelationshipContextComposer;
 use App\Application\ShadowTeaching\TeachingContextComposer;
+use App\Application\ShadowKnowledge\KnowledgeContextComposer;
 use App\Domain\Chat\ChatPrompt;
 use App\Domain\Shadow\SessionLearning\TeachingStrategy;
 use App\Domain\Shadow\ShadowExplanationStyle;
@@ -21,6 +22,7 @@ final class ShadowWatchPromptBuilder
         private readonly ?RelationshipContextComposer $relationshipContextComposer = null,
         private readonly ?MemoryContextComposer $memoryContextComposer = null,
         private readonly ?TeachingContextComposer $teachingContextComposer = null,
+        private readonly ?KnowledgeContextComposer $knowledgeContextComposer = null,
     ) {
     }
 
@@ -124,6 +126,10 @@ final class ShadowWatchPromptBuilder
 
         if (null !== $this->teachingContextComposer) {
             $lines = [...$lines, ...$this->teachingContextComposer->promptLines()];
+        }
+
+        if (null !== $this->knowledgeContextComposer) {
+            $lines = [...$lines, ...$this->knowledgeContextComposer->promptLines($question->text())];
         }
 
         return new ChatPrompt(implode("\n", $lines));

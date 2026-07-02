@@ -49,6 +49,10 @@ use App\Application\ShadowTeaching\TeachingAdvisor;
 use App\Application\ShadowTeaching\TeachingBuilder;
 use App\Application\ShadowTeaching\TeachingPlanner;
 use App\Application\ShadowTeaching\TeachingProgressUpdater;
+use App\Application\ShadowKnowledge\GraphConceptResolver;
+use App\Application\ShadowKnowledge\KnowledgeBuilder;
+use App\Application\ShadowKnowledge\KnowledgeEdgeResolver;
+use App\Application\ShadowKnowledge\KnowledgeGraphBuilder;
 use App\Domain\Chat\ChatProviderInterface;
 use App\Domain\Chat\ChatRequest;
 use App\Domain\Chat\ChatResponse;
@@ -72,6 +76,7 @@ use App\Infrastructure\Shadow\SessionLearning\InMemorySessionLearningStateReposi
 use App\Infrastructure\ShadowRelationship\InMemoryShadowRelationshipRepository;
 use App\Infrastructure\ShadowMemory\InMemoryShadowMemoryRepository;
 use App\Infrastructure\ShadowTeaching\InMemoryShadowTeachingRepository;
+use App\Infrastructure\ShadowKnowledge\InMemoryShadowKnowledgeRepository;
 use PHPUnit\Framework\TestCase;
 
 final class ShadowHandlersTest extends TestCase
@@ -212,8 +217,17 @@ final class ShadowHandlersTest extends TestCase
             new LearningAdaptiveVoiceResolver(),
             $this->sessionLearningCoordinator(),
             $this->relationshipProfileBuilder(),
+            $this->knowledgeBuilder(),
+        );
+    }
+
+    private function knowledgeBuilder(): KnowledgeBuilder
+    {
+        return new KnowledgeBuilder(
+            new InMemoryShadowKnowledgeRepository(),
             $this->memoryBuilder(),
             $this->teachingBuilder(),
+            new KnowledgeGraphBuilder(new KnowledgeEdgeResolver()),
         );
     }
 

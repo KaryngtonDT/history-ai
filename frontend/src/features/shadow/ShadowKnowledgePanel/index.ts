@@ -1,0 +1,1 @@
+export { ShadowKnowledgePanel } from "./ShadowKnowledgePanel";

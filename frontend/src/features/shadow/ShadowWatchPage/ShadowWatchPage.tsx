@@ -28,6 +28,7 @@ import { ShadowLearningPanel } from "../ShadowLearningPanel";
 import { ShadowPlayer } from "../ShadowPlayer";
 import { ShadowResumePrompt } from "../ShadowResumePrompt";
 import { ShadowTeachingPanel } from "../ShadowTeachingPanel";
+import { ShadowKnowledgePanel } from "../ShadowKnowledgePanel";
 import { ShadowTranscriptPanel } from "../ShadowTranscriptPanel";
 import { ShadowTranslationPanel } from "../ShadowTranslationPanel";
 import { ShadowTutorBadge } from "../ShadowTutorBadge";
@@ -550,6 +551,7 @@ export function ShadowWatchPage() {
 						onAdaptiveToggle={(enabled) => void handleAdaptiveToggle(enabled)}
 					/>
 					<ShadowTeachingPanel />
+					<ShadowKnowledgePanel />
 					{activeIntervention ? (
 						<ShadowInterventionCard
 							intervention={activeIntervention}

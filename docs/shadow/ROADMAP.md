@@ -8,7 +8,7 @@
 | 61 | Relationship engine |
 | 62 | Memory timeline & recall |
 | **63** | **Teaching engine** |
-| 64 | Knowledge graph (planned) |
+| **64** | **Knowledge graph & reasoning** |
 | 65 | Learning missions platform (planned) |
 | 66 | Platform hardening (planned) |
 | 67 | Public API (planned) |

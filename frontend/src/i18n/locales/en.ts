@@ -17,6 +17,9 @@ import { shadowRelationshipFr } from "./sections/shadowRelationship.fr";
 import { shadowTeachingDe } from "./sections/shadowTeaching.de";
 import { shadowTeachingEn } from "./sections/shadowTeaching.en";
 import { shadowTeachingFr } from "./sections/shadowTeaching.fr";
+import { shadowKnowledgeDe } from "./sections/shadowKnowledge.de";
+import { shadowKnowledgeEn } from "./sections/shadowKnowledge.en";
+import { shadowKnowledgeFr } from "./sections/shadowKnowledge.fr";
 import { shellDe } from "./sections/shell.de";
 import { shellEn } from "./sections/shell.en";
 import { shellFr } from "./sections/shell.fr";
@@ -73,7 +76,7 @@ export const en = mergeMessages(
 	),
 	mergeMessages(
 		mergeMessages(shadowRelationshipEn, shadowMemoryEn),
-		shadowTeachingEn,
+		mergeMessages(shadowTeachingEn, shadowKnowledgeEn),
 	),
 );
 
@@ -128,7 +131,7 @@ export const fr = mergeMessages(
 	),
 	mergeMessages(
 		mergeMessages(shadowRelationshipFr, shadowMemoryFr),
-		shadowTeachingFr,
+		mergeMessages(shadowTeachingFr, shadowKnowledgeFr),
 	),
 ) satisfies Messages;
 
@@ -181,6 +184,6 @@ export const de = mergeMessages(
 	),
 	mergeMessages(
 		mergeMessages(shadowRelationshipDe, shadowMemoryDe),
-		shadowTeachingDe,
+		mergeMessages(shadowTeachingDe, shadowKnowledgeDe),
 	),
 ) satisfies Messages;

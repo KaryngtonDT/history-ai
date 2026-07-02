@@ -13,8 +13,7 @@ use App\Application\Shadow\ShadowContextFactory;
 use App\Application\Shadow\ShadowSessionResolver;
 use App\Application\Shadow\SessionLearning\SessionLearningCoordinator;
 use App\Application\ShadowRelationship\RelationshipProfileBuilder;
-use App\Application\ShadowMemory\MemoryBuilder;
-use App\Application\ShadowTeaching\TeachingBuilder;
+use App\Application\ShadowKnowledge\KnowledgeBuilder;
 use App\Application\Shadow\ShadowWatchAnswerer;
 use App\Domain\Shadow\SessionLearning\TeachingStrategy;
 use App\Domain\Shadow\Exception\InvalidShadowSessionException;
@@ -34,8 +33,7 @@ final class AskShadowQuestionHandler
         private readonly LearningAdaptiveVoiceResolver $adaptiveVoiceResolver,
         private readonly SessionLearningCoordinator $sessionLearningCoordinator,
         private readonly RelationshipProfileBuilder $relationshipProfileBuilder,
-        private readonly MemoryBuilder $memoryBuilder,
-        private readonly TeachingBuilder $teachingBuilder,
+        private readonly KnowledgeBuilder $knowledgeBuilder,
     ) {
     }
 
@@ -113,18 +111,7 @@ final class AskShadowQuestionHandler
             ],
         ]);
 
-        $this->memoryBuilder->recordPayload('default', [
-            'source' => 'shadow',
-            'kind' => 'question',
-            'data' => [
-                'question' => $command->question,
-                'sessionId' => $command->sessionId,
-                'videoId' => $command->videoId,
-                'timeSeconds' => $command->currentTimeSeconds,
-            ],
-        ]);
-
-        $this->teachingBuilder->recordQuestion('default', [
+        $this->knowledgeBuilder->recordQuestion('default', [
             'question' => $command->question,
             'sessionId' => $command->sessionId,
             'videoId' => $command->videoId,

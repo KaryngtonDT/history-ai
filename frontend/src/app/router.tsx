@@ -84,6 +84,10 @@ export function AppRouter() {
 					path="/settings/shadow/teaching"
 					element={<ShadowSettingsPage />}
 				/>
+				<Route
+					path="/settings/shadow/knowledge"
+					element={<ShadowSettingsPage />}
+				/>
 			</Route>
 		</Routes>
 	);

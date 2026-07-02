@@ -5,12 +5,13 @@ import { ShadowIdentityCenter } from "@/features/shadowIdentity/ShadowIdentityCe
 import { ShadowMemoryCenter } from "@/features/shadowMemory/ShadowMemoryCenter";
 import { ShadowRelationshipCenter } from "@/features/shadowRelationship/ShadowRelationshipCenter";
 import { ShadowTeachingCenter } from "@/features/shadowTeaching/ShadowTeachingCenter";
+import { ShadowKnowledgeCenter } from "@/features/shadowKnowledge/ShadowKnowledgeCenter";
 import { useTranslation } from "@/i18n";
 import { shadowIdentityService } from "@/services/shadowIdentity/ShadowIdentityService";
 import type { ShadowIdentityProfile } from "@/services/shadowIdentity/types";
 import styles from "./ShadowSettingsPage.module.css";
 
-type ShadowTab = "identity" | "relationship" | "memory" | "teaching";
+type ShadowTab = "identity" | "relationship" | "memory" | "teaching" | "knowledge";
 
 function resolveTab(pathname: string): ShadowTab {
 	if (pathname.endsWith("/relationship")) {
@@ -23,6 +24,10 @@ function resolveTab(pathname: string): ShadowTab {
 
 	if (pathname.endsWith("/teaching")) {
 		return "teaching";
+	}
+
+	if (pathname.endsWith("/knowledge")) {
+		return "knowledge";
 	}
 
 	return "identity";
@@ -57,7 +62,9 @@ export function ShadowSettingsPage() {
 				? t("shadowMemory.title")
 				: activeTab === "teaching"
 					? t("shadowTeaching.title")
-					: t("shadowIdentity.title");
+					: activeTab === "knowledge"
+						? t("shadowKnowledge.title")
+						: t("shadowIdentity.title");
 
 	const description =
 		activeTab === "relationship"
@@ -66,7 +73,9 @@ export function ShadowSettingsPage() {
 				? t("shadowMemory.description")
 				: activeTab === "teaching"
 					? t("shadowTeaching.description")
-					: t("shadowIdentity.description");
+					: activeTab === "knowledge"
+						? t("shadowKnowledge.description")
+						: t("shadowIdentity.description");
 
 	const whatCanIDo =
 		activeTab === "relationship"
@@ -75,7 +84,9 @@ export function ShadowSettingsPage() {
 				? t("shadowMemory.whatCanIDo")
 				: activeTab === "teaching"
 					? t("shadowTeaching.whatCanIDo")
-					: t("shadowIdentity.whatCanIDo");
+					: activeTab === "knowledge"
+						? t("shadowKnowledge.whatCanIDo")
+						: t("shadowIdentity.whatCanIDo");
 
 	return (
 		<section>
@@ -112,6 +123,12 @@ export function ShadowSettingsPage() {
 				>
 					{t("shadowTeaching.tabs.teaching")}
 				</Link>
+				<Link
+					to="/settings/shadow/knowledge"
+					className={activeTab === "knowledge" ? styles.tabActive : styles.tab}
+				>
+					{t("shadowKnowledge.tabs.knowledge")}
+				</Link>
 			</div>
 			{error ? <p role="alert">{error}</p> : null}
 			{activeTab === "relationship" ? (
@@ -120,6 +137,8 @@ export function ShadowSettingsPage() {
 				<ShadowMemoryCenter />
 			) : activeTab === "teaching" ? (
 				<ShadowTeachingCenter />
+			) : activeTab === "knowledge" ? (
+				<ShadowKnowledgeCenter />
 			) : profile ? (
 				<ShadowIdentityCenter
 					profile={profile}
