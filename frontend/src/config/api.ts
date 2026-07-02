@@ -77,6 +77,32 @@ export const SHADOW_IDENTITY_PREFERENCES_PATH =
 export const SHADOW_IDENTITY_RESET_PATH = "/api/shadow/identity/reset";
 export const SHADOW_IDENTITY_CONFIGURE_PATH = "/api/shadow/identity/configure";
 
+export const SHADOW_RELATIONSHIP_PROFILE_PATH =
+	"/api/shadow/relationship/profile";
+export const SHADOW_RELATIONSHIP_PORTRAIT_PATH =
+	"/api/shadow/relationship/portrait";
+export const SHADOW_RELATIONSHIP_TIMELINE_PATH =
+	"/api/shadow/relationship/timeline";
+export const SHADOW_RELATIONSHIP_INTERESTS_PATH =
+	"/api/shadow/relationship/interests";
+export const SHADOW_RELATIONSHIP_SIGNALS_PATH =
+	"/api/shadow/relationship/signals";
+export const SHADOW_RELATIONSHIP_PREFERENCES_PATH =
+	"/api/shadow/relationship/preferences";
+export const SHADOW_RELATIONSHIP_RESET_PATH = "/api/shadow/relationship/reset";
+export const SHADOW_RELATIONSHIP_CONFIGURE_PATH =
+	"/api/shadow/relationship/configure";
+export function SHADOW_RELATIONSHIP_APPROVE_CHANGE_PATH(
+	changeId: string,
+): string {
+	return `/api/shadow/relationship/changes/${changeId}/approve`;
+}
+export function SHADOW_RELATIONSHIP_REJECT_CHANGE_PATH(
+	changeId: string,
+): string {
+	return `/api/shadow/relationship/changes/${changeId}/reject`;
+}
+
 export function videoReviewsPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/reviews`;
 }

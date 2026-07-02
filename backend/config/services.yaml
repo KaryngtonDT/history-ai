@@ -275,6 +275,9 @@ services:
     App\Domain\Shadow\SessionLearning\SessionLearningStateRepositoryInterface:
         alias: App\Infrastructure\Shadow\SessionLearning\FileSessionLearningStateRepository
 
+    App\Domain\ShadowRelationship\RelationshipRepositoryInterface:
+        alias: App\Infrastructure\ShadowRelationship\FileShadowRelationshipRepository
+
     app.storage.learning:
         class: App\Infrastructure\Storage\JsonFileStore
         arguments:
@@ -295,6 +298,11 @@ services:
         arguments:
             $directory: '%storage.root%/shadow/session-learning'
 
+    app.storage.shadow_relationship:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/shadow/relationship'
+
     App\Infrastructure\Learning\FileLearningProfileRepository:
         arguments:
             $store: '@app.storage.learning'
@@ -311,6 +319,10 @@ services:
         arguments:
             $store: '@app.storage.shadow_session_learning'
 
+    App\Infrastructure\ShadowRelationship\FileShadowRelationshipRepository:
+        arguments:
+            $store: '@app.storage.shadow_relationship'
+
     App\Application\Platform\PlatformHealthCheckerInterface:
         alias: App\Infrastructure\Platform\PlatformHealthChecker
 
@@ -326,6 +338,7 @@ services:
     App\Application\Shadow\ShadowWatchPromptBuilder:
         arguments:
             $identityBehaviorResolver: '@App\Application\ShadowIdentity\ShadowIdentityBehaviorResolver'
+            $relationshipContextComposer: '@App\Application\ShadowRelationship\RelationshipContextComposer'
 
     App\Domain\Shadow\ShadowConversationContextInterface:
         alias: App\Infrastructure\Shadow\NullShadowConversationContext

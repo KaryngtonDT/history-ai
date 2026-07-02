@@ -1,0 +1,101 @@
+.shadowRelationship {
+	display: grid;
+	gap: 1.5rem;
+}
+
+.scoreCard {
+	padding: 1rem 1.25rem;
+	border: 1px solid var(--color-border, #d8dee9);
+	border-radius: 12px;
+	background: var(--color-surface, #fff);
+}
+
+.scoreValue {
+	font-size: 2rem;
+	font-weight: 700;
+}
+
+.section {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.traitList,
+.timelineList,
+.questionList {
+	display: grid;
+	gap: 0.75rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.traitItem,
+.timelineItem,
+.questionItem {
+	padding: 0.75rem 1rem;
+	border-radius: 10px;
+	border: 1px solid var(--color-border, #d8dee9);
+}
+
+.meter {
+	display: inline-flex;
+	gap: 0.2rem;
+}
+
+.meter span {
+	width: 0.65rem;
+	height: 0.65rem;
+	border-radius: 999px;
+	background: #c7d2fe;
+}
+
+.meter span[data-active="true"] {
+	background: #4f46e5;
+}
+
+.pendingCard {
+	padding: 1rem;
+	border-radius: 10px;
+	border: 1px dashed #6366f1;
+	background: #eef2ff;
+}
+
+.actions {
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.teachBox {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.teachBox textarea {
+	min-height: 96px;
+	padding: 0.75rem;
+	border-radius: 10px;
+	border: 1px solid var(--color-border, #d8dee9);
+}
+
+.tabs {
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.tab,
+.tabActive {
+	padding: 0.5rem 0.9rem;
+	border-radius: 999px;
+	border: 1px solid var(--color-border, #d8dee9);
+	background: transparent;
+	cursor: pointer;
+}
+
+.tabActive {
+	background: #111827;
+	color: #fff;
+	border-color: #111827;
+}

@@ -72,6 +72,10 @@ export function AppRouter() {
 				<Route path="/settings/pipeline" element={<PipelineSettingsPage />} />
 				<Route path="/settings/learning" element={<LearningSettingsPage />} />
 				<Route path="/settings/shadow" element={<ShadowSettingsPage />} />
+				<Route
+					path="/settings/shadow/relationship"
+					element={<ShadowSettingsPage />}
+				/>
 			</Route>
 		</Routes>
 	);

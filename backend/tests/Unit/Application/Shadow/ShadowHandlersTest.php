@@ -24,6 +24,14 @@ use App\Application\Shadow\SessionLearning\PaceDetector;
 use App\Application\Shadow\SessionLearning\SessionLearningCoordinator;
 use App\Application\Shadow\SessionLearning\ShadowSessionLearningAnalyzer;
 use App\Application\Shadow\SessionLearning\TeachingStrategyResolver;
+use App\Application\ShadowRelationship\ConversationStyleDetector;
+use App\Application\ShadowRelationship\HabitDetector;
+use App\Application\ShadowRelationship\InterestDetector;
+use App\Application\ShadowRelationship\MotivationDetector;
+use App\Application\ShadowRelationship\RelationshipEvolutionEngine;
+use App\Application\ShadowRelationship\RelationshipProfileBuilder;
+use App\Application\ShadowRelationship\RelationshipSignalCollector;
+use App\Application\ShadowRelationship\RelationshipTraitResolver;
 use App\Application\Shadow\ShadowWatchAnswerer;
 use App\Application\Shadow\ShadowWatchPromptBuilder;
 use App\Application\Shadow\TimelineContextBuilder;
@@ -47,6 +55,7 @@ use App\Infrastructure\Chat\MockChatProvider;
 use App\Infrastructure\Learning\InMemoryLearningProfileRepository;
 use App\Infrastructure\Shadow\InMemoryShadowSessionRepository;
 use App\Infrastructure\Shadow\SessionLearning\InMemorySessionLearningStateRepository;
+use App\Infrastructure\ShadowRelationship\InMemoryShadowRelationshipRepository;
 use PHPUnit\Framework\TestCase;
 
 final class ShadowHandlersTest extends TestCase
@@ -186,6 +195,22 @@ final class ShadowHandlersTest extends TestCase
             new LearningAdaptiveAdvisor(new InMemoryLearningProfileRepository()),
             new LearningAdaptiveVoiceResolver(),
             $this->sessionLearningCoordinator(),
+            $this->relationshipProfileBuilder(),
+        );
+    }
+
+    private function relationshipProfileBuilder(): RelationshipProfileBuilder
+    {
+        return new RelationshipProfileBuilder(
+            new InMemoryShadowRelationshipRepository(),
+            new RelationshipSignalCollector(),
+            new RelationshipEvolutionEngine(
+                new InterestDetector(),
+                new HabitDetector(),
+                new MotivationDetector(),
+                new ConversationStyleDetector(),
+                new RelationshipTraitResolver(),
+            ),
         );
     }
 

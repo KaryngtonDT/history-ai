@@ -145,6 +145,11 @@ when@test:
             arguments:
                 $directory: '%kernel.cache_dir%/shadow-session-learning'
 
+        app.storage.shadow_relationship:
+            class: App\Infrastructure\Storage\JsonFileStore
+            arguments:
+                $directory: '%kernel.cache_dir%/shadow-relationship'
+
     parameters:
         storage.root: '%kernel.cache_dir%/storage'
         models.root: '%kernel.cache_dir%/models'

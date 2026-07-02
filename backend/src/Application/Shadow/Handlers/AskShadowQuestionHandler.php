@@ -12,6 +12,7 @@ use App\Application\Shadow\ShadowAnswerLanguageResolver;
 use App\Application\Shadow\ShadowContextFactory;
 use App\Application\Shadow\ShadowSessionResolver;
 use App\Application\Shadow\SessionLearning\SessionLearningCoordinator;
+use App\Application\ShadowRelationship\RelationshipProfileBuilder;
 use App\Application\Shadow\ShadowWatchAnswerer;
 use App\Domain\Shadow\SessionLearning\TeachingStrategy;
 use App\Domain\Shadow\Exception\InvalidShadowSessionException;
@@ -30,6 +31,7 @@ final class AskShadowQuestionHandler
         private readonly LearningAdaptiveAdvisor $learningAdvisor,
         private readonly LearningAdaptiveVoiceResolver $adaptiveVoiceResolver,
         private readonly SessionLearningCoordinator $sessionLearningCoordinator,
+        private readonly RelationshipProfileBuilder $relationshipProfileBuilder,
     ) {
     }
 
@@ -95,6 +97,17 @@ final class AskShadowQuestionHandler
         $session = $session->recordAnswer($answer);
 
         $this->sessionRepository->save($session);
+
+        $this->relationshipProfileBuilder->recordPayload('default', [
+            'source' => 'shadow',
+            'kind' => 'question',
+            'data' => [
+                'question' => $command->question,
+                'sessionId' => $command->sessionId,
+                'videoId' => $command->videoId,
+                'timeSeconds' => $command->currentTimeSeconds,
+            ],
+        ]);
 
         return ShadowAnswerResult::fromSession($session, $answer->text(), $voice);
     }
