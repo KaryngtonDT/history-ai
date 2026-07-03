@@ -1,15 +1,19 @@
 import type { PageContext, StorageSettings } from "./types";
 
 export const DEFAULT_LUMEN_API_BASE = "http://localhost:8000";
+export const DEFAULT_LUMEN_WEB_BASE = "http://localhost:5173";
+export const LUMEN_BROWSER_SETTINGS_PATH = "/settings/shadow/browser";
 
 const STORAGE_KEYS = {
   lumenApiBase: "lumenApiBase",
+  lumenWebBase: "lumenWebBase",
   scopeKey: "scopeKey",
 } as const;
 
 export async function getStorageSettings(): Promise<StorageSettings> {
   const stored = await chrome.storage.sync.get([
     STORAGE_KEYS.lumenApiBase,
+    STORAGE_KEYS.lumenWebBase,
     STORAGE_KEYS.scopeKey,
   ]);
 
@@ -18,6 +22,10 @@ export async function getStorageSettings(): Promise<StorageSettings> {
       typeof stored[STORAGE_KEYS.lumenApiBase] === "string"
         ? stored[STORAGE_KEYS.lumenApiBase]
         : DEFAULT_LUMEN_API_BASE,
+    lumenWebBase:
+      typeof stored[STORAGE_KEYS.lumenWebBase] === "string"
+        ? stored[STORAGE_KEYS.lumenWebBase]
+        : DEFAULT_LUMEN_WEB_BASE,
     scopeKey:
       typeof stored[STORAGE_KEYS.scopeKey] === "string"
         ? stored[STORAGE_KEYS.scopeKey]
@@ -27,6 +35,16 @@ export async function getStorageSettings(): Promise<StorageSettings> {
 
 export async function setLumenApiBase(lumenApiBase: string): Promise<void> {
   await chrome.storage.sync.set({ [STORAGE_KEYS.lumenApiBase]: lumenApiBase });
+}
+
+export async function setLumenWebBase(lumenWebBase: string): Promise<void> {
+  await chrome.storage.sync.set({ [STORAGE_KEYS.lumenWebBase]: lumenWebBase });
+}
+
+export async function getLumenBrowserSettingsUrl(): Promise<string> {
+  const { lumenWebBase } = await getStorageSettings();
+  const base = lumenWebBase.replace(/\/$/, "");
+  return `${base}${LUMEN_BROWSER_SETTINGS_PATH}`;
 }
 
 function apiUrl(base: string, path: string, scopeKey: string): string {

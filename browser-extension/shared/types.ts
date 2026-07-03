@@ -37,6 +37,7 @@ export interface BrowserSession {
 
 export interface StorageSettings {
   lumenApiBase: string;
+  lumenWebBase: string;
   scopeKey: string;
 }
 

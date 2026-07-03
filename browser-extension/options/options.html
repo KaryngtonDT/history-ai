@@ -40,7 +40,7 @@
   </head>
   <body>
     <h1>HistoryAI Shadow Options</h1>
-    <p>Configure the Lumen API endpoint for this extension.</p>
+    <p>Configure the Lumen API and web app URLs for this extension.</p>
     <form id="options-form">
       <label for="api-base">Lumen API base URL</label>
       <input
@@ -48,6 +48,14 @@
         name="apiBase"
         type="url"
         placeholder="http://localhost:8000"
+        required
+      />
+      <label for="web-base">Lumen web app base URL</label>
+      <input
+        id="web-base"
+        name="webBase"
+        type="url"
+        placeholder="http://localhost:5173"
         required
       />
       <button type="submit">Save</button>

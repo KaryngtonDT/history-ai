@@ -5,6 +5,7 @@ import {
   postBrowserContext,
   postBrowserPlatform,
 } from "../shared/api";
+import { isBrowserSessionActive } from "../shared/session";
 import type {
   BackgroundMessage,
   BackgroundResponse,
@@ -20,7 +21,7 @@ const sessionState: BrowserSession = {
 async function refreshSession(): Promise<BrowserSession> {
   try {
     const data = (await getBrowserSession()) as Record<string, unknown>;
-    sessionState.connected = Boolean(data.connected ?? data.state === "connected");
+    sessionState.connected = isBrowserSessionActive(data);
     sessionState.workspace = data;
     return { ...sessionState };
   } catch {

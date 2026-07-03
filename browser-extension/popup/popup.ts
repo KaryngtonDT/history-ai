@@ -1,4 +1,4 @@
-import { DEFAULT_LUMEN_API_BASE, getStorageSettings } from "../shared/api";
+import { getLumenBrowserSettingsUrl } from "../shared/api";
 import type { BackgroundResponse, BrowserSession } from "../shared/types";
 
 const statusEl = document.getElementById("status") as HTMLDivElement;
@@ -7,8 +7,7 @@ const disconnectBtn = document.getElementById("disconnect-btn") as HTMLButtonEle
 const settingsLink = document.getElementById("settings-link") as HTMLAnchorElement;
 
 async function loadSettingsLink(): Promise<void> {
-  const { lumenApiBase } = await getStorageSettings();
-  settingsLink.href = `${lumenApiBase.replace(/\/$/, "")}/settings`;
+  settingsLink.href = await getLumenBrowserSettingsUrl();
 }
 
 function renderSession(session: BrowserSession): void {
@@ -67,5 +66,3 @@ disconnectBtn.addEventListener("click", async () => {
 
 void loadSettingsLink();
 void refreshStatus();
-
-export { DEFAULT_LUMEN_API_BASE };
