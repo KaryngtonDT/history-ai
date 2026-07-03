@@ -1,4 +1,8 @@
-import { SHADOW_CONNECTED_STORAGE_KEY } from "../shared/connection-state";
+import {
+  SESSION_CHANGED_MESSAGE,
+  SHADOW_CONNECTED_STORAGE_KEY,
+  type SessionChangedMessage,
+} from "../shared/connection-state";
 import { BrowserPlatform } from "../shared/types";
 import type { BackgroundResponse, PageContext, ShadowAction } from "../shared/types";
 import { detectPlatform } from "../shared/platforms";
@@ -33,25 +37,33 @@ function injectStyles(): void {
   style.textContent = `
     #${PANEL_ID} {
       all: initial;
+      box-sizing: border-box;
       position: fixed;
-      bottom: 24px;
-      right: 24px;
+      right: max(16px, env(safe-area-inset-right));
+      bottom: max(16px, env(safe-area-inset-bottom));
       z-index: 2147483646;
-      font-family: system-ui, -apple-system, sans-serif;
-      font-size: 13px;
+      width: min(280px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      line-height: 1.4;
       color: #e8ecf1;
       background: #1a1f2e;
       border: 1px solid #2d3748;
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-      min-width: 200px;
+      border-radius: 14px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
       overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    #${PANEL_ID} * {
+      box-sizing: border-box;
     }
     #${PANEL_ID} .shadow-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 12px;
+      gap: 8px;
+      padding: 12px 14px;
       background: #121722;
       border-bottom: 1px solid #2d3748;
       font-weight: 600;
@@ -63,31 +75,68 @@ function injectStyles(): void {
     #${PANEL_ID} .shadow-toggle {
       all: unset;
       cursor: pointer;
-      padding: 2px 6px;
-      border-radius: 4px;
+      min-width: 36px;
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
       color: #64748b;
+      font-size: 18px;
+      line-height: 1;
     }
-    #${PANEL_ID} .shadow-toggle:hover { color: #e8ecf1; }
+    #${PANEL_ID} .shadow-toggle:hover,
+    #${PANEL_ID} .shadow-toggle:focus-visible {
+      color: #e8ecf1;
+      background: #2d3748;
+      outline: none;
+    }
     #${PANEL_ID} .shadow-actions {
       display: flex;
       flex-direction: column;
-      padding: 6px;
-      gap: 2px;
+      padding: 8px;
+      gap: 4px;
     }
     #${PANEL_ID} .shadow-actions.collapsed { display: none; }
     #${PANEL_ID} button.shadow-action {
       all: unset;
       cursor: pointer;
-      padding: 8px 10px;
-      border-radius: 8px;
+      display: block;
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border-radius: 10px;
       color: #e8ecf1;
+      font-size: 14px;
+      text-align: left;
       transition: background 0.15s;
     }
-    #${PANEL_ID} button.shadow-action:hover { background: #2d3748; }
+    #${PANEL_ID} button.shadow-action:hover,
+    #${PANEL_ID} button.shadow-action:focus-visible {
+      background: #2d3748;
+      outline: none;
+    }
     #${PANEL_ID} .shadow-platform {
-      padding: 4px 12px 8px;
+      padding: 6px 14px 12px;
       font-size: 11px;
       color: #64748b;
+      word-break: break-word;
+    }
+    #${PANEL_ID} .shadow-platform.collapsed { display: none; }
+    @media (max-width: 768px), (pointer: coarse) {
+      #${PANEL_ID} {
+        left: max(12px, env(safe-area-inset-left));
+        right: max(12px, env(safe-area-inset-right));
+        bottom: max(12px, env(safe-area-inset-bottom));
+        width: auto;
+        max-width: none;
+        border-radius: 16px;
+      }
+      #${PANEL_ID} button.shadow-action {
+        min-height: 48px;
+        font-size: 15px;
+        padding: 12px 14px;
+      }
     }
   `;
   document.head.appendChild(style);
@@ -105,6 +154,14 @@ function removePanel(): void {
   document.getElementById(PANEL_ID)?.remove();
 }
 
+function showPanel(): void {
+  renderPanel();
+}
+
+function hidePanel(): void {
+  removePanel();
+}
+
 async function isConnectedToLumen(): Promise<boolean> {
   try {
     const response = (await chrome.runtime.sendMessage({
@@ -119,11 +176,21 @@ async function isConnectedToLumen(): Promise<boolean> {
 
 async function syncPanelVisibility(): Promise<void> {
   if (await isConnectedToLumen()) {
-    renderPanel();
+    showPanel();
     return;
   }
 
-  removePanel();
+  hidePanel();
+}
+
+function isSessionChangedMessage(message: unknown): message is SessionChangedMessage {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "type" in message &&
+    (message as SessionChangedMessage).type === SESSION_CHANGED_MESSAGE &&
+    typeof (message as SessionChangedMessage).connected === "boolean"
+  );
 }
 
 function renderPanel(): void {
@@ -136,6 +203,8 @@ function renderPanel(): void {
   const context = buildContext();
   const panel = document.createElement("div");
   panel.id = PANEL_ID;
+  panel.setAttribute("role", "region");
+  panel.setAttribute("aria-label", "HistoryAI Shadow actions");
 
   const header = document.createElement("div");
   header.className = "shadow-header";
@@ -143,8 +212,10 @@ function renderPanel(): void {
 
   const toggle = document.createElement("button");
   toggle.className = "shadow-toggle";
+  toggle.type = "button";
   toggle.textContent = "−";
-  toggle.setAttribute("aria-label", "Toggle panel");
+  toggle.setAttribute("aria-label", "Toggle Shadow panel");
+  toggle.setAttribute("aria-expanded", "true");
   header.appendChild(toggle);
 
   const actions = document.createElement("div");
@@ -169,19 +240,39 @@ function renderPanel(): void {
 
   toggle.addEventListener("click", () => {
     const collapsed = actions.classList.toggle("collapsed");
+    platform.classList.toggle("collapsed", collapsed);
     toggle.textContent = collapsed ? "+" : "−";
+    toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
   });
 
   panel.append(header, actions, platform);
   document.body.appendChild(panel);
 }
 
+function applySessionChanged(connected: boolean): void {
+  if (connected) {
+    showPanel();
+    return;
+  }
+
+  hidePanel();
+}
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (!isSessionChangedMessage(message)) {
+    return;
+  }
+
+  applySessionChanged(message.connected);
+});
+
 chrome.storage.session.onChanged.addListener((changes) => {
   if (!(SHADOW_CONNECTED_STORAGE_KEY in changes)) {
     return;
   }
 
-  void syncPanelVisibility();
+  const nextValue = changes[SHADOW_CONNECTED_STORAGE_KEY]?.newValue;
+  applySessionChanged(nextValue === true);
 });
 
 function startOverlay(): void {

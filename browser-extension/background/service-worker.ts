@@ -5,7 +5,7 @@ import {
   postBrowserContext,
   postBrowserPlatform,
 } from "../shared/api";
-import { publishShadowConnected } from "../shared/connection-state";
+import { publishShadowConnected, notifyTabsSessionChanged } from "../shared/connection-state";
 import { isBrowserSessionActive } from "../shared/session";
 import type {
   BackgroundMessage,
@@ -22,6 +22,7 @@ const sessionState: BrowserSession = {
 async function setConnected(connected: boolean): Promise<void> {
   sessionState.connected = connected;
   await publishShadowConnected(connected);
+  await notifyTabsSessionChanged(connected);
 }
 
 async function refreshSession(): Promise<BrowserSession> {

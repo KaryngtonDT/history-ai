@@ -12,7 +12,7 @@
     "default_popup": "popup/popup.html"
   },
   "options_page": "options/options.html",
-  "permissions": ["storage", "activeTab"],
+  "permissions": ["storage", "activeTab", "tabs"],
   "host_permissions": [
     "http://localhost:8000/*",
     "http://127.0.0.1:8000/*",
