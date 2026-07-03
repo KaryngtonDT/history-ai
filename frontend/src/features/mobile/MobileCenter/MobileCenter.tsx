@@ -103,7 +103,11 @@ export function MobileCenter() {
 							<p>{t("mobile.status.noDevice")}</p>
 						)}
 						<div className={styles.mobileActions}>
-							<button type="button" disabled={busy} onClick={registerDemoDevice}>
+							<button
+								type="button"
+								disabled={busy}
+								onClick={registerDemoDevice}
+							>
 								{t("mobile.actions.registerDemo")}
 							</button>
 							<button type="button" disabled={busy} onClick={syncNow}>

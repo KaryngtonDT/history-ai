@@ -126,7 +126,9 @@ export class MockMobileRepository implements MobileRepository {
 		});
 	}
 
-	registerDevice(request: RegisterMobileDeviceRequest): Promise<MobileWorkspace> {
+	registerDevice(
+		request: RegisterMobileDeviceRequest,
+	): Promise<MobileWorkspace> {
 		const device = {
 			deviceId: request.deviceId,
 			platform: request.platform,

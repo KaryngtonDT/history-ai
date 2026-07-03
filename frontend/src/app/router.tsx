@@ -73,7 +73,10 @@ export function AppRouter() {
 				<Route path="/settings/ai" element={<AIEngineSettingsPage />} />
 				<Route path="/settings/pipeline" element={<PipelineSettingsPage />} />
 				<Route path="/settings/learning" element={<LearningSettingsPage />} />
-				<Route path="/settings/connections" element={<ConnectionsSettingsPage />} />
+				<Route
+					path="/settings/connections"
+					element={<ConnectionsSettingsPage />}
+				/>
 				<Route path="/settings/server" element={<ServerSettingsPage />} />
 				<Route path="/settings/shadow" element={<ShadowSettingsPage />} />
 				<Route

@@ -1,12 +1,12 @@
 import type {
+	MobileConnection,
 	MobileConnectionsResponse,
 	MobileHealth,
+	MobilePreferences,
 	MobileProfile,
 	MobileServer,
 	MobileToday,
 	MobileWorkspace,
-	MobileConnection,
-	MobilePreferences,
 	RegisterMobileDeviceRequest,
 	UpdateMobileConnectionRequest,
 	UpdateMobilePreferencesRequest,
@@ -34,7 +34,9 @@ export interface MobileRepository {
 
 	getConnections(scopeKey?: string): Promise<MobileConnectionsResponse>;
 
-	registerDevice(request: RegisterMobileDeviceRequest): Promise<MobileWorkspace>;
+	registerDevice(
+		request: RegisterMobileDeviceRequest,
+	): Promise<MobileWorkspace>;
 
 	sync(scopeKey?: string): Promise<MobileWorkspace>;
 

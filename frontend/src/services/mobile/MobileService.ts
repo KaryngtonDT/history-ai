@@ -1,5 +1,5 @@
-import { createMobileRepository } from "./MobileRepositoryFactory";
 import type { MobileRepository } from "./MobileRepository";
+import { createMobileRepository } from "./MobileRepositoryFactory";
 
 class MobileService {
 	private readonly repository: MobileRepository;
@@ -36,9 +36,7 @@ class MobileService {
 		return this.repository.getConnections(scopeKey);
 	}
 
-	registerDevice(
-		request: Parameters<MobileRepository["registerDevice"]>[0],
-	) {
+	registerDevice(request: Parameters<MobileRepository["registerDevice"]>[0]) {
 		return this.repository.registerDevice(request);
 	}
 
