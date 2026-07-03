@@ -6,30 +6,30 @@ Status: Planned (Sprint 70)
 
 ## Prerequisites
 
-- Flutter SDK (version pinned in `mobile/` when scaffold lands)
-- Android Studio or command-line SDK
-- Home Lumen instance reachable (LAN or Tailscale)
+- Flutter SDK at `C:\src\flutter` — run `scripts/setup-flutter.ps1` to add PATH
+- Android Studio (SDK) — required for `flutter run` / `flutter build apk`
+- Home Lumen reachable (LAN or Tailscale)
 - Tailscale app on device for Personal Remote testing
 
-## Tailscale
+## Quick start
 
-1. Install Tailscale from Play Store
-2. Join same tailnet as home PC
-3. Configure Connections in Shadow Mobile (see [TAILSCALE_SETUP.md](TAILSCALE_SETUP.md))
-
-## Build (after Sprint 70 scaffold)
-
-```bash
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/setup-flutter.ps1
 cd mobile
 flutter pub get
+flutter test
+flutter devices
 flutter run
 ```
 
-Production APK:
+Release APK:
 
-```bash
+```powershell
 flutter build apk --release
+# mobile/build/app/outputs/flutter-apk/app-release.apk
 ```
+
+URLs are configured in `mobile/lib/config/lumen_config.dart` (Tailscale `100.111.236.50:8000`).
 
 ## Dev tips
 
