@@ -12,6 +12,7 @@ use App\Domain\ShadowBrowser\BrowserRepositoryInterface;
 use App\Domain\ShadowBrowser\BrowserTab;
 use App\Domain\ShadowBrowser\BrowserWorkspace;
 use App\Domain\ShadowBrowser\Exception\InvalidShadowBrowserException;
+use App\Domain\ShadowPresence\Exception\InvalidShadowPresenceException;
 use App\Domain\ShadowPresence\PresenceSurface;
 
 final class BrowserCoordinator
@@ -45,7 +46,12 @@ final class BrowserCoordinator
     public function disconnect(string $scopeKey = 'default'): BrowserWorkspace
     {
         $workspace = $this->sessionManager->disconnect($scopeKey);
-        $this->presenceCoordinator->disconnect($scopeKey);
+
+        try {
+            $this->presenceCoordinator->disconnect($scopeKey);
+        } catch (InvalidShadowPresenceException) {
+            // Browser and presence sessions can be disconnected independently.
+        }
 
         return $workspace;
     }

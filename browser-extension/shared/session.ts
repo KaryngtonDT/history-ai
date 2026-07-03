@@ -1,6 +1,6 @@
 export function isBrowserSessionActive(data: Record<string, unknown>): boolean {
-  if (data.active === true) {
-    return true;
+  if (data.active !== true) {
+    return false;
   }
 
   const session = data.session;

@@ -71,7 +71,13 @@ final readonly class PresenceWorkspace
             return null;
         }
 
-        return $this->sessions->find($this->activeSessionId);
+        $session = $this->sessions->find($this->activeSessionId);
+
+        if (null === $session || PresenceState::Connected !== $session->state()) {
+            return null;
+        }
+
+        return $session;
     }
 
     public function connect(PresenceSurface $surface, ?string $shadowSessionId = null): self
@@ -100,7 +106,7 @@ final readonly class PresenceWorkspace
 
         return $this->replace(
             sessions: $this->sessions->upsert($active->disconnect()),
-            activeSessionId: null,
+            clearActiveSession: true,
         );
     }
 

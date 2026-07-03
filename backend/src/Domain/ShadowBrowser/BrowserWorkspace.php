@@ -78,7 +78,13 @@ final readonly class BrowserWorkspace
             return null;
         }
 
-        return $this->sessions->find($this->activeSessionId);
+        $session = $this->sessions->find($this->activeSessionId);
+
+        if (null === $session || BrowserState::Connected !== $session->state()) {
+            return null;
+        }
+
+        return $session;
     }
 
     public function connect(?string $shadowSessionId = null): self
@@ -101,8 +107,7 @@ final readonly class BrowserWorkspace
 
         return $this->replace(
             sessions: $this->sessions->upsert($active->disconnect()),
-            activeSessionId: null,
-            currentContext: null,
+            clearActiveSession: true,
             clearContext: true,
         );
     }

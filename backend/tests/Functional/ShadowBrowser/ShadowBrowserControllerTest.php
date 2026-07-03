@@ -28,6 +28,38 @@ final class ShadowBrowserControllerTest extends WebTestCase
         self::assertSame(self::SCOPE, $payload['scopeKey'] ?? null);
     }
 
+    public function testDisconnectClearsActiveBrowserSession(): void
+    {
+        $client = static::createClient();
+        $scope = self::SCOPE.'-disconnect';
+
+        $client->request(
+            'POST',
+            '/api/shadow/browser/connect',
+            server: ['CONTENT_TYPE' => 'application/json'],
+            content: json_encode(['scopeKey' => $scope], JSON_THROW_ON_ERROR),
+        );
+        self::assertResponseIsSuccessful();
+
+        $client->request(
+            'POST',
+            '/api/shadow/browser/disconnect',
+            server: ['CONTENT_TYPE' => 'application/json'],
+            content: json_encode(['scopeKey' => $scope], JSON_THROW_ON_ERROR),
+        );
+        self::assertResponseIsSuccessful();
+
+        $client->request('GET', '/api/shadow/browser/session?scopeKey='.$scope);
+        self::assertResponseIsSuccessful();
+        $payload = json_decode($client->getResponse()->getContent(), true);
+        self::assertIsArray($payload);
+        self::assertFalse($payload['active'] ?? true);
+        self::assertTrue(
+            !array_key_exists('session', $payload) || null === $payload['session'],
+            (string) json_encode($payload, JSON_THROW_ON_ERROR),
+        );
+    }
+
     public function testPlatformDetectsYoutube(): void
     {
         $client = static::createClient();

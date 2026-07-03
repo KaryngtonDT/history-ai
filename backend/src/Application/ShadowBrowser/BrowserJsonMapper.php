@@ -9,6 +9,7 @@ use App\Domain\ShadowBrowser\BrowserContext;
 use App\Domain\ShadowBrowser\BrowserPermission;
 use App\Domain\ShadowBrowser\BrowserSession;
 use App\Domain\ShadowBrowser\BrowserSitePolicy;
+use App\Domain\ShadowBrowser\BrowserState;
 use App\Domain\ShadowBrowser\BrowserTab;
 use App\Domain\ShadowBrowser\BrowserWorkspace;
 
@@ -25,7 +26,7 @@ final class BrowserJsonMapper
         }
 
         return [
-            'active' => true,
+            'active' => BrowserState::Connected === $session->state(),
             'session' => [
                 'id' => $session->id(),
                 'scopeKey' => $session->scopeKey(),

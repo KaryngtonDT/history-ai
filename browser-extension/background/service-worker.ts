@@ -33,8 +33,9 @@ async function refreshSession(): Promise<BrowserSession> {
 async function handleConnect(): Promise<BackgroundResponse> {
   try {
     const workspace = await connectBrowser(sessionState.shadowSessionId);
-    sessionState.connected = true;
-    sessionState.workspace = workspace as Record<string, unknown>;
+    const data = workspace as Record<string, unknown>;
+    sessionState.connected = isBrowserSessionActive(normalizeSessionPayload(data));
+    sessionState.workspace = data;
     return { ok: true, session: { ...sessionState } };
   } catch (error) {
     return {
@@ -44,18 +45,28 @@ async function handleConnect(): Promise<BackgroundResponse> {
   }
 }
 
+function normalizeSessionPayload(data: Record<string, unknown>): Record<string, unknown> {
+  const nested = data.session;
+  if (nested && typeof nested === "object" && "active" in nested) {
+    return nested as Record<string, unknown>;
+  }
+
+  return data;
+}
+
 async function handleDisconnect(): Promise<BackgroundResponse> {
   try {
     await disconnectBrowser();
-    sessionState.connected = false;
-    sessionState.workspace = undefined;
-    return { ok: true, session: { ...sessionState } };
   } catch (error) {
-    return {
-      ok: false,
-      error: error instanceof Error ? error.message : "Disconnect failed",
-    };
+    const message = error instanceof Error ? error.message : "Disconnect failed";
+    if (!message.includes("No active browser session")) {
+      return { ok: false, error: message };
+    }
   }
+
+  sessionState.connected = false;
+  sessionState.workspace = undefined;
+  return { ok: true, session: { ...sessionState } };
 }
 
 async function handlePageDetected(context: PageContext): Promise<BackgroundResponse> {
@@ -114,7 +125,11 @@ async function routeMessage(message: BackgroundMessage): Promise<BackgroundRespo
   }
 }
 
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason !== "install") {
+    return;
+  }
+
   void handleConnect().catch(() => {
     sessionState.connected = false;
   });
