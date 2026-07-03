@@ -24,11 +24,19 @@ npm install
 npm run dev
 ```
 
-Native shell (requires Rust + Tauri CLI):
+Native shell (requires Rust, Tauri CLI, and on Windows MSVC Build Tools):
 
 ```bash
 npm run tauri dev
 ```
+
+On Windows, use `tauri-dev.cmd` from the repo root to load MSVC and Cargo before `tauri dev`:
+
+```cmd
+desktop\tauri-dev.cmd
+```
+
+Icons are generated from `app-icon.png` via `npm run tauri icon app-icon.png` if you need to regenerate them.
 
 Environment:
 
