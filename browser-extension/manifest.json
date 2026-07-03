@@ -3,7 +3,6 @@
   "name": "HistoryAI Shadow Browser",
   "version": "0.1.0",
   "description": "Shadow Browser extension for HistoryAI / Lumen — contextual explain, translate, and save.",
-  "_comment_gecko": "Firefox: add browser_specific_settings.gecko.id = history-ai@lumen.local",
   "background": {
     "service_worker": "background/service-worker.js",
     "type": "module"
