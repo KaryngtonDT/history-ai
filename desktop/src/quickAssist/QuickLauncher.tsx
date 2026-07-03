@@ -3,6 +3,22 @@ import { API_BASE_URL, LUMEN_WEB_BASE_URL } from "../app/config";
 import { loadApiBaseUrl, saveApiBaseUrl } from "../auth/tokenStore";
 import { connectDesktop, syncShadowProfile } from "../profile/syncProfile";
 
+async function openLumen(path: string) {
+	const url = `${LUMEN_WEB_BASE_URL}${path}`;
+
+	if ("__TAURI_INTERNALS__" in window) {
+		try {
+			const { openUrl } = await import("@tauri-apps/plugin-opener");
+			await openUrl(url);
+			return;
+		} catch {
+			// Fall back to window.open when the opener plugin is unavailable.
+		}
+	}
+
+	window.open(url, "_blank", "noopener,noreferrer");
+}
+
 export function QuickLauncher() {
 	const [apiBaseUrl, setApiBaseUrl] = useState(loadApiBaseUrl() ?? API_BASE_URL);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -24,10 +40,6 @@ export function QuickLauncher() {
 			setStatus("Offline — check Lumen backend");
 		});
 	}, [refreshProfile]);
-
-	function openLumen(path: string) {
-		window.open(`${LUMEN_WEB_BASE_URL}${path}`, "_blank");
-	}
 
 	return (
 		<main style={{ fontFamily: "system-ui, sans-serif", padding: "1rem" }}>
@@ -61,18 +73,16 @@ export function QuickLauncher() {
 			<div style={{ display: "flex", gap: "0.5rem", marginTop: "0.75rem" }}>
 				<button
 					type="button"
-					onClick={() =>
-						openLumen(
-							`/settings/shadow/brain?q=${encodeURIComponent(searchQuery)}`,
-						)
-					}
+					onClick={() => void openLumen(
+						`/settings/shadow/brain?q=${encodeURIComponent(searchQuery)}`,
+					)}
 				>
 					Open concept search
 				</button>
-				<button type="button" onClick={() => openLumen("/settings/shadow/mentor")}>
+				<button type="button" onClick={() => void openLumen("/settings/shadow/mentor")}>
 					Resume mission
 				</button>
-				<button type="button" onClick={() => openLumen("/settings/shadow/presence")}>
+				<button type="button" onClick={() => void openLumen("/settings/shadow/presence")}>
 					Presence settings
 				</button>
 			</div>

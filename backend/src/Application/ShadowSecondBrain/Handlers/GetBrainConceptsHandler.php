@@ -18,6 +18,6 @@ final class GetBrainConceptsHandler
     /** @return array<string, mixed> */
     public function __invoke(string $scopeKey = 'default'): array
     {
-        return $this->mapper->concepts($this->builder->getWorkspace($scopeKey));
+        return $this->mapper->concepts($this->builder->getWorkspace($scopeKey), $scopeKey);
     }
 }

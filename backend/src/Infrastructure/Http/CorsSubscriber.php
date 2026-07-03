@@ -12,12 +12,16 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Minimal CORS for local frontend (localhost:5173) → Symfony API.
+ * Minimal CORS for local frontends → Symfony API.
  * Dev only — replace with a dedicated CORS policy before production.
  */
 final class CorsSubscriber implements EventSubscriberInterface
 {
-    private const ALLOWED_ORIGIN = 'http://localhost:5173';
+    /** @var list<string> */
+    private const ALLOWED_ORIGINS = [
+        'http://localhost:5173',
+        'http://localhost:1420',
+    ];
 
     public function __construct(
         #[Autowire('%kernel.environment%')]
@@ -35,43 +39,74 @@ final class CorsSubscriber implements EventSubscriberInterface
 
     public function onKernelRequest(RequestEvent $event): void
     {
-        if ($this->appEnv !== 'dev' || !$event->isMainRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
         $request = $event->getRequest();
+        $origin = $request->headers->get('Origin');
 
         if ($request->getMethod() !== 'OPTIONS' || !$this->isApiPath($request->getPathInfo())) {
             return;
         }
 
-        if ($request->headers->get('Origin') !== self::ALLOWED_ORIGIN) {
+        if (!$this->shouldApplyCors($origin)) {
             return;
         }
 
         $response = new Response('', Response::HTTP_NO_CONTENT);
-        $this->addCorsHeaders($response);
+        $this->addCorsHeaders($response, $origin);
 
         $event->setResponse($response);
     }
 
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if ($this->appEnv !== 'dev' || !$event->isMainRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
         $request = $event->getRequest();
+        $origin = $request->headers->get('Origin');
 
         if (!$this->isApiPath($request->getPathInfo())) {
             return;
         }
 
-        if ($request->headers->get('Origin') !== self::ALLOWED_ORIGIN) {
+        if (!$this->shouldApplyCors($origin)) {
             return;
         }
 
-        $this->addCorsHeaders($event->getResponse());
+        $this->addCorsHeaders($event->getResponse(), $origin);
+    }
+
+    private function shouldApplyCors(?string $origin): bool
+    {
+        if (!$this->isAllowedOrigin($origin)) {
+            return false;
+        }
+
+        if ('dev' === $this->appEnv) {
+            return true;
+        }
+
+        return is_string($origin)
+            && (str_starts_with($origin, 'http://localhost:')
+                || str_starts_with($origin, 'http://127.0.0.1:'));
+    }
+
+    private function isAllowedOrigin(?string $origin): bool
+    {
+        if (!is_string($origin) || '' === $origin) {
+            return false;
+        }
+
+        if (in_array($origin, self::ALLOWED_ORIGINS, true)) {
+            return true;
+        }
+
+        return str_starts_with($origin, 'http://localhost:')
+            || str_starts_with($origin, 'http://127.0.0.1:');
     }
 
     private function isApiPath(string $path): bool
@@ -79,10 +114,14 @@ final class CorsSubscriber implements EventSubscriberInterface
         return str_starts_with($path, '/api');
     }
 
-    private function addCorsHeaders(Response $response): void
+    private function addCorsHeaders(Response $response, ?string $origin): void
     {
-        $response->headers->set('Access-Control-Allow-Origin', self::ALLOWED_ORIGIN);
-        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        if (!is_string($origin) || !$this->isAllowedOrigin($origin)) {
+            return;
+        }
+
+        $response->headers->set('Access-Control-Allow-Origin', $origin);
+        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
         $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Accept');
     }
 }

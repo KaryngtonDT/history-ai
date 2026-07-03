@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 import { useTranslation } from "@/i18n";
 import { shadowBrainService } from "@/services/shadowBrain/ShadowBrainService";
 import type {
@@ -446,6 +447,8 @@ function SearchResultsPanel({ hits }: { hits: KnowledgeSearchHit[] }) {
 
 export function SecondBrainCenter() {
 	const { t } = useTranslation();
+	const [searchParams] = useSearchParams();
+	const initialQuery = searchParams.get("q")?.trim() ?? "";
 	const [dashboard, setDashboard] = useState<BrainDashboard | null>(null);
 	const [tree, setTree] = useState<KnowledgeTreeNode[]>([]);
 	const [selectedConceptKey, setSelectedConceptKey] = useState<string | null>(
@@ -455,13 +458,18 @@ export function SecondBrainCenter() {
 		null,
 	);
 	const [detailLoading, setDetailLoading] = useState(false);
-	const [searchQuery, setSearchQuery] = useState("");
+	const [searchQuery, setSearchQuery] = useState(initialQuery);
 	const [searchHits, setSearchHits] = useState<KnowledgeSearchHit[]>([]);
 	const [showTimeline, setShowTimeline] = useState(false);
 	const [showSearchResults, setShowSearchResults] = useState(false);
 	const [bottomView, setBottomView] = useState<BottomView>("notes");
 	const [error, setError] = useState<string | null>(null);
 	const [message, setMessage] = useState<string | null>(null);
+	const workspaceNotes = dashboard?.workspace?.notes ?? [];
+	const workspaceBookmarks = dashboard?.workspace?.bookmarks ?? [];
+	const workspaceInsights = dashboard?.insights ?? [];
+	const workspaceRevisions = dashboard?.revisions ?? [];
+	const workspaceTimeline = dashboard?.workspace?.timeline ?? [];
 
 	const loadConcept = useCallback(
 		async (conceptKey: string) => {
@@ -503,6 +511,25 @@ export function SecondBrainCenter() {
 	useEffect(() => {
 		void load();
 	}, [load]);
+
+	useEffect(() => {
+		if (initialQuery === "") {
+			return;
+		}
+
+		void (async () => {
+			setError(null);
+
+			try {
+				const response = await shadowBrainService.search(initialQuery);
+				setSearchHits(response.hits);
+				setShowSearchResults(true);
+				setShowTimeline(false);
+			} catch {
+				setError(t("shadowBrain.errors.searchFailed"));
+			}
+		})();
+	}, [initialQuery, t]);
 
 	const handleTreeSelect = (node: KnowledgeTreeNode) => {
 		if (node.conceptKey) {
@@ -656,8 +683,8 @@ export function SecondBrainCenter() {
 								? t("shadowBrain.search.title")
 								: t("shadowBrain.concept.title")}
 					</h3>
-					{showTimeline && dashboard ? (
-						<TimelinePanel events={dashboard.workspace.timeline} />
+					{showTimeline && dashboard?.workspace ? (
+						<TimelinePanel events={workspaceTimeline} />
 					) : showSearchResults ? (
 						<SearchResultsPanel hits={searchHits} />
 					) : (
@@ -717,16 +744,16 @@ export function SecondBrainCenter() {
 							{t("shadowBrain.bottom.stats")}
 						</button>
 					</div>
-					{bottomView === "notes" && dashboard ? (
-						<NotesPanel notes={dashboard.workspace.notes} />
+					{bottomView === "notes" ? (
+						<NotesPanel notes={workspaceNotes} />
 					) : null}
-					{bottomView === "bookmarks" && dashboard ? (
-						<BookmarksPanel bookmarks={dashboard.workspace.bookmarks} />
+					{bottomView === "bookmarks" ? (
+						<BookmarksPanel bookmarks={workspaceBookmarks} />
 					) : null}
-					{bottomView === "insights" && dashboard ? (
+					{bottomView === "insights" ? (
 						<InsightsPanel
-							insights={dashboard.insights}
-							revisions={dashboard.revisions}
+							insights={workspaceInsights}
+							revisions={workspaceRevisions}
 						/>
 					) : null}
 					{bottomView === "stats" && dashboard ? (
