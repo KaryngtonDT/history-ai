@@ -46,17 +46,17 @@ Shadow companion stack from Watch through Second Brain.
 
 ## Sprint 68 — Shadow Everywhere Foundation
 
-**Task:** [planning/Shadow/Sprint-68/TASK-0068.md](Shadow/Sprint-68/TASK-0068.md)
+**Task:** [planning/Shadow/Sprint-68/TASK-0068.md](Shadow/Sprint-68/TASK-0068.md) — **Complete**
 
-Foundation for Shadow Presence: domain, Context Hub, Desktop MVP (Tauri), Quick Assist, universal conversation, presence settings.
+Foundation for Shadow Presence: domain, Context Hub, universal conversation, presence settings, explainability — plus Tauri foundation and minimal Desktop Quick Launcher.
 
 ---
 
-# Next chapters (Phase III)
+# Next chapter (Phase III continued)
 
 | Sprint | Name |
 | ------ | ---- |
-| 69 | Browser Companion |
+| **69** | **Browser Companion** |
 | 70 | IDE Companion |
 | 71 | Mobile Companion |
 | 72 | Ambient Shadow |

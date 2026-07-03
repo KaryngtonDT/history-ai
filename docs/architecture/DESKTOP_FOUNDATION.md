@@ -1,67 +1,81 @@
 # Desktop Foundation — Architecture
 
-Version: 1.0
+Version: 1.1
 
 Status: Planned (Sprint 68)
 
-Parent: [SHADOW_PRESENCE.md](SHADOW_PRESENCE.md)
+Parent: [SHADOW_EVERYWHERE.md](SHADOW_EVERYWHERE.md)
+
+---
+
+# Sprint 68 split
+
+| Slice | Deliverable |
+| ----- | ----------- |
+| P68-SLICE-03 | Tauri **foundation** — auth, profile sync, window architecture |
+| P68-SLICE-07 | **Quick Launcher** — minimal UX on top of foundation |
+
+Browser, IDE, and Mobile are **not** built in S68.
 
 ---
 
 # Stack
 
-- **Tauri 2** — native shell, small footprint
-- **Frontend** — reuse Lumen design tokens where practical; minimal UI
-- **Backend** — existing Lumen Symfony API (`/api/shadow/presence/*`)
+- **Tauri 2** — native shell
+- **Minimal UI** — launcher class, not Lumen clone
+- **Backend** — `/api/shadow/presence/*` + existing Shadow APIs
 
 ---
 
-# Design intent
-
-The Desktop Companion is **not a copy of Lumen**.
-
-It is ultra-light — Raycast / Spotlight / ChatGPT Desktop class:
-
-| Capability | In desktop | In Lumen web |
-| ---------- | ---------- | ------------ |
-| Quick question | ✅ | ✅ |
-| Second Brain search | ✅ | ✅ |
-| Mission resume | ✅ | ✅ |
-| Voice (future) | ✅ stub | ✅ |
-| Full pipeline / workspace | ❌ deep link | ✅ |
-| Complex settings | minimal | ✅ full |
-
-Target: open in **< 300 ms**.
-
----
-
-# Folder layout
+# SLICE-03 — Foundation only
 
 ```text
 desktop/
-  src-tauri/          # Rust shell, global shortcut
+  src-tauri/           # Rust: window management, deep links
   src/
-    ShadowDesktopApp/
-    ShadowOverlay/    # floating panel
-    QuickAssist/      # command palette UX
-    ConversationBridge/
-    ContextPanel/
-  package.json
+    app/
+    auth/              # token / session to Lumen backend
+    profile/           # Shadow identity sync
+    windows/           # main + overlay layout
 ```
 
+Goals:
+
+- secure backend connection
+- local authentication
+- profile synchronization
+- fast-open architecture (< 300 ms target for SLICE-07)
+- window structure for future overlay
+
+**Not in SLICE-03:** global shortcuts, clipboard, tray monitoring.
+
 ---
 
-# MVP flows
+# SLICE-07 — Quick Launcher
 
-1. **Quick Assist** — `Ctrl+Shift+Space` → ask / search / resume
-2. **Concept open** — search result → context panel with Brain detail
-3. **Continue in Lumen** — deep link to `/settings/shadow/brain` or watch page
+Minimal commands:
+
+- open Shadow
+- search Second Brain
+- open concept
+- resume mission / conversation
+- deep link to Lumen page
+
+**Not in SLICE-07:** clipboard read, browser analysis, auto context.
 
 ---
 
-# Out of scope (S68)
+# Lumen vs Desktop
 
-- System tray background monitoring
-- OS-wide text selection hooks
-- Offline mode
-- Auto-update channel (manual build OK for MVP)
+| Capability | Desktop S68 | Lumen web |
+| ---------- | ----------- | --------- |
+| Quick search / ask | ✅ | ✅ |
+| Full Second Brain UI | deep link | ✅ |
+| Pipeline / workspace | deep link | ✅ |
+| Complex settings | minimal | ✅ full |
+
+---
+
+# Future (S69+)
+
+Desktop foundation enables later: global shortcut, tray presence, deep OS integration — each as **separate slices** with explicit privacy review.

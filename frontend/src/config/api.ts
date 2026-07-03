@@ -186,6 +186,16 @@ export function shadowBrainBookmarkPath(id: string): string {
 	return `/api/shadow/brain/bookmark/${id}`;
 }
 
+export const SHADOW_PRESENCE_SESSION_PATH = "/api/shadow/presence/session";
+export const SHADOW_PRESENCE_CONNECT_PATH = "/api/shadow/presence/connect";
+export const SHADOW_PRESENCE_DISCONNECT_PATH =
+	"/api/shadow/presence/disconnect";
+export const SHADOW_PRESENCE_CONTEXT_PATH = "/api/shadow/presence/context";
+export const SHADOW_PRESENCE_PREFERENCES_PATH =
+	"/api/shadow/presence/preferences";
+export const SHADOW_PRESENCE_HISTORY_PATH = "/api/shadow/presence/history";
+export const SHADOW_PRESENCE_EXPLAIN_PATH = "/api/shadow/presence/explain";
+
 export function videoReviewsPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/reviews`;
 }

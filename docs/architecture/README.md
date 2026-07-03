@@ -10,15 +10,15 @@ Status: Active
 
 **Constitutional reference:** [LUMEN_VISION_2030.md](../vision/LUMEN_VISION_2030.md)
 
-**Current architecture chapter:** Phase III — Shadow Everywhere (Sprint 68+)
+**Current architecture chapter:** Phase III — Shadow Everywhere (Sprint 68 — **foundation only**)
 
 | Doc | Topic |
 | --- | ----- |
+| [SHADOW_EVERYWHERE.md](SHADOW_EVERYWHERE.md) | Phase III overview & scope boundary |
 | [SHADOW_PRESENCE.md](SHADOW_PRESENCE.md) | Presence bounded context |
 | [CONTEXT_HUB.md](CONTEXT_HUB.md) | Unified context fusion |
-| [PRESENCE_PERMISSIONS.md](PRESENCE_PERMISSIONS.md) | Consent model |
-| [DESKTOP_FOUNDATION.md](DESKTOP_FOUNDATION.md) | Tauri desktop MVP |
-| [PRIVACY_MODEL.md](PRIVACY_MODEL.md) | Data access rules |
+| [PRESENCE_SECURITY.md](PRESENCE_SECURITY.md) | Permissions, privacy, explainability |
+| [DESKTOP_FOUNDATION.md](DESKTOP_FOUNDATION.md) | Tauri foundation + Quick Launcher |
 | [SECOND_BRAIN.md](SECOND_BRAIN.md) | Knowledge workspace (S67) |
 
 ---

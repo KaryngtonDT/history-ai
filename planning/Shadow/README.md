@@ -19,7 +19,7 @@ Every sprint must align with [LUMEN_VISION_2030.md](../../docs/vision/LUMEN_VISI
 | 65 | [TASK-0065](Sprint-65/TASK-0065.md) | Mentor & goals | Complete |
 | 66 | [TASK-0066](Sprint-66/TASK-0066.md) | Executive | Complete |
 | 67 | [TASK-0067](Sprint-67/TASK-0067.md) | Second Brain | Complete |
-| **68** | **[TASK-0068](Sprint-68/TASK-0068.md)** | **Shadow Everywhere Foundation** | **Next** |
+| **68** | **[TASK-0068](Sprint-68/TASK-0068.md)** | **Shadow Everywhere Foundation** | **Complete** |
 
 ---
 
@@ -30,7 +30,9 @@ Every sprint must align with [LUMEN_VISION_2030.md](../../docs/vision/LUMEN_VISI
 | Bounded context prefix | `ShadowPresence` (not `Presence` alone in domain names) |
 | API base | `/api/shadow/presence/*` |
 | Settings route | `/settings/shadow/presence` |
-| Frontend services | `shadowPresence/` |
+| Frontend services | `presence/` |
+| Frontend features | `features/presence/` |
+| i18n keys | `presence.*` |
 | Storage | `storage/shadow/presence/` |
 | Desktop app | `desktop/` (Tauri) |
 

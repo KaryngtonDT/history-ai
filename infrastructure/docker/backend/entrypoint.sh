@@ -15,6 +15,7 @@ mkdir -p \
   /var/www/html/storage/shadow/mentor \
   /var/www/html/storage/shadow/executive \
   /var/www/html/storage/shadow/brain \
+  /var/www/html/storage/shadow/presence \
   /var/www/html/storage/learning /var/www/html/storage/workspace /var/www/html/storage/logs /var/www/html/storage/temp /var/www/html/storage/cache
 
 chown -R www-data:www-data /var/www/html/storage

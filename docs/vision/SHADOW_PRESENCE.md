@@ -68,7 +68,7 @@ Same panel. Same voice. Same memory. Every surface.
 
 | Sprint | Surface | Role |
 | ------ | ------- | ---- |
-| 68 | Desktop (Tauri) | Foundation + Quick Assist |
+| 68 | Desktop (Tauri) | Foundation + Quick Launcher |
 | 69 | Browser extension | YouTube, PDF, web docs |
 | 70 | IDE extension | Cursor, VS Code, JetBrains |
 | 71 | Mobile | Continuity on the move |
@@ -82,10 +82,10 @@ Companions are **ultra-light entry points** into the same intelligence.
 
 # Architecture references
 
+- [SHADOW_EVERYWHERE.md](../architecture/SHADOW_EVERYWHERE.md) — Phase III scope
 - [SHADOW_PRESENCE.md](../architecture/SHADOW_PRESENCE.md) — technical bounded context
 - [CONTEXT_HUB.md](../architecture/CONTEXT_HUB.md) — shared context fusion
-- [PRESENCE_PERMISSIONS.md](../architecture/PRESENCE_PERMISSIONS.md) — consent model
-- [DESKTOP_FOUNDATION.md](../architecture/DESKTOP_FOUNDATION.md) — Tauri MVP
-- [PRIVACY_MODEL.md](../architecture/PRIVACY_MODEL.md) — data access rules
+- [PRESENCE_SECURITY.md](../architecture/PRESENCE_SECURITY.md) — consent & audit
+- [DESKTOP_FOUNDATION.md](../architecture/DESKTOP_FOUNDATION.md) — Tauri + Quick Launcher
 
 Implementation: [TASK-0068](../../planning/Shadow/Sprint-68/TASK-0068.md)

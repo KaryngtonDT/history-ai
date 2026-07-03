@@ -185,6 +185,11 @@ when@test:
             arguments:
                 $directory: '%kernel.cache_dir%/shadow-brain'
 
+        app.storage.shadow_presence:
+            class: App\Infrastructure\Storage\JsonFileStore
+            arguments:
+                $directory: '%kernel.cache_dir%/shadow-presence'
+
         App\Domain\ShadowGoals\ShadowGoalsRepositoryInterface:
             alias: App\Infrastructure\ShadowGoals\InMemoryShadowGoalsRepository
 
@@ -199,6 +204,9 @@ when@test:
 
         App\Domain\ShadowSecondBrain\ShadowSecondBrainRepositoryInterface:
             alias: App\Infrastructure\ShadowSecondBrain\InMemoryShadowSecondBrainRepository
+
+        App\Domain\ShadowPresence\ShadowPresenceRepositoryInterface:
+            alias: App\Infrastructure\ShadowPresence\InMemoryShadowPresenceRepository
 
     parameters:
         storage.root: '%kernel.cache_dir%/storage'

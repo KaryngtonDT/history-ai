@@ -140,7 +140,7 @@ Shadow lives beyond the browser.
 ```text
 Shadow Presence
       │
-      ├── Desktop Companion (S68)
+      ├── Desktop foundation + Quick Launcher (S68)
       ├── Browser Companion (S69)
       ├── IDE Companion (S70)
       ├── Mobile Companion (S71)

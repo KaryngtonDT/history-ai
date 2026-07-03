@@ -16,7 +16,7 @@ Constitutional reference: [LUMEN_VISION_2030.md](../vision/LUMEN_VISION_2030.md)
 | Mentor | `/settings/shadow/mentor` |
 | Executive | `/settings/shadow/executive` |
 | Second Brain | `/settings/shadow/brain` |
-| Presence | `/settings/shadow/presence` *(S68 planned)* |
+| Presence | `/settings/shadow/presence` |
 | Watch companion | `/video/{id}/watch` |
 | Desktop companion | Tauri app *(S68 planned)* |
 

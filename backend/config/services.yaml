@@ -302,6 +302,9 @@ services:
     App\Domain\ShadowSecondBrain\ShadowSecondBrainRepositoryInterface:
         alias: App\Infrastructure\ShadowSecondBrain\FileShadowSecondBrainRepository
 
+    App\Domain\ShadowPresence\ShadowPresenceRepositoryInterface:
+        alias: App\Infrastructure\ShadowPresence\FileShadowPresenceRepository
+
     app.storage.learning:
         class: App\Infrastructure\Storage\JsonFileStore
         arguments:
@@ -362,6 +365,11 @@ services:
         arguments:
             $directory: '%storage.root%/shadow/brain'
 
+    app.storage.shadow_presence:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/shadow/presence'
+
     App\Infrastructure\Learning\FileLearningProfileRepository:
         arguments:
             $store: '@app.storage.learning'
@@ -409,6 +417,10 @@ services:
     App\Infrastructure\ShadowSecondBrain\FileShadowSecondBrainRepository:
         arguments:
             $store: '@app.storage.shadow_brain'
+
+    App\Infrastructure\ShadowPresence\FileShadowPresenceRepository:
+        arguments:
+            $store: '@app.storage.shadow_presence'
 
     App\Application\Shadow\Handlers\AskShadowQuestionHandler:
         arguments:

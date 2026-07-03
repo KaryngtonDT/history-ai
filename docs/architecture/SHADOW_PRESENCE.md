@@ -1,8 +1,10 @@
 # Shadow Presence — Architecture
 
-Version: 1.0
+Version: 1.1
 
 Status: Planned (Sprint 68)
+
+Parent: [SHADOW_EVERYWHERE.md](SHADOW_EVERYWHERE.md)
 
 Vision: [SHADOW_PRESENCE.md](../vision/SHADOW_PRESENCE.md)
 
@@ -12,55 +14,52 @@ Task: [TASK-0068](../../planning/Shadow/Sprint-68/TASK-0068.md)
 
 # Bounded context
 
-`Domain/ShadowPresence/` — describes **where** and **how authorized** Shadow appears, not surface-specific UI.
+`Domain/ShadowPresence/` — **where**, **what authorized**, **which context** — never surface UI.
 
-| Aggregate / VO | Role |
-| -------------- | ---- |
-| `PresenceSession` | Active connection from a surface |
-| `PresenceContext` | Snapshot of fused intelligence for a request |
-| `PresenceSource` | Enum: `Desktop`, `Browser`, `Ide`, `Mobile`, `Web` |
-| `PresenceCapability` | What a surface can do (ask, search, resume mission) |
-| `PresencePermission` | User-granted scope (duration, data types) |
-| `PresenceAction` | User-initiated action from a surface |
-| `PresenceIntent` | Parsed intent (explain, search, resume, …) |
-| `PresenceState` | Connected, idle, disconnected |
+| Type | Members |
+| ---- | ------- |
+| Aggregates / entities | `PresenceSession`, `PresenceContext` |
+| Value objects | `PresenceSurface`, `PresenceCapability`, `PresencePermission`, `PresenceState`, `PresenceEvent` |
+| Port | `ShadowPresenceRepositoryInterface` |
 
 Persistence: `storage/shadow/presence/{id}.json`
+
+---
+
+# Surfaces (enum)
+
+| Value | Sprint |
+| ----- | ------ |
+| `web` | existing Lumen |
+| `desktop` | S68 foundation + Quick Launcher |
+| `browser` | S69 stub in settings |
+| `ide` | S70 stub in settings |
+| `mobile` | S71 stub in settings |
 
 ---
 
 # Layer diagram
 
 ```text
-Surface (Desktop / Browser / IDE / Web)
+Surface (web / desktop / future)
         │
         ▼
-Presentation — ShadowPresenceController
+ShadowPresenceController
         │
         ▼
-Application — PresenceCoordinator, ContextHub
-        │
-        ├── ShadowSecondBrain (read)
-        ├── ShadowMemory (read)
-        ├── ShadowExecutive (read)
-        ├── ShadowMentor (read)
-        └── Shadow session / conversation (read/write bridge)
+PresenceCoordinator · PresenceSessionManager
         │
         ▼
-Domain — ShadowPresence
+ContextHub → existing Shadow handlers (read)
+        │
+        ▼
+Domain/ShadowPresence
 ```
-
----
-
-# API surface
-
-See [TASK-0068](../../planning/Shadow/Sprint-68/TASK-0068.md) for endpoint list.
 
 ---
 
 # Related
 
 - [CONTEXT_HUB.md](CONTEXT_HUB.md)
-- [PRESENCE_PERMISSIONS.md](PRESENCE_PERMISSIONS.md)
+- [PRESENCE_SECURITY.md](PRESENCE_SECURITY.md)
 - [DESKTOP_FOUNDATION.md](DESKTOP_FOUNDATION.md)
-- [PRIVACY_MODEL.md](PRIVACY_MODEL.md)

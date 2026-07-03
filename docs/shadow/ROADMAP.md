@@ -42,7 +42,7 @@ Constitutional reference: [LUMEN_VISION_2030.md](../vision/LUMEN_VISION_2030.md)
 
 | Sprint | Name | Focus |
 | ------ | ---- | ----- |
-| **68** | **Shadow Everywhere Foundation** | Presence domain, Context Hub, Desktop MVP (Tauri), Quick Assist |
+| **68** | **Shadow Everywhere Foundation** ✅ | Presence layer, Context Hub, universal conversation, Tauri foundation, Quick Launcher |
 | 69 | Browser Companion | Chrome, Firefox, Edge, Safari — YouTube, PDF overlays |
 | 70 | IDE Companion | Cursor, VS Code, JetBrains — workspace-aware (with consent) |
 | 71 | Mobile Companion | Android, iOS — continuity, daily review, voice |
@@ -50,13 +50,18 @@ Constitutional reference: [LUMEN_VISION_2030.md](../vision/LUMEN_VISION_2030.md)
 
 ### Sprint 68 highlights
 
-- `ShadowPresence` bounded context — session, context, permissions, intents
-- **Context Hub** — fuses Watch, Memory, Mentor, Executive, Second Brain into one context
-- **Desktop Companion** (Tauri) — ultra-light, < 300 ms, not a Lumen clone
-- **Quick Assist** — global shortcut, search, concept lookup, mission resume
-- **Universal Conversation** — same thread across web, desktop, future surfaces
-- **Presence Settings** — `/settings/shadow/presence`
-- **Explainability** — every appearance has a documented *why*
+**One product objective:** Shadow Presence foundation — not all platforms.
+
+| Slice | Focus |
+| ----- | ----- |
+| 01–02 | Presence domain + Context Hub |
+| 03 | Tauri foundation (auth, profile, windows) |
+| 04 | Universal conversation |
+| 05–06 | Presence settings + explainability/privacy |
+| 07 | Desktop Quick Launcher (minimal) |
+| 08 | Documentation |
+
+**Deferred to S69–72:** Browser, IDE, Mobile, Ambient integrations.
 
 See [TASK-0068](../../planning/Shadow/Sprint-68/TASK-0068.md).
 

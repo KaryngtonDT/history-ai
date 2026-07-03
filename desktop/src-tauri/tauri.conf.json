@@ -1,0 +1,22 @@
+{
+	"$schema": "https://schema.tauri.app/config/2",
+	"productName": "Lumen Shadow",
+	"version": "0.1.0",
+	"identifier": "com.lumen.shadow.desktop",
+	"build": {
+		"frontendDist": "../dist",
+		"devUrl": "http://localhost:1420",
+		"beforeDevCommand": "npm run dev",
+		"beforeBuildCommand": "npm run build"
+	},
+	"app": {
+		"windows": [
+			{
+				"title": "Shadow",
+				"width": 420,
+				"height": 560,
+				"resizable": true
+			}
+		]
+	}
+}
