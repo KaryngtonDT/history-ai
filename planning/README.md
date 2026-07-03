@@ -1,105 +1,84 @@
-# Planning — History AI
+# Planning — Lumen / Shadow
 
-Version: 2.1
+Version: 3.0
 
 Status: Active
 
+Constitutional reference: [LUMEN_VISION_2030.md](../docs/vision/LUMEN_VISION_2030.md)
+
 ---
 
-# Delivery Model
-
-History AI delivers **vertical features** with **contract-first** design.
+# Delivery model (Shadow sprints)
 
 ```text
-Product Manifesto
+LUMEN_VISION_2030.md
         ↓
-RFC
+Shadow Roadmap (docs/shadow/ROADMAP.md)
         ↓
-Epic
+TASK-00XX.md (planning/Shadow/Sprint-XX/)
         ↓
-Feature Contract (4 documents)
-        ↓
-Technical Tasks
-        ↓
-Code
-        ↓
-Review
+Implementation + SprintXX-Verification.md
 ```
 
----
-
-# Feature Contract
-
-Before implementation, every Feature must have:
-
-| Document | Purpose |
-| -------- | ------- |
-| `FEATURE.md` | Goal, value, actors, success criteria |
-| `STORIES.md` | User stories |
-| `ACCEPTANCE_TESTS.md` | Testable scenarios |
-| `API_CONTRACT.md` | Stable API surface (backend Features) |
-| `COMPONENT_CATALOG.md` | Components, tokens, pages (UI Features) |
-
-UI-only Features (Phase A) use `COMPONENT_CATALOG.md` instead of `API_CONTRACT.md`.
-
-Only after contract **validation** are technical tasks created in `tasks/`.
-
-Frontend and backend can then work in parallel against the same contract.
+Early Epic/Milestone contracts (PDF Upload, Design System) remain valid **historical foundation** — see [Legacy planning](#legacy-planning).
 
 ---
 
-# Folder Layout
+# Folder layout
 
 ```text
 planning/
 ├── README.md
-├── BACKLOG.md
+├── DELIVERY_ROADMAP.md          ← active roadmap
 ├── WORKFLOW.md
-├── DELIVERY_ROADMAP.md
+├── BACKLOG.md
 │
-├── Epics/
-│   └── Epic-01-Content-Ingestion/
-│       ├── EPIC.md
-│       └── Feature-0001-PDF-Upload/
-│           ├── FEATURE.md
-│           ├── STORIES.md
-│           ├── ACCEPTANCE_TESTS.md
-│           ├── API_CONTRACT.md
-│           └── tasks/              ← after contract validation
+├── Shadow/                      ← **current Shadow sprints**
+│   ├── README.md
+│   └── Sprint-XX/TASK-00XX.md
 │
-└── Milestone-XX/                   ← legacy
+├── Epics/                       ← legacy feature contracts (foundation)
+└── Milestone-XX/                ← legacy infrastructure tasks
 ```
 
 ---
 
-# Current Focus
+# Current focus
 
-**Sprint 3 — Processing Domain** — [SPRINT-03.md](SPRINT-03.md)
+**Sprint 68 — Shadow Everywhere Foundation**
 
-Sprint 2 closed — [SPRINT-02.md](SPRINT-02.md) · Architecture review — [SPRINT-02-ARCHITECTURE-REVIEW.md](SPRINT-02-ARCHITECTURE-REVIEW.md)
+- [TASK-0068](Shadow/Sprint-68/TASK-0068.md)
+- [DELIVERY_ROADMAP.md](DELIVERY_ROADMAP.md)
 
-Feature contracts for PDF Upload remain valid for Phase B+ vertical slices.
+Sprint 67 (Second Brain) — **Complete**.
+
+---
+
+# Legacy planning
+
+These folders document early MVP and infrastructure work. They are **not** the active model for Shadow Phase III:
+
+- `Milestone-01/` … `Milestone-06/`
+- `MVP-SPRINT-01*`, `SPRINT-02.md`, `SPRINT-03.md`
+- `Epics/Epic-00-UI-Foundation/`, `Epics/Epic-01-Content-Ingestion/`
+
+Retain for audit; do not treat as current product direction.
 
 ---
 
 # Rules
 
-* **No code until Feature Contract is validated**
-* **1 Feature = end-to-end user capability**
-* **1 Task = 1 Prompt = 1 Commit = 1 Review**
-* Tasks must reference `ACCEPTANCE_TESTS.md` and `API_CONTRACT.md`
-* Legacy Milestone tasks (TASK-0007–0010) remain valid foundation
+- Align every Shadow sprint with [LUMEN_VISION_2030.md](../docs/vision/LUMEN_VISION_2030.md)
+- 1 Task = 1 focused implementation cycle
+- Docker validation gate required before sprint sign-off
+- Update `docs/reports/SprintXX-Verification.md` on completion
 
 ---
 
-# Cursor Prompt (after contract validation)
+# Cursor prompt
 
 ```text
 Read AGENTS.md.
-Read START_HERE.md.
-Read docs/00_PROJECT/PRODUCT_MANIFESTO.md.
-Read engineering/00_ENGINEERING_PRINCIPLES.md.
-Read docs/06_RFC/RFC-0001-content-processing-pipeline.md.
-Read Feature-XXXX: FEATURE.md, STORIES.md, ACCEPTANCE_TESTS.md, API_CONTRACT.md.
-Implement ONLY the current Task in tasks/.
+Read docs/vision/LUMEN_VISION_2030.md.
+Implement ONLY planning/Shadow/Sprint-XX/TASK-00XX.md.
 ```

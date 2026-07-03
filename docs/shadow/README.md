@@ -1,6 +1,8 @@
 # Shadow
 
-Shadow is Lumen's AI learning companion — voice, watch sync, memory, relationship, and teaching.
+Shadow is Lumen's AI learning companion — voice, watch sync, memory, relationship, teaching, and omnipresent presence (Phase III).
+
+Constitutional reference: [LUMEN_VISION_2030.md](../vision/LUMEN_VISION_2030.md)
 
 ## Product surfaces
 
@@ -14,9 +16,19 @@ Shadow is Lumen's AI learning companion — voice, watch sync, memory, relations
 | Mentor | `/settings/shadow/mentor` |
 | Executive | `/settings/shadow/executive` |
 | Second Brain | `/settings/shadow/brain` |
+| Presence | `/settings/shadow/presence` *(S68 planned)* |
 | Watch companion | `/video/{id}/watch` |
+| Desktop companion | Tauri app *(S68 planned)* |
 
 ## Documentation map
+
+### Vision
+
+- [LUMEN Vision 2030](../vision/LUMEN_VISION_2030.md)
+- [Shadow Presence](../vision/SHADOW_PRESENCE.md)
+- [Shadow Continuity](../vision/SHADOW_CONTINUITY.md)
+
+### Shadow domains
 
 - [Getting started](GETTING_STARTED.md)
 - [Architecture](ARCHITECTURE.md)
@@ -38,3 +50,4 @@ Shadow is Lumen's AI learning companion — voice, watch sync, memory, relations
 - User control and full reset
 - No model training in Shadow bounded contexts
 - Composes with Lumen pipeline artefacts
+- Progress over engagement — grow the user intellectually

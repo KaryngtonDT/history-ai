@@ -1,8 +1,12 @@
-# History AI
+# History AI → Lumen
 
 Version: 2.0
 
-Status: Approved
+Status: **Superseded for product direction**
+
+> **Use [LUMEN_VISION_2030.md](../vision/LUMEN_VISION_2030.md) as the constitutional product reference.**
+>
+> This document retains the original History AI / Learning Platform framing for historical context.
 
 Author: Product Team
 

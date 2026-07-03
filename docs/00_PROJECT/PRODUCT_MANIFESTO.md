@@ -4,6 +4,8 @@ Version: 1.0
 
 Status: Draft
 
+> **Product direction:** [LUMEN_VISION_2030.md](../vision/LUMEN_VISION_2030.md) is the constitutional reference. This manifesto remains the durable-knowledge mission statement.
+
 ---
 
 # Our Mission

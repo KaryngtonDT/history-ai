@@ -1,8 +1,25 @@
 # Architecture Documentation
 
-Version: 1.0
+Version: 1.1
 
 Status: Active
+
+---
+
+# Product direction
+
+**Constitutional reference:** [LUMEN_VISION_2030.md](../vision/LUMEN_VISION_2030.md)
+
+**Current architecture chapter:** Phase III — Shadow Everywhere (Sprint 68+)
+
+| Doc | Topic |
+| --- | ----- |
+| [SHADOW_PRESENCE.md](SHADOW_PRESENCE.md) | Presence bounded context |
+| [CONTEXT_HUB.md](CONTEXT_HUB.md) | Unified context fusion |
+| [PRESENCE_PERMISSIONS.md](PRESENCE_PERMISSIONS.md) | Consent model |
+| [DESKTOP_FOUNDATION.md](DESKTOP_FOUNDATION.md) | Tauri desktop MVP |
+| [PRIVACY_MODEL.md](PRIVACY_MODEL.md) | Data access rules |
+| [SECOND_BRAIN.md](SECOND_BRAIN.md) | Knowledge workspace (S67) |
 
 ---
 

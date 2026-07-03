@@ -14,7 +14,8 @@ Shadow Teaching (S63) ──► Paths, exercises, revisions, checkpoints
 Shadow Knowledge (S64) ──► Graph, prerequisites, gaps, reasoning
 Shadow Mentor (S65) ──► Goals, roadmap, missions, weekly review
 Shadow Executive (S66) ──► Agenda, decisions, orchestration
-Shadow Second Brain (S67) ──► Unified knowledge workspace (planned)
+Shadow Second Brain (S67) ──► Unified knowledge workspace ✅
+Shadow Presence (S68+) ──► Context Hub, multi-surface companion (planned)
         │
         ▼
 ShadowWatchPromptBuilder ──► Chat provider
@@ -22,6 +23,6 @@ ShadowWatchPromptBuilder ──► Chat provider
 
 Bounded contexts live under `backend/src/Domain/Shadow*`.
 
-Persistence: `storage/shadow/{identity,sessions,relationship,memory,teaching,knowledge,goals,mentor,executive,brain}/`.
+Persistence: `storage/shadow/{identity,sessions,relationship,memory,teaching,knowledge,goals,mentor,executive,brain,presence}/`.
 
-See also `docs/architecture/SHADOW_EXECUTIVE_FUNCTION.md`, `docs/architecture/SECOND_BRAIN.md`.
+See also `docs/vision/LUMEN_VISION_2030.md`, `docs/architecture/SHADOW_PRESENCE.md`, `docs/architecture/SECOND_BRAIN.md`.
