@@ -305,6 +305,9 @@ services:
     App\Domain\ShadowPresence\ShadowPresenceRepositoryInterface:
         alias: App\Infrastructure\ShadowPresence\FileShadowPresenceRepository
 
+    App\Domain\ShadowBrowser\BrowserRepositoryInterface:
+        alias: App\Infrastructure\ShadowBrowser\FileShadowBrowserRepository
+
     app.storage.learning:
         class: App\Infrastructure\Storage\JsonFileStore
         arguments:
@@ -370,6 +373,11 @@ services:
         arguments:
             $directory: '%storage.root%/shadow/presence'
 
+    app.storage.shadow_browser:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/shadow/browser'
+
     App\Infrastructure\Learning\FileLearningProfileRepository:
         arguments:
             $store: '@app.storage.learning'
@@ -421,6 +429,10 @@ services:
     App\Infrastructure\ShadowPresence\FileShadowPresenceRepository:
         arguments:
             $store: '@app.storage.shadow_presence'
+
+    App\Infrastructure\ShadowBrowser\FileShadowBrowserRepository:
+        arguments:
+            $store: '@app.storage.shadow_browser'
 
     App\Application\Shadow\Handlers\AskShadowQuestionHandler:
         arguments:

@@ -18,7 +18,7 @@ const defaultPreferences: PresencePreferences = {
 	surfaceEnabled: {
 		web: true,
 		desktop: true,
-		browser: false,
+		browser: true,
 		ide: false,
 		mobile: false,
 	},

@@ -196,6 +196,16 @@ export const SHADOW_PRESENCE_PREFERENCES_PATH =
 export const SHADOW_PRESENCE_HISTORY_PATH = "/api/shadow/presence/history";
 export const SHADOW_PRESENCE_EXPLAIN_PATH = "/api/shadow/presence/explain";
 
+export const SHADOW_BROWSER_SESSION_PATH = "/api/shadow/browser/session";
+export const SHADOW_BROWSER_CONNECT_PATH = "/api/shadow/browser/connect";
+export const SHADOW_BROWSER_DISCONNECT_PATH = "/api/shadow/browser/disconnect";
+export const SHADOW_BROWSER_CONTEXT_PATH = "/api/shadow/browser/context";
+export const SHADOW_BROWSER_PLATFORM_PATH = "/api/shadow/browser/platform";
+export const SHADOW_BROWSER_PERMISSIONS_PATH =
+	"/api/shadow/browser/permissions";
+export const SHADOW_BROWSER_HISTORY_PATH = "/api/shadow/browser/history";
+export const SHADOW_BROWSER_EXPLAIN_PATH = "/api/shadow/browser/explain";
+
 export function videoReviewsPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/reviews`;
 }

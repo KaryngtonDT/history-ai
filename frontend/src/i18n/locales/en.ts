@@ -1,4 +1,7 @@
 import { type DeepStringRecord, mergeMessages } from "../localeUtils";
+import { browserDe } from "./sections/browser.de";
+import { browserEn } from "./sections/browser.en";
+import { browserFr } from "./sections/browser.fr";
 import { learningDe } from "./sections/learning.de";
 import { learningEn } from "./sections/learning.en";
 import { learningFr } from "./sections/learning.fr";
@@ -93,7 +96,7 @@ export const en = mergeMessages(
 				mergeMessages(shadowTeachingEn, shadowKnowledgeEn),
 				mergeMessages(shadowMentorEn, shadowExecutiveEn),
 			),
-			mergeMessages(presenceEn, shadowBrainEn),
+			mergeMessages(mergeMessages(presenceEn, shadowBrainEn), browserEn),
 		),
 	),
 );
@@ -154,7 +157,7 @@ export const fr = mergeMessages(
 				mergeMessages(shadowTeachingFr, shadowKnowledgeFr),
 				mergeMessages(shadowMentorFr, shadowExecutiveFr),
 			),
-			mergeMessages(presenceFr, shadowBrainFr),
+			mergeMessages(mergeMessages(presenceFr, shadowBrainFr), browserFr),
 		),
 	),
 ) satisfies Messages;
@@ -213,7 +216,7 @@ export const de = mergeMessages(
 				mergeMessages(shadowTeachingDe, shadowKnowledgeDe),
 				mergeMessages(shadowMentorDe, shadowExecutiveDe),
 			),
-			mergeMessages(presenceDe, shadowBrainDe),
+			mergeMessages(mergeMessages(presenceDe, shadowBrainDe), browserDe),
 		),
 	),
 ) satisfies Messages;

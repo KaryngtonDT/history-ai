@@ -1,0 +1,17 @@
+{
+  "name": "history-ai-browser-extension",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.304",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.0",
+    "vitest": "^4.1.9"
+  }
+}

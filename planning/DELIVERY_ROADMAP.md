@@ -50,14 +50,19 @@ Shadow companion stack from Watch through Second Brain.
 
 Foundation for Shadow Presence: domain, Context Hub, universal conversation, presence settings, explainability — plus Tauri foundation and minimal Desktop Quick Launcher.
 
+## Sprint 69 — Shadow Browser Companion
+
+**Task:** [planning/Shadow/Sprint-69/TASK-0069.md](Shadow/Sprint-69/TASK-0069.md) — **Complete**
+
+First Shadow Client in the browser: MV3 extension, Browser Presence domain, platform detection, overlay, YouTube/reading companions, permission center.
+
 ---
 
 # Next chapter (Phase III continued)
 
 | Sprint | Name |
 | ------ | ---- |
-| **69** | **Browser Companion** |
-| 70 | IDE Companion |
+| 70 | IDE Companion ← next |
 | 71 | Mobile Companion |
 | 72 | Ambient Shadow |
 

@@ -10,11 +10,16 @@ Status: Active
 
 **Constitutional reference:** [LUMEN_VISION_2030.md](../vision/LUMEN_VISION_2030.md)
 
-**Current architecture chapter:** Phase III — Shadow Everywhere (Sprint 68 — **foundation only**)
+**Current architecture chapter:** Phase III — Shadow Everywhere (Sprint 69 — Browser Companion)
 
 | Doc | Topic |
 | --- | ----- |
 | [SHADOW_EVERYWHERE.md](SHADOW_EVERYWHERE.md) | Phase III overview & scope boundary |
+| [SHADOW_BROWSER.md](SHADOW_BROWSER.md) | Browser Companion (S69) |
+| [BROWSER_OVERLAY.md](BROWSER_OVERLAY.md) | Content overlay |
+| [PLATFORM_DETECTION.md](PLATFORM_DETECTION.md) | URL platform detection |
+| [BROWSER_PRIVACY.md](BROWSER_PRIVACY.md) | Per-site permissions |
+| [BROWSER_SECURITY.md](BROWSER_SECURITY.md) | Extension security |
 | [SHADOW_PRESENCE.md](SHADOW_PRESENCE.md) | Presence bounded context |
 | [CONTEXT_HUB.md](CONTEXT_HUB.md) | Unified context fusion |
 | [PRESENCE_SECURITY.md](PRESENCE_SECURITY.md) | Permissions, privacy, explainability |

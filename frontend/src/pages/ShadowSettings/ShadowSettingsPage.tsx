@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
+import { BrowserCenter } from "@/features/browser/BrowserCenter";
 import { PresenceCenter } from "@/features/presence/PresenceCenter";
 import { PageIntroduction } from "@/features/product";
 import { SecondBrainCenter } from "@/features/shadowBrain/SecondBrainCenter";
@@ -24,7 +25,8 @@ type ShadowTab =
 	| "mentor"
 	| "executive"
 	| "brain"
-	| "presence";
+	| "presence"
+	| "browser";
 
 function resolveTab(pathname: string): ShadowTab {
 	if (pathname.endsWith("/relationship")) {
@@ -57,6 +59,10 @@ function resolveTab(pathname: string): ShadowTab {
 
 	if (pathname.endsWith("/presence")) {
 		return "presence";
+	}
+
+	if (pathname.endsWith("/browser")) {
+		return "browser";
 	}
 
 	return "identity";
@@ -101,7 +107,9 @@ export function ShadowSettingsPage() {
 									? t("shadowBrain.title")
 									: activeTab === "presence"
 										? t("presence.title")
-										: t("shadowIdentity.title");
+										: activeTab === "browser"
+											? t("browser.title")
+											: t("shadowIdentity.title");
 
 	const description =
 		activeTab === "relationship"
@@ -120,7 +128,9 @@ export function ShadowSettingsPage() {
 									? t("shadowBrain.description")
 									: activeTab === "presence"
 										? t("presence.description")
-										: t("shadowIdentity.description");
+										: activeTab === "browser"
+											? t("browser.description")
+											: t("shadowIdentity.description");
 
 	const whatCanIDo =
 		activeTab === "relationship"
@@ -139,7 +149,9 @@ export function ShadowSettingsPage() {
 									? t("shadowBrain.whatCanIDo")
 									: activeTab === "presence"
 										? t("presence.whatCanIDo")
-										: t("shadowIdentity.whatCanIDo");
+										: activeTab === "browser"
+											? t("browser.whatCanIDo")
+											: t("shadowIdentity.whatCanIDo");
 
 	return (
 		<section>
@@ -206,6 +218,12 @@ export function ShadowSettingsPage() {
 				>
 					{t("presence.tabs.presence")}
 				</Link>
+				<Link
+					to="/settings/shadow/browser"
+					className={activeTab === "browser" ? styles.tabActive : styles.tab}
+				>
+					{t("browser.tabs.browser")}
+				</Link>
 			</div>
 			{error ? <p role="alert">{error}</p> : null}
 			{activeTab === "relationship" ? (
@@ -224,6 +242,8 @@ export function ShadowSettingsPage() {
 				<SecondBrainCenter />
 			) : activeTab === "presence" ? (
 				<PresenceCenter />
+			) : activeTab === "browser" ? (
+				<BrowserCenter />
 			) : profile ? (
 				<ShadowIdentityCenter
 					profile={profile}

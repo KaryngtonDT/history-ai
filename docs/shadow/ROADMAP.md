@@ -43,7 +43,7 @@ Constitutional reference: [LUMEN_VISION_2030.md](../vision/LUMEN_VISION_2030.md)
 | Sprint | Name | Focus |
 | ------ | ---- | ----- |
 | **68** | **Shadow Everywhere Foundation** ✅ | Presence layer, Context Hub, universal conversation, Tauri foundation, Quick Launcher |
-| 69 | Browser Companion | Chrome, Firefox, Edge, Safari — YouTube, PDF overlays |
+| **69** | **Browser Companion** ✅ | MV3 extension, Browser Presence, overlay, YouTube/reading, permissions |
 | 70 | IDE Companion | Cursor, VS Code, JetBrains — workspace-aware (with consent) |
 | 71 | Mobile Companion | Android, iOS — continuity, daily review, voice |
 | 72 | Ambient Shadow | Always-available presence, proactive missions (opt-in) |
