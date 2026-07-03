@@ -3,6 +3,12 @@ import {
   SHADOW_CONNECTED_STORAGE_KEY,
   type SessionChangedMessage,
 } from "../shared/connection-state";
+import {
+  applyPanelPosition,
+  clampPanelPosition,
+  enablePanelDrag,
+  loadPanelPosition,
+} from "../shared/panel-position";
 import { BrowserPlatform } from "../shared/types";
 import type { BackgroundResponse, PageContext, ShadowAction } from "../shared/types";
 import { detectPlatform } from "../shared/platforms";
@@ -55,6 +61,15 @@ function injectStyles(): void {
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
     }
+    #${PANEL_ID}.shadow-panel-positioned {
+      right: auto;
+      bottom: auto;
+      width: min(280px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+    }
+    #${PANEL_ID}.is-dragging {
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+      user-select: none;
+    }
     #${PANEL_ID} * {
       box-sizing: border-box;
     }
@@ -71,6 +86,12 @@ function injectStyles(): void {
       letter-spacing: 0.04em;
       text-transform: uppercase;
       color: #94a3b8;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+    }
+    #${PANEL_ID} .shadow-header.is-dragging {
+      cursor: grabbing;
     }
     #${PANEL_ID} .shadow-toggle {
       all: unset;
@@ -124,7 +145,7 @@ function injectStyles(): void {
     }
     #${PANEL_ID} .shadow-platform.collapsed { display: none; }
     @media (max-width: 768px), (pointer: coarse) {
-      #${PANEL_ID} {
+      #${PANEL_ID}:not(.shadow-panel-positioned) {
         left: max(12px, env(safe-area-inset-left));
         right: max(12px, env(safe-area-inset-right));
         bottom: max(12px, env(safe-area-inset-bottom));
@@ -247,6 +268,17 @@ function renderPanel(): void {
 
   panel.append(header, actions, platform);
   document.body.appendChild(panel);
+
+  enablePanelDrag(panel, header);
+
+  void loadPanelPosition().then((position) => {
+    if (!position || !document.getElementById(PANEL_ID)) {
+      return;
+    }
+
+    const clamped = clampPanelPosition(panel, position.x, position.y);
+    applyPanelPosition(panel, clamped);
+  });
 }
 
 function applySessionChanged(connected: boolean): void {
