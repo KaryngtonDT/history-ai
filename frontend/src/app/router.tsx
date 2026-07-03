@@ -6,6 +6,7 @@ import { AudioTranscriptPage } from "@/pages/AudioTranscript/AudioTranscriptPage
 import { AudioTranslationsPage } from "@/pages/AudioTranslations/AudioTranslationsPage";
 import { AudioUploadPage } from "@/pages/AudioUpload/AudioUploadPage";
 import { CollectionsPage } from "@/pages/Collections/CollectionsPage";
+import { ConnectionsSettingsPage } from "@/pages/ConnectionsSettings/ConnectionsSettingsPage";
 import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
 import { ImportPage } from "@/pages/Import/ImportPage";
 import { LearningSettingsPage } from "@/pages/LearningSettings/LearningSettingsPage";
@@ -13,6 +14,7 @@ import { LibraryItemPage } from "@/pages/Library/LibraryItemPage";
 import { LibraryPage } from "@/pages/Library/LibraryPage";
 import { PipelineSettingsPage } from "@/pages/PipelineSettings/PipelineSettingsPage";
 import { ProcessingPage } from "@/pages/Processing/ProcessingPage";
+import { ServerSettingsPage } from "@/pages/ServerSettings/ServerSettingsPage";
 import { SettingsPage } from "@/pages/Settings/SettingsPage";
 import { ShadowSettingsPage } from "@/pages/ShadowSettings/ShadowSettingsPage";
 import { VideoAudioPage } from "@/pages/VideoAudio/VideoAudioPage";
@@ -71,6 +73,8 @@ export function AppRouter() {
 				<Route path="/settings/ai" element={<AIEngineSettingsPage />} />
 				<Route path="/settings/pipeline" element={<PipelineSettingsPage />} />
 				<Route path="/settings/learning" element={<LearningSettingsPage />} />
+				<Route path="/settings/connections" element={<ConnectionsSettingsPage />} />
+				<Route path="/settings/server" element={<ServerSettingsPage />} />
 				<Route path="/settings/shadow" element={<ShadowSettingsPage />} />
 				<Route
 					path="/settings/shadow/relationship"
@@ -103,6 +107,10 @@ export function AppRouter() {
 				/>
 				<Route
 					path="/settings/shadow/browser"
+					element={<ShadowSettingsPage />}
+				/>
+				<Route
+					path="/settings/shadow/mobile"
 					element={<ShadowSettingsPage />}
 				/>
 			</Route>

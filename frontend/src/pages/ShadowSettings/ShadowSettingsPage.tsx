@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { BrowserCenter } from "@/features/browser/BrowserCenter";
+import { MobileCenter } from "@/features/mobile";
 import { PresenceCenter } from "@/features/presence/PresenceCenter";
 import { PageIntroduction } from "@/features/product";
 import { SecondBrainCenter } from "@/features/shadowBrain/SecondBrainCenter";
@@ -26,7 +27,8 @@ type ShadowTab =
 	| "executive"
 	| "brain"
 	| "presence"
-	| "browser";
+	| "browser"
+	| "mobile";
 
 function resolveTab(pathname: string): ShadowTab {
 	if (pathname.endsWith("/relationship")) {
@@ -63,6 +65,10 @@ function resolveTab(pathname: string): ShadowTab {
 
 	if (pathname.endsWith("/browser")) {
 		return "browser";
+	}
+
+	if (pathname.endsWith("/mobile")) {
+		return "mobile";
 	}
 
 	return "identity";
@@ -109,7 +115,9 @@ export function ShadowSettingsPage() {
 										? t("presence.title")
 										: activeTab === "browser"
 											? t("browser.title")
-											: t("shadowIdentity.title");
+											: activeTab === "mobile"
+												? t("mobile.title")
+												: t("shadowIdentity.title");
 
 	const description =
 		activeTab === "relationship"
@@ -130,7 +138,9 @@ export function ShadowSettingsPage() {
 										? t("presence.description")
 										: activeTab === "browser"
 											? t("browser.description")
-											: t("shadowIdentity.description");
+											: activeTab === "mobile"
+												? t("mobile.description")
+												: t("shadowIdentity.description");
 
 	const whatCanIDo =
 		activeTab === "relationship"
@@ -151,7 +161,9 @@ export function ShadowSettingsPage() {
 										? t("presence.whatCanIDo")
 										: activeTab === "browser"
 											? t("browser.whatCanIDo")
-											: t("shadowIdentity.whatCanIDo");
+											: activeTab === "mobile"
+												? t("mobile.whatCanIDo")
+												: t("shadowIdentity.whatCanIDo");
 
 	return (
 		<section>
@@ -224,6 +236,12 @@ export function ShadowSettingsPage() {
 				>
 					{t("browser.tabs.browser")}
 				</Link>
+				<Link
+					to="/settings/shadow/mobile"
+					className={activeTab === "mobile" ? styles.tabActive : styles.tab}
+				>
+					{t("mobile.tabs.mobile")}
+				</Link>
 			</div>
 			{error ? <p role="alert">{error}</p> : null}
 			{activeTab === "relationship" ? (
@@ -244,6 +262,8 @@ export function ShadowSettingsPage() {
 				<PresenceCenter />
 			) : activeTab === "browser" ? (
 				<BrowserCenter />
+			) : activeTab === "mobile" ? (
+				<MobileCenter />
 			) : profile ? (
 				<ShadowIdentityCenter
 					profile={profile}

@@ -61,7 +61,7 @@ storage-tree:
 	@mkdir -p storage/uploads/video storage/uploads/audio storage/uploads/pdf \
 		storage/artifacts/transcript storage/artifacts/translation storage/artifacts/audio \
 		storage/artifacts/voiceclone storage/artifacts/lipsync storage/artifacts/render storage/artifacts/quality \
-		storage/shadow/identity storage/shadow/sessions storage/shadow/session-learning storage/shadow/relationship storage/shadow/memory storage/shadow/teaching storage/shadow/knowledge storage/shadow/goals storage/shadow/mentor storage/shadow/executive storage/shadow/brain storage/shadow/presence storage/learning storage/workspace \
+		storage/shadow/identity storage/shadow/sessions storage/shadow/session-learning storage/shadow/relationship storage/shadow/memory storage/shadow/teaching storage/shadow/knowledge storage/shadow/goals storage/shadow/mentor storage/shadow/executive storage/shadow/brain storage/shadow/presence storage/shadow/browser storage/shadow/mobile storage/learning storage/workspace \
 		storage/logs storage/temp storage/cache
 	@mkdir -p models/whisper models/ollama models/f5 models/openvoice models/latentsync
 	@mkdir -p backups/mysql backups/storage backups/configuration

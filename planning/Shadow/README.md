@@ -19,7 +19,10 @@ Every sprint must align with [LUMEN_VISION_2030.md](../../docs/vision/LUMEN_VISI
 | 65 | [TASK-0065](Sprint-65/TASK-0065.md) | Mentor & goals | Complete |
 | 66 | [TASK-0066](Sprint-66/TASK-0066.md) | Executive | Complete |
 | 67 | [TASK-0067](Sprint-67/TASK-0067.md) | Second Brain | Complete |
-| **68** | **[TASK-0068](Sprint-68/TASK-0068.md)** | **Shadow Everywhere Foundation** | **Complete** |
+| 68 | [TASK-0068](Sprint-68/TASK-0068.md) | Shadow Everywhere Foundation | Complete |
+| 69 | [TASK-0069](Sprint-69/TASK-0069.md) | Browser Companion | Complete |
+| **70** | **[TASK-0070](Sprint-70/TASK-0070.md)** | **Mobile Companion & Personal Remote Access** | **Complete** |
+| 71 | [TASK-0071](Sprint-71/TASK-0071.md) | IDE Companion | Planned |
 
 ---
 

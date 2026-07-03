@@ -308,6 +308,9 @@ services:
     App\Domain\ShadowBrowser\BrowserRepositoryInterface:
         alias: App\Infrastructure\ShadowBrowser\FileShadowBrowserRepository
 
+    App\Domain\Mobile\MobileRepositoryInterface:
+        alias: App\Infrastructure\Mobile\FileMobileRepository
+
     app.storage.learning:
         class: App\Infrastructure\Storage\JsonFileStore
         arguments:
@@ -378,6 +381,11 @@ services:
         arguments:
             $directory: '%storage.root%/shadow/browser'
 
+    app.storage.shadow_mobile:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/shadow/mobile'
+
     App\Infrastructure\Learning\FileLearningProfileRepository:
         arguments:
             $store: '@app.storage.learning'
@@ -433,6 +441,10 @@ services:
     App\Infrastructure\ShadowBrowser\FileShadowBrowserRepository:
         arguments:
             $store: '@app.storage.shadow_browser'
+
+    App\Infrastructure\Mobile\FileMobileRepository:
+        arguments:
+            $store: '@app.storage.shadow_mobile'
 
     App\Application\Shadow\Handlers\AskShadowQuestionHandler:
         arguments:

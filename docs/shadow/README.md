@@ -18,7 +18,10 @@ Constitutional reference: [LUMEN_VISION_2030.md](../vision/LUMEN_VISION_2030.md)
 | Second Brain | `/settings/shadow/brain` |
 | Presence | `/settings/shadow/presence` |
 | Watch companion | `/video/{id}/watch` |
-| Desktop companion | Tauri app *(S68 planned)* |
+| Desktop companion | Tauri app *(S68)* |
+| Browser companion | MV3 extension *(S69)* |
+| Mobile companion | Flutter app *(S70 planned)* |
+| Personal Remote | Tailscale + home Docker *(S70)* |
 
 ## Documentation map
 

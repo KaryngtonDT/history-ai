@@ -44,9 +44,25 @@ Constitutional reference: [LUMEN_VISION_2030.md](../vision/LUMEN_VISION_2030.md)
 | ------ | ---- | ----- |
 | **68** | **Shadow Everywhere Foundation** ✅ | Presence layer, Context Hub, universal conversation, Tauri foundation, Quick Launcher |
 | **69** | **Browser Companion** ✅ | MV3 extension, Browser Presence, overlay, YouTube/reading, permissions |
-| 70 | IDE Companion | Cursor, VS Code, JetBrains — workspace-aware (with consent) |
-| 71 | Mobile Companion | Android, iOS — continuity, daily review, voice |
+| **70** | **Mobile Companion & Personal Remote Access** ← next | Flutter Android/iOS, Connection Manager, **Tailscale**, Today, Watch, Second Brain, server dashboard |
+| 71 | IDE Companion | Cursor, VS Code, JetBrains — workspace-aware (with consent) |
 | 72 | Ambient Shadow | Always-available presence, proactive missions (opt-in) |
+
+### Sprint 70 highlights
+
+**One product objective:** Shadow Mobile usable in daily life — home server first, no public cloud required.
+
+| Slice | Focus |
+| ----- | ----- |
+| 01–02 | Mobile domain + Flutter foundation |
+| 03–04 | Connection Manager + Tailscale / Auto LAN switching |
+| 05–08 | Voice, Watch, Today, Second Brain |
+| 09–11 | Notifications, Connections settings, Personal Server dashboard |
+| 12 | Documentation |
+
+**Deployment:** [Personal Remote](../../docs/architecture/DEPLOYMENT_PROFILES.md) (Docker + Tailscale) is the recommended profile.
+
+See [TASK-0070](../../planning/Shadow/Sprint-70/TASK-0070.md).
 
 ### Sprint 68 highlights
 
@@ -88,7 +104,7 @@ Do **not** start until daily Shadow usage across companions is proven.
 | S67–S72 "daily friction" (Desktop, Coding, Life Dashboard, Delight) | Phase III Shadow Everywhere (S68–72) |
 | S67 platform hardening → S68 public API | Phase IV after companions |
 | S73–74 Shadow Chronicle only | Chronicle may return inside Second Brain / Executive — not blocking Phase III |
-| Web-first: Site → API → SDK | Shadow-first: Desktop → Browser → IDE → Mobile |
+| Web-first: Site → API → SDK | Shadow-first: Desktop → Browser → Mobile (Tailscale) → IDE |
 
 ---
 

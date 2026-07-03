@@ -51,3 +51,16 @@ make prod-fresh            # removes postgres/redis/minio volumes only
 make health
 make doctor
 ```
+
+## Deployment profiles
+
+Lumen supports multiple deployment profiles with **one codebase**. See [DEPLOYMENT_PROFILES.md](../architecture/DEPLOYMENT_PROFILES.md).
+
+| Profile | Use when |
+| ------- | -------- |
+| **Personal Local** | Development on same machine (`localhost`) |
+| **Personal Remote** ⭐ | Home Docker + phone/laptop away from home via **Tailscale** |
+| **Home Server** | Family NAS / dedicated box (Tailscale) |
+| **Cloud** | Future public API (Phase IV) |
+
+For Personal Remote setup: [TAILSCALE_SETUP.md](TAILSCALE_SETUP.md) · [PERSONAL_SERVER.md](PERSONAL_SERVER.md)

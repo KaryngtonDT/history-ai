@@ -16,7 +16,7 @@ See [WORKFLOW.md](WORKFLOW.md) for roles, cycle, and quality gates.
 
 **Shadow** = product — AI companion that accompanies the user everywhere they learn.
 
-Current chapter: **Phase III — Shadow Everywhere** (Sprint 68+).
+Current chapter: **Phase III — Shadow Everywhere** (Sprint 71 — IDE Companion).
 
 ---
 
@@ -44,17 +44,22 @@ Shadow companion stack from Watch through Second Brain.
 
 # Current focus
 
-## Sprint 68 — Shadow Everywhere Foundation
+## Sprint 70 — Shadow Mobile Companion & Personal Remote Access — **Complete**
 
-**Task:** [planning/Shadow/Sprint-68/TASK-0068.md](Shadow/Sprint-68/TASK-0068.md) — **Complete**
+**Task:** [planning/Shadow/Sprint-70/TASK-0070.md](Shadow/Sprint-70/TASK-0070.md)
 
-Foundation for Shadow Presence: domain, Context Hub, universal conversation, presence settings, explainability — plus Tauri foundation and minimal Desktop Quick Launcher.
+Mobile API, web settings (Mobile, Connections, Server), Flutter Connection Manager foundation, Tailscale as official Personal Remote transport.
 
-## Sprint 69 — Shadow Browser Companion
+## Current focus
 
-**Task:** [planning/Shadow/Sprint-69/TASK-0069.md](Shadow/Sprint-69/TASK-0069.md) — **Complete**
+## Sprint 71 — Shadow IDE Companion ← **next**
 
-First Shadow Client in the browser: MV3 extension, Browser Presence domain, platform detection, overlay, YouTube/reading companions, permission center.
+**Task:** [planning/Shadow/Sprint-71/TASK-0071.md](Shadow/Sprint-71/TASK-0071.md) — **Planned**
+
+| Sprint | Task | Summary |
+| ------ | ---- | ------- |
+| 68 | [TASK-0068](Shadow/Sprint-68/TASK-0068.md) | Shadow Everywhere foundation, Tauri, Quick Launcher |
+| 69 | [TASK-0069](Shadow/Sprint-69/TASK-0069.md) | Browser Companion (MV3 extension) |
 
 ---
 
@@ -62,8 +67,7 @@ First Shadow Client in the browser: MV3 extension, Browser Presence domain, plat
 
 | Sprint | Name |
 | ------ | ---- |
-| 70 | IDE Companion ← next |
-| 71 | Mobile Companion |
+| 71 | IDE Companion |
 | 72 | Ambient Shadow |
 
 Detail: [docs/shadow/ROADMAP.md](../docs/shadow/ROADMAP.md)

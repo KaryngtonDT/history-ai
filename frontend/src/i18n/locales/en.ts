@@ -2,9 +2,15 @@ import { type DeepStringRecord, mergeMessages } from "../localeUtils";
 import { browserDe } from "./sections/browser.de";
 import { browserEn } from "./sections/browser.en";
 import { browserFr } from "./sections/browser.fr";
+import { connectionsDe } from "./sections/connections.de";
+import { connectionsEn } from "./sections/connections.en";
+import { connectionsFr } from "./sections/connections.fr";
 import { learningDe } from "./sections/learning.de";
 import { learningEn } from "./sections/learning.en";
 import { learningFr } from "./sections/learning.fr";
+import { mobileDe } from "./sections/mobile.de";
+import { mobileEn } from "./sections/mobile.en";
+import { mobileFr } from "./sections/mobile.fr";
 import { pipelineDe } from "./sections/pipeline.de";
 import { pipelineEn } from "./sections/pipeline.en";
 import { pipelineFr } from "./sections/pipeline.fr";
@@ -32,6 +38,9 @@ import { shadowMentorFr } from "./sections/shadowMentor.fr";
 import { shadowRelationshipDe } from "./sections/shadowRelationship.de";
 import { shadowRelationshipEn } from "./sections/shadowRelationship.en";
 import { shadowRelationshipFr } from "./sections/shadowRelationship.fr";
+import { serverDe } from "./sections/server.de";
+import { serverEn } from "./sections/server.en";
+import { serverFr } from "./sections/server.fr";
 import { shadowTeachingDe } from "./sections/shadowTeaching.de";
 import { shadowTeachingEn } from "./sections/shadowTeaching.en";
 import { shadowTeachingFr } from "./sections/shadowTeaching.fr";
@@ -96,7 +105,10 @@ export const en = mergeMessages(
 				mergeMessages(shadowTeachingEn, shadowKnowledgeEn),
 				mergeMessages(shadowMentorEn, shadowExecutiveEn),
 			),
-			mergeMessages(mergeMessages(presenceEn, shadowBrainEn), browserEn),
+			mergeMessages(
+				mergeMessages(mergeMessages(presenceEn, shadowBrainEn), browserEn),
+				mergeMessages(mobileEn, mergeMessages(connectionsEn, serverEn)),
+			),
 		),
 	),
 );
@@ -157,7 +169,10 @@ export const fr = mergeMessages(
 				mergeMessages(shadowTeachingFr, shadowKnowledgeFr),
 				mergeMessages(shadowMentorFr, shadowExecutiveFr),
 			),
-			mergeMessages(mergeMessages(presenceFr, shadowBrainFr), browserFr),
+			mergeMessages(
+				mergeMessages(mergeMessages(presenceFr, shadowBrainFr), browserFr),
+				mergeMessages(mobileFr, mergeMessages(connectionsFr, serverFr)),
+			),
 		),
 	),
 ) satisfies Messages;
@@ -216,7 +231,10 @@ export const de = mergeMessages(
 				mergeMessages(shadowTeachingDe, shadowKnowledgeDe),
 				mergeMessages(shadowMentorDe, shadowExecutiveDe),
 			),
-			mergeMessages(mergeMessages(presenceDe, shadowBrainDe), browserDe),
+			mergeMessages(
+				mergeMessages(mergeMessages(presenceDe, shadowBrainDe), browserDe),
+				mergeMessages(mobileDe, mergeMessages(connectionsDe, serverDe)),
+			),
 		),
 	),
 ) satisfies Messages;

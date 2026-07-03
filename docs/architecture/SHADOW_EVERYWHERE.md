@@ -1,12 +1,12 @@
 # Shadow Everywhere — Architecture
 
-Version: 1.0
+Version: 1.1
 
-Status: Planned (Sprint 68)
+Status: Active (Phase III)
 
 Vision: [LUMEN_VISION_2030.md](../vision/LUMEN_VISION_2030.md)
 
-Task: [TASK-0068](../../planning/Shadow/Sprint-68/TASK-0068.md)
+Tasks: [TASK-0068](../../planning/Shadow/Sprint-68/TASK-0068.md) · [TASK-0069](../../planning/Shadow/Sprint-69/TASK-0069.md) · [TASK-0070](../../planning/Shadow/Sprint-70/TASK-0070.md)
 
 ---
 
@@ -14,20 +14,21 @@ Task: [TASK-0068](../../planning/Shadow/Sprint-68/TASK-0068.md)
 
 **Shadow Everywhere** is the architectural chapter that lets Shadow exist on multiple surfaces while reusing one intelligence stack.
 
-Sprint 68 delivers the **foundation layer only** — not Browser, IDE, or Mobile integrations.
+> **One Shadow. One Home. Everywhere.**
 
-> **One Shadow. Multiple Presences.**
+Clients are **thin presence surfaces**. Intelligence stays on the **home Lumen server** (Docker prod-like) for personal deployments.
 
 ---
 
 # Layer stack
 
 ```text
-Future surfaces (S69–S72)
-  Browser · IDE · Mobile · Ambient
+Shadow Clients
+  Desktop · Browser · Mobile · (IDE S71 · Ambient S72)
               │
               ▼
-Desktop Quick Launcher (S68-SLICE-07) + Tauri foundation (S68-SLICE-03)
+Transport Layer (opaque to Shadow)
+  Localhost · LAN · Tailscale · Cloud (future)
               │
               ▼
 Shadow Presence Layer          ← Domain/ShadowPresence
@@ -39,8 +40,12 @@ Shadow Context Hub             ← Application/ShadowPresence
 Shadow Intelligence (S55–S67) ← existing bounded contexts
               │
               ▼
-Lumen Platform                 ← pipeline, storage, API
+Lumen Platform @ home          ← Docker, storage, models, Second Brain
 ```
+
+**Home Server First:** Personal Remote via [Tailscale](TAILSCALE_ARCHITECTURE.md) is the recommended transport for developers and solo users before public cloud (Phase IV).
+
+Deployment profiles: [DEPLOYMENT_PROFILES.md](DEPLOYMENT_PROFILES.md)
 
 ---
 
@@ -57,10 +62,27 @@ Lumen Platform                 ← pipeline, storage, API
 
 ---
 
+# Sprint map (Phase III)
+
+| Sprint | Deliverable | Status |
+| ------ | ----------- | ------ |
+| 68 | Presence foundation, Tauri, Quick Launcher | ✅ |
+| 69 | Browser Companion (MV3) | ✅ |
+| **70** | **Mobile Companion + Personal Remote (Tailscale)** | **Planned** |
+| 71 | IDE Companion | Planned |
+| 72 | Ambient Shadow | Planned |
+
+---
+
 # Related documents
 
 - [SHADOW_PRESENCE.md](SHADOW_PRESENCE.md)
 - [CONTEXT_HUB.md](CONTEXT_HUB.md)
 - [PRESENCE_SECURITY.md](PRESENCE_SECURITY.md)
 - [DESKTOP_FOUNDATION.md](DESKTOP_FOUNDATION.md)
+- [SHADOW_BROWSER.md](SHADOW_BROWSER.md)
+- [SHADOW_MOBILE.md](SHADOW_MOBILE.md)
+- [TAILSCALE_ARCHITECTURE.md](TAILSCALE_ARCHITECTURE.md)
+- [PERSONAL_REMOTE_ACCESS.md](PERSONAL_REMOTE_ACCESS.md)
+- [HOME_SERVER.md](HOME_SERVER.md)
 - [Vision: Shadow Presence](../vision/SHADOW_PRESENCE.md)

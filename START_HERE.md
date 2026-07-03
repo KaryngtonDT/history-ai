@@ -63,9 +63,9 @@ Read:
 
 # Step 6 — Current Work
 
-**Sprint 68 — Shadow Everywhere Foundation**
+**Sprint 71 — Shadow IDE Companion**
 
-- Task: [planning/Shadow/Sprint-68/TASK-0068.md](planning/Shadow/Sprint-68/TASK-0068.md)
+- Task: [planning/Shadow/Sprint-71/TASK-0071.md](planning/Shadow/Sprint-71/TASK-0071.md)
 - Delivery: [planning/DELIVERY_ROADMAP.md](planning/DELIVERY_ROADMAP.md)
 - Shadow index: [planning/Shadow/README.md](planning/Shadow/README.md)
 

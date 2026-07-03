@@ -206,6 +206,19 @@ export const SHADOW_BROWSER_PERMISSIONS_PATH =
 export const SHADOW_BROWSER_HISTORY_PATH = "/api/shadow/browser/history";
 export const SHADOW_BROWSER_EXPLAIN_PATH = "/api/shadow/browser/explain";
 
+export const SHADOW_MOBILE_PROFILE_PATH = "/api/shadow/mobile/profile";
+export const SHADOW_MOBILE_TODAY_PATH = "/api/shadow/mobile/today";
+export const SHADOW_MOBILE_MISSIONS_PATH = "/api/shadow/mobile/missions";
+export const SHADOW_MOBILE_REVISIONS_PATH = "/api/shadow/mobile/revisions";
+export const SHADOW_MOBILE_SERVER_PATH = "/api/shadow/mobile/server";
+export const SHADOW_MOBILE_HEALTH_PATH = "/api/shadow/mobile/health";
+export const SHADOW_MOBILE_CONNECTIONS_PATH = "/api/shadow/mobile/connections";
+export const SHADOW_MOBILE_DEVICE_PATH = "/api/shadow/mobile/device";
+export const SHADOW_MOBILE_SYNC_PATH = "/api/shadow/mobile/sync";
+export const SHADOW_MOBILE_PREFERENCES_PATH = "/api/shadow/mobile/preferences";
+export const SHADOW_MOBILE_CONNECTION_PATH = "/api/shadow/mobile/connection";
+export const SHADOW_MOBILE_PUSH_TOKEN_PATH = "/api/shadow/mobile/push-token";
+
 export function videoReviewsPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/reviews`;
 }

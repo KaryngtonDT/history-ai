@@ -10,12 +10,18 @@ Status: Active
 
 **Constitutional reference:** [LUMEN_VISION_2030.md](../vision/LUMEN_VISION_2030.md)
 
-**Current architecture chapter:** Phase III — Shadow Everywhere (Sprint 69 — Browser Companion)
+**Current architecture chapter:** Phase III — Shadow Everywhere (Sprint 70 — Mobile Companion & Personal Remote Access)
 
 | Doc | Topic |
 | --- | ----- |
-| [SHADOW_EVERYWHERE.md](SHADOW_EVERYWHERE.md) | Phase III overview & scope boundary |
+| [SHADOW_EVERYWHERE.md](SHADOW_EVERYWHERE.md) | Phase III overview & transport layer |
 | [SHADOW_BROWSER.md](SHADOW_BROWSER.md) | Browser Companion (S69) |
+| [SHADOW_MOBILE.md](SHADOW_MOBILE.md) | Mobile Companion (S70) |
+| [TAILSCALE_ARCHITECTURE.md](TAILSCALE_ARCHITECTURE.md) | Private remote access |
+| [PERSONAL_REMOTE_ACCESS.md](PERSONAL_REMOTE_ACCESS.md) | Home-server-first model |
+| [MOBILE_CONNECTION_MANAGER.md](MOBILE_CONNECTION_MANAGER.md) | LAN / Tailscale / Auto |
+| [HOME_SERVER.md](HOME_SERVER.md) | Personal server dashboard |
+| [DEPLOYMENT_PROFILES.md](DEPLOYMENT_PROFILES.md) | Personal / Family / Team / Cloud |
 | [BROWSER_OVERLAY.md](BROWSER_OVERLAY.md) | Content overlay |
 | [PLATFORM_DETECTION.md](PLATFORM_DETECTION.md) | URL platform detection |
 | [BROWSER_PRIVACY.md](BROWSER_PRIVACY.md) | Per-site permissions |
