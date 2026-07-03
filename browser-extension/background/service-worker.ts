@@ -5,6 +5,7 @@ import {
   postBrowserContext,
   postBrowserPlatform,
 } from "../shared/api";
+import { publishShadowConnected } from "../shared/connection-state";
 import { isBrowserSessionActive } from "../shared/session";
 import type {
   BackgroundMessage,
@@ -18,14 +19,19 @@ const sessionState: BrowserSession = {
   scopeKey: "default",
 };
 
+async function setConnected(connected: boolean): Promise<void> {
+  sessionState.connected = connected;
+  await publishShadowConnected(connected);
+}
+
 async function refreshSession(): Promise<BrowserSession> {
   try {
     const data = (await getBrowserSession()) as Record<string, unknown>;
-    sessionState.connected = isBrowserSessionActive(data);
+    await setConnected(isBrowserSessionActive(data));
     sessionState.workspace = data;
     return { ...sessionState };
   } catch {
-    sessionState.connected = false;
+    await setConnected(false);
     return { ...sessionState };
   }
 }
@@ -34,7 +40,7 @@ async function handleConnect(): Promise<BackgroundResponse> {
   try {
     const workspace = await connectBrowser(sessionState.shadowSessionId);
     const data = workspace as Record<string, unknown>;
-    sessionState.connected = isBrowserSessionActive(normalizeSessionPayload(data));
+    await setConnected(isBrowserSessionActive(normalizeSessionPayload(data)));
     sessionState.workspace = data;
     return { ok: true, session: { ...sessionState } };
   } catch (error) {
@@ -64,7 +70,7 @@ async function handleDisconnect(): Promise<BackgroundResponse> {
     }
   }
 
-  sessionState.connected = false;
+  await setConnected(false);
   sessionState.workspace = undefined;
   return { ok: true, session: { ...sessionState } };
 }
@@ -130,8 +136,8 @@ chrome.runtime.onInstalled.addListener((details) => {
     return;
   }
 
-  void handleConnect().catch(() => {
-    sessionState.connected = false;
+  void handleConnect().catch(async () => {
+    await setConnected(false);
   });
 });
 

@@ -1,5 +1,6 @@
+import { SHADOW_CONNECTED_STORAGE_KEY } from "../shared/connection-state";
 import { BrowserPlatform } from "../shared/types";
-import type { PageContext, ShadowAction } from "../shared/types";
+import type { BackgroundResponse, PageContext, ShadowAction } from "../shared/types";
 import { detectPlatform } from "../shared/platforms";
 
 const PANEL_ID = "historyai-shadow-panel";
@@ -100,6 +101,31 @@ function sendAction(action: ShadowAction): void {
     });
 }
 
+function removePanel(): void {
+  document.getElementById(PANEL_ID)?.remove();
+}
+
+async function isConnectedToLumen(): Promise<boolean> {
+  try {
+    const response = (await chrome.runtime.sendMessage({
+      type: "GET_SESSION",
+    })) as BackgroundResponse;
+
+    return Boolean(response.ok && "session" in response && response.session.connected);
+  } catch {
+    return false;
+  }
+}
+
+async function syncPanelVisibility(): Promise<void> {
+  if (await isConnectedToLumen()) {
+    renderPanel();
+    return;
+  }
+
+  removePanel();
+}
+
 function renderPanel(): void {
   if (document.getElementById(PANEL_ID)) {
     return;
@@ -150,10 +176,22 @@ function renderPanel(): void {
   document.body.appendChild(panel);
 }
 
+chrome.storage.session.onChanged.addListener((changes) => {
+  if (!(SHADOW_CONNECTED_STORAGE_KEY in changes)) {
+    return;
+  }
+
+  void syncPanelVisibility();
+});
+
+function startOverlay(): void {
+  void syncPanelVisibility();
+}
+
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", renderPanel);
+  document.addEventListener("DOMContentLoaded", startOverlay);
 } else {
-  renderPanel();
+  startOverlay();
 }
 
 export {};
