@@ -323,6 +323,48 @@ export const pipelineEn = {
 			loading: "Starting Shadow watch session...",
 			preparingTranscript:
 				"Preparing transcript for Shadow Watch. This may take a few minutes after import.",
+			bootstrapTitle: "Preparing Shadow Watch",
+			bootstrapStarting: "Initializing Shadow Watch...",
+			bootstrapLoadingTranscript: "Checking transcript...",
+			bootstrapLoadingRenders: "Checking final video renders...",
+			bootstrapStartingSession: "Starting Shadow session...",
+			bootstrapLoadingContext: "Loading watch context...",
+			bootstrapReady: "Shadow Watch is ready.",
+			bootstrapStepTranscript: "Transcript (speech-to-text)",
+			bootstrapStepRenders: "Playable video",
+			bootstrapStepSession: "Shadow session",
+			bootstrapStepContext: "Watch context",
+			bootstrapTranscriptReadyDetail: "{{segments}} segments available",
+			bootstrapTranscriptMissingDetail:
+				"No transcript yet — waiting for pipeline processing",
+			bootstrapRenderReadyDetail: "Render ready ({{language}})",
+			bootstrapRenderMissingDetail: "Render metadata missing",
+			bootstrapNoRenderDetail:
+				"No final render yet — Shadow can still start without video playback",
+			bootstrapWaitingTranscript:
+				"Waiting for transcript (attempt {{attempt}}, {{elapsed}}s elapsed)...",
+			bootstrapTranscriptTimeout:
+				"Transcript not ready after 5 minutes. Run the video pipeline from Lumen.",
+			bootstrapLogTitle: "Activity log",
+			bootstrapLogStart: "Bootstrap started for video {{videoId}}",
+			bootstrapLogFetchTranscript: "GET /api/videos/{id}/transcript",
+			bootstrapLogTranscriptReady: "Transcript ready ({{segments}} segments)",
+			bootstrapLogTranscriptMissing: "Transcript not found yet",
+			bootstrapLogFetchRenders: "GET /api/videos/{id}/render",
+			bootstrapLogRendersLoaded: "Found {{count}} render(s)",
+			bootstrapLogFetchRenderStream:
+				"GET render stream for language {{language}}",
+			bootstrapLogRenderStreamReady: "Render stream URL resolved",
+			bootstrapLogNoRender: "No final render available",
+			bootstrapLogStartSession: "POST /api/videos/{id}/shadow/sessions",
+			bootstrapLogSessionReady: "Shadow session started ({{sessionId}})",
+			bootstrapLogSessionFailed: "Shadow session failed: {{error}}",
+			bootstrapLogLoadContext: "GET /api/videos/{id}/shadow/context",
+			bootstrapLogPollTranscript: "Polling transcript again...",
+			bootstrapLogUnexpectedError: "Unexpected bootstrap error: {{error}}",
+			bootstrapLogReady: "Bootstrap complete — opening Shadow Watch",
+			emptyDescriptionWithError:
+				"Could not start Shadow Watch. Last error: {{error}}",
 			emptyTitle: "Shadow unavailable",
 			emptyDescription:
 				"Could not start a watch session. Check that the video has a transcript.",

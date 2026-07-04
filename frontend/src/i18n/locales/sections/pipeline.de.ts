@@ -334,6 +334,48 @@ export const pipelineDe: PipelineMessages = {
 			loading: "Shadow-Sitzung wird gestartet...",
 			preparingTranscript:
 				"Transkript für Shadow Watch wird vorbereitet. Nach dem Import kann dies einige Minuten dauern.",
+			bootstrapTitle: "Shadow Watch wird vorbereitet",
+			bootstrapStarting: "Shadow Watch wird initialisiert...",
+			bootstrapLoadingTranscript: "Transkript wird geprüft...",
+			bootstrapLoadingRenders: "Finale Video-Render werden geprüft...",
+			bootstrapStartingSession: "Shadow-Sitzung wird gestartet...",
+			bootstrapLoadingContext: "Watch-Kontext wird geladen...",
+			bootstrapReady: "Shadow Watch ist bereit.",
+			bootstrapStepTranscript: "Transkript (Speech-to-Text)",
+			bootstrapStepRenders: "Abspielbares Video",
+			bootstrapStepSession: "Shadow-Sitzung",
+			bootstrapStepContext: "Watch-Kontext",
+			bootstrapTranscriptReadyDetail: "{{segments}} Segmente verfügbar",
+			bootstrapTranscriptMissingDetail:
+				"Noch kein Transkript — Pipeline-Verarbeitung läuft",
+			bootstrapRenderReadyDetail: "Render bereit ({{language}})",
+			bootstrapRenderMissingDetail: "Render-Metadaten fehlen",
+			bootstrapNoRenderDetail:
+				"Noch kein Final Render — Shadow kann ohne Videowiedergabe starten",
+			bootstrapWaitingTranscript:
+				"Warte auf Transkript (Versuch {{attempt}}, {{elapsed}} s)...",
+			bootstrapTranscriptTimeout:
+				"Transkript nach 5 Minuten nicht bereit. Starten Sie die Video-Pipeline in Lumen.",
+			bootstrapLogTitle: "Aktivitätsprotokoll",
+			bootstrapLogStart: "Bootstrap gestartet für Video {{videoId}}",
+			bootstrapLogFetchTranscript: "GET /api/videos/{id}/transcript",
+			bootstrapLogTranscriptReady: "Transkript bereit ({{segments}} Segmente)",
+			bootstrapLogTranscriptMissing: "Transkript noch nicht vorhanden",
+			bootstrapLogFetchRenders: "GET /api/videos/{id}/render",
+			bootstrapLogRendersLoaded: "{{count}} Render gefunden",
+			bootstrapLogFetchRenderStream:
+				"GET Render-Stream für Sprache {{language}}",
+			bootstrapLogRenderStreamReady: "Render-Stream-URL aufgelöst",
+			bootstrapLogNoRender: "Kein Final Render verfügbar",
+			bootstrapLogStartSession: "POST /api/videos/{id}/shadow/sessions",
+			bootstrapLogSessionReady: "Shadow-Sitzung gestartet ({{sessionId}})",
+			bootstrapLogSessionFailed: "Shadow-Sitzung fehlgeschlagen: {{error}}",
+			bootstrapLogLoadContext: "GET /api/videos/{id}/shadow/context",
+			bootstrapLogPollTranscript: "Transkript erneut prüfen...",
+			bootstrapLogUnexpectedError: "Unerwarteter Bootstrap-Fehler: {{error}}",
+			bootstrapLogReady: "Bootstrap abgeschlossen — Shadow Watch wird geöffnet",
+			emptyDescriptionWithError:
+				"Shadow Watch konnte nicht starten. Letzter Fehler: {{error}}",
 			emptyTitle: "Shadow nicht verfügbar",
 			emptyDescription:
 				"Sitzung konnte nicht gestartet werden. Prüfen Sie, ob ein Transkript vorhanden ist.",

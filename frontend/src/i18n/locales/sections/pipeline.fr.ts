@@ -334,6 +334,48 @@ export const pipelineFr: PipelineMessages = {
 			loading: "Démarrage de la session Shadow...",
 			preparingTranscript:
 				"Préparation de la transcription pour Shadow Watch. Cela peut prendre quelques minutes après l'import.",
+			bootstrapTitle: "Préparation de Shadow Watch",
+			bootstrapStarting: "Initialisation de Shadow Watch...",
+			bootstrapLoadingTranscript: "Vérification de la transcription...",
+			bootstrapLoadingRenders: "Vérification des rendus vidéo...",
+			bootstrapStartingSession: "Démarrage de la session Shadow...",
+			bootstrapLoadingContext: "Chargement du contexte de visionnage...",
+			bootstrapReady: "Shadow Watch est prêt.",
+			bootstrapStepTranscript: "Transcription (speech-to-text)",
+			bootstrapStepRenders: "Vidéo lisible",
+			bootstrapStepSession: "Session Shadow",
+			bootstrapStepContext: "Contexte Watch",
+			bootstrapTranscriptReadyDetail: "{{segments}} segments disponibles",
+			bootstrapTranscriptMissingDetail:
+				"Pas encore de transcription — attente du pipeline",
+			bootstrapRenderReadyDetail: "Rendu prêt ({{language}})",
+			bootstrapRenderMissingDetail: "Métadonnées de rendu manquantes",
+			bootstrapNoRenderDetail:
+				"Pas encore de rendu final — Shadow peut démarrer sans lecteur vidéo",
+			bootstrapWaitingTranscript:
+				"Attente de la transcription (tentative {{attempt}}, {{elapsed}} s)...",
+			bootstrapTranscriptTimeout:
+				"Transcription non prête après 5 minutes. Lancez le pipeline vidéo depuis Lumen.",
+			bootstrapLogTitle: "Journal d'activité",
+			bootstrapLogStart: "Démarrage pour la vidéo {{videoId}}",
+			bootstrapLogFetchTranscript: "GET /api/videos/{id}/transcript",
+			bootstrapLogTranscriptReady: "Transcription prête ({{segments}} segments)",
+			bootstrapLogTranscriptMissing: "Transcription introuvable pour l'instant",
+			bootstrapLogFetchRenders: "GET /api/videos/{id}/render",
+			bootstrapLogRendersLoaded: "{{count}} rendu(s) trouvé(s)",
+			bootstrapLogFetchRenderStream:
+				"GET stream du rendu pour la langue {{language}}",
+			bootstrapLogRenderStreamReady: "URL du stream de rendu résolue",
+			bootstrapLogNoRender: "Aucun rendu final disponible",
+			bootstrapLogStartSession: "POST /api/videos/{id}/shadow/sessions",
+			bootstrapLogSessionReady: "Session Shadow démarrée ({{sessionId}})",
+			bootstrapLogSessionFailed: "Échec session Shadow : {{error}}",
+			bootstrapLogLoadContext: "GET /api/videos/{id}/shadow/context",
+			bootstrapLogPollTranscript: "Nouvelle vérification de la transcription...",
+			bootstrapLogUnexpectedError: "Erreur inattendue : {{error}}",
+			bootstrapLogReady: "Initialisation terminée — ouverture de Shadow Watch",
+			emptyDescriptionWithError:
+				"Impossible de démarrer Shadow Watch. Dernière erreur : {{error}}",
 			emptyTitle: "Shadow indisponible",
 			emptyDescription:
 				"Impossible de démarrer une session. Vérifiez que la vidéo a une transcription.",

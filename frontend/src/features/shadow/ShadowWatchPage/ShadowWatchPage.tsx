@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Spinner } from "@/components/ui/Spinner";
 import { API_BASE_URL } from "@/config/api";
 import { KnowledgeDiffPanel } from "@/features/shadowBrain/KnowledgeDiffPanel";
 import { ExecutiveWatchBar } from "@/features/shadowExecutive/ExecutiveWatchBar";
@@ -49,6 +48,16 @@ import {
 	voiceRateForStrategy,
 } from "../shadowVoice";
 import { VocabularyPanel } from "../VocabularyPanel";
+import {
+	ShadowWatchBootstrapPanel,
+	type BootstrapCheckItem,
+	type BootstrapLogEntry,
+} from "./ShadowWatchBootstrapPanel";
+import {
+	appendBootstrapLog,
+	formatBootstrapError,
+	updateBootstrapCheck,
+} from "./shadowWatchBootstrap";
 import styles from "./ShadowWatchPage.module.css";
 
 const CONTEXT_DEBOUNCE_MS = 400;
@@ -73,9 +82,12 @@ export function ShadowWatchPage() {
 	const interventionBusyRef = useRef(false);
 
 	const [loading, setLoading] = useState(true);
-	const [loadingLabel, setLoadingLabel] = useState<string | undefined>(
-		undefined,
+	const [loadingSubtitle, setLoadingSubtitle] = useState("");
+	const [bootstrapChecks, setBootstrapChecks] = useState<BootstrapCheckItem[]>(
+		[],
 	);
+	const [bootstrapLog, setBootstrapLog] = useState<BootstrapLogEntry[]>([]);
+	const [bootstrapFailure, setBootstrapFailure] = useState<string | null>(null);
 	const [streamUrl, setStreamUrl] = useState<string | null>(null);
 	const [session, setSession] = useState<ShadowSession | null>(null);
 	const [context, setContext] = useState<WatchContext | null>(null);
@@ -114,13 +126,64 @@ export function ShadowWatchPage() {
 	useEffect(() => {
 		let cancelled = false;
 
+		const pushLog = (
+			message: string,
+			level: BootstrapLogEntry["level"] = "info",
+		) => {
+			if (cancelled) {
+				return;
+			}
+
+			setBootstrapLog((current) => appendBootstrapLog(current, message, level));
+		};
+
+		const patchCheck = (
+			id: string,
+			patch: Partial<Omit<BootstrapCheckItem, "id">>,
+		) => {
+			if (cancelled) {
+				return;
+			}
+
+			setBootstrapChecks((current) => updateBootstrapCheck(current, id, patch));
+		};
+
 		async function bootstrap() {
 			setLoading(true);
-			setLoadingLabel(undefined);
+			setBootstrapFailure(null);
+			setBootstrapLog([]);
+			setLoadingSubtitle(t("pipeline.shadow.bootstrapStarting"));
+
+			const initialChecks: BootstrapCheckItem[] = [
+				{
+					id: "transcript",
+					label: t("pipeline.shadow.bootstrapStepTranscript"),
+					status: "active",
+				},
+				{
+					id: "renders",
+					label: t("pipeline.shadow.bootstrapStepRenders"),
+					status: "pending",
+				},
+				{
+					id: "session",
+					label: t("pipeline.shadow.bootstrapStepSession"),
+					status: "pending",
+				},
+				{
+					id: "context",
+					label: t("pipeline.shadow.bootstrapStepContext"),
+					status: "pending",
+				},
+			];
+			setBootstrapChecks(initialChecks);
+			pushLog(t("pipeline.shadow.bootstrapLogStart", { videoId }));
 
 			try {
+				pushLog(t("pipeline.shadow.bootstrapLogFetchTranscript"));
+				setLoadingSubtitle(t("pipeline.shadow.bootstrapLoadingTranscript"));
+
 				let transcriptResult = await transcriptService.getTranscript(videoId);
-				const renders = await videoRenderService.listRenders(videoId);
 
 				if (cancelled) {
 					return;
@@ -128,9 +191,50 @@ export function ShadowWatchPage() {
 
 				setTranscript(transcriptResult);
 
+				if (transcriptResult) {
+					pushLog(
+						t("pipeline.shadow.bootstrapLogTranscriptReady", {
+							segments: transcriptResult.segmentCount,
+						}),
+					);
+					patchCheck("transcript", {
+						status: "done",
+						detail: t("pipeline.shadow.bootstrapTranscriptReadyDetail", {
+							segments: transcriptResult.segmentCount,
+						}),
+					});
+				} else {
+					pushLog(t("pipeline.shadow.bootstrapLogTranscriptMissing"), "warn");
+					patchCheck("transcript", {
+						status: "warning",
+						detail: t("pipeline.shadow.bootstrapTranscriptMissingDetail"),
+					});
+				}
+
+				patchCheck("renders", { status: "active" });
+				pushLog(t("pipeline.shadow.bootstrapLogFetchRenders"));
+				setLoadingSubtitle(t("pipeline.shadow.bootstrapLoadingRenders"));
+
+				const renders = await videoRenderService.listRenders(videoId);
+
+				if (cancelled) {
+					return;
+				}
+
+				pushLog(
+					t("pipeline.shadow.bootstrapLogRendersLoaded", {
+						count: renders.length,
+					}),
+				);
+
 				const firstRender = renders[0] ?? null;
 
 				if (firstRender) {
+					pushLog(
+						t("pipeline.shadow.bootstrapLogFetchRenderStream", {
+							language: firstRender.targetLanguage,
+						}),
+					);
 					const render = await videoRenderService.getRender(
 						videoId,
 						firstRender.targetLanguage,
@@ -140,46 +244,141 @@ export function ShadowWatchPage() {
 						setStreamUrl(
 							resolveVideoRenderStreamUrl(render.streamUrl, API_BASE_URL),
 						);
+						pushLog(t("pipeline.shadow.bootstrapLogRenderStreamReady"));
 					}
+
+					patchCheck("renders", {
+						status: render ? "done" : "warning",
+						detail: render
+							? t("pipeline.shadow.bootstrapRenderReadyDetail", {
+									language: firstRender.targetLanguage,
+								})
+							: t("pipeline.shadow.bootstrapRenderMissingDetail"),
+					});
+				} else {
+					pushLog(t("pipeline.shadow.bootstrapLogNoRender"), "warn");
+					patchCheck("renders", {
+						status: "warning",
+						detail: t("pipeline.shadow.bootstrapNoRenderDetail"),
+					});
 				}
 
 				const deadline = Date.now() + TRANSCRIPT_WAIT_TIMEOUT_MS;
+				let pollAttempt = 0;
 
 				while (!cancelled) {
+					patchCheck("session", { status: "active" });
+					pushLog(t("pipeline.shadow.bootstrapLogStartSession"));
+					setLoadingSubtitle(t("pipeline.shadow.bootstrapStartingSession"));
+
 					try {
 						const startedSession = await shadowService.startSession(videoId, {
 							targetLanguage: DEFAULT_TARGET_LANGUAGE,
 							contentId: videoId,
 						});
 
+						patchCheck("session", { status: "done" });
+						pushLog(
+							t("pipeline.shadow.bootstrapLogSessionReady", {
+								sessionId: startedSession.sessionId,
+							}),
+						);
+
+						patchCheck("context", { status: "active" });
+						pushLog(t("pipeline.shadow.bootstrapLogLoadContext"));
+						setLoadingSubtitle(t("pipeline.shadow.bootstrapLoadingContext"));
+
 						setSession(startedSession);
 						await refreshContext(0, startedSession);
+
+						patchCheck("context", { status: "done" });
+						pushLog(t("pipeline.shadow.bootstrapLogReady"));
+						setLoadingSubtitle(t("pipeline.shadow.bootstrapReady"));
 						return;
-					} catch {
+					} catch (error) {
+						const message = formatBootstrapError(error);
+						pushLog(
+							t("pipeline.shadow.bootstrapLogSessionFailed", { error: message }),
+							"error",
+						);
+						patchCheck("session", {
+							status: "error",
+							detail: message,
+						});
+
 						if (transcriptResult !== null) {
+							setBootstrapFailure(message);
 							return;
 						}
 
 						if (Date.now() >= deadline) {
+							const timeoutMessage = t(
+								"pipeline.shadow.bootstrapTranscriptTimeout",
+							);
+							pushLog(timeoutMessage, "error");
+							setBootstrapFailure(timeoutMessage);
+							patchCheck("transcript", {
+								status: "error",
+								detail: timeoutMessage,
+							});
 							return;
 						}
 
-						setLoadingLabel(t("pipeline.shadow.preparingTranscript"));
+						pollAttempt += 1;
+						const elapsedSeconds = Math.round(
+							(TRANSCRIPT_WAIT_TIMEOUT_MS - (deadline - Date.now())) / 1000,
+						);
+						const waitingMessage = t(
+							"pipeline.shadow.bootstrapWaitingTranscript",
+							{
+								attempt: pollAttempt,
+								elapsed: elapsedSeconds,
+							},
+						);
+						pushLog(waitingMessage, "warn");
+						setLoadingSubtitle(waitingMessage);
+						patchCheck("transcript", {
+							status: "active",
+							detail: waitingMessage,
+						});
+						patchCheck("session", { status: "pending" });
+
 						await sleep(TRANSCRIPT_POLL_INTERVAL_MS);
 
 						if (cancelled) {
 							return;
 						}
 
+						pushLog(t("pipeline.shadow.bootstrapLogPollTranscript"));
 						transcriptResult =
 							await transcriptService.getTranscript(videoId);
 						setTranscript(transcriptResult);
+
+						if (transcriptResult) {
+							pushLog(
+								t("pipeline.shadow.bootstrapLogTranscriptReady", {
+									segments: transcriptResult.segmentCount,
+								}),
+							);
+							patchCheck("transcript", {
+								status: "done",
+								detail: t("pipeline.shadow.bootstrapTranscriptReadyDetail", {
+									segments: transcriptResult.segmentCount,
+								}),
+							});
+						}
 					}
 				}
+			} catch (error) {
+				const message = formatBootstrapError(error);
+				pushLog(
+					t("pipeline.shadow.bootstrapLogUnexpectedError", { error: message }),
+					"error",
+				);
+				setBootstrapFailure(message);
 			} finally {
 				if (!cancelled) {
 					setLoading(false);
-					setLoadingLabel(undefined);
 				}
 			}
 		}
@@ -521,7 +720,13 @@ export function ShadowWatchPage() {
 
 	if (loading) {
 		return (
-			<Spinner label={loadingLabel ?? t("pipeline.shadow.loading")} />
+			<ShadowWatchBootstrapPanel
+				title={t("pipeline.shadow.bootstrapTitle")}
+				subtitle={loadingSubtitle || t("pipeline.shadow.loading")}
+				checks={bootstrapChecks}
+				log={bootstrapLog}
+				logTitle={t("pipeline.shadow.bootstrapLogTitle")}
+			/>
 		);
 	}
 
@@ -529,7 +734,30 @@ export function ShadowWatchPage() {
 		return (
 			<EmptyState
 				title={t("pipeline.shadow.emptyTitle")}
-				description={t("pipeline.shadow.emptyDescription")}
+				description={
+					bootstrapFailure
+						? t("pipeline.shadow.emptyDescriptionWithError", {
+								error: bootstrapFailure,
+							})
+						: t("pipeline.shadow.emptyDescription")
+				}
+				action={
+					bootstrapLog.length > 0 ? (
+						<details className={styles.bootstrapFailureDetails}>
+							<summary>{t("pipeline.shadow.bootstrapLogTitle")}</summary>
+							<ul className={styles.bootstrapFailureLog}>
+								{bootstrapLog.map((entry, index) => (
+									<li
+										key={`${entry.time}-${index}`}
+										data-level={entry.level}
+									>
+										<span>{entry.time}</span> {entry.message}
+									</li>
+								))}
+							</ul>
+						</details>
+					) : undefined
+				}
 			/>
 		);
 	}
