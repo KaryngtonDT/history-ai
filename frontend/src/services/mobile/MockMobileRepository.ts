@@ -15,10 +15,10 @@ import type {
 
 const defaultConnection: MobileConnection = {
 	mode: "auto",
-	localhostUrl: "http://127.0.0.1:8080",
-	lanUrl: "http://192.168.1.10:8080",
-	tailscaleUrl: "http://100.64.0.1:8080",
-	homeWifiSsids: ["HomeWiFi"],
+	localhostUrl: "http://127.0.0.1:8000",
+	lanUrl: "http://192.168.178.21:8000",
+	tailscaleUrl: "http://127.0.0.1:8000",
+	homeWifiSsids: ["FRITZ!Box 7530 BQ"],
 };
 
 const defaultPreferences: MobilePreferences = {

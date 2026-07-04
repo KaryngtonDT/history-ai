@@ -20,10 +20,14 @@ function Get-LanIPv4 {
 }
 
 function Get-HomeWifiSsid {
+    # Hotspot SSIDs must not be treated as home LAN (e.g. phone hotspot "steve").
+    $ExcludeHotspotSsids = @('steve')
+
     $line = netsh wlan show interfaces | Select-String "^\s*SSID\s*:" | Select-Object -First 1
     if ($null -eq $line) { return @() }
     $ssid = ($line -replace "^\s*SSID\s*:\s*", "").Trim()
     if ($ssid -eq "" -or $ssid -eq "N/A") { return @() }
+    if ($ExcludeHotspotSsids -contains $ssid) { return @() }
     return @($ssid)
 }
 
@@ -73,7 +77,7 @@ Write-Host "Connection profile saved to Lumen." -ForegroundColor Green
 try {
     $existing = Get-NetFirewallRule -DisplayName "Lumen Docker 8000" -ErrorAction SilentlyContinue
     if (-not $existing) {
-        New-NetFirewallRule -DisplayName "Lumen Docker 8000" -Direction Inbound -LocalPort 8000 -Protocol TCP -Action Allow -Profile Private,Domain | Out-Null
+        New-NetFirewallRule -DisplayName "Lumen Docker 8000" -Direction Inbound -LocalPort 8000 -Protocol TCP -Action Allow -Profile Any | Out-Null
         Write-Host "Firewall rule added for TCP 8000." -ForegroundColor Green
     } else {
         Write-Host "Firewall rule already present."

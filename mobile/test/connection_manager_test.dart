@@ -11,12 +11,21 @@ void main() {
       homeWifiSsids: ['HomeWiFi'],
     );
 
-    test('auto uses LAN on home wifi', () {
+    test('auto uses LAN on home wifi SSID', () {
       final manager = ConnectionManager(config: config);
 
       expect(
-        manager.resolveEndpoint(isOnHomeWifi: true, lanReachable: true),
+        manager.resolveEndpoint(currentSsid: 'HomeWiFi'),
         config.lanUrl,
+      );
+    });
+
+    test('auto uses Tailscale on hotspot steve', () {
+      final manager = ConnectionManager(config: config);
+
+      expect(
+        manager.resolveEndpoint(currentSsid: 'steve'),
+        config.tailscaleUrl,
       );
     });
 
@@ -24,8 +33,26 @@ void main() {
       final manager = ConnectionManager(config: config);
 
       expect(
-        manager.resolveEndpoint(isOnHomeWifi: false),
+        manager.resolveEndpoint(currentSsid: 'OtherNetwork'),
         config.tailscaleUrl,
+      );
+    });
+
+    test('auto candidates prefer LAN then Tailscale at home', () {
+      final manager = ConnectionManager(config: config);
+
+      expect(
+        manager.candidateEndpoints(currentSsid: 'HomeWiFi'),
+        [config.lanUrl, config.tailscaleUrl],
+      );
+    });
+
+    test('auto candidates prefer Tailscale on hotspot', () {
+      final manager = ConnectionManager(config: config);
+
+      expect(
+        manager.candidateEndpoints(currentSsid: 'steve'),
+        [config.tailscaleUrl, config.lanUrl],
       );
     });
 
@@ -41,8 +68,20 @@ void main() {
       );
 
       expect(
-        manager.resolveEndpoint(isOnHomeWifi: true),
+        manager.resolveEndpoint(currentSsid: 'HomeWiFi'),
         'http://100.64.0.1:8080',
+      );
+    });
+
+    test('forceTailscale override', () {
+      final manager = ConnectionManager(config: config);
+
+      expect(
+        manager.resolveEndpoint(
+          currentSsid: 'HomeWiFi',
+          forceTailscale: true,
+        ),
+        config.tailscaleUrl,
       );
     });
   });

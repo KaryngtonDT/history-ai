@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.2.2
+  network_info_plus: ^6.1.4
+  permission_handler: ^11.4.0
 
 dev_dependencies:
   flutter_test:

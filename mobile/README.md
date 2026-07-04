@@ -25,8 +25,8 @@ Personal Remote URLs are in `lib/config/lumen_config.dart`:
 | Setting | Current value |
 |---------|---------------|
 | Tailscale | `http://100.111.236.50:8000` |
-| LAN | `http://192.168.43.194:8000` |
-| Home Wi‑Fi | `steve` |
+| LAN | `http://192.168.178.21:8000` |
+| Home Wi‑Fi | `FRITZ!Box 7530 BQ` (not hotspot `steve`) |
 
 Re-run after IP changes:
 

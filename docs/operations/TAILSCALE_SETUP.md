@@ -30,17 +30,17 @@ Example: `100.64.12.34`
 ### 3. Confirm Lumen is reachable locally
 
 ```bash
-curl -s http://127.0.0.1:8080/api/health
+curl -s http://127.0.0.1:8000/api/health
 ```
 
-Adjust port if your `docker-compose` maps differently.
+Adjust port if your `docker-compose` maps differently (prod-like default: **8000**).
 
 ### 4. Confirm Lumen via Tailscale IP
 
 From another device on the tailnet (or phone on cellular with Tailscale):
 
 ```bash
-curl -s http://100.64.12.34:8080/api/health
+curl -s http://100.64.12.34:8000/api/health
 ```
 
 If this fails, check Docker port binding (`0.0.0.0:8080`) and Windows firewall rules for Tailscale interface.

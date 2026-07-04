@@ -21,9 +21,9 @@ final readonly class MobileConnection
         return new self(
             MobileConnectionMode::Auto,
             'http://127.0.0.1:8000',
-            'http://192.168.43.194:8000',
+            'http://192.168.178.21:8000',
             'http://100.111.236.50:8000',
-            ['steve'],
+            ['FRITZ!Box 7530 BQ'],
         );
     }
 
