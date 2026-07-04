@@ -1,5 +1,5 @@
-# Local development overrides (auto-merged by Docker Compose).
-# Mounts application source so code changes apply without rebuilding images.
+# Local development overrides (auto-merged with docker-compose.yml only).
+# Not applied when using docker-compose.prod-like.yml (separate project: history-ai-prod-like).
 
 name: history-ai
 

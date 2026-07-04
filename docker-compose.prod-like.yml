@@ -1,7 +1,7 @@
 # Lumen — production-like stack (no dev bind mounts on application source).
 # Use: docker compose -f docker-compose.prod-like.yml up -d --build
 
-name: history-ai
+name: history-ai-prod-like
 
 services:
   postgres:
@@ -71,6 +71,7 @@ services:
       APP_SECRET: ${APP_SECRET:-change-me}
       DATABASE_URL: ${DATABASE_URL:-postgresql://history_ai:history_ai@postgres:5432/history_ai?serverVersion=17&charset=utf8}
       MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-redis://redis:6379/messages}
+      STT_PROVIDER: ${STT_PROVIDER:-deterministic}
       WORKER_BASE_URL: ${WORKER_BASE_URL:-http://worker:8001}
       MODELS_ROOT: /models
     volumes:
@@ -100,6 +101,7 @@ services:
         VITE_USE_MOCK: "false"
         VITE_API_BASE_URL: "http://localhost:8000"
     restart: unless-stopped
+    command: npm run preview -- --host 0.0.0.0 --port 5173
     ports:
       - "5173:5173"
     networks:
