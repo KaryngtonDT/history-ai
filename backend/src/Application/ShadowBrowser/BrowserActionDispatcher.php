@@ -146,7 +146,7 @@ final class BrowserActionDispatcher
             ? 'youtube'
             : null;
 
-        $bookmark = $this->postBrainBookmarkHandler($scopeKey, [
+        $bookmark = ($this->postBrainBookmarkHandler)($scopeKey, [
             'label' => $page['title'],
             'tags' => ['browser', $page['platform']->value],
             'resourceType' => $resourceType,
@@ -174,7 +174,9 @@ final class BrowserActionDispatcher
             ];
         }
 
-        if (!YouTubeUrl::isValid($page['url'])) {
+        $url = $this->canonicalYoutubeUrl($page['url']);
+
+        if (!YouTubeUrl::isValid($url)) {
             return [
                 'action' => BrowserActionType::OpenWatch->value,
                 'status' => 'unavailable',
@@ -182,7 +184,7 @@ final class BrowserActionDispatcher
             ];
         }
 
-        $existing = $this->findImportedVideo($page['url']);
+        $existing = $this->findImportedVideo($url);
 
         if (null !== $existing) {
             return $this->watchResponse($existing['videoId'], 'completed', 'Watch ready.');
@@ -200,8 +202,8 @@ final class BrowserActionDispatcher
         }
 
         try {
-            $result = $this->importYouTubeHandler(new ImportYouTubeCommand(
-                url: $page['url'],
+            $result = ($this->importYouTubeHandler)(new ImportYouTubeCommand(
+                url: $url,
                 processingMode: ProcessingMode::Manual,
             ));
         } catch (InvalidYouTubeException $exception) {
@@ -209,6 +211,12 @@ final class BrowserActionDispatcher
                 'action' => BrowserActionType::OpenWatch->value,
                 'status' => 'error',
                 'message' => $exception->getMessage(),
+            ];
+        } catch (\Throwable $exception) {
+            return [
+                'action' => BrowserActionType::OpenWatch->value,
+                'status' => 'error',
+                'message' => 'YouTube import failed. Try again from Lumen or check server logs.',
             ];
         }
 
@@ -261,5 +269,16 @@ final class BrowserActionDispatcher
         }
 
         return 'fr';
+    }
+
+    private function canonicalYoutubeUrl(string $url): string
+    {
+        $videoKey = $this->youtubeUrlParser->extractVideoKey($url);
+
+        if (null === $videoKey) {
+            return trim($url);
+        }
+
+        return sprintf('https://www.youtube.com/watch?v=%s', $videoKey);
     }
 }

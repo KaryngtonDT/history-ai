@@ -188,4 +188,40 @@ final class ShadowBrowserControllerTest extends WebTestCase
         self::assertSame('confirmation_required', $payload['status'] ?? null);
         self::assertTrue($payload['importRequired'] ?? false);
     }
+
+    public function testOpenWatchImportReturnsWatchPathWhenConfirmed(): void
+    {
+        $client = static::createClient();
+        $scope = self::SCOPE.'-open-watch-import';
+
+        $client->request(
+            'POST',
+            '/api/shadow/browser/connect',
+            server: ['CONTENT_TYPE' => 'application/json'],
+            content: json_encode(['scopeKey' => $scope], JSON_THROW_ON_ERROR),
+        );
+        self::assertResponseIsSuccessful();
+
+        $client->request(
+            'POST',
+            '/api/shadow/browser/open-watch',
+            server: ['CONTENT_TYPE' => 'application/json'],
+            content: json_encode([
+                'scopeKey' => $scope,
+                'url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                'title' => 'Import Test',
+                'platform' => 'youtube',
+                'host' => 'youtube.com',
+                'importConfirmed' => true,
+            ], JSON_THROW_ON_ERROR),
+        );
+
+        self::assertResponseIsSuccessful();
+        $payload = json_decode($client->getResponse()->getContent(), true);
+        self::assertIsArray($payload);
+        self::assertSame('open_watch', $payload['action'] ?? null);
+        self::assertContains($payload['status'] ?? null, ['processing', 'completed']);
+        self::assertIsString($payload['watchPath'] ?? null);
+        self::assertStringStartsWith('/video/', (string) ($payload['watchPath'] ?? ''));
+    }
 }

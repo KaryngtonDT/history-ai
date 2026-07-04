@@ -11,7 +11,7 @@ import {
   postBrowserSummarize,
   postBrowserTranslate,
 } from "../shared/api";
-import { publishShadowConnected, notifyTabsSessionChanged } from "../shared/connection-state";
+import { publishShadowConnected, notifyTabsSessionChanged, readShadowConnected } from "../shared/connection-state";
 import { isBrowserSessionActive } from "../shared/session";
 import type {
   BackgroundMessage,
@@ -43,6 +43,19 @@ async function refreshSession(): Promise<BrowserSession> {
     await setConnected(false);
     return { ...sessionState };
   }
+}
+
+async function ensureConnected(): Promise<boolean> {
+  if (sessionState.connected) {
+    return true;
+  }
+
+  if (!(await readShadowConnected())) {
+    return false;
+  }
+
+  const session = await refreshSession();
+  return session.connected;
 }
 
 async function handleConnect(): Promise<BackgroundResponse> {
@@ -115,7 +128,7 @@ async function handlePageDetected(
   context: PageContext,
   sender?: chrome.runtime.MessageSender,
 ): Promise<BackgroundResponse> {
-  if (!sessionState.connected) {
+  if (!(await ensureConnected())) {
     return { ok: true, session: { ...sessionState } };
   }
 
@@ -174,7 +187,7 @@ async function handleShadowAction(
   action: BackgroundMessage & { type: "SHADOW_ACTION" },
   sender?: chrome.runtime.MessageSender,
 ): Promise<BackgroundResponse> {
-  if (!sessionState.connected) {
+  if (!(await ensureConnected())) {
     return { ok: false, error: "Not connected to Lumen" };
   }
 
@@ -226,6 +239,14 @@ chrome.runtime.onInstalled.addListener((details) => {
   void handleConnect().catch(async () => {
     await setConnected(false);
   });
+});
+
+void readShadowConnected().then((connected) => {
+  if (!connected) {
+    return;
+  }
+
+  void refreshSession();
 });
 
 chrome.runtime.onMessage.addListener((message: BackgroundMessage, sender, sendResponse) => {
