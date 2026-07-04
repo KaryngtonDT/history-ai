@@ -267,6 +267,70 @@ export function ShadowWatchPage() {
 				let pollAttempt = 0;
 
 				while (!cancelled) {
+					if (transcriptResult === null) {
+						if (Date.now() >= deadline) {
+							const timeoutMessage = t(
+								"pipeline.shadow.bootstrapTranscriptTimeout",
+							);
+							pushLog(timeoutMessage, "error");
+							setBootstrapFailure(timeoutMessage);
+							patchCheck("transcript", {
+								status: "error",
+								detail: timeoutMessage,
+							});
+							return;
+						}
+
+						pollAttempt += 1;
+						const elapsedSeconds = Math.round(
+							(TRANSCRIPT_WAIT_TIMEOUT_MS - (deadline - Date.now())) / 1000,
+						);
+						const waitingMessage = t(
+							"pipeline.shadow.bootstrapWaitingTranscript",
+							{
+								attempt: pollAttempt,
+								elapsed: elapsedSeconds,
+							},
+						);
+						pushLog(waitingMessage, "warn");
+						setLoadingSubtitle(waitingMessage);
+						patchCheck("transcript", {
+							status: "active",
+							detail: waitingMessage,
+						});
+						patchCheck("session", {
+							status: "pending",
+							detail: t("pipeline.shadow.bootstrapSessionWaitingTranscript"),
+						});
+
+						await sleep(TRANSCRIPT_POLL_INTERVAL_MS);
+
+						if (cancelled) {
+							return;
+						}
+
+						pushLog(t("pipeline.shadow.bootstrapLogPollTranscript"));
+						transcriptResult =
+							await transcriptService.getTranscript(videoId);
+						setTranscript(transcriptResult);
+
+						if (transcriptResult) {
+							pushLog(
+								t("pipeline.shadow.bootstrapLogTranscriptReady", {
+									segments: transcriptResult.segmentCount,
+								}),
+							);
+							patchCheck("transcript", {
+								status: "done",
+								detail: t("pipeline.shadow.bootstrapTranscriptReadyDetail", {
+									segments: transcriptResult.segmentCount,
+								}),
+							});
+						}
+
+						continue;
+					}
+
 					patchCheck("session", { status: "active" });
 					pushLog(t("pipeline.shadow.bootstrapLogStartSession"));
 					setLoadingSubtitle(t("pipeline.shadow.bootstrapStartingSession"));
@@ -305,68 +369,8 @@ export function ShadowWatchPage() {
 							status: "error",
 							detail: message,
 						});
-
-						if (transcriptResult !== null) {
-							setBootstrapFailure(message);
-							return;
-						}
-
-						if (Date.now() >= deadline) {
-							const timeoutMessage = t(
-								"pipeline.shadow.bootstrapTranscriptTimeout",
-							);
-							pushLog(timeoutMessage, "error");
-							setBootstrapFailure(timeoutMessage);
-							patchCheck("transcript", {
-								status: "error",
-								detail: timeoutMessage,
-							});
-							return;
-						}
-
-						pollAttempt += 1;
-						const elapsedSeconds = Math.round(
-							(TRANSCRIPT_WAIT_TIMEOUT_MS - (deadline - Date.now())) / 1000,
-						);
-						const waitingMessage = t(
-							"pipeline.shadow.bootstrapWaitingTranscript",
-							{
-								attempt: pollAttempt,
-								elapsed: elapsedSeconds,
-							},
-						);
-						pushLog(waitingMessage, "warn");
-						setLoadingSubtitle(waitingMessage);
-						patchCheck("transcript", {
-							status: "active",
-							detail: waitingMessage,
-						});
-						patchCheck("session", { status: "pending" });
-
-						await sleep(TRANSCRIPT_POLL_INTERVAL_MS);
-
-						if (cancelled) {
-							return;
-						}
-
-						pushLog(t("pipeline.shadow.bootstrapLogPollTranscript"));
-						transcriptResult =
-							await transcriptService.getTranscript(videoId);
-						setTranscript(transcriptResult);
-
-						if (transcriptResult) {
-							pushLog(
-								t("pipeline.shadow.bootstrapLogTranscriptReady", {
-									segments: transcriptResult.segmentCount,
-								}),
-							);
-							patchCheck("transcript", {
-								status: "done",
-								detail: t("pipeline.shadow.bootstrapTranscriptReadyDetail", {
-									segments: transcriptResult.segmentCount,
-								}),
-							});
-						}
+						setBootstrapFailure(message);
+						return;
 					}
 				}
 			} catch (error) {

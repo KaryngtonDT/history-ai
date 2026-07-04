@@ -26,7 +26,7 @@ case "${MESSENGER_TRANSPORT_DSN:-sync://}" in
   sync://)
     ;;
   *)
-    php bin/console messenger:consume async --time-limit=0 --memory-limit=512M --no-interaction &
+    php bin/console messenger:consume async --memory-limit=512M --no-interaction &
     ;;
 esac
 

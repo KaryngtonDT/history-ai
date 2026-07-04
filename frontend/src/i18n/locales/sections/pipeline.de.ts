@@ -344,6 +344,8 @@ export const pipelineDe: PipelineMessages = {
 			bootstrapStepTranscript: "Transkript (Speech-to-Text)",
 			bootstrapStepRenders: "Abspielbares Video",
 			bootstrapStepSession: "Shadow-Sitzung",
+			bootstrapSessionWaitingTranscript:
+				"Warte auf Transkript, bevor die Shadow-Sitzung startet",
 			bootstrapStepContext: "Watch-Kontext",
 			bootstrapTranscriptReadyDetail: "{{segments}} Segmente verfügbar",
 			bootstrapTranscriptMissingDetail:

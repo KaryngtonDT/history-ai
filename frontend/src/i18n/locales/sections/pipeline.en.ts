@@ -333,6 +333,8 @@ export const pipelineEn = {
 			bootstrapStepTranscript: "Transcript (speech-to-text)",
 			bootstrapStepRenders: "Playable video",
 			bootstrapStepSession: "Shadow session",
+			bootstrapSessionWaitingTranscript:
+				"Waiting for transcript before starting Shadow session",
 			bootstrapStepContext: "Watch context",
 			bootstrapTranscriptReadyDetail: "{{segments}} segments available",
 			bootstrapTranscriptMissingDetail:
