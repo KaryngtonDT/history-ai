@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Infrastructure\Speech;
 
 use App\Domain\Speech\SpeechToTextProviderInterface;
+use App\Infrastructure\Speech\DeterministicSpeechToTextProvider;
 use App\Infrastructure\Speech\Exception\InvalidSpeechToTextConfigurationException;
 use App\Infrastructure\Speech\FasterWhisperOutputParser;
 use App\Infrastructure\Speech\FasterWhisperProcessRunnerInterface;
@@ -15,48 +16,55 @@ use PHPUnit\Framework\TestCase;
 final class SpeechToTextProviderFactoryTest extends TestCase
 {
     private FasterWhisperProvider $fasterWhisperProvider;
+    private DeterministicSpeechToTextProvider $deterministicProvider;
 
     protected function setUp(): void
     {
+        $parser = new FasterWhisperOutputParser();
         $this->fasterWhisperProvider = new FasterWhisperProvider(
             $this->createMock(FasterWhisperProcessRunnerInterface::class),
-            new FasterWhisperOutputParser(),
+            $parser,
             'faster-whisper',
             'base',
+        );
+        $this->deterministicProvider = new DeterministicSpeechToTextProvider($parser);
+    }
+
+    private function factory(string $providerName): SpeechToTextProviderFactory
+    {
+        return new SpeechToTextProviderFactory(
+            $providerName,
+            $this->fasterWhisperProvider,
+            $this->deterministicProvider,
         );
     }
 
     public function testCreatesFasterWhisperProviderByDefault(): void
     {
-        $factory = new SpeechToTextProviderFactory('', $this->fasterWhisperProvider);
-
-        $provider = $factory->create();
+        $provider = $this->factory('')->create();
 
         self::assertSame($this->fasterWhisperProvider, $provider);
     }
 
     public function testCreatesFasterWhisperProviderForExplicitName(): void
     {
-        $factory = new SpeechToTextProviderFactory(
-            SpeechToTextProviderFactory::PROVIDER_FASTER_WHISPER,
-            $this->fasterWhisperProvider,
-        );
-
-        $provider = $factory->create();
+        $provider = $this->factory(SpeechToTextProviderFactory::PROVIDER_FASTER_WHISPER)->create();
 
         self::assertInstanceOf(SpeechToTextProviderInterface::class, $provider);
         self::assertSame($this->fasterWhisperProvider, $provider);
     }
 
+    public function testCreatesDeterministicProviderForExplicitName(): void
+    {
+        $provider = $this->factory(SpeechToTextProviderFactory::PROVIDER_DETERMINISTIC)->create();
+
+        self::assertSame($this->deterministicProvider, $provider);
+    }
+
     public function testRejectsUnknownProvider(): void
     {
-        $factory = new SpeechToTextProviderFactory(
-            'unknown',
-            $this->fasterWhisperProvider,
-        );
-
         $this->expectException(InvalidSpeechToTextConfigurationException::class);
 
-        $factory->create();
+        $this->factory('unknown')->create();
     }
 }

@@ -254,6 +254,14 @@ export function videoTranscriptPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/transcript`;
 }
 
+export function videoStatusPath(videoId: string): string {
+	return `${VIDEOS_PATH}/${videoId}/status`;
+}
+
+export function videoProcessPath(videoId: string): string {
+	return `${VIDEOS_PATH}/${videoId}/process`;
+}
+
 export function videoTranslationsPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/translations`;
 }

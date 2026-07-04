@@ -1,8 +1,10 @@
-import { VIDEOS_PATH } from "@/config/api";
+import { videoProcessPath, videoStatusPath, VIDEOS_PATH } from "@/config/api";
 import type { HttpClient } from "@/services/http/HttpClient";
 import { ApiError, ValidationError } from "@/shared/errors";
 import {
 	mapVideoUploadFromApi,
+	type VideoJobStatus,
+	type VideoProcessResult,
 	type VideoUploadApiDto,
 	type VideoUploadOptions,
 	type VideoUploadResult,
@@ -48,5 +50,16 @@ export class HttpVideoRepository implements VideoRepository {
 
 			throw error;
 		}
+	}
+
+	async getStatus(videoId: string): Promise<VideoJobStatus> {
+		return this.httpClient.get<VideoJobStatus>(videoStatusPath(videoId));
+	}
+
+	async processVideo(videoId: string): Promise<VideoProcessResult> {
+		return this.httpClient.post<VideoProcessResult>(
+			videoProcessPath(videoId),
+			{},
+		);
 	}
 }

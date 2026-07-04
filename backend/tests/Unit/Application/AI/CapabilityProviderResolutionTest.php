@@ -9,7 +9,7 @@ use App\Domain\Pipeline\PipelineConfigurationResolverInterface;
 use App\Infrastructure\AI\AIEngineRegistryFactory;
 use App\Infrastructure\AI\AIProviderResolver;
 use App\Infrastructure\AI\Exception\InvalidAIEngineConfigurationException;
-use App\Infrastructure\Speech\FasterWhisperOutputParser;
+use App\Infrastructure\Speech\DeterministicSpeechToTextProvider;
 use App\Infrastructure\Speech\FasterWhisperProcessRunnerInterface;
 use App\Infrastructure\Speech\FasterWhisperProvider;
 use App\Infrastructure\Speech\SpeechToTextProviderFactory;
@@ -61,6 +61,7 @@ final class CapabilityProviderResolutionTest extends TestCase
                     'faster-whisper',
                     'base',
                 ),
+                new DeterministicSpeechToTextProvider(new FasterWhisperOutputParser()),
             ),
             new TranslationProviderFactory(
                 'ollama',

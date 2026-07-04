@@ -10,6 +10,18 @@ export interface VideoUploadResult {
 	status: VideoStatus;
 }
 
+export interface VideoJobStatus {
+	videoId: string;
+	status: VideoStatus;
+	originalFilename: string;
+	language: string;
+	createdAt: string;
+}
+
+export interface VideoProcessResult {
+	status: "queued" | "unchanged";
+}
+
 export type VideoValidationResult =
 	| { valid: true }
 	| { valid: false; error: string };

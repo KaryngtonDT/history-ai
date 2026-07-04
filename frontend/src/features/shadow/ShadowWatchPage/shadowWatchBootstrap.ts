@@ -1,4 +1,5 @@
 import { ApiError } from "@/shared/errors/ApiError";
+import { appendActivityLog } from "@/features/activity/activityLogStore";
 import type {
 	BootstrapCheckItem,
 	BootstrapLogEntry,
@@ -39,6 +40,7 @@ export function appendBootstrapLog(
 	level: BootstrapLogEntry["level"] = "info",
 ): BootstrapLogEntry[] {
 	logBootstrap(message, level);
+	appendActivityLog(message, level, "ShadowWatch");
 	const time = new Date().toLocaleTimeString();
 	return [...entries.slice(-19), { time, message, level }];
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Application\ShadowBrowser;
 
 use App\Application\ShadowSecondBrain\Handlers\PostBrainBookmarkHandler;
-use App\Application\Video\Ports\VideoProcessingQueueInterface;
+use App\Application\Video\VideoProcessingEnqueueService;
 use App\Application\YouTube\Commands\ImportYouTubeCommand;
 use App\Application\YouTube\Handlers\ImportYouTubeHandler;
 use App\Domain\Orchestrator\ProcessingMode;
@@ -28,7 +28,7 @@ final class BrowserActionDispatcher
         private readonly ImportYouTubeHandler $importYouTubeHandler,
         private readonly PostBrainBookmarkHandler $postBrainBookmarkHandler,
         private readonly BrowserAuditLog $auditLog,
-        private readonly VideoProcessingQueueInterface $videoProcessingQueue,
+        private readonly VideoProcessingEnqueueService $videoProcessingEnqueueService,
         private readonly TranscriptRepositoryInterface $transcriptRepository,
     ) {
     }
@@ -308,6 +308,6 @@ final class BrowserActionDispatcher
             return;
         }
 
-        $this->videoProcessingQueue->enqueue($id, ProcessingMode::Manual);
+        $this->videoProcessingEnqueueService->enqueueIfNeeded($id, ProcessingMode::Manual);
     }
 }

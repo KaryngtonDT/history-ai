@@ -20,6 +20,7 @@ import { detectPlatform } from "../shared/platforms";
 
 const PANEL_ID = "historyai-shadow-panel";
 const RESULT_ID = "historyai-shadow-result";
+const ACTIVITY_LOG_ID = "historyai-shadow-activity-log";
 const TOAST_HOST_ID = "historyai-shadow-toast-host";
 const DIALOG_HOST_ID = "historyai-shadow-dialog-host";
 
@@ -38,6 +39,80 @@ const ACTIONS: { action: ShadowAction; label: string; youtubeOnly?: boolean }[] 
 ];
 
 let pendingAction: ShadowAction | null = null;
+
+type ActivityLogLevel = "info" | "warn" | "error";
+
+interface ActivityLogEntry {
+  time: string;
+  message: string;
+  level: ActivityLogLevel;
+}
+
+const activityLogEntries: ActivityLogEntry[] = [];
+
+function appendShadowActivityLog(
+  message: string,
+  level: ActivityLogLevel = "info",
+): void {
+  activityLogEntries.push({
+    time: new Date().toLocaleTimeString(),
+    message,
+    level,
+  });
+
+  if (activityLogEntries.length > 30) {
+    activityLogEntries.shift();
+  }
+
+  renderActivityLog();
+}
+
+function renderActivityLog(): void {
+  const host = document.getElementById(ACTIVITY_LOG_ID);
+  if (!host) {
+    return;
+  }
+
+  host.replaceChildren();
+
+  const title = document.createElement("div");
+  title.className = "shadow-activity-title";
+  title.textContent = "Journal d'activité";
+  host.appendChild(title);
+
+  const list = document.createElement("ul");
+  list.className = "shadow-activity-list";
+
+  for (const entry of activityLogEntries) {
+    const item = document.createElement("li");
+    item.dataset.level = entry.level;
+    item.textContent = `${entry.time} ${entry.message}`;
+    list.appendChild(item);
+  }
+
+  if (activityLogEntries.length === 0) {
+    const empty = document.createElement("li");
+    empty.textContent = "Aucune activité pour l'instant.";
+    list.appendChild(empty);
+  }
+
+  host.appendChild(list);
+  host.scrollTop = host.scrollHeight;
+}
+
+function ensureActivityLogHost(): HTMLElement {
+  let host = document.getElementById(ACTIVITY_LOG_ID);
+  if (host) {
+    return host;
+  }
+
+  const panel = document.getElementById(PANEL_ID);
+  host = document.createElement("div");
+  host.id = ACTIVITY_LOG_ID;
+  host.className = "shadow-activity-log";
+  panel?.appendChild(host);
+  return host;
+}
 
 function buildContext(): PageContext {
   const url = window.location.href;
@@ -206,6 +281,40 @@ function injectStyles(): void {
       word-break: break-word;
     }
     #${PANEL_ID} .shadow-platform.collapsed { display: none; }
+    #${PANEL_ID} .shadow-activity-log {
+      display: none;
+      margin: 0 12px 12px;
+      padding: 10px;
+      border: 1px dashed #334155;
+      border-radius: 10px;
+      background: #121722;
+      max-height: 160px;
+      overflow-y: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    #${PANEL_ID} .shadow-activity-log.is-visible { display: block; }
+    #${PANEL_ID} .shadow-activity-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+    #${PANEL_ID} .shadow-activity-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    #${PANEL_ID} .shadow-activity-list li {
+      padding: 2px 0;
+      color: #cbd5e1;
+      word-break: break-word;
+    }
+    #${PANEL_ID} .shadow-activity-list li[data-level="warn"] { color: #fbbf24; }
+    #${PANEL_ID} .shadow-activity-list li[data-level="error"] { color: #f87171; }
     #${TOAST_HOST_ID} {
       position: fixed;
       right: max(16px, env(safe-area-inset-right));
@@ -455,6 +564,9 @@ function setActionLoading(action: ShadowAction, loading: boolean): void {
   const existing = button.querySelector(".shadow-spinner");
   existing?.remove();
 
+  const activityHost = ensureActivityLogHost();
+  activityHost.classList.toggle("is-visible", loading);
+
   if (loading) {
     const spinner = document.createElement("span");
     spinner.className = "shadow-spinner";
@@ -589,27 +701,34 @@ async function handleAction(action: ShadowAction): Promise<void> {
   }
 
   pendingAction = action;
+  activityLogEntries.length = 0;
+  appendShadowActivityLog(`Action ${action} démarrée`);
   setActionLoading(action, true);
   showResult("Loading...", "Processing your request with Shadow.");
 
   try {
     if (action === "translate") {
       hideResult();
+      appendShadowActivityLog("Sélection de la langue de traduction");
       const language = await showLanguagePicker();
       if (!language) {
+        appendShadowActivityLog("Traduction annulée", "warn");
         return;
       }
 
       setActionLoading(action, true);
+      appendShadowActivityLog(`Traduction vers ${language.toUpperCase()}`);
       showResult("Loading...", "Translating...");
 
       const response = await sendAction(action, { language });
       if (!response.ok) {
+        appendShadowActivityLog(response.error, "error");
         showToast(response.error, "error");
         hideResult();
         return;
       }
 
+      appendShadowActivityLog("Traduction terminée");
       if (isActionResult(response.data)) {
         presentActionResult(response.data);
       }
@@ -618,17 +737,24 @@ async function handleAction(action: ShadowAction): Promise<void> {
 
     if (action === "open_watch") {
       hideResult();
+      appendShadowActivityLog("Open Watch — vérification import Lumen");
       showToast("Checking import status...", "warning");
 
       const initial = await sendAction(action);
       if (!initial.ok) {
+        appendShadowActivityLog(initial.error, "error");
         showToast(initial.error, "error");
         return;
       }
 
       if (!isActionResult(initial.data)) {
+        appendShadowActivityLog("Réponse Open Watch invalide", "error");
         return;
       }
+
+      appendShadowActivityLog(
+        `Open Watch status: ${initial.data.status} — ${initial.data.message ?? ""}`,
+      );
 
       if (initial.data.status === "confirmation_required") {
         const confirmed = await showImportDialog(
@@ -636,41 +762,57 @@ async function handleAction(action: ShadowAction): Promise<void> {
         );
 
         if (!confirmed) {
+          appendShadowActivityLog("Import YouTube annulé", "warn");
           showToast("Import cancelled", "warning");
           return;
         }
 
         setActionLoading(action, true);
+        appendShadowActivityLog("Import YouTube confirmé — envoi à Lumen");
         showToast("Importing... Preparing Shadow Watch.", "warning");
 
         const imported = await sendAction(action, { importConfirmed: true });
         if (!imported.ok) {
+          appendShadowActivityLog(imported.error, "error");
           showToast(imported.error, "error");
           return;
         }
 
         if (isActionResult(imported.data)) {
+          appendShadowActivityLog(
+            `Import terminé — videoId ${imported.data.videoId ?? "?"}`,
+          );
           presentActionResult(imported.data);
         }
         return;
       }
 
       if (initial.data.status === "error") {
+        appendShadowActivityLog(initial.data.message ?? "Open Watch error", "error");
         showToast(initial.data.message ?? "Open Watch unavailable", "error");
         return;
+      }
+
+      if (initial.data.videoId) {
+        appendShadowActivityLog(
+          `Watch prêt — ouverture /video/${initial.data.videoId}/watch`,
+        );
       }
 
       presentActionResult(initial.data);
       return;
     }
 
+    appendShadowActivityLog(`Envoi action ${action} à Lumen`);
     const response = await sendAction(action);
     if (!response.ok) {
+      appendShadowActivityLog(response.error, "error");
       showToast(response.error, "error");
       hideResult();
       return;
     }
 
+    appendShadowActivityLog(`Action ${action} terminée`);
     if (isActionResult(response.data)) {
       presentActionResult(response.data);
     }

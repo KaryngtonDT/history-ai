@@ -21,6 +21,8 @@ import type {
 } from "@/services/shadow/types";
 import { transcriptService } from "@/services/transcript/TranscriptService";
 import type { VideoTranscript } from "@/services/transcript/types";
+import type { VideoStatus } from "@/services/video/types";
+import { videoService } from "@/services/video/VideoService";
 import { CurrentContextCard } from "../CurrentContextCard";
 import { ShadowControls } from "../ShadowControls";
 import { ShadowConversation } from "../ShadowConversation";
@@ -265,9 +267,67 @@ export function ShadowWatchPage() {
 
 				const deadline = Date.now() + TRANSCRIPT_WAIT_TIMEOUT_MS;
 				let pollAttempt = 0;
+				let reprocessAttempted = false;
 
 				while (!cancelled) {
 					if (transcriptResult === null) {
+						let pipelineStatus: VideoStatus | null = null;
+
+						try {
+							pushLog(t("pipeline.shadow.bootstrapLogFetchStatus"));
+							const jobStatus = await videoService.getStatus(videoId);
+							pipelineStatus = jobStatus.status;
+							pushLog(
+								t("pipeline.shadow.bootstrapLogPipelineStatus", {
+									status: jobStatus.status,
+								}),
+							);
+							patchCheck("transcript", {
+								status:
+									jobStatus.status === "failed"
+										? "error"
+										: jobStatus.status === "completed"
+											? "warning"
+											: "active",
+								detail: t("pipeline.shadow.bootstrapPipelineStatusDetail", {
+									status: jobStatus.status,
+								}),
+							});
+
+							if (jobStatus.status === "failed") {
+								if (!reprocessAttempted) {
+									reprocessAttempted = true;
+									pushLog(
+										t("pipeline.shadow.bootstrapLogRequeuePipeline"),
+										"warn",
+									);
+									const processResult =
+										await videoService.processVideo(videoId);
+									pushLog(
+										t("pipeline.shadow.bootstrapLogRequeueResult", {
+											status: processResult.status,
+										}),
+									);
+									await sleep(TRANSCRIPT_POLL_INTERVAL_MS);
+									continue;
+								}
+
+								const failedMessage = t(
+									"pipeline.shadow.bootstrapPipelineFailed",
+								);
+								pushLog(failedMessage, "error");
+								setBootstrapFailure(failedMessage);
+								return;
+							}
+						} catch (error) {
+							pushLog(
+								t("pipeline.shadow.bootstrapLogStatusFailed", {
+									error: formatBootstrapError(error),
+								}),
+								"warn",
+							);
+						}
+
 						if (Date.now() >= deadline) {
 							const timeoutMessage = t(
 								"pipeline.shadow.bootstrapTranscriptTimeout",
@@ -290,6 +350,7 @@ export function ShadowWatchPage() {
 							{
 								attempt: pollAttempt,
 								elapsed: elapsedSeconds,
+								status: pipelineStatus ?? "unknown",
 							},
 						);
 						pushLog(waitingMessage, "warn");

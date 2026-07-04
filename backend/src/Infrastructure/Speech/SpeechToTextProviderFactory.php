@@ -10,10 +10,12 @@ use App\Infrastructure\Speech\Exception\InvalidSpeechToTextConfigurationExceptio
 final class SpeechToTextProviderFactory
 {
     public const string PROVIDER_FASTER_WHISPER = 'faster_whisper';
+    public const string PROVIDER_DETERMINISTIC = 'deterministic';
 
     public function __construct(
         private readonly string $providerName,
         private readonly FasterWhisperProvider $fasterWhisperProvider,
+        private readonly DeterministicSpeechToTextProvider $deterministicProvider,
     ) {
     }
 
@@ -25,8 +27,12 @@ final class SpeechToTextProviderFactory
             return $this->fasterWhisperProvider;
         }
 
+        if (self::PROVIDER_DETERMINISTIC === $normalized) {
+            return $this->deterministicProvider;
+        }
+
         throw new InvalidSpeechToTextConfigurationException(sprintf(
-            'Unknown STT_PROVIDER value "%s". Supported values: faster_whisper.',
+            'Unknown STT_PROVIDER value "%s". Supported values: faster_whisper, deterministic.',
             $this->providerName,
         ));
     }

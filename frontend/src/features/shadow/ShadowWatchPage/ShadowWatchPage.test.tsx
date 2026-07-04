@@ -7,6 +7,7 @@ import { videoRenderService } from "@/services/render/VideoRenderService";
 import { shadowService } from "@/services/shadow/ShadowService";
 import { DEFAULT_SHADOW_VOICE_PREFERENCE } from "@/services/shadow/types";
 import { transcriptService } from "@/services/transcript/TranscriptService";
+import { videoService } from "@/services/video/VideoService";
 import { renderWithProviders } from "@/test/render";
 
 const VIDEO_ID = "550e8400-e29b-41d4-a716-446655440099";
@@ -14,6 +15,13 @@ const VIDEO_ID = "550e8400-e29b-41d4-a716-446655440099";
 describe("ShadowWatchPage", () => {
 	it("renders watch mode and starts a session", async () => {
 		vi.spyOn(videoRenderService, "listRenders").mockResolvedValue([]);
+		vi.spyOn(videoService, "getStatus").mockResolvedValue({
+			videoId: VIDEO_ID,
+			status: "completed",
+			originalFilename: "lecture.mp4",
+			language: "unknown",
+			createdAt: new Date().toISOString(),
+		});
 		vi.spyOn(transcriptService, "getTranscript").mockResolvedValue({
 			videoId: VIDEO_ID,
 			transcriptId: "550e8400-e29b-41d4-a716-446655440010",
@@ -89,6 +97,13 @@ describe("ShadowWatchPage", () => {
 
 	it("submits a question to Shadow", async () => {
 		vi.spyOn(videoRenderService, "listRenders").mockResolvedValue([]);
+		vi.spyOn(videoService, "getStatus").mockResolvedValue({
+			videoId: VIDEO_ID,
+			status: "completed",
+			originalFilename: "lecture.mp4",
+			language: "unknown",
+			createdAt: new Date().toISOString(),
+		});
 		vi.spyOn(transcriptService, "getTranscript").mockResolvedValue({
 			videoId: VIDEO_ID,
 			transcriptId: "550e8400-e29b-41d4-a716-446655440010",

@@ -107,6 +107,22 @@ final readonly class VideoJob
         return $this->withStatus(VideoStatus::Failed);
     }
 
+    public function requeue(): self
+    {
+        if (VideoStatus::Failed === $this->status) {
+            return $this->withStatus(VideoStatus::Queued);
+        }
+
+        if (VideoStatus::Queued === $this->status || VideoStatus::Processing === $this->status) {
+            return $this;
+        }
+
+        throw new InvalidVideoJobException(sprintf(
+            'Cannot requeue a video job in status "%s".',
+            $this->status->value,
+        ));
+    }
+
     public function id(): VideoId
     {
         return $this->id;

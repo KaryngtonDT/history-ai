@@ -355,9 +355,12 @@ export const pipelineDe: PipelineMessages = {
 			bootstrapNoRenderDetail:
 				"Noch kein Final Render — Shadow kann ohne Videowiedergabe starten",
 			bootstrapWaitingTranscript:
-				"Warte auf Transkript (Versuch {{attempt}}, {{elapsed}} s)...",
+				"Warte auf Transkript (Versuch {{attempt}}, {{elapsed}} s, Pipeline: {{status}})...",
 			bootstrapTranscriptTimeout:
 				"Transkript nach 5 Minuten nicht bereit. Starten Sie die Video-Pipeline in Lumen.",
+			bootstrapPipelineFailed:
+				"Video-Pipeline fehlgeschlagen. Watch erneut öffnen oder in Lumen neu starten.",
+			bootstrapPipelineStatusDetail: "Pipeline-Status: {{status}}",
 			bootstrapLogTitle: "Aktivitätsprotokoll",
 			bootstrapLogStart: "Bootstrap gestartet für Video {{videoId}}",
 			bootstrapLogFetchTranscript: "GET /api/videos/{id}/transcript",
@@ -374,6 +377,13 @@ export const pipelineDe: PipelineMessages = {
 			bootstrapLogSessionFailed: "Shadow-Sitzung fehlgeschlagen: {{error}}",
 			bootstrapLogLoadContext: "GET /api/videos/{id}/shadow/context",
 			bootstrapLogPollTranscript: "Transkript erneut prüfen...",
+			bootstrapLogFetchStatus: "GET /api/videos/{id}/status",
+			bootstrapLogPipelineStatus: "Pipeline-Status: {{status}}",
+			bootstrapLogRequeuePipeline:
+				"POST /api/videos/{id}/process — fehlgeschlagenen Job erneut einreihen",
+			bootstrapLogRequeueResult: "Antwort erneutes Einreihen: {{status}}",
+			bootstrapLogStatusFailed:
+				"Pipeline-Status konnte nicht gelesen werden: {{error}}",
 			bootstrapLogUnexpectedError: "Unerwarteter Bootstrap-Fehler: {{error}}",
 			bootstrapLogReady: "Bootstrap abgeschlossen — Shadow Watch wird geöffnet",
 			emptyDescriptionWithError:

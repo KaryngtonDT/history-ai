@@ -1,4 +1,9 @@
-import type { VideoUploadOptions, VideoUploadResult } from "./types";
+import type {
+	VideoJobStatus,
+	VideoProcessResult,
+	VideoUploadOptions,
+	VideoUploadResult,
+} from "./types";
 import type { VideoRepository } from "./VideoRepository";
 
 export class MockVideoRepository implements VideoRepository {
@@ -19,5 +24,19 @@ export class MockVideoRepository implements VideoRepository {
 			videoId: "550e8400-e29b-41d4-a716-446655440099",
 			status: "queued",
 		};
+	}
+
+	async getStatus(videoId: string): Promise<VideoJobStatus> {
+		return {
+			videoId,
+			status: "completed",
+			originalFilename: "lecture.mp4",
+			language: "unknown",
+			createdAt: new Date().toISOString(),
+		};
+	}
+
+	async processVideo(_videoId: string): Promise<VideoProcessResult> {
+		return { status: "queued" };
 	}
 }

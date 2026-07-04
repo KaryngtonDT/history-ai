@@ -72,6 +72,22 @@ final class VideoJobTest extends TestCase
         self::assertSame(VideoStatus::Failed, $failed->status());
     }
 
+    public function testRequeueTransitionFromFailed(): void
+    {
+        $requeued = VideoJob::createUploaded(
+            new VideoId(self::VIDEO_ID),
+            'lecture.mp4',
+            VideoLanguage::German,
+        )
+            ->withStoragePath('/var/video-storage/lecture.mp4')
+            ->queue()
+            ->startProcessing()
+            ->fail()
+            ->requeue();
+
+        self::assertSame(VideoStatus::Queued, $requeued->status());
+    }
+
     public function testRejectsInvalidStatusTransitions(): void
     {
         $uploaded = VideoJob::createUploaded(

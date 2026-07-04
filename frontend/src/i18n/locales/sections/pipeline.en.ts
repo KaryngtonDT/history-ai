@@ -344,9 +344,12 @@ export const pipelineEn = {
 			bootstrapNoRenderDetail:
 				"No final render yet — Shadow can still start without video playback",
 			bootstrapWaitingTranscript:
-				"Waiting for transcript (attempt {{attempt}}, {{elapsed}}s elapsed)...",
+				"Waiting for transcript (attempt {{attempt}}, {{elapsed}}s elapsed, pipeline: {{status}})...",
 			bootstrapTranscriptTimeout:
 				"Transcript not ready after 5 minutes. Run the video pipeline from Lumen.",
+			bootstrapPipelineFailed:
+				"Video pipeline failed. Re-open Watch after fixing STT or retry from Lumen.",
+			bootstrapPipelineStatusDetail: "Pipeline status: {{status}}",
 			bootstrapLogTitle: "Activity log",
 			bootstrapLogStart: "Bootstrap started for video {{videoId}}",
 			bootstrapLogFetchTranscript: "GET /api/videos/{id}/transcript",
@@ -363,6 +366,12 @@ export const pipelineEn = {
 			bootstrapLogSessionFailed: "Shadow session failed: {{error}}",
 			bootstrapLogLoadContext: "GET /api/videos/{id}/shadow/context",
 			bootstrapLogPollTranscript: "Polling transcript again...",
+			bootstrapLogFetchStatus: "GET /api/videos/{id}/status",
+			bootstrapLogPipelineStatus: "Pipeline status: {{status}}",
+			bootstrapLogRequeuePipeline:
+				"POST /api/videos/{id}/process — re-queue failed job",
+			bootstrapLogRequeueResult: "Re-queue response: {{status}}",
+			bootstrapLogStatusFailed: "Could not read pipeline status: {{error}}",
 			bootstrapLogUnexpectedError: "Unexpected bootstrap error: {{error}}",
 			bootstrapLogReady: "Bootstrap complete — opening Shadow Watch",
 			emptyDescriptionWithError:

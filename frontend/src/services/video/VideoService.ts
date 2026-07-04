@@ -1,5 +1,7 @@
 import { ValidationError } from "@/shared/errors";
 import type {
+	VideoJobStatus,
+	VideoProcessResult,
 	VideoUploadOptions,
 	VideoUploadResult,
 	VideoValidationResult,
@@ -48,6 +50,14 @@ export class VideoService {
 		}
 
 		return this.repository.uploadVideo(file, options);
+	}
+
+	async getStatus(videoId: string): Promise<VideoJobStatus> {
+		return this.repository.getStatus(videoId);
+	}
+
+	async processVideo(videoId: string): Promise<VideoProcessResult> {
+		return this.repository.processVideo(videoId);
 	}
 }
 

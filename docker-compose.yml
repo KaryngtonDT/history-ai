@@ -71,6 +71,7 @@ services:
       APP_SECRET: ${APP_SECRET:-change-me}
       DATABASE_URL: ${DATABASE_URL:-postgresql://history_ai:history_ai@postgres:5432/history_ai?serverVersion=17&charset=utf8}
       MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=0}
+      STT_PROVIDER: ${STT_PROVIDER:-deterministic}
       WORKER_BASE_URL: ${WORKER_BASE_URL:-http://worker:8001}
       MODELS_ROOT: /models
     volumes:

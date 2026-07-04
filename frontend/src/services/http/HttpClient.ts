@@ -1,3 +1,4 @@
+import { appendActivityLog } from "@/features/activity/activityLogStore";
 import { ApiError, NetworkError } from "@/shared/errors";
 
 export interface PostFormDataOptions {
@@ -12,17 +13,26 @@ export class HttpClient {
 	}
 
 	async get<T>(path: string): Promise<T> {
+		appendActivityLog(`GET ${path}`, "info", "http");
+
 		try {
 			const response = await fetch(`${this.baseUrl}${path}`, {
 				headers: { Accept: "application/json" },
 			});
 
 			if (!response.ok) {
+				appendActivityLog(
+					`GET ${path} failed (${response.status})`,
+					"error",
+					"http",
+				);
 				throw new ApiError(
 					`GET ${path} failed (${response.status})`,
 					response.status,
 				);
 			}
+
+			appendActivityLog(`GET ${path} OK (${response.status})`, "info", "http");
 
 			return (await response.json()) as T;
 		} catch (error) {
@@ -143,6 +153,8 @@ export class HttpClient {
 		path: string,
 		body: unknown,
 	): Promise<T> {
+		appendActivityLog(`${method} ${path}`, "info", "http");
+
 		try {
 			const response = await fetch(`${this.baseUrl}${path}`, {
 				method,
@@ -154,11 +166,22 @@ export class HttpClient {
 			});
 
 			if (!response.ok) {
+				appendActivityLog(
+					`${method} ${path} failed (${response.status})`,
+					"error",
+					"http",
+				);
 				throw new ApiError(
 					`${method} ${path} failed (${response.status})`,
 					response.status,
 				);
 			}
+
+			appendActivityLog(
+				`${method} ${path} OK (${response.status})`,
+				"info",
+				"http",
+			);
 
 			return (await response.json()) as T;
 		} catch (error) {

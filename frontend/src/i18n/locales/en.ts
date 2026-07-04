@@ -1,4 +1,7 @@
 import { type DeepStringRecord, mergeMessages } from "../localeUtils";
+import { activityLogDe } from "./sections/activityLog.de";
+import { activityLogEn } from "./sections/activityLog.en";
+import { activityLogFr } from "./sections/activityLog.fr";
 import { browserDe } from "./sections/browser.de";
 import { browserEn } from "./sections/browser.en";
 import { browserFr } from "./sections/browser.fr";
@@ -88,6 +91,7 @@ const baseEn = {
 } as const;
 
 export const en = mergeMessages(
+	activityLogEn,
 	mergeMessages(
 		mergeMessages(
 			mergeMessages(
@@ -152,6 +156,7 @@ const baseFr = {
 } as const satisfies DeepStringRecord<typeof baseEn>;
 
 export const fr = mergeMessages(
+	activityLogFr,
 	mergeMessages(
 		mergeMessages(
 			mergeMessages(
@@ -214,6 +219,7 @@ const baseDe = {
 } as const satisfies DeepStringRecord<typeof baseEn>;
 
 export const de = mergeMessages(
+	activityLogDe,
 	mergeMessages(
 		mergeMessages(
 			mergeMessages(

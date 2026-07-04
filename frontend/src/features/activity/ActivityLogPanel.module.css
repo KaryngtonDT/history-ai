@@ -1,0 +1,140 @@
+.root {
+	position: fixed;
+	right: max(16px, env(safe-area-inset-right));
+	bottom: max(16px, env(safe-area-inset-bottom));
+	z-index: 1200;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 8px;
+	max-width: min(420px, calc(100vw - 32px));
+	font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 14px;
+	border: 1px solid var(--color-border, #d6dbe3);
+	border-radius: 999px;
+	background: var(--color-surface, #fff);
+	box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--color-text, #111827);
+}
+
+.toggleCount {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 22px;
+	height: 22px;
+	padding: 0 6px;
+	border-radius: 999px;
+	background: var(--color-primary-soft, #eef2ff);
+	color: var(--color-primary, #4338ca);
+	font-size: 12px;
+}
+
+.root[data-has-errors="true"] .toggleCount {
+	background: #fee2e2;
+	color: #b91c1c;
+}
+
+.panel {
+	width: min(420px, calc(100vw - 32px));
+	max-height: min(320px, 40vh);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	border: 1px dashed var(--color-border, #cbd5e1);
+	border-radius: 14px;
+	background: var(--color-surface-muted, #f8fafc);
+	box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
+}
+
+.header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 12px 14px;
+	border-bottom: 1px solid var(--color-border, #e2e8f0);
+}
+
+.title {
+	margin: 0;
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--color-text, #0f172a);
+}
+
+.latest {
+	margin: 4px 0 0;
+	font-size: 12px;
+	color: var(--color-text-muted, #64748b);
+}
+
+.headerActions {
+	display: flex;
+	gap: 4px;
+}
+
+.iconButton {
+	border: none;
+	background: transparent;
+	color: var(--color-text-muted, #64748b);
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 1;
+	padding: 4px 6px;
+	border-radius: 6px;
+}
+
+.iconButton:hover {
+	background: rgba(15, 23, 42, 0.06);
+	color: var(--color-text, #0f172a);
+}
+
+.list {
+	margin: 0;
+	padding: 8px 0;
+	list-style: none;
+	overflow: auto;
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-size: 12px;
+	line-height: 1.45;
+}
+
+.entry {
+	display: grid;
+	grid-template-columns: auto auto 1fr;
+	gap: 8px;
+	padding: 4px 14px;
+	color: var(--color-text, #1e293b);
+}
+
+.entry[data-level="warn"] {
+	color: #b45309;
+}
+
+.entry[data-level="error"] {
+	color: #b91c1c;
+}
+
+.time {
+	color: var(--color-text-muted, #64748b);
+}
+
+.source {
+	color: var(--color-primary, #4338ca);
+	font-weight: 600;
+}
+
+.empty {
+	padding: 12px 14px;
+	color: var(--color-text-muted, #64748b);
+}

@@ -7,9 +7,33 @@ import { videoRenderService } from "@/services/render/VideoRenderService";
 import { shadowService } from "@/services/shadow/ShadowService";
 import { DEFAULT_SHADOW_VOICE_PREFERENCE } from "@/services/shadow/types";
 import { transcriptService } from "@/services/transcript/TranscriptService";
+import { videoService } from "@/services/video/VideoService";
 import { renderWithProviders } from "@/test/render";
 
 const VIDEO_ID = "550e8400-e29b-41d4-a716-446655440099";
+
+const defaultTranscript = {
+	videoId: VIDEO_ID,
+	transcriptId: "550e8400-e29b-41d4-a716-446655440010",
+	language: "english" as const,
+	text: "Hello world.",
+	duration: 5,
+	segmentCount: 1,
+	segments: [{ index: 0, startTime: 0, endTime: 5, text: "Hello world." }],
+};
+
+function mockShadowWatchBootstrap(): void {
+	vi.spyOn(videoRenderService, "listRenders").mockResolvedValue([]);
+	vi.spyOn(transcriptService, "getTranscript").mockResolvedValue(defaultTranscript);
+	vi.spyOn(videoService, "getStatus").mockResolvedValue({
+		videoId: VIDEO_ID,
+		status: "completed",
+		originalFilename: "lecture.mp4",
+		language: "unknown",
+		createdAt: new Date().toISOString(),
+	});
+	vi.spyOn(videoService, "processVideo").mockResolvedValue({ status: "queued" });
+}
 
 const defaultPolicy = {
 	enabled: false,
@@ -25,8 +49,7 @@ const defaultVoicePreference = DEFAULT_SHADOW_VOICE_PREFERENCE;
 
 describe("ShadowWatchPage proactive tutor", () => {
 	it("disables intervention checks when proactive mode is off", async () => {
-		vi.spyOn(videoRenderService, "listRenders").mockResolvedValue([]);
-		vi.spyOn(transcriptService, "getTranscript").mockResolvedValue(null);
+		mockShadowWatchBootstrap();
 		vi.spyOn(shadowService, "startSession").mockResolvedValue({
 			sessionId: "550e8400-e29b-41d4-a716-446655440020",
 			videoId: VIDEO_ID,
@@ -81,8 +104,7 @@ describe("ShadowWatchPage proactive tutor", () => {
 	});
 
 	it("updates policy when proactive mode is enabled", async () => {
-		vi.spyOn(videoRenderService, "listRenders").mockResolvedValue([]);
-		vi.spyOn(transcriptService, "getTranscript").mockResolvedValue(null);
+		mockShadowWatchBootstrap();
 		vi.spyOn(shadowService, "startSession").mockResolvedValue({
 			sessionId: "550e8400-e29b-41d4-a716-446655440020",
 			videoId: VIDEO_ID,
@@ -127,8 +149,7 @@ describe("ShadowWatchPage proactive tutor", () => {
 	});
 
 	it("updates voice preference when speaking language changes", async () => {
-		vi.spyOn(videoRenderService, "listRenders").mockResolvedValue([]);
-		vi.spyOn(transcriptService, "getTranscript").mockResolvedValue(null);
+		mockShadowWatchBootstrap();
 		vi.spyOn(shadowService, "startSession").mockResolvedValue({
 			sessionId: "550e8400-e29b-41d4-a716-446655440020",
 			videoId: VIDEO_ID,

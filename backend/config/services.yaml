@@ -19,7 +19,7 @@ parameters:
     audio.source_storage_dir: '%storage.root%/uploads/audio'
     youtube.download_dir: '%storage.root%/temp/youtube'
     youtube.yt_dlp.binary_default: 'yt-dlp'
-    stt.provider_default: 'faster_whisper'
+    stt.provider_default: 'deterministic'
     stt.faster_whisper.binary_default: 'faster-whisper'
     stt.faster_whisper.model_default: 'base'
     translation.provider_default: 'ollama'

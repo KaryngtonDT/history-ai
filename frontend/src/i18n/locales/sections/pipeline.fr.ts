@@ -355,9 +355,12 @@ export const pipelineFr: PipelineMessages = {
 			bootstrapNoRenderDetail:
 				"Pas encore de rendu final — Shadow peut démarrer sans lecteur vidéo",
 			bootstrapWaitingTranscript:
-				"Attente de la transcription (tentative {{attempt}}, {{elapsed}} s)...",
+				"Attente de la transcription (tentative {{attempt}}, {{elapsed}} s, pipeline : {{status}})...",
 			bootstrapTranscriptTimeout:
 				"Transcription non prête après 5 minutes. Lancez le pipeline vidéo depuis Lumen.",
+			bootstrapPipelineFailed:
+				"Le pipeline vidéo a échoué. Rouvrez Watch après correction STT ou relancez depuis Lumen.",
+			bootstrapPipelineStatusDetail: "Statut pipeline : {{status}}",
 			bootstrapLogTitle: "Journal d'activité",
 			bootstrapLogStart: "Démarrage pour la vidéo {{videoId}}",
 			bootstrapLogFetchTranscript: "GET /api/videos/{id}/transcript",
@@ -374,6 +377,13 @@ export const pipelineFr: PipelineMessages = {
 			bootstrapLogSessionFailed: "Échec session Shadow : {{error}}",
 			bootstrapLogLoadContext: "GET /api/videos/{id}/shadow/context",
 			bootstrapLogPollTranscript: "Nouvelle vérification de la transcription...",
+			bootstrapLogFetchStatus: "GET /api/videos/{id}/status",
+			bootstrapLogPipelineStatus: "Statut pipeline : {{status}}",
+			bootstrapLogRequeuePipeline:
+				"POST /api/videos/{id}/process — remise en file d'un job échoué",
+			bootstrapLogRequeueResult: "Réponse remise en file : {{status}}",
+			bootstrapLogStatusFailed:
+				"Impossible de lire le statut pipeline : {{error}}",
 			bootstrapLogUnexpectedError: "Erreur inattendue : {{error}}",
 			bootstrapLogReady: "Initialisation terminée — ouverture de Shadow Watch",
 			emptyDescriptionWithError:
