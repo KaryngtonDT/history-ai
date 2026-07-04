@@ -84,14 +84,45 @@ async function handleDisconnect(): Promise<BackgroundResponse> {
   return { ok: true, session: { ...sessionState } };
 }
 
-async function handlePageDetected(context: PageContext): Promise<BackgroundResponse> {
+async function resolveTabId(
+  context: PageContext,
+  sender?: chrome.runtime.MessageSender,
+): Promise<string> {
+  if (context.tabId) {
+    return context.tabId;
+  }
+
+  if (sender?.tab?.id !== undefined) {
+    return String(sender.tab.id);
+  }
+
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (tab?.id !== undefined) {
+    return String(tab.id);
+  }
+
+  throw new Error("Could not resolve browser tab id.");
+}
+
+async function withTabContext(
+  context: PageContext,
+  sender?: chrome.runtime.MessageSender,
+): Promise<PageContext> {
+  return { ...context, tabId: await resolveTabId(context, sender) };
+}
+
+async function handlePageDetected(
+  context: PageContext,
+  sender?: chrome.runtime.MessageSender,
+): Promise<BackgroundResponse> {
   if (!sessionState.connected) {
     return { ok: true, session: { ...sessionState } };
   }
 
   try {
-    await postBrowserPlatform(context);
-    await postBrowserContext(context);
+    const enriched = await withTabContext(context, sender);
+    await postBrowserPlatform(enriched);
+    await postBrowserContext(enriched);
     return { ok: true, data: { synced: true } };
   } catch (error) {
     return {
@@ -141,13 +172,15 @@ async function runBrowserAction(
 
 async function handleShadowAction(
   action: BackgroundMessage & { type: "SHADOW_ACTION" },
+  sender?: chrome.runtime.MessageSender,
 ): Promise<BackgroundResponse> {
   if (!sessionState.connected) {
     return { ok: false, error: "Not connected to Lumen" };
   }
 
   try {
-    const result = await runBrowserAction(action.action, action.context, {
+    const enriched = await withTabContext(action.context, sender);
+    const result = await runBrowserAction(action.action, enriched, {
       language: action.language,
       importConfirmed: action.importConfirmed,
     });
@@ -161,7 +194,10 @@ async function handleShadowAction(
   }
 }
 
-async function routeMessage(message: BackgroundMessage): Promise<BackgroundResponse> {
+async function routeMessage(
+  message: BackgroundMessage,
+  sender?: chrome.runtime.MessageSender,
+): Promise<BackgroundResponse> {
   switch (message.type) {
     case "GET_SESSION":
       return { ok: true, session: await refreshSession() };
@@ -170,13 +206,13 @@ async function routeMessage(message: BackgroundMessage): Promise<BackgroundRespo
     case "DISCONNECT":
       return handleDisconnect();
     case "PAGE_DETECTED":
-      return handlePageDetected(message.context);
+      return handlePageDetected(message.context, sender);
     case "POST_CONTEXT":
-      return handlePageDetected(message.context);
+      return handlePageDetected(message.context, sender);
     case "POST_PLATFORM":
-      return handlePageDetected(message.context);
+      return handlePageDetected(message.context, sender);
     case "SHADOW_ACTION":
-      return handleShadowAction(message);
+      return handleShadowAction(message, sender);
     default:
       return { ok: false, error: "Unknown message type" };
   }
@@ -192,8 +228,8 @@ chrome.runtime.onInstalled.addListener((details) => {
   });
 });
 
-chrome.runtime.onMessage.addListener((message: BackgroundMessage, _sender, sendResponse) => {
-  void routeMessage(message).then(sendResponse);
+chrome.runtime.onMessage.addListener((message: BackgroundMessage, sender, sendResponse) => {
+  void routeMessage(message, sender).then(sendResponse);
   return true;
 });
 

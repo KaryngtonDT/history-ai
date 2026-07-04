@@ -104,11 +104,16 @@ export async function getBrowserSession(): Promise<unknown> {
 }
 
 export async function postBrowserContext(context: PageContext): Promise<unknown> {
+  if (!context.tabId) {
+    throw new Error("Browser context requires tab id.");
+  }
+
   return apiFetch("/api/shadow/browser/context", { method: "POST" }, {
     url: context.url,
     title: context.title,
     platform: context.platform,
     host: context.host,
+    tabId: context.tabId,
   });
 }
 

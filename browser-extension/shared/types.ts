@@ -48,6 +48,7 @@ export interface PageContext {
   title: string;
   platform: BrowserPlatform;
   host: string;
+  tabId?: string;
 }
 
 export interface BrowserSession {
