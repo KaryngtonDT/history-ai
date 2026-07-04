@@ -2,16 +2,24 @@ import {
   connectBrowser,
   disconnectBrowser,
   getBrowserSession,
+  getStorageSettings,
   postBrowserContext,
+  postBrowserExplain,
+  postBrowserOpenWatch,
   postBrowserPlatform,
+  postBrowserSave,
+  postBrowserSummarize,
+  postBrowserTranslate,
 } from "../shared/api";
 import { publishShadowConnected, notifyTabsSessionChanged } from "../shared/connection-state";
 import { isBrowserSessionActive } from "../shared/session";
 import type {
   BackgroundMessage,
   BackgroundResponse,
+  BrowserActionResult,
   BrowserSession,
   PageContext,
+  ShadowAction,
 } from "../shared/types";
 
 const sessionState: BrowserSession = {
@@ -93,6 +101,44 @@ async function handlePageDetected(context: PageContext): Promise<BackgroundRespo
   }
 }
 
+async function openWatchTab(watchPath: string): Promise<void> {
+  const { lumenWebBase } = await getStorageSettings();
+  const base = lumenWebBase.replace(/\/$/, "");
+  await chrome.tabs.create({ url: `${base}${watchPath}` });
+}
+
+async function runBrowserAction(
+  action: ShadowAction,
+  context: PageContext,
+  options?: { language?: string; importConfirmed?: boolean },
+): Promise<BrowserActionResult> {
+  await postBrowserContext(context);
+
+  switch (action) {
+    case "explain":
+      return postBrowserExplain(context);
+    case "translate":
+      return postBrowserTranslate(context, options?.language ?? "fr");
+    case "summarize":
+      return postBrowserSummarize(context);
+    case "save_to_brain":
+      return postBrowserSave(context);
+    case "open_watch": {
+      const result = await postBrowserOpenWatch(context, {
+        importConfirmed: options?.importConfirmed ?? false,
+      });
+
+      if (result.watchPath && result.status !== "confirmation_required") {
+        await openWatchTab(result.watchPath);
+      }
+
+      return result;
+    }
+    default:
+      throw new Error(`Unknown action: ${String(action)}`);
+  }
+}
+
 async function handleShadowAction(
   action: BackgroundMessage & { type: "SHADOW_ACTION" },
 ): Promise<BackgroundResponse> {
@@ -101,8 +147,12 @@ async function handleShadowAction(
   }
 
   try {
-    await postBrowserContext(action.context);
-    return { ok: true, data: { action: action.action, queued: true } };
+    const result = await runBrowserAction(action.action, action.context, {
+      language: action.language,
+      importConfirmed: action.importConfirmed,
+    });
+
+    return { ok: true, data: result };
   } catch (error) {
     return {
       ok: false,

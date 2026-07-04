@@ -21,6 +21,28 @@ export type ShadowAction =
   | "save_to_brain"
   | "open_watch";
 
+export type BrowserActionStatus =
+  | "completed"
+  | "confirmation_required"
+  | "processing"
+  | "unavailable"
+  | "error";
+
+export interface BrowserActionResult {
+  action: ShadowAction;
+  status: BrowserActionStatus;
+  message?: string;
+  summary?: string;
+  body?: string;
+  concepts?: string[];
+  estimatedLevel?: string;
+  keyPoints?: string[];
+  language?: string;
+  importRequired?: boolean;
+  videoId?: string;
+  watchPath?: string;
+}
+
 export interface PageContext {
   url: string;
   title: string;
@@ -46,11 +68,17 @@ export type BackgroundMessage =
   | { type: "CONNECT" }
   | { type: "DISCONNECT" }
   | { type: "PAGE_DETECTED"; context: PageContext }
-  | { type: "SHADOW_ACTION"; action: ShadowAction; context: PageContext }
+  | {
+      type: "SHADOW_ACTION";
+      action: ShadowAction;
+      context: PageContext;
+      language?: string;
+      importConfirmed?: boolean;
+    }
   | { type: "POST_CONTEXT"; context: PageContext }
   | { type: "POST_PLATFORM"; context: PageContext };
 
 export type BackgroundResponse =
   | { ok: true; session: BrowserSession }
-  | { ok: true; data: unknown }
+  | { ok: true; data: BrowserActionResult | Record<string, unknown> }
   | { ok: false; error: string };

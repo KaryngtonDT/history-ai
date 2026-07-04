@@ -121,4 +121,71 @@ final class ShadowBrowserControllerTest extends WebTestCase
         self::assertTrue($granted['read_page_context'] ?? false);
         self::assertTrue($granted['read_selection'] ?? false);
     }
+
+    public function testExplainActionReturnsVisibleSummary(): void
+    {
+        $client = static::createClient();
+        $scope = self::SCOPE.'-explain-action';
+
+        $client->request(
+            'POST',
+            '/api/shadow/browser/connect',
+            server: ['CONTENT_TYPE' => 'application/json'],
+            content: json_encode(['scopeKey' => $scope], JSON_THROW_ON_ERROR),
+        );
+        self::assertResponseIsSuccessful();
+
+        $client->request(
+            'POST',
+            '/api/shadow/browser/explain',
+            server: ['CONTENT_TYPE' => 'application/json'],
+            content: json_encode([
+                'scopeKey' => $scope,
+                'url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                'title' => 'Secret History',
+                'platform' => 'youtube',
+                'host' => 'youtube.com',
+            ], JSON_THROW_ON_ERROR),
+        );
+
+        self::assertResponseIsSuccessful();
+        $payload = json_decode($client->getResponse()->getContent(), true);
+        self::assertIsArray($payload);
+        self::assertSame('completed', $payload['status'] ?? null);
+        self::assertSame('explain', $payload['action'] ?? null);
+        self::assertStringContainsString('Secret History', (string) ($payload['summary'] ?? ''));
+    }
+
+    public function testOpenWatchRequiresConfirmationWhenNotImported(): void
+    {
+        $client = static::createClient();
+        $scope = self::SCOPE.'-open-watch';
+
+        $client->request(
+            'POST',
+            '/api/shadow/browser/connect',
+            server: ['CONTENT_TYPE' => 'application/json'],
+            content: json_encode(['scopeKey' => $scope], JSON_THROW_ON_ERROR),
+        );
+        self::assertResponseIsSuccessful();
+
+        $client->request(
+            'POST',
+            '/api/shadow/browser/open-watch',
+            server: ['CONTENT_TYPE' => 'application/json'],
+            content: json_encode([
+                'scopeKey' => $scope,
+                'url' => 'https://www.youtube.com/watch?v=9OpenWatch9',
+                'title' => 'Open Watch Test',
+                'platform' => 'youtube',
+                'host' => 'youtube.com',
+            ], JSON_THROW_ON_ERROR),
+        );
+
+        self::assertResponseIsSuccessful();
+        $payload = json_decode($client->getResponse()->getContent(), true);
+        self::assertIsArray($payload);
+        self::assertSame('confirmation_required', $payload['status'] ?? null);
+        self::assertTrue($payload['importRequired'] ?? false);
+    }
 }

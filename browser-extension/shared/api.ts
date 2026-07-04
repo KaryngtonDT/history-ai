@@ -1,4 +1,4 @@
-import type { PageContext, StorageSettings } from "./types";
+import type { BrowserActionResult, PageContext, StorageSettings } from "./types";
 
 export const DEFAULT_LUMEN_API_BASE = "http://localhost:8000";
 export const DEFAULT_LUMEN_WEB_BASE = "http://localhost:5173";
@@ -131,4 +131,45 @@ export async function getBrowserExplain(): Promise<unknown> {
   }
 
   return response.json();
+}
+
+function pagePayload(context: PageContext): Record<string, unknown> {
+  return {
+    url: context.url,
+    title: context.title,
+    platform: context.platform,
+    host: context.host,
+  };
+}
+
+export async function postBrowserExplain(context: PageContext): Promise<BrowserActionResult> {
+  return apiFetch("/api/shadow/browser/explain", { method: "POST" }, pagePayload(context));
+}
+
+export async function postBrowserTranslate(
+  context: PageContext,
+  language: string,
+): Promise<BrowserActionResult> {
+  return apiFetch("/api/shadow/browser/translate", { method: "POST" }, {
+    ...pagePayload(context),
+    language,
+  });
+}
+
+export async function postBrowserSummarize(context: PageContext): Promise<BrowserActionResult> {
+  return apiFetch("/api/shadow/browser/summarize", { method: "POST" }, pagePayload(context));
+}
+
+export async function postBrowserSave(context: PageContext): Promise<BrowserActionResult> {
+  return apiFetch("/api/shadow/browser/save", { method: "POST" }, pagePayload(context));
+}
+
+export async function postBrowserOpenWatch(
+  context: PageContext,
+  options?: { importConfirmed?: boolean },
+): Promise<BrowserActionResult> {
+  return apiFetch("/api/shadow/browser/open-watch", { method: "POST" }, {
+    ...pagePayload(context),
+    importConfirmed: options?.importConfirmed ?? false,
+  });
 }

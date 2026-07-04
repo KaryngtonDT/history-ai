@@ -8,11 +8,13 @@ use App\Application\ShadowBrowser\Handlers\GetBrowserExplainHandler;
 use App\Application\ShadowBrowser\Handlers\GetBrowserHistoryHandler;
 use App\Application\ShadowBrowser\Handlers\GetBrowserPermissionsHandler;
 use App\Application\ShadowBrowser\Handlers\GetBrowserSessionHandler;
+use App\Application\ShadowBrowser\Handlers\PostBrowserActionHandler;
 use App\Application\ShadowBrowser\Handlers\PostBrowserConnectHandler;
 use App\Application\ShadowBrowser\Handlers\PostBrowserContextHandler;
 use App\Application\ShadowBrowser\Handlers\PostBrowserDisconnectHandler;
 use App\Application\ShadowBrowser\Handlers\PostBrowserPlatformHandler;
 use App\Application\ShadowBrowser\Handlers\PutBrowserPermissionsHandler;
+use App\Domain\ShadowBrowser\BrowserActionType;
 use App\Domain\ShadowBrowser\Exception\InvalidShadowBrowserException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -106,6 +108,51 @@ final class ShadowBrowserController extends AbstractController
     public function explain(Request $request, GetBrowserExplainHandler $handler): JsonResponse
     {
         return $this->json($handler($this->scopeKey($request)));
+    }
+
+    #[Route('/api/shadow/browser/explain', name: 'api_shadow_browser_explain_post', methods: ['POST'])]
+    public function explainAction(Request $request, PostBrowserActionHandler $handler): JsonResponse
+    {
+        return $this->runAction($request, $handler, BrowserActionType::Explain);
+    }
+
+    #[Route('/api/shadow/browser/translate', name: 'api_shadow_browser_translate', methods: ['POST'])]
+    public function translateAction(Request $request, PostBrowserActionHandler $handler): JsonResponse
+    {
+        return $this->runAction($request, $handler, BrowserActionType::Translate);
+    }
+
+    #[Route('/api/shadow/browser/summarize', name: 'api_shadow_browser_summarize', methods: ['POST'])]
+    public function summarizeAction(Request $request, PostBrowserActionHandler $handler): JsonResponse
+    {
+        return $this->runAction($request, $handler, BrowserActionType::Summarize);
+    }
+
+    #[Route('/api/shadow/browser/save', name: 'api_shadow_browser_save', methods: ['POST'])]
+    public function saveAction(Request $request, PostBrowserActionHandler $handler): JsonResponse
+    {
+        return $this->runAction($request, $handler, BrowserActionType::SaveToBrain);
+    }
+
+    #[Route('/api/shadow/browser/open-watch', name: 'api_shadow_browser_open_watch', methods: ['POST'])]
+    public function openWatchAction(Request $request, PostBrowserActionHandler $handler): JsonResponse
+    {
+        return $this->runAction($request, $handler, BrowserActionType::OpenWatch);
+    }
+
+    private function runAction(
+        Request $request,
+        PostBrowserActionHandler $handler,
+        BrowserActionType $action,
+    ): JsonResponse {
+        $payload = json_decode($request->getContent(), true);
+        $scopeKey = is_array($payload) ? $this->scopeKey($request, $payload) : $this->scopeKey($request);
+
+        try {
+            return $this->json($handler($scopeKey, $action, is_array($payload) ? $payload : []));
+        } catch (InvalidShadowBrowserException $exception) {
+            return $this->json(['error' => $exception->getMessage()], 400);
+        }
     }
 
     /** @param array<string, mixed>|null $payload */

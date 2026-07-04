@@ -16,7 +16,7 @@ See [WORKFLOW.md](WORKFLOW.md) for roles, cycle, and quality gates.
 
 **Shadow** = product — AI companion that accompanies the user everywhere they learn.
 
-Current chapter: **Phase III — Shadow Everywhere** (Sprint 71 — IDE Companion).
+Current chapter: **Phase III — Shadow Everywhere** (Sprint 69.5 — Browser Experience Completion, then Sprint 71).
 
 ---
 
@@ -51,6 +51,12 @@ Shadow companion stack from Watch through Second Brain.
 Mobile API, web settings (Mobile, Connections, Server), Flutter Connection Manager foundation, Tailscale as official Personal Remote transport.
 
 ## Current focus
+
+## Sprint 69.5 — Shadow Browser Experience Completion ← **in progress**
+
+**Task:** [planning/Shadow/Sprint-69.5/TASK-0069.5.md](Shadow/Sprint-69.5/TASK-0069.5.md)
+
+Connect overlay actions to backend APIs; loading, results, toasts, Open Watch import flow.
 
 ## Sprint 71 — Shadow IDE Companion ← **next**
 

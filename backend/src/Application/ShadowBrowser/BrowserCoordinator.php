@@ -120,4 +120,9 @@ final class BrowserCoordinator
 
         return $workspace;
     }
+
+    public function saveWorkspace(BrowserWorkspace $workspace): void
+    {
+        $this->repository->save($workspace);
+    }
 }

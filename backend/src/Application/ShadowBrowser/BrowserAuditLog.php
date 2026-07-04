@@ -71,4 +71,25 @@ final class BrowserAuditLog
             $url,
         );
     }
+
+    public function recordAction(
+        BrowserWorkspace $workspace,
+        \App\Domain\ShadowBrowser\BrowserActionType $action,
+        string $url,
+        BrowserPlatform $platform,
+    ): BrowserActivity {
+        $host = $this->platformDetectionEngine->extractHost($url);
+        $permissionsUsed = '' !== $host
+            ? $this->permissionEvaluator->grantedPermissions($workspace, $host)
+            : [];
+
+        return BrowserActivity::create(
+            ucfirst(str_replace('_', ' ', $action->value)),
+            $platform,
+            'browser_action',
+            sprintf('Shadow browser action: %s.', $action->value),
+            $permissionsUsed,
+            $url,
+        );
+    }
 }

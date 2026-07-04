@@ -2,13 +2,15 @@
 
 Content script injects a floating Shadow panel on allowed sites.
 
-## Actions (MVP)
+## Actions
 
-- Explain
-- Translate
-- Summarize
-- Save to Second Brain
-- Open Watch Mode (YouTube)
+Each button calls a real backend action (Sprint 69.5). See [BROWSER_ACTIONS.md](./BROWSER_ACTIONS.md).
+
+- Explain — result panel
+- Translate — language picker + result panel
+- Summarize — key points panel
+- Save to Second Brain — toast
+- Open Watch (YouTube) — import dialog if needed, then opens `/video/{id}/watch`
 
 ## UX
 
