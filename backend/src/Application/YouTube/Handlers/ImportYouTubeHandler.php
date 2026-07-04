@@ -84,11 +84,13 @@ final class ImportYouTubeHandler
 
         $this->youtubeVideoRepository->save($youtubeVideo);
 
-        $this->videoProcessingQueue->enqueue(
-            $videoId,
-            $command->processingMode,
-            $command->strategy,
-        );
+        if ($command->queueProcessing) {
+            $this->videoProcessingQueue->enqueue(
+                $videoId,
+                $command->processingMode,
+                $command->strategy,
+            );
+        }
 
         return new YouTubeImportResult(
             $youtubeId,

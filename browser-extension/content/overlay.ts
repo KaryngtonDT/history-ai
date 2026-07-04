@@ -655,6 +655,11 @@ async function handleAction(action: ShadowAction): Promise<void> {
         return;
       }
 
+      if (initial.data.status === "error") {
+        showToast(initial.data.message ?? "Open Watch unavailable", "error");
+        return;
+      }
+
       presentActionResult(initial.data);
       return;
     }

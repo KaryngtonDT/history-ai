@@ -13,6 +13,7 @@ final readonly class ImportYouTubeCommand
         public string $url,
         public ProcessingMode $processingMode = ProcessingMode::Manual,
         public ?ProcessingStrategy $strategy = null,
+        public bool $queueProcessing = true,
     ) {
     }
 }

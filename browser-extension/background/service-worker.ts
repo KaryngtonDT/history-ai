@@ -40,22 +40,18 @@ async function refreshSession(): Promise<BrowserSession> {
     sessionState.workspace = data;
     return { ...sessionState };
   } catch {
-    await setConnected(false);
-    return { ...sessionState };
+    return { ...sessionState, connected: sessionState.connected };
   }
 }
 
 async function ensureConnected(): Promise<boolean> {
-  if (sessionState.connected) {
+  const session = await refreshSession();
+  if (session.connected) {
     return true;
   }
 
-  if (!(await readShadowConnected())) {
-    return false;
-  }
-
-  const session = await refreshSession();
-  return session.connected;
+  const reconnect = await handleConnect();
+  return reconnect.ok && (reconnect.session?.connected ?? false);
 }
 
 async function handleConnect(): Promise<BackgroundResponse> {
@@ -156,7 +152,9 @@ async function runBrowserAction(
   context: PageContext,
   options?: { language?: string; importConfirmed?: boolean },
 ): Promise<BrowserActionResult> {
-  await postBrowserContext(context);
+  if (action !== "open_watch" || !options?.importConfirmed) {
+    await postBrowserContext(context);
+  }
 
   switch (action) {
     case "explain":

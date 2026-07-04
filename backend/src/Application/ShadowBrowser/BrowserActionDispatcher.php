@@ -14,6 +14,7 @@ use App\Domain\ShadowBrowser\Exception\InvalidShadowBrowserException;
 use App\Domain\YouTube\Exception\InvalidYouTubeException;
 use App\Domain\YouTube\YouTubeUrl;
 use App\Domain\YouTube\YouTubeVideoRepositoryInterface;
+use App\Infrastructure\YouTube\YouTubeImporterException;
 
 final class BrowserActionDispatcher
 {
@@ -205,8 +206,15 @@ final class BrowserActionDispatcher
             $result = ($this->importYouTubeHandler)(new ImportYouTubeCommand(
                 url: $url,
                 processingMode: ProcessingMode::Manual,
+                queueProcessing: false,
             ));
         } catch (InvalidYouTubeException $exception) {
+            return [
+                'action' => BrowserActionType::OpenWatch->value,
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ];
+        } catch (YouTubeImporterException $exception) {
             return [
                 'action' => BrowserActionType::OpenWatch->value,
                 'status' => 'error',
@@ -216,14 +224,14 @@ final class BrowserActionDispatcher
             return [
                 'action' => BrowserActionType::OpenWatch->value,
                 'status' => 'error',
-                'message' => 'YouTube import failed. Try again from Lumen or check server logs.',
+                'message' => $exception->getMessage(),
             ];
         }
 
         return $this->watchResponse(
             $result->videoId->value,
-            'processing',
-            'Import started. Opening Shadow Watch.',
+            'completed',
+            'Video imported. Opening Shadow Watch.',
         );
     }
 
