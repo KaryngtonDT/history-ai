@@ -332,6 +332,8 @@ export const pipelineFr: PipelineMessages = {
 			description:
 				"Regardez avec votre compagnon IA. Posez des questions sur le moment présent, mettez en pause ensemble et suivez transcription et traduction.",
 			loading: "Démarrage de la session Shadow...",
+			preparingTranscript:
+				"Préparation de la transcription pour Shadow Watch. Cela peut prendre quelques minutes après l'import.",
 			emptyTitle: "Shadow indisponible",
 			emptyDescription:
 				"Impossible de démarrer une session. Vérifiez que la vidéo a une transcription.",

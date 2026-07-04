@@ -332,6 +332,8 @@ export const pipelineDe: PipelineMessages = {
 			description:
 				"Schauen Sie mit Ihrem KI-Begleiter. Fragen Sie zum aktuellen Moment, pausieren Sie gemeinsam und folgen Sie Transkript und Übersetzung.",
 			loading: "Shadow-Sitzung wird gestartet...",
+			preparingTranscript:
+				"Transkript für Shadow Watch wird vorbereitet. Nach dem Import kann dies einige Minuten dauern.",
 			emptyTitle: "Shadow nicht verfügbar",
 			emptyDescription:
 				"Sitzung konnte nicht gestartet werden. Prüfen Sie, ob ein Transkript vorhanden ist.",

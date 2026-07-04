@@ -321,6 +321,8 @@ export const pipelineEn = {
 			description:
 				"Watch with your AI companion. Ask about the current moment, pause together, and follow transcript and translation in sync.",
 			loading: "Starting Shadow watch session...",
+			preparingTranscript:
+				"Preparing transcript for Shadow Watch. This may take a few minutes after import.",
 			emptyTitle: "Shadow unavailable",
 			emptyDescription:
 				"Could not start a watch session. Check that the video has a transcript.",

@@ -55,6 +55,14 @@ const CONTEXT_DEBOUNCE_MS = 400;
 const INTERVENTION_DEBOUNCE_MS = 900;
 const LEARNING_POLL_MS = 5000;
 const DEFAULT_TARGET_LANGUAGE = "fr";
+const TRANSCRIPT_POLL_INTERVAL_MS = 3000;
+const TRANSCRIPT_WAIT_TIMEOUT_MS = 5 * 60 * 1000;
+
+function sleep(ms: number): Promise<void> {
+	return new Promise((resolve) => {
+		window.setTimeout(resolve, ms);
+	});
+}
 
 export function ShadowWatchPage() {
 	const { videoId = "" } = useParams();
@@ -65,6 +73,9 @@ export function ShadowWatchPage() {
 	const interventionBusyRef = useRef(false);
 
 	const [loading, setLoading] = useState(true);
+	const [loadingLabel, setLoadingLabel] = useState<string | undefined>(
+		undefined,
+	);
 	const [streamUrl, setStreamUrl] = useState<string | null>(null);
 	const [session, setSession] = useState<ShadowSession | null>(null);
 	const [context, setContext] = useState<WatchContext | null>(null);
@@ -105,42 +116,71 @@ export function ShadowWatchPage() {
 
 		async function bootstrap() {
 			setLoading(true);
+			setLoadingLabel(undefined);
 
-			const [renders, transcriptResult] = await Promise.all([
-				videoRenderService.listRenders(videoId),
-				transcriptService.getTranscript(videoId),
-			]);
+			try {
+				let transcriptResult = await transcriptService.getTranscript(videoId);
+				const renders = await videoRenderService.listRenders(videoId);
 
-			if (cancelled) {
-				return;
-			}
-
-			setTranscript(transcriptResult);
-
-			const firstRender = renders[0] ?? null;
-
-			if (firstRender) {
-				const render = await videoRenderService.getRender(
-					videoId,
-					firstRender.targetLanguage,
-				);
-
-				if (render && !cancelled) {
-					setStreamUrl(
-						resolveVideoRenderStreamUrl(render.streamUrl, API_BASE_URL),
-					);
+				if (cancelled) {
+					return;
 				}
-			}
 
-			const startedSession = await shadowService.startSession(videoId, {
-				targetLanguage: DEFAULT_TARGET_LANGUAGE,
-				contentId: videoId,
-			});
+				setTranscript(transcriptResult);
 
-			if (!cancelled) {
-				setSession(startedSession);
-				await refreshContext(0, startedSession);
-				setLoading(false);
+				const firstRender = renders[0] ?? null;
+
+				if (firstRender) {
+					const render = await videoRenderService.getRender(
+						videoId,
+						firstRender.targetLanguage,
+					);
+
+					if (render && !cancelled) {
+						setStreamUrl(
+							resolveVideoRenderStreamUrl(render.streamUrl, API_BASE_URL),
+						);
+					}
+				}
+
+				const deadline = Date.now() + TRANSCRIPT_WAIT_TIMEOUT_MS;
+
+				while (!cancelled) {
+					try {
+						const startedSession = await shadowService.startSession(videoId, {
+							targetLanguage: DEFAULT_TARGET_LANGUAGE,
+							contentId: videoId,
+						});
+
+						setSession(startedSession);
+						await refreshContext(0, startedSession);
+						return;
+					} catch {
+						if (transcriptResult !== null) {
+							return;
+						}
+
+						if (Date.now() >= deadline) {
+							return;
+						}
+
+						setLoadingLabel(t("pipeline.shadow.preparingTranscript"));
+						await sleep(TRANSCRIPT_POLL_INTERVAL_MS);
+
+						if (cancelled) {
+							return;
+						}
+
+						transcriptResult =
+							await transcriptService.getTranscript(videoId);
+						setTranscript(transcriptResult);
+					}
+				}
+			} finally {
+				if (!cancelled) {
+					setLoading(false);
+					setLoadingLabel(undefined);
+				}
 			}
 		}
 
@@ -149,7 +189,7 @@ export function ShadowWatchPage() {
 		return () => {
 			cancelled = true;
 		};
-	}, [videoId, refreshContext]);
+	}, [videoId, refreshContext, t]);
 
 	const refreshSessionLearning = useCallback(
 		async (activeSession: ShadowSession) => {
@@ -480,7 +520,9 @@ export function ShadowWatchPage() {
 	};
 
 	if (loading) {
-		return <Spinner label={t("pipeline.shadow.loading")} />;
+		return (
+			<Spinner label={loadingLabel ?? t("pipeline.shadow.loading")} />
+		);
 	}
 
 	if (!session) {

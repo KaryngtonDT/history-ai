@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Application\ShadowBrowser;
 
 use App\Application\ShadowSecondBrain\Handlers\PostBrainBookmarkHandler;
+use App\Application\Video\Ports\VideoProcessingQueueInterface;
 use App\Application\YouTube\Commands\ImportYouTubeCommand;
 use App\Application\YouTube\Handlers\ImportYouTubeHandler;
 use App\Domain\Orchestrator\ProcessingMode;
 use App\Domain\ShadowBrowser\BrowserActionType;
 use App\Domain\ShadowBrowser\BrowserPlatform;
 use App\Domain\ShadowBrowser\Exception\InvalidShadowBrowserException;
+use App\Domain\Speech\TranscriptRepositoryInterface;
+use App\Domain\Video\VideoId;
 use App\Domain\YouTube\Exception\InvalidYouTubeException;
 use App\Domain\YouTube\YouTubeUrl;
 use App\Domain\YouTube\YouTubeVideoRepositoryInterface;
@@ -25,6 +28,8 @@ final class BrowserActionDispatcher
         private readonly ImportYouTubeHandler $importYouTubeHandler,
         private readonly PostBrainBookmarkHandler $postBrainBookmarkHandler,
         private readonly BrowserAuditLog $auditLog,
+        private readonly VideoProcessingQueueInterface $videoProcessingQueue,
+        private readonly TranscriptRepositoryInterface $transcriptRepository,
     ) {
     }
 
@@ -188,6 +193,8 @@ final class BrowserActionDispatcher
         $existing = $this->findImportedVideo($url);
 
         if (null !== $existing) {
+            $this->ensureTranscriptProcessingQueued($existing['videoId']);
+
             return $this->watchResponse($existing['videoId'], 'completed', 'Watch ready.');
         }
 
@@ -206,7 +213,6 @@ final class BrowserActionDispatcher
             $result = ($this->importYouTubeHandler)(new ImportYouTubeCommand(
                 url: $url,
                 processingMode: ProcessingMode::Manual,
-                queueProcessing: false,
             ));
         } catch (InvalidYouTubeException $exception) {
             return [
@@ -288,5 +294,20 @@ final class BrowserActionDispatcher
         }
 
         return sprintf('https://www.youtube.com/watch?v=%s', $videoKey);
+    }
+
+    private function ensureTranscriptProcessingQueued(string $videoId): void
+    {
+        try {
+            $id = new VideoId($videoId);
+        } catch (\Throwable) {
+            return;
+        }
+
+        if (null !== $this->transcriptRepository->findByVideoId($id)) {
+            return;
+        }
+
+        $this->videoProcessingQueue->enqueue($id, ProcessingMode::Manual);
     }
 }

@@ -20,5 +20,15 @@ mkdir -p \
 
 chown -R www-data:www-data /var/www/html/storage
 
+php bin/console messenger:setup-transports --no-interaction 2>/dev/null || true
+
+case "${MESSENGER_TRANSPORT_DSN:-sync://}" in
+  sync://)
+    ;;
+  *)
+    php bin/console messenger:consume async --time-limit=0 --memory-limit=512M --no-interaction &
+    ;;
+esac
+
 php-fpm -D
 exec nginx -g 'daemon off;'
