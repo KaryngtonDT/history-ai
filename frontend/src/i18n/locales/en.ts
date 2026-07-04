@@ -95,23 +95,25 @@ export const en = mergeMessages(
 	mergeMessages(
 		mergeMessages(
 			mergeMessages(
-				mergeMessages(mergeMessages(baseEn, shellEn), pipelineEn),
-				workspaceEn,
+				mergeMessages(
+					mergeMessages(mergeMessages(baseEn, shellEn), pipelineEn),
+					workspaceEn,
+				),
+				learningEn,
 			),
-			learningEn,
+			shadowIdentityEn,
 		),
-		shadowIdentityEn,
-	),
-	mergeMessages(
-		mergeMessages(shadowRelationshipEn, shadowMemoryEn),
 		mergeMessages(
+			mergeMessages(shadowRelationshipEn, shadowMemoryEn),
 			mergeMessages(
-				mergeMessages(shadowTeachingEn, shadowKnowledgeEn),
-				mergeMessages(shadowMentorEn, shadowExecutiveEn),
-			),
-			mergeMessages(
-				mergeMessages(mergeMessages(presenceEn, shadowBrainEn), browserEn),
-				mergeMessages(mobileEn, mergeMessages(connectionsEn, serverEn)),
+				mergeMessages(
+					mergeMessages(shadowTeachingEn, shadowKnowledgeEn),
+					mergeMessages(shadowMentorEn, shadowExecutiveEn),
+				),
+				mergeMessages(
+					mergeMessages(mergeMessages(presenceEn, shadowBrainEn), browserEn),
+					mergeMessages(mobileEn, mergeMessages(connectionsEn, serverEn)),
+				),
 			),
 		),
 	),
@@ -160,23 +162,25 @@ export const fr = mergeMessages(
 	mergeMessages(
 		mergeMessages(
 			mergeMessages(
-				mergeMessages(mergeMessages(baseFr, shellFr), pipelineFr),
-				workspaceFr,
+				mergeMessages(
+					mergeMessages(mergeMessages(baseFr, shellFr), pipelineFr),
+					workspaceFr,
+				),
+				learningFr,
 			),
-			learningFr,
+			shadowIdentityFr,
 		),
-		shadowIdentityFr,
-	),
-	mergeMessages(
-		mergeMessages(shadowRelationshipFr, shadowMemoryFr),
 		mergeMessages(
+			mergeMessages(shadowRelationshipFr, shadowMemoryFr),
 			mergeMessages(
-				mergeMessages(shadowTeachingFr, shadowKnowledgeFr),
-				mergeMessages(shadowMentorFr, shadowExecutiveFr),
-			),
-			mergeMessages(
-				mergeMessages(mergeMessages(presenceFr, shadowBrainFr), browserFr),
-				mergeMessages(mobileFr, mergeMessages(connectionsFr, serverFr)),
+				mergeMessages(
+					mergeMessages(shadowTeachingFr, shadowKnowledgeFr),
+					mergeMessages(shadowMentorFr, shadowExecutiveFr),
+				),
+				mergeMessages(
+					mergeMessages(mergeMessages(presenceFr, shadowBrainFr), browserFr),
+					mergeMessages(mobileFr, mergeMessages(connectionsFr, serverFr)),
+				),
 			),
 		),
 	),
@@ -223,23 +227,25 @@ export const de = mergeMessages(
 	mergeMessages(
 		mergeMessages(
 			mergeMessages(
-				mergeMessages(mergeMessages(baseDe, shellDe), pipelineDe),
-				workspaceDe,
+				mergeMessages(
+					mergeMessages(mergeMessages(baseDe, shellDe), pipelineDe),
+					workspaceDe,
+				),
+				learningDe,
 			),
-			learningDe,
+			shadowIdentityDe,
 		),
-		shadowIdentityDe,
-	),
-	mergeMessages(
-		mergeMessages(shadowRelationshipDe, shadowMemoryDe),
 		mergeMessages(
+			mergeMessages(shadowRelationshipDe, shadowMemoryDe),
 			mergeMessages(
-				mergeMessages(shadowTeachingDe, shadowKnowledgeDe),
-				mergeMessages(shadowMentorDe, shadowExecutiveDe),
-			),
-			mergeMessages(
-				mergeMessages(mergeMessages(presenceDe, shadowBrainDe), browserDe),
-				mergeMessages(mobileDe, mergeMessages(connectionsDe, serverDe)),
+				mergeMessages(
+					mergeMessages(shadowTeachingDe, shadowKnowledgeDe),
+					mergeMessages(shadowMentorDe, shadowExecutiveDe),
+				),
+				mergeMessages(
+					mergeMessages(mergeMessages(presenceDe, shadowBrainDe), browserDe),
+					mergeMessages(mobileDe, mergeMessages(connectionsDe, serverDe)),
+				),
 			),
 		),
 	),

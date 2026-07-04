@@ -15,9 +15,9 @@ use App\Domain\ShadowBrowser\Exception\InvalidShadowBrowserException;
 use App\Domain\Speech\TranscriptRepositoryInterface;
 use App\Domain\Video\VideoId;
 use App\Domain\YouTube\Exception\InvalidYouTubeException;
+use App\Domain\YouTube\Exception\YouTubeImporterException;
 use App\Domain\YouTube\YouTubeUrl;
 use App\Domain\YouTube\YouTubeVideoRepositoryInterface;
-use App\Infrastructure\YouTube\YouTubeImporterException;
 
 final class BrowserActionDispatcher
 {

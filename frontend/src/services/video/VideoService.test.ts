@@ -11,6 +11,14 @@ function createRepositoryMock(
 			videoId: "550e8400-e29b-41d4-a716-446655440099",
 			status: "queued",
 		}),
+		getStatus: vi.fn().mockResolvedValue({
+			videoId: "550e8400-e29b-41d4-a716-446655440099",
+			status: "completed",
+			originalFilename: "lecture.mp4",
+			language: "unknown",
+			createdAt: new Date().toISOString(),
+		}),
+		processVideo: vi.fn().mockResolvedValue({ status: "queued" }),
 		...overrides,
 	};
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\YouTube;
 
+use App\Domain\YouTube\Exception\YouTubeImporterException;
 use App\Domain\YouTube\YouTubeDownloadResult;
 use App\Domain\YouTube\YouTubeImporterInterface;
 use App\Domain\YouTube\YouTubeMetadata;
