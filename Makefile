@@ -1,5 +1,5 @@
 .PHONY: help install up down ps logs config \
-	dev dev-stop prod prod-stop prod-rebuild prod-fresh prod-restart \
+	dev dev-stop prod prod-stop prod-rebuild prod-fresh prod-restart setup-engines \
 	prod-backend prod-frontend prod-worker prod-migrate prod-prune-backend-run prod-logs \
 	test test-backend test-frontend test-worker test-all ci \
 	backup restore verify-backup health doctor status migrate shell-backend
@@ -25,6 +25,7 @@ help:
 	@echo "  make prod             Start prod-like stack"
 	@echo "  make prod-stop        Stop prod-like stack"
 	@echo "  make prod-rebuild     Rebuild all prod-like images"
+	@echo "  make setup-engines    Pull Ollama model + verify pipeline CLIs"
 	@echo "  make prod-restart     Restart prod-like stack"
 	@echo "  make prod-fresh       DESTROY volumes + reset (confirmation)"
 	@echo ""
@@ -61,6 +62,7 @@ storage-tree:
 	@mkdir -p storage/uploads/video storage/uploads/audio storage/uploads/pdf \
 		storage/artifacts/transcript storage/artifacts/translation storage/artifacts/audio \
 		storage/artifacts/voiceclone storage/artifacts/lipsync storage/artifacts/render storage/artifacts/quality \
+	@mkdir -p storage/runtime storage/runtime/benchmark \
 		storage/shadow/identity storage/shadow/sessions storage/shadow/session-learning storage/shadow/relationship storage/shadow/memory storage/shadow/teaching storage/shadow/knowledge storage/shadow/goals storage/shadow/mentor storage/shadow/executive storage/shadow/brain storage/shadow/presence storage/shadow/browser storage/shadow/mobile storage/learning storage/workspace \
 		storage/logs storage/temp storage/cache
 	@mkdir -p models/whisper models/ollama models/f5 models/openvoice models/latentsync
@@ -96,6 +98,9 @@ prod-stop:
 
 prod-rebuild:
 	$(COMPOSE_PROD) up -d --build --force-recreate
+
+setup-engines:
+	bash scripts/setup-engines.sh
 
 prod-restart:
 	$(COMPOSE_PROD) restart

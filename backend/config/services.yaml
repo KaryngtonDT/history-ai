@@ -19,13 +19,13 @@ parameters:
     audio.source_storage_dir: '%storage.root%/uploads/audio'
     youtube.download_dir: '%storage.root%/temp/youtube'
     youtube.yt_dlp.binary_default: 'yt-dlp'
-    stt.provider_default: 'deterministic'
+    stt.provider_default: 'faster_whisper'
     stt.faster_whisper.binary_default: 'faster-whisper'
     stt.faster_whisper.model_default: 'base'
     translation.provider_default: 'ollama'
     translation.languages_default: 'fr,de'
     ollama.base_url_default: 'http://ollama:11434'
-    ollama.model_default: 'qwen3'
+    ollama.model_default: 'qwen2.5:3b'
     tts.provider_default: 'f5'
     tts.f5.binary_default: 'f5-tts'
     tts.f5.model_default: 'F5-TTS'
@@ -721,3 +721,51 @@ services:
     App\Infrastructure\VideoRender\VideoRenderProviderFactory:
         arguments:
             $defaultProviderName: '%env(default:video_render.provider_default:VIDEO_RENDER_PROVIDER)%'
+
+    app.storage.runtime:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/runtime'
+
+    app.storage.runtime_benchmark:
+        class: App\Infrastructure\Storage\JsonFileStore
+        arguments:
+            $directory: '%storage.root%/runtime/benchmark'
+
+    App\Domain\Engine\EngineRepositoryInterface:
+        alias: App\Infrastructure\Runtime\Catalog\StaticEngineRepository
+
+    App\Domain\Runtime\RuntimeRepositoryInterface:
+        alias: App\Infrastructure\Runtime\Persistence\FileRuntimeRepository
+
+    App\Application\Runtime\RuntimePlatformInterface:
+        alias: App\Infrastructure\Runtime\RuntimePlatformService
+
+    App\Infrastructure\Runtime\Persistence\FileRuntimeRepository:
+        arguments:
+            $store: '@app.storage.runtime'
+
+    App\Infrastructure\Runtime\Benchmark\BenchmarkRunner:
+        arguments:
+            $store: '@app.storage.runtime_benchmark'
+
+    App\Infrastructure\Runtime\Discovery\OllamaScanner:
+        arguments:
+            $baseUrl: '%env(default:ollama.base_url_default:OLLAMA_BASE_URL)%'
+
+    App\Infrastructure\Runtime\Discovery\ModelScanner:
+        arguments:
+            $modelsRoot: '%models.root%'
+
+    App\Infrastructure\Runtime\Discovery\EngineDiscovery:
+        arguments:
+            $sttProvider: '%env(default:stt.provider_default:STT_PROVIDER)%'
+            $translationProvider: '%env(default:translation.provider_default:TRANSLATION_PROVIDER)%'
+            $ttsProvider: '%env(default:tts.provider_default:TTS_PROVIDER)%'
+            $voiceCloneProvider: '%env(default:voice_clone.provider_default:VOICE_CLONE_PROVIDER)%'
+            $lipSyncProvider: '%env(default:lip_sync.provider_default:LIP_SYNC_PROVIDER)%'
+            $videoRenderProvider: '%env(default:video_render.provider_default:VIDEO_RENDER_PROVIDER)%'
+
+    App\Infrastructure\Runtime\Catalog\StaticEngineRepository:
+        arguments:
+            $ollamaModel: '%env(default:ollama.model_default:OLLAMA_MODEL)%'

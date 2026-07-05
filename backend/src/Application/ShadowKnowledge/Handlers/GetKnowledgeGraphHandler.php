@@ -18,6 +18,6 @@ final class GetKnowledgeGraphHandler
     /** @return array<string, mixed> */
     public function __invoke(string $scopeKey = 'default'): array
     {
-        return $this->mapper->toArray($this->builder->syncGraph($scopeKey));
+        return $this->mapper->toArray($this->builder->readGraph($scopeKey));
     }
 }

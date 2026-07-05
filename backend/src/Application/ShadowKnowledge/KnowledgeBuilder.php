@@ -24,6 +24,11 @@ final class KnowledgeBuilder
         return $this->repository->findByScope($scopeKey) ?? KnowledgeGraph::create(scopeKey: $scopeKey);
     }
 
+    public function readGraph(string $scopeKey = 'default'): KnowledgeGraph
+    {
+        return $this->getOrCreate($scopeKey);
+    }
+
     public function syncGraph(string $scopeKey = 'default'): KnowledgeGraph
     {
         $memory = $this->memoryBuilder->ingestRelationship($scopeKey);

@@ -61,6 +61,22 @@ services:
       retries: 5
       start_period: 10s
 
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - history-ai
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
   backend:
     build:
       context: .
@@ -71,7 +87,16 @@ services:
       APP_SECRET: ${APP_SECRET:-change-me}
       DATABASE_URL: ${DATABASE_URL:-postgresql://history_ai:history_ai@postgres:5432/history_ai?serverVersion=17&charset=utf8}
       MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-redis://redis:6379/messages}
-      STT_PROVIDER: ${STT_PROVIDER:-deterministic}
+      STT_PROVIDER: ${STT_PROVIDER:-faster_whisper}
+      STT_FASTER_WHISPER_MODEL: ${STT_FASTER_WHISPER_MODEL:-base}
+      HF_HOME: /models/whisper
+      TRANSLATION_PROVIDER: ${TRANSLATION_PROVIDER:-ollama}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:3b}
+      TTS_PROVIDER: ${TTS_PROVIDER:-f5}
+      VOICE_CLONE_PROVIDER: ${VOICE_CLONE_PROVIDER:-openvoice}
+      LIP_SYNC_PROVIDER: ${LIP_SYNC_PROVIDER:-latentsync}
+      VIDEO_RENDER_PROVIDER: ${VIDEO_RENDER_PROVIDER:-ffmpeg}
       WORKER_BASE_URL: ${WORKER_BASE_URL:-http://worker:8001}
       MODELS_ROOT: /models
     volumes:
@@ -86,6 +111,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      ollama:
+        condition: service_started
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/health"]
       interval: 10s
@@ -166,3 +193,5 @@ volumes:
     name: history-ai-prod-like-lumen-storage
   lumen_models:
     name: history-ai-prod-like-lumen-models
+  ollama_data:
+    name: history-ai-prod-like-ollama-data

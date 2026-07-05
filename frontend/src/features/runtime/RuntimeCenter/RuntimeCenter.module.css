@@ -1,0 +1,76 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.title {
+	margin: 0;
+	font-size: 1.5rem;
+}
+
+.subtitle {
+	margin: 0.25rem 0 0;
+	color: var(--color-text-muted);
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: 1rem;
+}
+
+.card,
+.engineCard {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.section {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.engineGrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 1rem;
+}
+
+.engineHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+}
+
+.meta {
+	margin: 0;
+	font-size: 0.875rem;
+	color: var(--color-text-muted);
+}
+
+.issueList,
+.stepList {
+	margin: 0.5rem 0 0;
+	padding-left: 1.25rem;
+}
+
+.error {
+	color: var(--color-danger);
+}

@@ -18,6 +18,6 @@ final class GetKnowledgeNodeHandler
     /** @return array<string, mixed> */
     public function __invoke(string $scopeKey, string $nodeKey): array
     {
-        return $this->mapper->nodeDetail($this->builder->syncGraph($scopeKey), $nodeKey);
+        return $this->mapper->nodeDetail($this->builder->readGraph($scopeKey), $nodeKey);
     }
 }

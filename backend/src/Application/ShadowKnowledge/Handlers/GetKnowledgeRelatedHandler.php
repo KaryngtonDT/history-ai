@@ -18,7 +18,7 @@ final class GetKnowledgeRelatedHandler
     /** @return array<string, mixed> */
     public function __invoke(string $scopeKey, string $key): array
     {
-        $detail = $this->mapper->nodeDetail($this->builder->syncGraph($scopeKey), $key);
+        $detail = $this->mapper->nodeDetail($this->builder->readGraph($scopeKey), $key);
 
         return [
             'scopeKey' => $scopeKey,

@@ -20,6 +20,6 @@ final class PostKnowledgeSearchHandler
     {
         $query = is_string($payload['query'] ?? null) ? trim($payload['query']) : '';
 
-        return $this->searchService->search($this->builder->syncGraph($scopeKey), $query);
+        return $this->searchService->search($this->builder->readGraph($scopeKey), $query);
     }
 }

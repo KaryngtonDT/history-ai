@@ -130,9 +130,12 @@ export const pipelineFr: PipelineMessages = {
 			videoId: "ID vidéo :",
 			fullText: "Texte complet",
 			segmentsDuration: "{{count}} segments · durée {{duration}}",
+			deterministicNotice:
+				"Mode dev : transcription factice (STT_PROVIDER=deterministic), pas une vraie transcription audio. Configurez faster-whisper ou un STT réel pour transcrire la vidéo.",
 		},
 		translation: {
-			failed: "La génération de traduction a échoué.",
+			failed:
+				"La génération de traduction a échoué. Sans Ollama en local Docker, choisissez Mock comme moteur.",
 			loading: "Chargement des traductions",
 			requiredTitle: "Transcription requise",
 			requiredDescription:
@@ -309,9 +312,14 @@ export const pipelineFr: PipelineMessages = {
 			lockedAction: "Aller à {{step}}",
 			dependsOn: "Dépend de : {{step}}",
 			actionOpen: "Ouvrir",
+			actionView: "Voir",
 			actionStart: "Démarrer",
 			actionLocked: "Verrouillé",
+			loadingProgress: "Chargement du statut pipeline…",
 			statusOpen: "ouvert",
+			statusCompleted: "terminé",
+			statusInProgress: "en cours",
+			statusFailed: "échoué",
 			statusGenerate: "générer",
 			statusLocked: "verrouillé",
 			statusUnknown: "inconnu",
@@ -372,6 +380,10 @@ export const pipelineFr: PipelineMessages = {
 				"GET stream du rendu pour la langue {{language}}",
 			bootstrapLogRenderStreamReady: "URL du stream de rendu résolue",
 			bootstrapLogNoRender: "Aucun rendu final disponible",
+			bootstrapLogOriginalStream:
+				"GET /api/videos/{id}/stream — vidéo source importée",
+			bootstrapOriginalStreamDetail:
+				"Lecture de la vidéo importée (pas encore de rendu final)",
 			bootstrapLogStartSession: "POST /api/videos/{id}/shadow/sessions",
 			bootstrapLogSessionReady: "Session Shadow démarrée ({{sessionId}})",
 			bootstrapLogSessionFailed: "Échec session Shadow : {{error}}",
@@ -392,11 +404,14 @@ export const pipelineFr: PipelineMessages = {
 			emptyDescription:
 				"Impossible de démarrer une session. Vérifiez que la vidéo a une transcription.",
 			noVideoTitle: "Aucune vidéo lisible",
-			noVideoDescription: "Générez un rendu final pour regarder avec Shadow.",
+			noVideoDescription:
+				"Impossible de charger la vidéo. Consultez le journal d'activité ci-dessus pour les erreurs API.",
 			currentTime: "Temps actuel",
 			currentSegment: "Segment {{index}} : {{text}}",
 			noSegment: "Aucun segment à cet instant.",
 			transcriptTitle: "Transcription",
+			transcriptEmpty:
+				"Aucun segment de transcription. Lancez le pipeline vidéo ou attendez le traitement.",
 			translationTitle: "Traduction",
 			noTranslation: "Traduction indisponible pour ce moment.",
 			conversationTitle: "Conversation Shadow",

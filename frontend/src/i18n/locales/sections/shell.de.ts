@@ -283,6 +283,11 @@ export const shellDe: ShellMessages = {
 			title: "Oberflächensprache",
 			description: "Sprache für Menüs, Beschriftungen und Hilfetexte wählen.",
 		},
+		runtime: {
+			title: "KI-Runtime",
+			description:
+				"Installierte KI-Engines entdecken, prüfen, benchmarken und validieren.",
+		},
 		aiEngines: {
 			title: "KI-Engines",
 			description: "Registrierte Anbieter und Fähigkeiten (Sprint 34).",

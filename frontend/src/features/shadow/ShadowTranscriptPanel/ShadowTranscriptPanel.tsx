@@ -34,21 +34,25 @@ export function ShadowTranscriptPanel({
 			</button>
 			{!collapsed ? (
 				<ul className={styles.list}>
-					{transcript?.segments.map((segment) => {
-						const isActive = activeSegment?.index === segment.index;
+					{transcript?.segments.length ? (
+						transcript.segments.map((segment) => {
+							const isActive = activeSegment?.index === segment.index;
 
-						return (
-							<li
-								key={segment.index}
-								className={isActive ? styles.active : styles.item}
-							>
-								<span className={styles.time}>
-									{formatTimestamp(segment.startTime)}
-								</span>
-								<span>{segment.text}</span>
-							</li>
-						);
-					})}
+							return (
+								<li
+									key={segment.index}
+									className={isActive ? styles.active : styles.item}
+								>
+									<span className={styles.time}>
+										{formatTimestamp(segment.startTime)}
+									</span>
+									<span>{segment.text}</span>
+								</li>
+							);
+						})
+					) : (
+						<li className={styles.empty}>{t("pipeline.shadow.transcriptEmpty")}</li>
+					)}
 				</ul>
 			) : null}
 		</section>

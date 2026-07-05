@@ -1,7 +1,9 @@
 import { Link } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Spinner } from "@/components/ui/Spinner";
 import { useTranslation } from "@/i18n/useTranslation";
-import { buildArtifactJourney } from "../journeyModel";
+import { buildArtifactJourney, type ArtifactStatus } from "../journeyModel";
+import { useVideoPipelineProgress } from "../useVideoPipelineProgress";
 import styles from "./ArtifactJourney.module.css";
 
 interface ArtifactJourneyProps {
@@ -9,25 +11,34 @@ interface ArtifactJourneyProps {
 	title?: string;
 }
 
-function statusClass(status: string): string {
+function statusClass(status: ArtifactStatus): string {
 	const base = styles.badge;
 
-	if (status === "open") {
-		return `${base} ${styles.badgeOpen}`;
+	switch (status) {
+		case "completed":
+			return `${base} ${styles.badgeCompleted}`;
+		case "in_progress":
+			return `${base} ${styles.badgeInProgress}`;
+		case "failed":
+			return `${base} ${styles.badgeFailed}`;
+		case "open":
+			return `${base} ${styles.badgeOpen}`;
+		case "generate":
+			return `${base} ${styles.badgeGenerate}`;
+		default:
+			return `${base} ${styles.badgeLocked}`;
 	}
-
-	if (status === "generate") {
-		return `${base} ${styles.badgeGenerate}`;
-	}
-
-	return `${base} ${styles.badgeLocked}`;
 }
 
 function actionLabel(
-	status: string,
+	status: ArtifactStatus,
 	t: (key: string, params?: Record<string, string | number>) => string,
 ): string {
-	if (status === "open") {
+	if (status === "completed") {
+		return t("pipeline.artifactJourney.actionView");
+	}
+
+	if (status === "open" || status === "in_progress" || status === "failed") {
 		return t("pipeline.artifactJourney.actionOpen");
 	}
 
@@ -38,10 +49,18 @@ function actionLabel(
 	return t("pipeline.artifactJourney.actionLocked");
 }
 
+function statusKey(status: ArtifactStatus): string {
+	return `pipeline.artifactJourney.status${status
+		.split("_")
+		.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+		.join("")}`;
+}
+
 export function ArtifactJourney({ videoId, title }: ArtifactJourneyProps) {
 	const { t } = useTranslation();
+	const progress = useVideoPipelineProgress(videoId);
 	const resolvedTitle = title ?? t("pipeline.artifactJourney.defaultTitle");
-	const steps = buildArtifactJourney(videoId, t);
+	const steps = buildArtifactJourney(videoId, t, progress);
 
 	return (
 		<section className={styles.root} aria-label={resolvedTitle}>
@@ -49,6 +68,11 @@ export function ArtifactJourney({ videoId, title }: ArtifactJourneyProps) {
 			<p className={styles.subtitle}>
 				{t("pipeline.artifactJourney.subtitle")}
 			</p>
+			{videoId && progress.loading ? (
+				<div className={styles.loading}>
+					<Spinner label={t("pipeline.artifactJourney.loadingProgress")} />
+				</div>
+			) : null}
 			{!videoId ? (
 				<EmptyState
 					title={t("pipeline.artifactJourney.noVideoTitle")}
@@ -67,9 +91,7 @@ export function ArtifactJourney({ videoId, title }: ArtifactJourneyProps) {
 							<div className={styles.cardHeader}>
 								<h3 className={styles.cardTitle}>{step.label}</h3>
 								<span className={statusClass(step.status)}>
-									{t(
-										`pipeline.artifactJourney.status${step.status.charAt(0).toUpperCase()}${step.status.slice(1)}`,
-									)}
+									{t(statusKey(step.status))}
 								</span>
 							</div>
 							<p className={styles.cardDescription}>{step.description}</p>

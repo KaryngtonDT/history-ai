@@ -2541,6 +2541,16 @@ final class ApiDocumentationTest extends WebTestCase
         self::assertArrayHasKey('LearningRecommendation', $spec['components']['schemas']);
     }
 
+    public function testOpenApiSpecDocumentsRuntimeOverviewOperation(): void
+    {
+        $spec = $this->fetchOpenApiSpec();
+
+        self::assertArrayHasKey('/api/runtime', $spec['paths']);
+        self::assertSame('getRuntimeOverview', $spec['paths']['/api/runtime']['get']['operationId']);
+        self::assertSame('getRuntimeReadiness', $spec['paths']['/api/runtime/readiness']['get']['operationId']);
+        self::assertSame('validateRuntimePipeline', $spec['paths']['/api/runtime/pipeline/validate']['post']['operationId']);
+    }
+
     /**
      * @return array<string, mixed>
      */

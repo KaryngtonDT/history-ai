@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+"""F5-TTS CLI shim — produces valid artifacts until real F5 weights are mounted."""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+
+
+def _minimal_wav() -> bytes:
+    return (
+        b"RIFF\x24\x08\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00"
+        b"\x44\xAC\x00\x00\x88\x58\x01\x00\x02\x00\x10\x00data\x00\x08\x00\x00"
+    )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="F5-TTS synthesis shim")
+    parser.add_argument("--text", required=True)
+    parser.add_argument("--voice", default="default")
+    parser.add_argument("--model", default="F5-TTS")
+    parser.add_argument("--base-path", default="/models/f5")
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+
+    os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
+    with open(args.output, "wb") as handle:
+        handle.write(_minimal_wav())
+
+    duration = max(1.0, len(args.text) / 20.0)
+    print(json.dumps({"duration": duration, "format": "wav", "output": args.output}))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

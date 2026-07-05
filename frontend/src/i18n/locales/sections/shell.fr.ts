@@ -288,6 +288,11 @@ export const shellFr: ShellMessages = {
 			title: "Langue de l'interface",
 			description: "Choisissez la langue des menus, libellés et textes d'aide.",
 		},
+		runtime: {
+			title: "Runtime IA",
+			description:
+				"Découvrir, vérifier, benchmarker et valider les moteurs IA installés.",
+		},
 		aiEngines: {
 			title: "Moteurs IA",
 			description:

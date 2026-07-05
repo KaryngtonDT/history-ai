@@ -54,3 +54,14 @@
 	font-size: var(--font-sm);
 	color: var(--shell-text-muted);
 }
+
+.devNotice {
+	margin: 0;
+	padding: var(--space-3) var(--space-4);
+	border: 1px solid #fcd34d;
+	border-radius: var(--radius-md);
+	background: #fffbeb;
+	color: #92400e;
+	font-size: var(--font-sm);
+	line-height: 1.5;
+}

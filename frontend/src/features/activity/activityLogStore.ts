@@ -12,6 +12,8 @@ type ActivityLogListener = () => void;
 
 const MAX_ENTRIES = 100;
 
+const EMPTY_ENTRIES: ActivityLogEntry[] = [];
+
 function formatTime(date: Date): string {
 	return date.toLocaleTimeString();
 }
@@ -21,7 +23,8 @@ function createEntryId(): string {
 }
 
 class ActivityLogStore {
-	private entries: ActivityLogEntry[] = [];
+	/** Cached snapshot — must keep referential equality until the store mutates. */
+	private snapshot: ActivityLogEntry[] = EMPTY_ENTRIES;
 	private listeners = new Set<ActivityLogListener>();
 
 	append(
@@ -37,7 +40,7 @@ class ActivityLogStore {
 			source,
 		};
 
-		this.entries = [...this.entries.slice(-(MAX_ENTRIES - 1)), entry];
+		this.snapshot = [...this.snapshot.slice(-(MAX_ENTRIES - 1)), entry];
 		this.notify();
 
 		const prefix = source ? `[${source}]` : "[Activity]";
@@ -55,11 +58,15 @@ class ActivityLogStore {
 	}
 
 	getEntries(): ActivityLogEntry[] {
-		return [...this.entries];
+		return this.snapshot;
 	}
 
 	clear(): void {
-		this.entries = [];
+		if (this.snapshot.length === 0) {
+			return;
+		}
+
+		this.snapshot = EMPTY_ENTRIES;
 		this.notify();
 	}
 

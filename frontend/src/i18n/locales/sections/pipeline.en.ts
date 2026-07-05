@@ -122,9 +122,12 @@ export const pipelineEn = {
 			videoId: "Video ID:",
 			fullText: "Full text",
 			segmentsDuration: "{{count}} segments · {{duration}} duration",
+			deterministicNotice:
+				"Dev mode: this is a placeholder transcript (STT_PROVIDER=deterministic), not real speech-to-text. Install faster-whisper or configure real STT for actual transcription.",
 		},
 		translation: {
-			failed: "Translation generation failed.",
+			failed:
+				"Translation generation failed. In local Docker without Ollama, choose Mock as the engine.",
 			loading: "Loading translations",
 			requiredTitle: "Transcript required",
 			requiredDescription:
@@ -298,9 +301,14 @@ export const pipelineEn = {
 			lockedAction: "Go to {{step}}",
 			dependsOn: "Depends on: {{step}}",
 			actionOpen: "Open",
+			actionView: "View",
 			actionStart: "Start",
 			actionLocked: "Locked",
+			loadingProgress: "Loading pipeline status…",
 			statusOpen: "open",
+			statusCompleted: "done",
+			statusInProgress: "in progress",
+			statusFailed: "failed",
 			statusGenerate: "generate",
 			statusLocked: "locked",
 			statusUnknown: "unknown",
@@ -361,6 +369,9 @@ export const pipelineEn = {
 				"GET render stream for language {{language}}",
 			bootstrapLogRenderStreamReady: "Render stream URL resolved",
 			bootstrapLogNoRender: "No final render available",
+			bootstrapLogOriginalStream: "GET /api/videos/{id}/stream — original upload",
+			bootstrapOriginalStreamDetail:
+				"Using uploaded source video (no final render yet)",
 			bootstrapLogStartSession: "POST /api/videos/{id}/shadow/sessions",
 			bootstrapLogSessionReady: "Shadow session started ({{sessionId}})",
 			bootstrapLogSessionFailed: "Shadow session failed: {{error}}",
@@ -381,11 +392,13 @@ export const pipelineEn = {
 				"Could not start a watch session. Check that the video has a transcript.",
 			noVideoTitle: "No playable video yet",
 			noVideoDescription:
-				"Generate a final render to watch with Shadow, or process the video first.",
+				"The uploaded video could not be loaded. Check the activity log above for API errors.",
 			currentTime: "Current time",
 			currentSegment: "Segment {{index}}: {{text}}",
 			noSegment: "No segment at this timestamp.",
 			transcriptTitle: "Transcript",
+			transcriptEmpty:
+				"No transcript segments yet. Run the video pipeline or wait for processing.",
 			translationTitle: "Translation",
 			noTranslation: "Translation not available for this moment.",
 			conversationTitle: "Shadow conversation",

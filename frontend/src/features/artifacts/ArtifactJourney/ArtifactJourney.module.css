@@ -95,6 +95,25 @@
 	color: var(--shell-text-muted);
 }
 
+.badgeCompleted {
+	background: rgba(34, 197, 94, 0.18);
+	color: #15803d;
+}
+
+.badgeInProgress {
+	background: rgba(59, 130, 246, 0.15);
+	color: #2563eb;
+}
+
+.badgeFailed {
+	background: rgba(239, 68, 68, 0.15);
+	color: #dc2626;
+}
+
+.loading {
+	margin-bottom: var(--space-2);
+}
+
 .action {
 	display: inline-block;
 	font-size: var(--font-sm);

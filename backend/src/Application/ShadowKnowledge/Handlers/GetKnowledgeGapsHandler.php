@@ -18,7 +18,7 @@ final class GetKnowledgeGapsHandler
     /** @return array<string, mixed> */
     public function __invoke(string $scopeKey, string $goalKey = 'kubernetes'): array
     {
-        $graph = $this->builder->syncGraph($scopeKey);
+        $graph = $this->builder->readGraph($scopeKey);
 
         return [
             'scopeKey' => $scopeKey,

@@ -2,8 +2,16 @@ import {
 	getVideoPipelineStepLabel,
 	type VideoPipelineStepId,
 } from "@/features/product/videoRoutes";
+import type { VideoPipelineProgress } from "./useVideoPipelineProgress";
 
-export type ArtifactStatus = "open" | "generate" | "locked" | "unknown";
+export type ArtifactStatus =
+	| "completed"
+	| "in_progress"
+	| "failed"
+	| "open"
+	| "generate"
+	| "locked"
+	| "unknown";
 
 export interface ArtifactJourneyStep {
 	id: VideoPipelineStepId | "video" | "quality";
@@ -19,24 +27,65 @@ type TranslateFn = (
 	params?: Record<string, string | number>,
 ) => string;
 
+function isProcessing(videoStatus: VideoPipelineProgress["videoStatus"]): boolean {
+	return videoStatus === "queued" || videoStatus === "processing";
+}
+
+function resolveStepStatus(
+	completed: boolean,
+	dependencyMet: boolean,
+	videoStatus: VideoPipelineProgress["videoStatus"],
+): ArtifactStatus {
+	if (completed) {
+		return "completed";
+	}
+
+	if (!dependencyMet) {
+		return "locked";
+	}
+
+	if (videoStatus === "failed") {
+		return "failed";
+	}
+
+	if (isProcessing(videoStatus)) {
+		return "in_progress";
+	}
+
+	return "open";
+}
+
 export function buildArtifactJourney(
 	videoId: string | null,
 	t: TranslateFn,
+	progress?: VideoPipelineProgress,
 ): ArtifactJourneyStep[] {
+	const videoStatus = progress?.videoStatus ?? null;
+	const hasTranscript = progress?.hasTranscript ?? false;
+	const hasTranslations = progress?.hasTranslations ?? false;
+	const hasAudio = progress?.hasAudio ?? false;
+	const hasVoiceClone = progress?.hasVoiceClone ?? false;
+	const hasLipSync = progress?.hasLipSync ?? false;
+	const hasRender = progress?.hasRender ?? false;
+
 	const base = videoId
 		? [
 				{
 					id: "transcript" as const,
 					label: getVideoPipelineStepLabel(t, "transcript"),
 					description: t("pipeline.artifactJourney.transcriptDescription"),
-					status: "open" as const,
+					status: resolveStepStatus(hasTranscript, true, videoStatus),
 					path: `/video/${videoId}/transcript`,
 				},
 				{
 					id: "translations" as const,
 					label: getVideoPipelineStepLabel(t, "translations"),
 					description: t("pipeline.artifactJourney.translationsDescription"),
-					status: "open" as const,
+					status: resolveStepStatus(
+						hasTranslations,
+						hasTranscript,
+						videoStatus,
+					),
 					path: `/video/${videoId}/translations`,
 					dependsOnLabel: getVideoPipelineStepLabel(t, "transcript"),
 				},
@@ -44,7 +93,7 @@ export function buildArtifactJourney(
 					id: "audio" as const,
 					label: getVideoPipelineStepLabel(t, "audio"),
 					description: t("pipeline.artifactJourney.audioDescription"),
-					status: "open" as const,
+					status: resolveStepStatus(hasAudio, hasTranslations, videoStatus),
 					path: `/video/${videoId}/audio`,
 					dependsOnLabel: getVideoPipelineStepLabel(t, "translations"),
 				},
@@ -52,7 +101,7 @@ export function buildArtifactJourney(
 					id: "voice-clone" as const,
 					label: getVideoPipelineStepLabel(t, "voice-clone"),
 					description: t("pipeline.artifactJourney.voiceCloneDescription"),
-					status: "open" as const,
+					status: resolveStepStatus(hasVoiceClone, hasAudio, videoStatus),
 					path: `/video/${videoId}/voice-clone`,
 					dependsOnLabel: getVideoPipelineStepLabel(t, "audio"),
 				},
@@ -60,7 +109,7 @@ export function buildArtifactJourney(
 					id: "lip-sync" as const,
 					label: getVideoPipelineStepLabel(t, "lip-sync"),
 					description: t("pipeline.artifactJourney.lipSyncDescription"),
-					status: "open" as const,
+					status: resolveStepStatus(hasLipSync, hasVoiceClone, videoStatus),
 					path: `/video/${videoId}/lip-sync`,
 					dependsOnLabel: getVideoPipelineStepLabel(t, "voice-clone"),
 				},
@@ -68,7 +117,7 @@ export function buildArtifactJourney(
 					id: "render" as const,
 					label: getVideoPipelineStepLabel(t, "render"),
 					description: t("pipeline.artifactJourney.renderDescription"),
-					status: "open" as const,
+					status: resolveStepStatus(hasRender, hasLipSync, videoStatus),
 					path: `/video/${videoId}/render`,
 					dependsOnLabel: getVideoPipelineStepLabel(t, "lip-sync"),
 				},
@@ -80,7 +129,7 @@ export function buildArtifactJourney(
 			id: "video",
 			label: t("pipeline.artifactJourney.videoLabel"),
 			description: t("pipeline.artifactJourney.videoDescription"),
-			status: videoId ? "open" : "generate",
+			status: videoId ? "completed" : "generate",
 			path: videoId ? undefined : "/video/upload",
 		},
 		...base,
@@ -88,7 +137,9 @@ export function buildArtifactJourney(
 			id: "quality",
 			label: t("pipeline.artifactJourney.qualityLabel"),
 			description: t("pipeline.artifactJourney.qualityDescription"),
-			status: videoId ? "open" : "locked",
+			status: videoId
+				? resolveStepStatus(hasRender, hasRender, videoStatus)
+				: "locked",
 			path: videoId ? `/video/${videoId}` : undefined,
 			dependsOnLabel: getVideoPipelineStepLabel(t, "render"),
 		},

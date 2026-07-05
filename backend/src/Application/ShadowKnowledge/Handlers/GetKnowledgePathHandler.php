@@ -18,7 +18,7 @@ final class GetKnowledgePathHandler
     /** @return array<string, mixed> */
     public function __invoke(string $scopeKey = 'default'): array
     {
-        $graph = $this->builder->syncGraph($scopeKey);
+        $graph = $this->builder->readGraph($scopeKey);
         $data = $this->mapper->toArray($graph);
 
         return [

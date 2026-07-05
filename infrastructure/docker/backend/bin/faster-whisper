@@ -1,0 +1,108 @@
+#!/usr/bin/env python3
+"""Faster-Whisper CLI wrapper for Lumen backend (JSON stdout contract)."""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+import tempfile
+
+
+def _extract_audio(input_path: str) -> tuple[str, str | None]:
+    lower = input_path.lower()
+    if lower.endswith((".wav", ".mp3", ".flac", ".ogg", ".m4a")):
+        return input_path, None
+
+    temp_dir = tempfile.mkdtemp(prefix="lumen-whisper-")
+    output_path = os.path.join(temp_dir, "audio.wav")
+    command = [
+        "ffmpeg",
+        "-y",
+        "-i",
+        input_path,
+        "-vn",
+        "-acodec",
+        "pcm_s16le",
+        "-ar",
+        "16000",
+        "-ac",
+        "1",
+        output_path,
+    ]
+    result = subprocess.run(command, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or "ffmpeg audio extraction failed")
+
+    return output_path, temp_dir
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Transcribe media with Faster-Whisper")
+    parser.add_argument("input_path")
+    parser.add_argument("--model", default=os.environ.get("STT_FASTER_WHISPER_MODEL", "base"))
+    parser.add_argument("--output-format", default="json")
+    args = parser.parse_args()
+
+    if args.output_format != "json":
+        print(f"Unsupported output format: {args.output_format}", file=sys.stderr)
+        return 1
+
+    if not os.path.isfile(args.input_path):
+        print(f"Input file not found: {args.input_path}", file=sys.stderr)
+        return 1
+
+    cache_dir = os.environ.get("HF_HOME") or os.environ.get("XDG_CACHE_HOME")
+    if cache_dir:
+        os.makedirs(cache_dir, exist_ok=True)
+
+    temp_dir: str | None = None
+    try:
+        audio_path, temp_dir = _extract_audio(args.input_path)
+
+        from faster_whisper import WhisperModel
+
+        device = os.environ.get("STT_FASTER_WHISPER_DEVICE", "cpu")
+        compute_type = os.environ.get("STT_FASTER_WHISPER_COMPUTE_TYPE", "int8")
+        model = WhisperModel(args.model, device=device, compute_type=compute_type)
+        segments_iter, info = model.transcribe(audio_path, beam_size=5)
+
+        segments = []
+        for index, segment in enumerate(segments_iter):
+            text = segment.text.strip()
+            if not text:
+                continue
+            segments.append(
+                {
+                    "index": index,
+                    "start": float(segment.start),
+                    "end": float(segment.end),
+                    "text": text,
+                }
+            )
+
+        payload = {
+            "language": info.language or "unknown",
+            "segments": segments,
+        }
+        print(json.dumps(payload, ensure_ascii=False))
+        return 0
+    except Exception as error:  # noqa: BLE001
+        print(str(error), file=sys.stderr)
+        return 1
+    finally:
+        if temp_dir and os.path.isdir(temp_dir):
+            for name in os.listdir(temp_dir):
+                try:
+                    os.remove(os.path.join(temp_dir, name))
+                except OSError:
+                    pass
+            try:
+                os.rmdir(temp_dir)
+            except OSError:
+                pass
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

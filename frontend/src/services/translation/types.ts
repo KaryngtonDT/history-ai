@@ -57,7 +57,7 @@ export const TRANSLATION_PROVIDERS: Array<{
 	label: string;
 }> = [
 	{ value: "qwen", label: "Qwen 3 (Ollama)" },
-	{ value: "mock", label: "Mock" },
+	{ value: "mock", label: "Mock (local dev)" },
 ];
 
 const TRANSLATION_LANGUAGES = new Set<TranslationLanguage>([

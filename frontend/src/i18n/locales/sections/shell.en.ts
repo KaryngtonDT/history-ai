@@ -276,6 +276,11 @@ export const shellEn = {
 			title: "Interface language",
 			description: "Choose the language for menus, labels, and help text.",
 		},
+		runtime: {
+			title: "AI Runtime",
+			description:
+				"Discover, verify, benchmark, and validate installed AI engines.",
+		},
 		aiEngines: {
 			title: "AI Engines",
 			description: "View registered providers and capabilities (Sprint 34).",

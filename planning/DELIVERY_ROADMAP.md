@@ -16,7 +16,7 @@ See [WORKFLOW.md](WORKFLOW.md) for roles, cycle, and quality gates.
 
 **Shadow** = product — AI companion that accompanies the user everywhere they learn.
 
-Current chapter: **Phase III — Shadow Everywhere** (Sprint 69.5 — Browser Experience Completion, then Sprint 71).
+Current chapter: **Platform Sprint 70.4** (AI Runtime Platform), then **Phase III — Shadow Everywhere** resumes with Sprint 71.
 
 ---
 
@@ -44,21 +44,25 @@ Shadow companion stack from Watch through Second Brain.
 
 # Current focus
 
+## Platform Sprint 70.4 — AI Runtime, Engine Intelligence & Benchmark Platform ← **next**
+
+**Task:** [planning/Platform/Sprint-70.4/TASK-0070.4.md](Platform/Sprint-70.4/TASK-0070.4.md)
+
+Merged former Platform Sprints **70.4 + 70.5** into one infrastructure chapter: Runtime, Registry, Discovery, Readiness, Launcher, Health, Benchmark, Intelligence, Catalog, Validation, Explainability. Host-installed engines + Docker application stack only. **Last major IA infrastructure sprint before returning to Shadow.**
+
+## Sprint 69.5 — Shadow Browser Experience Completion — **in progress**
+
+**Task:** [planning/Shadow/Sprint-69.5/TASK-0069.5.md](Shadow/Sprint-69.5/TASK-0069.5.md)
+
+Connect overlay actions to backend APIs; loading, results, toasts, Open Watch import flow.
+
 ## Sprint 70 — Shadow Mobile Companion & Personal Remote Access — **Complete**
 
 **Task:** [planning/Shadow/Sprint-70/TASK-0070.md](Shadow/Sprint-70/TASK-0070.md)
 
 Mobile API, web settings (Mobile, Connections, Server), Flutter Connection Manager foundation, Tailscale as official Personal Remote transport.
 
-## Current focus
-
-## Sprint 69.5 — Shadow Browser Experience Completion ← **in progress**
-
-**Task:** [planning/Shadow/Sprint-69.5/TASK-0069.5.md](Shadow/Sprint-69.5/TASK-0069.5.md)
-
-Connect overlay actions to backend APIs; loading, results, toasts, Open Watch import flow.
-
-## Sprint 71 — Shadow IDE Companion ← **next**
+## Sprint 71 — Shadow IDE Companion ← **after Platform 70.4**
 
 **Task:** [planning/Shadow/Sprint-71/TASK-0071.md](Shadow/Sprint-71/TASK-0071.md) — **Planned**
 
@@ -73,6 +77,7 @@ Connect overlay actions to backend APIs; loading, results, toasts, Open Watch im
 
 | Sprint | Name |
 | ------ | ---- |
+| **70.4** | **AI Runtime Platform** (Platform — see [Platform/README.md](Platform/README.md)) |
 | 71 | IDE Companion |
 | 72 | Ambient Shadow |
 
@@ -96,6 +101,14 @@ Shadow sprints use:
 docs/vision/LUMEN_VISION_2030.md
         ↓
 planning/Shadow/Sprint-XX/TASK-00XX.md
+        ↓
+Implementation + docs/reports/SprintXX-Verification.md
+```
+
+Platform infrastructure sprints use:
+
+```text
+planning/Platform/Sprint-XX/TASK-00XX.md
         ↓
 Implementation + docs/reports/SprintXX-Verification.md
 ```

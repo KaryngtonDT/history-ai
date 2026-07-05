@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { API_BASE_URL } from "@/config/api";
+import { API_BASE_URL, videoStreamPath } from "@/config/api";
 import { KnowledgeDiffPanel } from "@/features/shadowBrain/KnowledgeDiffPanel";
 import { ExecutiveWatchBar } from "@/features/shadowExecutive/ExecutiveWatchBar";
 import { useTranslation } from "@/i18n/useTranslation";
@@ -230,6 +230,7 @@ export function ShadowWatchPage() {
 				);
 
 				const firstRender = renders[0] ?? null;
+				let playbackReady = false;
 
 				if (firstRender) {
 					pushLog(
@@ -246,22 +247,29 @@ export function ShadowWatchPage() {
 						setStreamUrl(
 							resolveVideoRenderStreamUrl(render.streamUrl, API_BASE_URL),
 						);
+						playbackReady = true;
 						pushLog(t("pipeline.shadow.bootstrapLogRenderStreamReady"));
 					}
 
 					patchCheck("renders", {
-						status: render ? "done" : "warning",
-						detail: render
+						status: playbackReady ? "done" : "warning",
+						detail: playbackReady
 							? t("pipeline.shadow.bootstrapRenderReadyDetail", {
 									language: firstRender.targetLanguage,
 								})
 							: t("pipeline.shadow.bootstrapRenderMissingDetail"),
 					});
-				} else {
+				}
+
+				if (!playbackReady && !cancelled) {
 					pushLog(t("pipeline.shadow.bootstrapLogNoRender"), "warn");
+					pushLog(t("pipeline.shadow.bootstrapLogOriginalStream"));
+					setStreamUrl(
+						resolveVideoRenderStreamUrl(videoStreamPath(videoId), API_BASE_URL),
+					);
 					patchCheck("renders", {
-						status: "warning",
-						detail: t("pipeline.shadow.bootstrapNoRenderDetail"),
+						status: "done",
+						detail: t("pipeline.shadow.bootstrapOriginalStreamDetail"),
 					});
 				}
 
@@ -864,6 +872,12 @@ export function ShadowWatchPage() {
 						currentTime={currentTime}
 						segment={context?.currentTranscriptSegment ?? null}
 					/>
+					<ShadowTranscriptPanel
+						transcript={transcript}
+						activeSegment={context?.currentTranscriptSegment ?? null}
+						collapsed={transcriptCollapsed}
+						onToggle={() => setTranscriptCollapsed((value) => !value)}
+					/>
 					<ShadowVoiceButton
 						onTranscript={(text) => setQuestion(text)}
 						speechLanguage={speakingLanguage}
@@ -925,12 +939,6 @@ export function ShadowWatchPage() {
 			</div>
 
 			<div className={styles.panels}>
-				<ShadowTranscriptPanel
-					transcript={transcript}
-					activeSegment={context?.currentTranscriptSegment ?? null}
-					collapsed={transcriptCollapsed}
-					onToggle={() => setTranscriptCollapsed((value) => !value)}
-				/>
 				<ShadowTranslationPanel
 					segment={context?.currentTranslationSegment ?? null}
 					nearbyContext={context?.nearbyTranslationContext ?? ""}

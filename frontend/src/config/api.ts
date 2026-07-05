@@ -54,6 +54,10 @@ export const SEARCH_LIBRARY_PATH = "/api/search/library";
 
 export const VIDEOS_PATH = "/api/videos";
 
+export function videoStreamPath(videoId: string): string {
+	return `${VIDEOS_PATH}/${videoId}/stream`;
+}
+
 export const AUDIO_PATH = "/api/audio";
 
 export const YOUTUBE_PATH = "/api/youtube";
@@ -224,6 +228,27 @@ export function videoReviewsPath(videoId: string): string {
 }
 
 export const AI_PROVIDERS_PATH = "/api/ai/providers";
+
+export const RUNTIME_PATH = "/api/runtime";
+export const RUNTIME_READINESS_PATH = "/api/runtime/readiness";
+export const RUNTIME_HEALTH_PATH = "/api/runtime/health";
+export const RUNTIME_ENGINES_PATH = "/api/runtime/engines";
+export const RUNTIME_CATALOG_PATH = "/api/runtime/catalog";
+export const RUNTIME_RECOMMENDATIONS_PATH = "/api/runtime/recommendations";
+export const RUNTIME_PROFILES_PATH = "/api/runtime/profiles";
+export const RUNTIME_BENCHMARK_PATH = "/api/runtime/benchmark";
+export const RUNTIME_BENCHMARK_FULL_PATH = "/api/runtime/benchmark/full";
+export const RUNTIME_PIPELINE_VALIDATE_PATH = "/api/runtime/pipeline/validate";
+export const RUNTIME_PROFILE_PATH = "/api/runtime/profile";
+export const RUNTIME_SELECTION_PATH = "/api/runtime/selection";
+
+export function runtimeEngineTestPath(engineId: string): string {
+	return `${RUNTIME_PATH}/engines/${engineId}/test`;
+}
+
+export function runtimeReportPath(pipelineId: string): string {
+	return `${RUNTIME_PATH}/report/${pipelineId}`;
+}
 
 export const PIPELINE_PATH = "/api/pipeline";
 
