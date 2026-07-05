@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-05  
 **Mode:** PROVISIONING (post-audit)  
-**Command:** `make provision-engines` / `scripts/provision-engines.sh`
+**Last update:** Ollama translation alternatives provisioned
 
 ## Summary
 
@@ -10,7 +10,42 @@
 |---|---|
 | Auto-provision supported | **7** engines |
 | Manual / blocked | **11** engines |
+| **READY (real)** after Ollama pulls | **7 / 18** |
 | Target terminal states | **READY** or **BLOCKED** only |
+
+## Ollama translation provisioning (2026-07-05)
+
+### Tags chosen (local / limited machine)
+
+| Engine | Ollama tag | Size | Registry ID | Prefix match |
+|---|---|---|---|---|
+| Gemma 3 (default) | `gemma3:4b` | 3.3 GB | `ollama_gemma3` | `gemma3` |
+| Qwen 3 (alt 1) | `qwen3:4b` | 2.5 GB | `ollama_qwen3` | `qwen3` |
+| DeepSeek R1 Distill (alt 2) | `deepseek-r1:1.5b` | 1.1 GB | `ollama_deepseek_r1_distill` | `deepseek-r1` |
+
+Larger tags documented in `docs/operations/ENGINE_MODELS.md` (`gemma3:12b`, `qwen3:8b`, `deepseek-r1:7b`, etc.).
+
+### `ollama list` (verified)
+
+```
+deepseek-r1:1.5b    1.1 GB
+qwen3:4b            2.5 GB
+gemma3:4b           3.3 GB
+```
+
+### Runtime tests (`POST /api/runtime/engines/{id}/test`)
+
+| Engine | Result | Mode | Model found |
+|---|---|---|---|
+| `ollama_gemma3` | **pass** | real | yes |
+| `ollama_qwen3` | **pass** | real | yes |
+| `ollama_deepseek_r1_distill` | **pass** | real | yes |
+
+### Readiness (`GET /api/runtime/readiness`)
+
+- **status:** `degraded` (expected — TTS/Voice/LipSync still blocked)
+- **readyCount:** `7/18`
+- Translation capability: **3/3 READY** (all Ollama engines)
 
 ## Provisioning infrastructure delivered
 
@@ -22,16 +57,16 @@
 - Docs: `ENGINE_INSTALLATION.md`, `ENGINE_MODELS.md`, `ENGINE_REQUIREMENTS.md`, `ENGINE_UPDATE.md`, `ENGINE_TROUBLESHOOTING.md`
 - Prompt archived: `.ai/prompts/sprint-70.4-engine-provisioning.md`
 
-## Engine matrix (after provisioning run)
+## Engine matrix (current)
 
 | Capability | Engine | Installed | Model | Configured | Executable | Runtime Ready | Smoke | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|
-| STT | Faster Whisper Large V3 | auto | prefetch | yes | yes | **ready** | pass | READY | `make provision-engines` prefetches HF large-v3 |
+| STT | Faster Whisper Large V3 | yes | yes | yes | yes | yes | pass | **READY** | HF large-v3 prefetched |
 | STT | Parakeet | no | no | no | no | no | fail | BLOCKED | NeMo + NGC manual install |
 | STT | Canary | no | no | no | no | no | fail | BLOCKED | NeMo + NGC manual install |
-| Translation | Ollama + Gemma 3 | auto | pull | yes | yes | after pull | after pull | READY/BLOCKED | `ollama pull gemma3:4b` |
-| Translation | Ollama + Qwen 3 | auto | pull | no | yes | after pull | after pull | READY/BLOCKED | `ollama pull qwen3:4b` |
-| Translation | DeepSeek R1 Distill | auto | pull | no | yes | after pull | after pull | READY/BLOCKED | `ollama pull deepseek-r1:1.5b` |
+| Translation | Ollama + Gemma 3 | yes | `gemma3:4b` | yes | yes | yes | pass | **READY** | Default `OLLAMA_MODEL` |
+| Translation | Ollama + Qwen 3 | yes | `qwen3:4b` | no | yes | yes | pass | **READY** | Alt 1 |
+| Translation | DeepSeek R1 Distill | yes | `deepseek-r1:1.5b` | no | yes | yes | pass | **READY** | Alt 2, lightest |
 | TTS | F5-TTS | shim | no | yes | yes | no | fail | BLOCKED | Mount real weights + replace shim |
 | TTS | Kokoro | no | no | no | no | no | fail | BLOCKED | Host install |
 | TTS | Dia | no | no | no | no | no | fail | BLOCKED | Host install |
@@ -41,32 +76,30 @@
 | Lip sync | LatentSync | shim | no | yes | yes | no | fail | BLOCKED | Clone upstream + weights |
 | Lip sync | EchoMimic V2 | no | no | no | no | no | fail | BLOCKED | Manual |
 | Lip sync | MuseTalk | no | no | no | no | no | fail | BLOCKED | Manual |
-| Render | FFmpeg | yes | n/a | yes | yes | **ready** | pass | READY | Bundled in image |
-| Render | FFmpeg NVENC | yes | n/a | no | yes | **ready** | pass | READY | Encoder probe |
-| Render | FFmpeg AV1 | yes | n/a | no | yes | **ready** | pass | READY | Encoder probe |
+| Render | FFmpeg | yes | n/a | yes | yes | yes | pass | **READY** | Bundled in image |
+| Render | FFmpeg NVENC | yes | n/a | no | yes | yes | pass | **READY** | Encoder probe |
+| Render | FFmpeg AV1 | yes | n/a | no | yes | yes | pass | **READY** | Encoder probe |
 
-## Auto-provision steps (run locally)
+## Pull commands (Windows / Docker)
 
 ```powershell
-# From repo root (Docker Desktop running)
 docker compose -f docker-compose.prod-like.yml exec ollama ollama pull gemma3:4b
 docker compose -f docker-compose.prod-like.yml exec ollama ollama pull qwen3:4b
 docker compose -f docker-compose.prod-like.yml exec ollama ollama pull deepseek-r1:1.5b
-docker compose -f docker-compose.prod-like.yml exec backend python3 -c "from faster_whisper import WhisperModel; WhisperModel('large-v3', device='cpu', compute_type='int8')"
-curl -X POST http://localhost:8000/api/runtime/provision
-make runtime-validate
 ```
 
-## Expected pipeline after successful Ollama pulls
+**Note:** First `qwen3:4b` attempt failed with digest mismatch; retry succeeded.
+
+## Expected pipeline after Ollama provisioning
 
 | Stage | Status |
 |---|---|
-| STT | READY |
-| Translation | READY |
+| STT | **READY** |
+| Translation | **READY** (3 engines) |
 | TTS | BLOCKED (shim) |
 | Voice clone | BLOCKED (shim) |
 | Lip sync | BLOCKED (shim) |
-| Render | READY |
+| Render | **READY** |
 
 **3/6 configured REAL stages** without manual host installs. Full 6/6 REAL requires mounting F5, OpenVoice, LatentSync weights.
 
