@@ -7,6 +7,7 @@ import type {
 	RuntimeReadiness,
 	RuntimeRecommendation,
 	RuntimeValidationReport,
+	RuntimeEngineTestResult,
 } from "./types";
 
 export interface RuntimeRepository {
@@ -17,7 +18,9 @@ export interface RuntimeRepository {
 	getCatalog(): Promise<RuntimeCatalog>;
 	getRecommendations(): Promise<RuntimeRecommendation[]>;
 	listProfiles(): Promise<RuntimeProfile[]>;
-	testEngine(engineId: string): Promise<Record<string, unknown>>;
+	testEngine(engineId: string): Promise<RuntimeEngineTestResult>;
+	provisionEngine(engineId: string): Promise<Record<string, unknown>>;
+	provisionAll(): Promise<Record<string, unknown>>;
 	runFullBenchmark(): Promise<Record<string, unknown>>;
 	validatePipeline(): Promise<RuntimeValidationReport>;
 }

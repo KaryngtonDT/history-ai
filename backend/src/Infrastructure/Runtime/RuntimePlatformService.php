@@ -15,6 +15,7 @@ use App\Infrastructure\Runtime\Discovery\EngineDiscovery;
 use App\Infrastructure\Runtime\Health\HealthMonitor;
 use App\Infrastructure\Runtime\Intelligence\AutoSelectionEngine;
 use App\Infrastructure\Runtime\Intelligence\RecommendationEngine;
+use App\Infrastructure\Runtime\Provisioning\EngineProvisioner;
 use App\Infrastructure\Runtime\Readiness\ReadinessEngine;
 
 final class RuntimePlatformService implements RuntimePlatformInterface
@@ -27,6 +28,7 @@ final class RuntimePlatformService implements RuntimePlatformInterface
         private readonly AutoSelectionEngine $autoSelectionEngine,
         private readonly BenchmarkRunner $benchmarkRunner,
         private readonly RuntimeRepositoryInterface $runtimeRepository,
+        private readonly EngineProvisioner $engineProvisioner,
     ) {
     }
 
@@ -192,5 +194,15 @@ final class RuntimePlatformService implements RuntimePlatformInterface
     public function report(string $pipelineId): ?array
     {
         return $this->runtimeRepository->findValidationReport($pipelineId);
+    }
+
+    public function provisionEngine(string $engineId): array
+    {
+        return $this->engineProvisioner->provision($engineId);
+    }
+
+    public function provisionAll(): array
+    {
+        return $this->engineProvisioner->provisionAll();
     }
 }

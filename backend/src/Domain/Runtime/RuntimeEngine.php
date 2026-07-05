@@ -28,6 +28,10 @@ final readonly class RuntimeEngine
         public ?string $expectedModel = null,
         public array $requirements = [],
         public ?array $lastTestResult = null,
+        public ?string $installCommand = null,
+        public ?string $modelDownloadHint = null,
+        public ?string $documentationPath = null,
+        public bool $autoProvisionSupported = false,
     ) {
     }
 
@@ -62,6 +66,11 @@ final readonly class RuntimeEngine
                 $this->requirements,
             ),
             'lastTestResult' => $this->lastTestResult,
+            'installCommand' => $this->installCommand,
+            'modelDownloadHint' => $this->modelDownloadHint,
+            'documentationPath' => $this->documentationPath,
+            'autoProvisionSupported' => $this->autoProvisionSupported,
+            'runtimeReady' => $this->isReady(),
         ];
     }
 }

@@ -777,6 +777,12 @@ services:
             $lipSyncProvider: '%env(default:lip_sync.provider_default:LIP_SYNC_PROVIDER)%'
             $videoRenderProvider: '%env(default:video_render.provider_default:VIDEO_RENDER_PROVIDER)%'
 
+    App\Infrastructure\Runtime\Provisioning\EngineProvisioner:
+        arguments:
+            $ollamaBaseUrl: '%env(default:ollama.base_url_default:OLLAMA_BASE_URL)%'
+
+    App\Infrastructure\Runtime\Readiness\EngineStatusFinalizer: ~
+
     App\Infrastructure\Runtime\Catalog\StaticEngineRepository:
         arguments:
             $assessor: '@App\Infrastructure\Runtime\Discovery\EngineReadinessAssessor'

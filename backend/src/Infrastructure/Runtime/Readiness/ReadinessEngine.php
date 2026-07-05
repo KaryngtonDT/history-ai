@@ -11,6 +11,7 @@ use App\Domain\Runtime\RuntimeEngine;
 use App\Domain\Runtime\RuntimeRequirement;
 use App\Domain\Runtime\RuntimeStatus;
 use App\Infrastructure\Runtime\Discovery\EngineDiscovery;
+use App\Infrastructure\Runtime\Readiness\EngineStatusFinalizer;
 
 final class ReadinessReport
 {
@@ -47,8 +48,10 @@ final class ReadinessReport
 
 final class ReadinessEngine
 {
-    public function __construct(private readonly EngineDiscovery $engineDiscovery)
-    {
+    public function __construct(
+        private readonly EngineDiscovery $engineDiscovery,
+        private readonly EngineStatusFinalizer $statusFinalizer,
+    ) {
     }
 
     public function evaluate(): ReadinessReport
@@ -58,6 +61,7 @@ final class ReadinessEngine
         $readyCount = 0;
 
         foreach ($this->engineDiscovery->discover() as $engine) {
+            $engine = $this->statusFinalizer->finalize($engine);
             $runtimeEngine = $this->toRuntimeEngine($engine);
             $engines[] = $runtimeEngine;
 
@@ -125,6 +129,10 @@ final class ReadinessEngine
             errorReason: $engine->errorReason,
             expectedModel: $engine->expectedModel,
             requirements: $requirements,
+            installCommand: $engine->installCommand,
+            modelDownloadHint: $engine->modelDownloadHint,
+            documentationPath: $engine->documentationPath,
+            autoProvisionSupported: $engine->autoProvisionSupported,
         );
     }
 

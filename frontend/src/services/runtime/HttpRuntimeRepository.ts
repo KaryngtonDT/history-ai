@@ -6,8 +6,10 @@ import {
 	RUNTIME_PATH,
 	RUNTIME_PIPELINE_VALIDATE_PATH,
 	RUNTIME_PROFILES_PATH,
+	RUNTIME_PROVISION_PATH,
 	RUNTIME_READINESS_PATH,
 	RUNTIME_RECOMMENDATIONS_PATH,
+	runtimeEngineProvisionPath,
 	runtimeEngineTestPath,
 } from "@/config/api";
 import type { HttpClient } from "@/services/http/HttpClient";
@@ -21,10 +23,15 @@ import type {
 	RuntimeReadiness,
 	RuntimeRecommendation,
 	RuntimeValidationReport,
+	RuntimeEngineTestResult,
 } from "./types";
 
 export class HttpRuntimeRepository implements RuntimeRepository {
-	constructor(private readonly httpClient: HttpClient) {}
+	private readonly httpClient: HttpClient;
+
+	constructor(httpClient: HttpClient) {
+		this.httpClient = httpClient;
+	}
 
 	getOverview(): Promise<RuntimeOverview> {
 		return this.httpClient.get<RuntimeOverview>(RUNTIME_PATH);
@@ -62,9 +69,23 @@ export class HttpRuntimeRepository implements RuntimeRepository {
 			.then((response) => response.profiles);
 	}
 
-	testEngine(engineId: string): Promise<Record<string, unknown>> {
-		return this.httpClient.post<Record<string, unknown>>(
+	testEngine(engineId: string): Promise<RuntimeEngineTestResult> {
+		return this.httpClient.post<RuntimeEngineTestResult>(
 			runtimeEngineTestPath(engineId),
+			{},
+		);
+	}
+
+	provisionEngine(engineId: string): Promise<Record<string, unknown>> {
+		return this.httpClient.post<Record<string, unknown>>(
+			runtimeEngineProvisionPath(engineId),
+			{},
+		);
+	}
+
+	provisionAll(): Promise<Record<string, unknown>> {
+		return this.httpClient.post<Record<string, unknown>>(
+			RUNTIME_PROVISION_PATH,
 			{},
 		);
 	}

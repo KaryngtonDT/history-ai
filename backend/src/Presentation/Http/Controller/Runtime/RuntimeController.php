@@ -119,6 +119,20 @@ final class RuntimeController extends AbstractController
         return $this->json($this->platform->updateSelection($payload));
     }
 
+    #[OA\Post(operationId: 'provisionRuntimeEngine', tags: ['Runtime'])]
+    #[Route('/engines/{id}/provision', name: 'api_runtime_engine_provision', methods: ['POST'])]
+    public function provisionEngine(string $id): JsonResponse
+    {
+        return $this->json($this->platform->provisionEngine($id));
+    }
+
+    #[OA\Post(operationId: 'provisionAllRuntimeEngines', tags: ['Runtime'])]
+    #[Route('/provision', name: 'api_runtime_provision_all', methods: ['POST'])]
+    public function provisionAll(): JsonResponse
+    {
+        return $this->json($this->platform->provisionAll());
+    }
+
     #[OA\Get(operationId: 'getRuntimeReport', tags: ['Runtime'])]
     #[Route('/report/{pipelineId}', name: 'api_runtime_report', methods: ['GET'])]
     public function report(string $pipelineId): JsonResponse

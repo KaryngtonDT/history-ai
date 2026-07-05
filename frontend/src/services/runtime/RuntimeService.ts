@@ -2,7 +2,11 @@ import type { RuntimeRepository } from "./RuntimeRepository";
 import { createRuntimeRepository } from "./RuntimeRepositoryFactory";
 
 export class RuntimeService {
-	constructor(private readonly repository: RuntimeRepository) {}
+	private readonly repository: RuntimeRepository;
+
+	constructor(repository: RuntimeRepository) {
+		this.repository = repository;
+	}
 
 	getOverview() {
 		return this.repository.getOverview();
@@ -34,6 +38,14 @@ export class RuntimeService {
 
 	testEngine(engineId: string) {
 		return this.repository.testEngine(engineId);
+	}
+
+	provisionEngine(engineId: string) {
+		return this.repository.provisionEngine(engineId);
+	}
+
+	provisionAll() {
+		return this.repository.provisionAll();
 	}
 
 	runFullBenchmark() {

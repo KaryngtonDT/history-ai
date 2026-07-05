@@ -14,6 +14,8 @@ enum RuntimeStatus: string
     case Missing = 'missing';
     case Misconfigured = 'misconfigured';
     case Mock = 'mock';
+    case Blocked = 'blocked';
+    case Provisioning = 'provisioning';
 
     public function isOperational(): bool
     {
@@ -23,5 +25,10 @@ enum RuntimeStatus: string
     public function isReportedReady(): bool
     {
         return self::Ready === $this;
+    }
+
+    public function isTerminal(): bool
+    {
+        return self::Ready === $this || self::Blocked === $this;
     }
 }

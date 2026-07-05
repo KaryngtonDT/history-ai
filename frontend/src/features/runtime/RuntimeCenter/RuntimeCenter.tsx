@@ -21,7 +21,8 @@ function statusVariant(status: string): "success" | "warning" | "danger" | "neut
 		status === "unavailable" ||
 		status === "fail" ||
 		status === "missing" ||
-		status === "misconfigured"
+		status === "misconfigured" ||
+		status === "blocked"
 	) {
 		return "danger";
 	}
@@ -95,6 +96,26 @@ export function RuntimeCenter() {
 		}
 	};
 
+	const runProvisionAll = async () => {
+		setBusy("provision");
+		try {
+			await runtimeService.provisionAll();
+			await load();
+		} finally {
+			setBusy(null);
+		}
+	};
+
+	const provisionEngine = async (engine: RuntimeEngine) => {
+		setBusy(`provision-${engine.id}`);
+		try {
+			await runtimeService.provisionEngine(engine.id);
+			await load();
+		} finally {
+			setBusy(null);
+		}
+	};
+
 	const testEngine = async (engine: RuntimeEngine) => {
 		setBusy(engine.id);
 		try {
@@ -132,7 +153,15 @@ export function RuntimeCenter() {
 					onClick={() => void runValidation()}
 					disabled={busy !== null}
 				>
-					{busy === "validate" ? "Validating…" : "Run Pipeline Validation"}
+					{busy === "validate" ? "Validating…" : "Verify Pipeline"}
+				</Button>
+				<Button
+					type="button"
+					variant="secondary"
+					onClick={() => void runProvisionAll()}
+					disabled={busy !== null}
+				>
+					{busy === "provision" ? "Installing…" : "Install All (Auto)"}
 				</Button>
 				<Button
 					type="button"
@@ -140,7 +169,7 @@ export function RuntimeCenter() {
 					onClick={() => void runBenchmark()}
 					disabled={busy !== null}
 				>
-					{busy === "benchmark" ? "Benchmarking…" : "Run Full Benchmark"}
+					{busy === "benchmark" ? "Benchmarking…" : "Benchmark All"}
 				</Button>
 			</div>
 
@@ -214,14 +243,29 @@ export function RuntimeCenter() {
 									{lastTest.error ? ` — ${lastTest.error}` : ""}
 								</p>
 							)}
+							{engine.installCommand && (
+								<p className={styles.meta}>Install: {engine.installCommand}</p>
+							)}
+							<div className={styles.engineActions}>
+							{engine.autoProvisionSupported && (
+								<Button
+									type="button"
+									variant="secondary"
+									onClick={() => void provisionEngine(engine)}
+									disabled={busy !== null}
+								>
+									{busy === `provision-${engine.id}` ? "Installing…" : "Install"}
+								</Button>
+							)}
 							<Button
 								type="button"
 								variant="secondary"
 								onClick={() => void testEngine(engine)}
 								disabled={busy !== null}
 							>
-								{busy === engine.id ? "Testing…" : "Run Test"}
+								{busy === engine.id ? "Testing…" : "Test"}
 							</Button>
+							</div>
 						</Card>
 					);
 					})}

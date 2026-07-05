@@ -74,4 +74,14 @@ interface RuntimePlatformInterface
      * @return array<string, mixed>|null
      */
     public function report(string $pipelineId): ?array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function provisionEngine(string $engineId): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function provisionAll(): array;
 }

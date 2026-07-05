@@ -242,8 +242,14 @@ export const RUNTIME_PIPELINE_VALIDATE_PATH = "/api/runtime/pipeline/validate";
 export const RUNTIME_PROFILE_PATH = "/api/runtime/profile";
 export const RUNTIME_SELECTION_PATH = "/api/runtime/selection";
 
+export const RUNTIME_PROVISION_PATH = "/api/runtime/provision";
+
 export function runtimeEngineTestPath(engineId: string): string {
 	return `${RUNTIME_PATH}/engines/${engineId}/test`;
+}
+
+export function runtimeEngineProvisionPath(engineId: string): string {
+	return `${RUNTIME_PATH}/engines/${engineId}/provision`;
 }
 
 export function runtimeReportPath(pipelineId: string): string {

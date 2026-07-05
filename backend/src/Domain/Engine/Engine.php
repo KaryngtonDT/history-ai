@@ -33,6 +33,10 @@ final readonly class Engine
         public ?string $errorReason = null,
         public ?string $expectedModel = null,
         public ?string $ollamaModelTag = null,
+        public ?string $installCommand = null,
+        public ?string $modelDownloadHint = null,
+        public ?string $documentationPath = null,
+        public bool $autoProvisionSupported = false,
     ) {
     }
 
@@ -71,6 +75,11 @@ final readonly class Engine
                 $this->requirements,
             ),
             'documentationUrl' => $this->documentationUrl,
+            'installCommand' => $this->installCommand,
+            'modelDownloadHint' => $this->modelDownloadHint,
+            'documentationPath' => $this->documentationPath,
+            'autoProvisionSupported' => $this->autoProvisionSupported,
+            'runtimeReady' => $this->isReady(),
         ];
     }
 }

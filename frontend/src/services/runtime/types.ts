@@ -36,6 +36,11 @@ export interface RuntimeEngine {
 	version?: string | null;
 	binaryPath?: string | null;
 	requirements?: RuntimeRequirement[];
+	autoProvisionSupported?: boolean;
+	runtimeReady?: boolean;
+	installCommand?: string | null;
+	modelDownloadHint?: string | null;
+	documentationPath?: string | null;
 	lastTestResult?: RuntimeEngineTestResult | null;
 }
 

@@ -1,7 +1,7 @@
 .PHONY: help install up down ps logs config \
 	dev dev-stop prod prod-stop prod-rebuild prod-fresh prod-restart setup-engines \
 	prod-backend prod-frontend prod-worker prod-migrate prod-prune-backend-run prod-logs \
-	test test-backend test-frontend test-worker test-all ci runtime-validate runtime-benchmark \
+	test test-backend test-frontend test-worker test-all ci runtime-validate runtime-benchmark provision-engines \
 	backup restore verify-backup health doctor status migrate shell-backend
 
 COMPOSE ?= docker compose
@@ -25,7 +25,8 @@ help:
 	@echo "  make prod             Start prod-like stack"
 	@echo "  make prod-stop        Stop prod-like stack"
 	@echo "  make prod-rebuild     Rebuild all prod-like images"
-	@echo "  make setup-engines    Pull Ollama model + verify pipeline CLIs"
+	@echo "  make setup-engines    Alias for provision-engines"
+	@echo "  make provision-engines Pull models + auto-provision supported engines"
 	@echo "  make prod-restart     Restart prod-like stack"
 	@echo "  make prod-fresh       DESTROY volumes + reset (confirmation)"
 	@echo ""
@@ -99,8 +100,10 @@ prod-stop:
 prod-rebuild:
 	$(COMPOSE_PROD) up -d --build --force-recreate
 
-setup-engines:
-	bash scripts/setup-engines.sh
+setup-engines: provision-engines
+
+provision-engines:
+	bash scripts/provision-engines.sh
 
 prod-restart:
 	$(COMPOSE_PROD) restart

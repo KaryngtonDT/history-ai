@@ -10,7 +10,7 @@ export function RuntimeSettingsPage() {
 				title="AI Runtime"
 				description="Discover, verify, benchmark, and validate the engines that actually run your pipeline."
 				whatCanIDo="Check readiness, run engine tests, validate the full pipeline, and review recommendations."
-				secondaryActions={<ExplainThisButton featureId="runtime" />}
+				secondaryActions={<ExplainThisButton featureId="ai-engines" />}
 			/>
 			<RuntimeCenter />
 		</section>
