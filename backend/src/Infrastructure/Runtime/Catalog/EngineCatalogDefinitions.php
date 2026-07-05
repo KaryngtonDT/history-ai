@@ -112,7 +112,7 @@ final class EngineCatalogDefinitions
                 'f5-tts',
                 'f5',
                 'F5-TTS',
-                installedMode: EngineExecutionMode::Shim,
+                installedMode: EngineExecutionMode::Real,
             ),
             new EngineDefinition(
                 'kokoro',
@@ -143,7 +143,7 @@ final class EngineCatalogDefinitions
                 'openvoice',
                 'openvoice',
                 'openvoice_v2',
-                installedMode: EngineExecutionMode::Shim,
+                installedMode: EngineExecutionMode::Real,
             ),
             new EngineDefinition(
                 'chatterbox',
@@ -174,7 +174,7 @@ final class EngineCatalogDefinitions
                 'latentsync',
                 'latentsync',
                 'latentsync',
-                installedMode: EngineExecutionMode::Shim,
+                installedMode: EngineExecutionMode::Real,
             ),
             new EngineDefinition(
                 'echomimic_v2',

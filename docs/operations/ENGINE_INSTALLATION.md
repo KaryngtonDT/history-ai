@@ -75,9 +75,17 @@ Set `OLLAMA_MODEL` to the active model tag. Runtime Center lists each variant se
 
 ### F5-TTS / OpenVoice / LatentSync (real weights)
 
-The Docker image ships **shim CLIs** under `/usr/local/bin/` for development. Replace them with real engine installs and mount model files under `/models/<engine>/`.
+Use the dedicated installer (venv + model download):
 
-Until real weights are mounted, Runtime Center shows status `mock` (shim).
+```bash
+make install-gpu-engines
+# or per engine:
+docker compose -f docker-compose.prod-like.yml exec backend bash /opt/lumen/install-gpu-engines.sh --engine f5
+```
+
+See **`docs/operations/ENGINE_INSTALL_F5_OPENVOICE_LATENTSYNC.md`** for repos, CUDA, disk, rollback.
+
+Until weights are installed, Runtime Center shows status `blocked` or `misconfigured` (not silent mock).
 
 ### Missing alternatives
 

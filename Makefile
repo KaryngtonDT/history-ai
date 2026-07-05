@@ -1,7 +1,7 @@
 .PHONY: help install up down ps logs config \
 	dev dev-stop prod prod-stop prod-rebuild prod-fresh prod-restart setup-engines \
 	prod-backend prod-frontend prod-worker prod-migrate prod-prune-backend-run prod-logs \
-	test test-backend test-frontend test-worker test-all ci runtime-validate runtime-benchmark provision-engines \
+	test test-backend test-frontend test-worker test-all ci runtime-validate runtime-benchmark provision-engines install-gpu-engines \
 	backup restore verify-backup health doctor status migrate shell-backend
 
 COMPOSE ?= docker compose
@@ -27,6 +27,7 @@ help:
 	@echo "  make prod-rebuild     Rebuild all prod-like images"
 	@echo "  make setup-engines    Alias for provision-engines"
 	@echo "  make provision-engines Pull models + auto-provision supported engines"
+	@echo "  make install-gpu-engines Install F5-TTS, OpenVoice, LatentSync venvs"
 	@echo "  make prod-restart     Restart prod-like stack"
 	@echo "  make prod-fresh       DESTROY volumes + reset (confirmation)"
 	@echo ""
@@ -104,6 +105,9 @@ setup-engines: provision-engines
 
 provision-engines:
 	bash scripts/provision-engines.sh
+
+install-gpu-engines:
+	$(BACKEND_EXEC) bash /opt/lumen/install-gpu-engines.sh --engine all
 
 prod-restart:
 	$(COMPOSE_PROD) restart

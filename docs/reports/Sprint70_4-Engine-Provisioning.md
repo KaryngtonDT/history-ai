@@ -4,6 +4,31 @@
 **Mode:** PROVISIONING (post-audit)  
 **Last update:** Ollama translation alternatives provisioned
 
+## GPU engines install (2026-07-05)
+
+Plan: `docs/operations/ENGINE_INSTALL_F5_OPENVOICE_LATENTSYNC.md`  
+Installer: `make install-gpu-engines`
+
+| Engine | Venv | Models | Runtime status | Notes |
+|---|---|---|---|---|
+| F5-TTS | `/models/venvs/f5-tts` | `/models/f5` | **READY** (real) | Smoke test may take minutes on CPU (first HF load) |
+| OpenVoice V2 | `/models/venvs/openvoice` | pending | **BLOCKED** | Re-run after script fix (skip 526MB UniDic; PyAV/av==14.1.0) |
+| LatentSync | partial | partial | **BLOCKED** | Install OOM (exit 137); needs GPU + more RAM |
+
+### Fixes applied during install
+
+- CLI wrappers: venv dispatch + CRLF fix on Windows (`sed -i 's/\r$//'`)
+- Shim detection: bash wrappers no longer false-positive; placeholders under `/opt/lumen/placeholders/`
+- F5 runner uses `/models/venvs/f5-tts/bin/f5-tts_infer-cli`
+
+### Re-run commands
+
+```powershell
+docker compose -f docker-compose.prod-like.yml exec backend bash /opt/lumen/install-gpu-engines.sh --engine openvoice
+docker compose -f docker-compose.prod-like.yml exec backend bash /opt/lumen/install-gpu-engines.sh --engine latentsync
+curl -X POST http://localhost:8000/api/runtime/engines/f5_tts/test
+```
+
 ## Summary
 
 | Metric | Value |

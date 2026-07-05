@@ -368,6 +368,10 @@ final class EngineReadinessAssessor
 
     private function isShimBinary(string $binaryPath, EngineDefinition $definition): bool
     {
+        if (str_starts_with($binaryPath, '/opt/lumen/placeholders/')) {
+            return true;
+        }
+
         if (EngineExecutionMode::Shim === $definition->installedMode) {
             return true;
         }
@@ -378,7 +382,17 @@ final class EngineReadinessAssessor
 
         $head = @file_get_contents($binaryPath, false, null, 0, 4096);
 
-        return is_string($head) && str_contains(strtolower($head), 'shim');
+        if (!is_string($head)) {
+            return false;
+        }
+
+        $lower = strtolower($head);
+
+        if (str_starts_with($head, '#!/bin/bash') || str_starts_with($head, '#!/usr/bin/env bash')) {
+            return false;
+        }
+
+        return str_contains($lower, 'placeholder') || str_contains($lower, 'shim');
     }
 
     private function ffmpegHasEncoder(string $binaryPath, string $encoder): bool

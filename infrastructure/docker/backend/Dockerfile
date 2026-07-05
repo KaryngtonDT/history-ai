@@ -9,14 +9,29 @@ RUN apt-get update \
         wget \
         curl \
         unzip \
+        git \
         ffmpeg \
         python3 \
         python3-pip \
+        python3-venv \
+        python3-dev \
+        build-essential \
+        libsndfile1 \
+        libgl1 \
+        libglib2.0-0 \
+        pkg-config \
+        libavformat-dev \
+        libavcodec-dev \
+        libavdevice-dev \
+        libavutil-dev \
+        libswscale-dev \
+        libswresample-dev \
+        libavfilter-dev \
         libicu-dev \
         libpq-dev \
         libzip-dev \
         $PHPIZE_DEPS \
-    && pip3 install --break-system-packages faster-whisper yt-dlp \
+    && pip3 install --break-system-packages faster-whisper yt-dlp huggingface_hub \
     && docker-php-ext-install -j"$(nproc)" intl opcache pdo_pgsql zip \
     && pecl install redis \
     && docker-php-ext-enable redis \
@@ -46,10 +61,29 @@ COPY infrastructure/docker/backend/bin/faster-whisper \
      infrastructure/docker/backend/bin/openvoice \
      infrastructure/docker/backend/bin/latentsync \
      /usr/local/bin/
+COPY infrastructure/docker/backend/placeholders/f5-tts \
+     infrastructure/docker/backend/placeholders/openvoice \
+     infrastructure/docker/backend/placeholders/latentsync \
+     /opt/lumen/placeholders/
+COPY infrastructure/docker/backend/engines/ /opt/lumen/engines/
+COPY scripts/install-f5-openvoice-latentsync.sh /opt/lumen/install-gpu-engines.sh
 RUN chmod +x /usr/local/bin/faster-whisper \
              /usr/local/bin/f5-tts \
              /usr/local/bin/openvoice \
-             /usr/local/bin/latentsync
+             /usr/local/bin/latentsync \
+             /opt/lumen/placeholders/f5-tts \
+             /opt/lumen/placeholders/openvoice \
+             /opt/lumen/placeholders/latentsync \
+             /opt/lumen/install-gpu-engines.sh \
+             /opt/lumen/engines/*.py \
+ && sed -i 's/\r$//' /usr/local/bin/f5-tts \
+             /usr/local/bin/openvoice \
+             /usr/local/bin/latentsync \
+             /opt/lumen/placeholders/f5-tts \
+             /opt/lumen/placeholders/openvoice \
+             /opt/lumen/placeholders/latentsync \
+             /opt/lumen/install-gpu-engines.sh \
+             /opt/lumen/engines/*.py
 
 COPY infrastructure/docker/backend/nginx.conf /etc/nginx/conf.d/default.conf
 RUN rm -f /etc/nginx/sites-enabled/default

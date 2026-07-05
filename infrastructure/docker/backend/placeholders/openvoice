@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+"""OpenVoice CLI placeholder — produces valid artifacts until real OpenVoice weights are mounted."""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+
+
+def _minimal_wav() -> bytes:
+    return (
+        b"RIFF\x24\x08\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00"
+        b"\x44\xAC\x00\x00\x88\x58\x01\x00\x02\x00\x10\x00data\x00\x08\x00\x00"
+    )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="OpenVoice voice clone placeholder")
+    parser.add_argument("--reference", required=True)
+    parser.add_argument("--source", required=True)
+    parser.add_argument("--text", required=True)
+    parser.add_argument("--model", default="openvoice_v2")
+    parser.add_argument("--base-path", default="/models/openvoice")
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--source-duration", type=float, default=3.0)
+    args = parser.parse_args()
+
+    os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
+    with open(args.output, "wb") as handle:
+        handle.write(_minimal_wav())
+
+    print(
+        json.dumps(
+            {
+                "duration": max(1.0, args.source_duration),
+                "sampleRate": 44100,
+                "output": args.output,
+            }
+        )
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

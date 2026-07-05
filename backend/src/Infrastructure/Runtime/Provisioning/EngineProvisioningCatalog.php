@@ -74,12 +74,11 @@ final class EngineProvisioningCatalog
             ),
             new EngineProvisionSpec(
                 'f5_tts',
-                false,
-                blockedReason: 'F5-TTS real weights are not bundled in Docker. Mount checkpoints under /models/f5 and replace the dev shim with the upstream F5-TTS CLI.',
-                installCommand: 'See docs/operations/ENGINE_INSTALLATION.md#f5-tts',
+                true,
+                installCommand: 'make install-gpu-engines or: docker compose exec backend bash /opt/lumen/install-gpu-engines.sh --engine f5',
                 modelDownloadHint: 'https://huggingface.co/SWivid/F5-TTS',
                 modelPath: '/models/f5',
-                documentationPath: 'docs/operations/ENGINE_INSTALLATION.md#f5-tts',
+                documentationPath: 'docs/operations/ENGINE_INSTALL_F5_OPENVOICE_LATENTSYNC.md#1-f5-tts',
             ),
             new EngineProvisionSpec(
                 'kokoro',
@@ -101,12 +100,11 @@ final class EngineProvisioningCatalog
             ),
             new EngineProvisionSpec(
                 'openvoice_v2',
-                false,
-                blockedReason: 'OpenVoice V2 weights are not bundled. Clone OpenVoice, install deps, mount /models/openvoice, replace shim CLI.',
-                installCommand: 'See docs/operations/ENGINE_INSTALLATION.md#openvoice-v2',
+                true,
+                installCommand: 'make install-gpu-engines or: docker compose exec backend bash /opt/lumen/install-gpu-engines.sh --engine openvoice',
                 modelDownloadHint: 'https://huggingface.co/myshell-ai/OpenVoiceV2',
                 modelPath: '/models/openvoice',
-                documentationPath: 'docs/operations/ENGINE_INSTALLATION.md#openvoice-v2',
+                documentationPath: 'docs/operations/ENGINE_INSTALL_F5_OPENVOICE_LATENTSYNC.md#2-openvoice-v2',
             ),
             new EngineProvisionSpec(
                 'chatterbox',
@@ -127,12 +125,11 @@ final class EngineProvisioningCatalog
             ),
             new EngineProvisionSpec(
                 'latentsync',
-                false,
-                blockedReason: 'LatentSync real weights are not bundled. Clone LatentSync repo and mount /models/latentsync.',
-                installCommand: 'See docs/operations/ENGINE_INSTALLATION.md#latentsync',
+                true,
+                installCommand: 'make install-gpu-engines or: docker compose exec backend bash /opt/lumen/install-gpu-engines.sh --engine latentsync',
                 modelDownloadHint: 'https://github.com/bytedance/LatentSync',
                 modelPath: '/models/latentsync',
-                documentationPath: 'docs/operations/ENGINE_INSTALLATION.md#latentsync',
+                documentationPath: 'docs/operations/ENGINE_INSTALL_F5_OPENVOICE_LATENTSYNC.md#3-latentsync',
             ),
             new EngineProvisionSpec(
                 'echomimic_v2',

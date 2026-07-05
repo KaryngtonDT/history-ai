@@ -40,6 +40,9 @@ final class EngineProvisioner
             'ollama_gemma3' => $this->provisionOllamaModel('gemma3:4b', $output),
             'ollama_qwen3' => $this->provisionOllamaModel('qwen3:4b', $output),
             'ollama_deepseek_r1_distill' => $this->provisionOllamaModel('deepseek-r1:1.5b', $output),
+            'f5_tts' => $this->provisionGpuEngine('f5', $output),
+            'openvoice_v2' => $this->provisionGpuEngine('openvoice', $output),
+            'latentsync' => $this->provisionGpuEngine('latentsync', $output),
             'ffmpeg', 'ffmpeg_nvenc', 'ffmpeg_av1' => $this->verifyFfmpeg($output),
             default => false,
         };
@@ -127,6 +130,21 @@ final class EngineProvisioner
             escapeshellarg($payload),
         ));
         $process->setTimeout(900);
+        $process->run();
+        $output[] = trim($process->getOutput().$process->getErrorOutput());
+
+        return $process->isSuccessful();
+    }
+
+    /**
+     * @param list<string> $output
+     */
+    private function provisionGpuEngine(string $engine, array &$output): bool
+    {
+        $process = Process::fromShellCommandline(
+            'bash /opt/lumen/install-gpu-engines.sh --engine '.escapeshellarg($engine).' 2>&1',
+        );
+        $process->setTimeout(7200);
         $process->run();
         $output[] = trim($process->getOutput().$process->getErrorOutput());
 
