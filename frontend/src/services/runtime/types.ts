@@ -5,16 +5,38 @@ export interface RuntimeRequirement {
 	detail?: string | null;
 }
 
+export interface RuntimeEngineTestResult {
+	engineId: string;
+	status: string;
+	ok: boolean;
+	mode: string;
+	durationMs?: number;
+	executableFound?: boolean;
+	modelFound?: boolean;
+	fallbackUsed?: boolean;
+	outputSample?: string | null;
+	error?: string | null;
+	at?: string;
+}
+
 export interface RuntimeEngine {
 	id: string;
 	displayName: string;
 	capability: string;
 	status: string;
+	mode: string;
+	role?: string | null;
+	roleLabel?: string | null;
 	configured: boolean;
 	discovered: boolean;
+	executableFound: boolean;
+	modelFound: boolean;
+	errorReason?: string | null;
+	expectedModel?: string | null;
 	version?: string | null;
 	binaryPath?: string | null;
 	requirements?: RuntimeRequirement[];
+	lastTestResult?: RuntimeEngineTestResult | null;
 }
 
 export interface RuntimeReadiness {
@@ -70,6 +92,9 @@ export interface RuntimeValidationStep {
 	requestedEngineId: string;
 	executedEngineId: string;
 	status: string;
+	mode?: string;
+	executableFound?: boolean;
+	modelFound?: boolean;
 	fallbackUsed: boolean;
 	reason?: string | null;
 	confidence: number;

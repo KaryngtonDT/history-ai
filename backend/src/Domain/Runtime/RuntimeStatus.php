@@ -11,9 +11,17 @@ enum RuntimeStatus: string
     case Ready = 'ready';
     case Degraded = 'degraded';
     case Unavailable = 'unavailable';
+    case Missing = 'missing';
+    case Misconfigured = 'misconfigured';
+    case Mock = 'mock';
 
     public function isOperational(): bool
     {
-        return self::Ready === $this || self::Degraded === $this;
+        return self::Ready === $this;
+    }
+
+    public function isReportedReady(): bool
+    {
+        return self::Ready === $this;
     }
 }

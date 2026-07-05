@@ -6,6 +6,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { runtimeService } from "@/services/runtime/RuntimeService";
 import type {
 	RuntimeEngine,
+	RuntimeEngineTestResult,
 	RuntimeOverview,
 	RuntimeReadiness,
 	RuntimeRecommendation,
@@ -15,9 +16,23 @@ import styles from "./RuntimeCenter.module.css";
 
 function statusVariant(status: string): "success" | "warning" | "danger" | "neutral" {
 	if (status === "ready" || status === "pass") return "success";
-	if (status === "degraded") return "warning";
-	if (status === "unavailable" || status === "fail") return "danger";
+	if (status === "mock" || status === "degraded") return "warning";
+	if (
+		status === "unavailable" ||
+		status === "fail" ||
+		status === "missing" ||
+		status === "misconfigured"
+	) {
+		return "danger";
+	}
 	return "neutral";
+}
+
+function modeLabel(mode: string): string {
+	if (mode === "real") return "REAL";
+	if (mode === "shim") return "SHIM";
+	if (mode === "mock") return "MOCK";
+	return mode.toUpperCase();
 }
 
 export function RuntimeCenter() {
@@ -26,6 +41,9 @@ export function RuntimeCenter() {
 	const [recommendations, setRecommendations] = useState<RuntimeRecommendation[]>(
 		[],
 	);
+	const [testResults, setTestResults] = useState<
+		Record<string, RuntimeEngineTestResult>
+	>({});
 	const [validation, setValidation] = useState<RuntimeValidationReport | null>(
 		null,
 	);
@@ -80,7 +98,8 @@ export function RuntimeCenter() {
 	const testEngine = async (engine: RuntimeEngine) => {
 		setBusy(engine.id);
 		try {
-			await runtimeService.testEngine(engine.id);
+			const result = await runtimeService.testEngine(engine.id);
+			setTestResults((current) => ({ ...current, [engine.id]: result }));
 			await load();
 		} finally {
 			setBusy(null);
@@ -152,19 +171,49 @@ export function RuntimeCenter() {
 			<section className={styles.section}>
 				<h3>Engines</h3>
 				<div className={styles.engineGrid}>
-					{readiness.engines.map((engine) => (
+					{readiness.engines.map((engine) => {
+						const lastTest = testResults[engine.id];
+						return (
 						<Card key={engine.id} className={styles.engineCard}>
 							<div className={styles.engineHeader}>
 								<strong>{engine.displayName}</strong>
-								<Badge variant={statusVariant(engine.status)}>
-									{engine.status}
-								</Badge>
+								<div className={styles.badges}>
+									<Badge variant={statusVariant(engine.status)}>
+										{engine.status.toUpperCase()}
+									</Badge>
+									<Badge variant={engine.mode === "real" ? "success" : "warning"}>
+										{modeLabel(engine.mode)}
+									</Badge>
+								</div>
 							</div>
 							<p className={styles.meta}>
-								{engine.capability}
+								{engine.roleLabel ?? engine.capability}
 								{engine.configured ? " · configured" : ""}
-								{engine.discovered ? " · discovered" : ""}
+								{engine.executableFound ? " · executable" : " · no executable"}
+								{engine.modelFound ? " · model ok" : " · model missing"}
 							</p>
+							{engine.errorReason && (
+								<p className={styles.warning}>{engine.errorReason}</p>
+							)}
+							{engine.requirements && engine.requirements.length > 0 && (
+								<ul className={styles.requirementList}>
+									{engine.requirements.map((req) => (
+										<li key={req.key}>
+											{req.label}: {req.satisfied ? "ok" : "missing"}
+										</li>
+									))}
+								</ul>
+							)}
+							{lastTest && (
+								<p className={styles.meta}>
+									Last test: {lastTest.ok ? "PASS" : "FAIL"}
+									{lastTest.durationMs != null
+										? ` (${lastTest.durationMs}ms)`
+										: ""}
+									{lastTest.outputSample ? ` — ${lastTest.outputSample}` : ""}
+									{lastTest.error ? ` — ${lastTest.error}` : ""}
+								</p>
+							)}
 							<Button
 								type="button"
 								variant="secondary"
@@ -174,7 +223,8 @@ export function RuntimeCenter() {
 								{busy === engine.id ? "Testing…" : "Run Test"}
 							</Button>
 						</Card>
-					))}
+					);
+					})}
 				</div>
 			</section>
 

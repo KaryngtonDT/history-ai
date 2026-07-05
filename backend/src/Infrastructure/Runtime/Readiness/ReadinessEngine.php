@@ -53,50 +53,51 @@ final class ReadinessEngine
 
     public function evaluate(): ReadinessReport
     {
-        $environment = $this->engineDiscovery->environment();
-        /** @var array<string, string> $activeProviders */
-        $activeProviders = $environment['activeProviders'];
         $engines = [];
         $issues = [];
         $readyCount = 0;
 
         foreach ($this->engineDiscovery->discover() as $engine) {
-            $runtimeEngine = $this->toRuntimeEngine($engine, $activeProviders);
+            $runtimeEngine = $this->toRuntimeEngine($engine);
             $engines[] = $runtimeEngine;
 
             if ($runtimeEngine->isReady()) {
                 ++$readyCount;
             }
 
-            if ($runtimeEngine->configured && !$runtimeEngine->discovered) {
+            if ($runtimeEngine->configured && !$runtimeEngine->isReady()) {
                 $issues[] = sprintf(
-                    'Configured engine "%s" is not ready (%s).',
+                    'Configured engine "%s" is %s (%s). %s',
                     $runtimeEngine->displayName,
+                    $runtimeEngine->status->value,
                     $runtimeEngine->capability->label(),
+                    $runtimeEngine->errorReason ?? 'See requirements.',
                 );
             }
         }
 
         $total = count($engines);
+        $configuredReady = count(array_filter(
+            $engines,
+            static fn (RuntimeEngine $engine): bool => $engine->configured && $engine->isReady(),
+        ));
+        $configuredCount = count(array_filter(
+            $engines,
+            static fn (RuntimeEngine $engine): bool => $engine->configured,
+        ));
+
         $status = match (true) {
             0 === $total => RuntimeStatus::Unknown,
-            $readyCount === $total => RuntimeStatus::Ready,
-            $readyCount > 0 => RuntimeStatus::Degraded,
+            $configuredCount > 0 && $configuredReady === $configuredCount => RuntimeStatus::Ready,
+            $configuredReady > 0 => RuntimeStatus::Degraded,
             default => RuntimeStatus::Unavailable,
         };
 
         return new ReadinessReport($status, $readyCount, $total, $engines, $issues);
     }
 
-    /**
-     * @param array<string, string> $activeProviders
-     */
-    private function toRuntimeEngine(Engine $engine, array $activeProviders): RuntimeEngine
+    private function toRuntimeEngine(Engine $engine): RuntimeEngine
     {
-        $capability = RuntimeCapability::from($engine->capability->value);
-        $activeId = $this->normalizeProviderId($activeProviders[$engine->capability->value] ?? '');
-        $configured = $activeId === $engine->id || ($engine->id === 'f5_tts' && 'f5' === $activeId);
-        $discovered = $engine->installed;
         $requirements = array_map(
             static fn ($req): RuntimeRequirement => new RuntimeRequirement(
                 $req->key,
@@ -107,31 +108,24 @@ final class ReadinessEngine
             $engine->requirements,
         );
 
-        $status = match (true) {
-            $discovered => RuntimeStatus::Ready,
-            $configured => RuntimeStatus::Unavailable,
-            default => RuntimeStatus::Degraded,
-        };
-
         return new RuntimeEngine(
             id: $engine->id,
             displayName: $engine->displayName,
-            capability: $capability,
-            status: $status,
-            configured: $configured,
-            discovered: $discovered,
+            capability: RuntimeCapability::from($engine->capability->value),
+            status: $engine->runtimeStatus,
+            mode: $engine->executionMode,
+            configured: $engine->configured,
+            discovered: $engine->installed,
+            executableFound: $engine->executableFound,
+            modelFound: $engine->modelFound,
+            role: $engine->role->value,
+            roleLabel: $engine->role->label(),
             version: $engine->version?->value,
             binaryPath: $engine->version?->build,
+            errorReason: $engine->errorReason,
+            expectedModel: $engine->expectedModel,
             requirements: $requirements,
         );
-    }
-
-    private function normalizeProviderId(string $providerId): string
-    {
-        return match ($providerId) {
-            'f5', 'f5_tts' => 'f5_tts',
-            default => $providerId,
-        };
     }
 
     public function stageTypeForCapability(RuntimeCapability $capability): PipelineStageType

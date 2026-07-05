@@ -1,7 +1,7 @@
 .PHONY: help install up down ps logs config \
 	dev dev-stop prod prod-stop prod-rebuild prod-fresh prod-restart setup-engines \
 	prod-backend prod-frontend prod-worker prod-migrate prod-prune-backend-run prod-logs \
-	test test-backend test-frontend test-worker test-all ci \
+	test test-backend test-frontend test-worker test-all ci runtime-validate runtime-benchmark \
 	backup restore verify-backup health doctor status migrate shell-backend
 
 COMPOSE ?= docker compose
@@ -169,6 +169,12 @@ health:
 	@echo ""
 	curl -sf http://localhost:8000/live
 	@echo ""
+
+runtime-validate:
+	curl -sf -X POST http://localhost:8000/api/runtime/pipeline/validate | python -m json.tool
+
+runtime-benchmark:
+	curl -sf -X POST http://localhost:8000/api/runtime/benchmark/full | python -m json.tool
 
 doctor:
 	bash scripts/doctor.sh

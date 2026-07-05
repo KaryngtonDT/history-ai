@@ -138,8 +138,11 @@ final class RuntimePlatformService implements RuntimePlatformInterface
                 'requestedEngineId' => $selections[$engine->capability->value] ?? $engine->id,
                 'executedEngineId' => $engine->id,
                 'status' => $engine->status->value,
+                'mode' => $engine->mode->value,
+                'executableFound' => $engine->executableFound,
+                'modelFound' => $engine->modelFound,
                 'fallbackUsed' => false,
-                'reason' => $stepOk ? null : 'Engine not ready',
+                'reason' => $stepOk ? null : ($engine->errorReason ?? 'Engine not ready'),
                 'confidence' => $stepOk ? 100 : 0,
             ];
         }

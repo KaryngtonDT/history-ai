@@ -64,12 +64,10 @@ final class EngineDiscovery
 
     public function defaultEngineId(string $capability): ?string
     {
-        foreach (EngineCatalogDefinitions::all() as $definition) {
-            if ($definition->capability->value === $capability && $definition->default) {
-                return $definition->id;
-            }
-        }
+        $definition = \App\Infrastructure\Runtime\Catalog\EngineCatalogDefinitions::defaultForCapability(
+            \App\Domain\Engine\EngineCatalogCapability::from($capability),
+        );
 
-        return null;
+        return $definition?->id;
     }
 }

@@ -30,7 +30,7 @@ final class RecommendationEngine
             $candidates = $this->engineRepository->findByCapability(
                 \App\Domain\Engine\EngineCatalogCapability::from($capability->value),
             );
-            $ready = array_values(array_filter($candidates, static fn ($e) => $e->installed));
+            $ready = array_values(array_filter($candidates, static fn ($e) => $e->isReady()));
             $selected = $this->selectForProfile($ready, $configuration->profile);
             $requested = $configuration->manualSelections[$capability->value] ?? null;
 

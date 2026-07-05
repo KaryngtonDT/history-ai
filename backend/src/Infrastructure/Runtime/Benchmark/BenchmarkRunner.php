@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Runtime\Benchmark;
 
-use App\Domain\Engine\EngineRepositoryInterface;
-use App\Infrastructure\Runtime\Discovery\BinaryScanner;
 use App\Infrastructure\Storage\JsonFileStore;
 
 final class BenchmarkRunner
 {
     public function __construct(
-        private readonly EngineRepositoryInterface $engineRepository,
-        private readonly BinaryScanner $binaryScanner,
+        private readonly EngineTestRunner $engineTestRunner,
         private readonly JsonFileStore $store,
     ) {
     }
@@ -22,29 +19,7 @@ final class BenchmarkRunner
      */
     public function runEngine(string $engineId): array
     {
-        $engine = $this->engineRepository->findById($engineId);
-
-        if (null === $engine) {
-            return ['engineId' => $engineId, 'ok' => false, 'error' => 'Engine not found'];
-        }
-
-        $started = microtime(true);
-        $ok = $engine->installed;
-
-        if (null !== $engine->binaryName) {
-            $ok = null !== $this->binaryScanner->locate($engine->binaryName);
-        }
-
-        $durationMs = round((microtime(true) - $started) * 1000, 2);
-        $result = [
-            'engineId' => $engineId,
-            'capability' => $engine->capability->value,
-            'ok' => $ok,
-            'durationMs' => $durationMs,
-            'qualityScore' => $ok ? 85.0 : 0.0,
-            'at' => (new \DateTimeImmutable())->format(DATE_ATOM),
-        ];
-
+        $result = $this->engineTestRunner->run($engineId);
         $this->appendHistory($result);
 
         return $result;
@@ -56,9 +31,17 @@ final class BenchmarkRunner
     public function runFull(): array
     {
         $results = [];
+        $engineIds = [
+            'faster_whisper_large_v3', 'parakeet', 'canary',
+            'ollama_gemma3', 'ollama_qwen3', 'ollama_deepseek_r1_distill',
+            'f5_tts', 'kokoro', 'dia',
+            'openvoice_v2', 'chatterbox', 'xtts_v2',
+            'latentsync', 'echomimic_v2', 'musetalk',
+            'ffmpeg', 'ffmpeg_nvenc', 'ffmpeg_av1',
+        ];
 
-        foreach ($this->engineRepository->all() as $engine) {
-            $results[] = $this->runEngine($engine->id);
+        foreach ($engineIds as $engineId) {
+            $results[] = $this->runEngine($engineId);
         }
 
         return [

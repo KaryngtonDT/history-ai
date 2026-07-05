@@ -10,9 +10,12 @@ final class OllamaScanner
     {
     }
 
-    public function isAvailable(): bool
+    public function isApiAvailable(): bool
     {
-        return [] !== $this->listModels();
+        $url = rtrim($this->baseUrl, '/');
+        $body = $this->fetch($url);
+
+        return null !== $body;
     }
 
     /**
@@ -53,8 +56,12 @@ final class OllamaScanner
 
     public function hasModel(string $model): bool
     {
+        $needle = strtolower(trim($model));
+
         foreach ($this->listModels() as $installed) {
-            if ($installed === $model || str_starts_with($installed, $model.':')) {
+            $normalized = strtolower($installed);
+
+            if ($normalized === $needle || str_starts_with($normalized, $needle.':')) {
                 return true;
             }
         }
@@ -74,7 +81,7 @@ final class OllamaScanner
             $status = (int) curl_getinfo($handle, CURLINFO_HTTP_CODE);
             curl_close($handle);
 
-            if (200 === $status && is_string($body)) {
+            if ($status >= 200 && $status < 500 && is_string($body)) {
                 return $body;
             }
         }

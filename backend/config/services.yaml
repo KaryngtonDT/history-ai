@@ -21,11 +21,11 @@ parameters:
     youtube.yt_dlp.binary_default: 'yt-dlp'
     stt.provider_default: 'faster_whisper'
     stt.faster_whisper.binary_default: 'faster-whisper'
-    stt.faster_whisper.model_default: 'base'
+    stt.faster_whisper.model_default: 'large-v3'
     translation.provider_default: 'ollama'
     translation.languages_default: 'fr,de'
     ollama.base_url_default: 'http://ollama:11434'
-    ollama.model_default: 'qwen2.5:3b'
+    ollama.model_default: 'gemma3:4b'
     tts.provider_default: 'f5'
     tts.f5.binary_default: 'f5-tts'
     tts.f5.model_default: 'F5-TTS'
@@ -749,6 +749,17 @@ services:
         arguments:
             $store: '@app.storage.runtime_benchmark'
 
+    App\Infrastructure\Runtime\Discovery\EngineReadinessAssessor:
+        arguments:
+            $sttConfiguredModel: '%env(default:stt.faster_whisper.model_default:STT_FASTER_WHISPER_MODEL)%'
+            $ollamaConfiguredModel: '%env(default:ollama.model_default:OLLAMA_MODEL)%'
+            $sttProvider: '%env(default:stt.provider_default:STT_PROVIDER)%'
+            $translationProvider: '%env(default:translation.provider_default:TRANSLATION_PROVIDER)%'
+            $ttsProvider: '%env(default:tts.provider_default:TTS_PROVIDER)%'
+            $voiceCloneProvider: '%env(default:voice_clone.provider_default:VOICE_CLONE_PROVIDER)%'
+            $lipSyncProvider: '%env(default:lip_sync.provider_default:LIP_SYNC_PROVIDER)%'
+            $videoRenderProvider: '%env(default:video_render.provider_default:VIDEO_RENDER_PROVIDER)%'
+
     App\Infrastructure\Runtime\Discovery\OllamaScanner:
         arguments:
             $baseUrl: '%env(default:ollama.base_url_default:OLLAMA_BASE_URL)%'
@@ -768,4 +779,4 @@ services:
 
     App\Infrastructure\Runtime\Catalog\StaticEngineRepository:
         arguments:
-            $ollamaModel: '%env(default:ollama.model_default:OLLAMA_MODEL)%'
+            $assessor: '@App\Infrastructure\Runtime\Discovery\EngineReadinessAssessor'

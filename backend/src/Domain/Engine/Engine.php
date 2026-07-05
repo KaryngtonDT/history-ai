@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Domain\Engine;
 
+use App\Domain\Runtime\EngineExecutionMode;
+use App\Domain\Runtime\RuntimeStatus;
+
 final readonly class Engine
 {
     /**
@@ -14,6 +17,7 @@ final readonly class Engine
         public string $displayName,
         public EngineCatalogCapability $capability,
         public EngineFamily $family,
+        public EngineCatalogRole $role,
         public bool $installed,
         public bool $compatible,
         public ?EngineVersion $version = null,
@@ -21,7 +25,20 @@ final readonly class Engine
         public ?string $modelPath = null,
         public array $requirements = [],
         public ?string $documentationUrl = null,
+        public EngineExecutionMode $executionMode = EngineExecutionMode::Real,
+        public RuntimeStatus $runtimeStatus = RuntimeStatus::Unknown,
+        public bool $executableFound = false,
+        public bool $modelFound = false,
+        public bool $configured = false,
+        public ?string $errorReason = null,
+        public ?string $expectedModel = null,
+        public ?string $ollamaModelTag = null,
     ) {
+    }
+
+    public function isReady(): bool
+    {
+        return RuntimeStatus::Ready === $this->runtimeStatus;
     }
 
     /**
@@ -34,8 +51,18 @@ final readonly class Engine
             'displayName' => $this->displayName,
             'capability' => $this->capability->value,
             'family' => $this->family->value,
+            'role' => $this->role->value,
+            'roleLabel' => $this->role->label(),
             'installed' => $this->installed,
             'compatible' => $this->compatible,
+            'status' => $this->runtimeStatus->value,
+            'mode' => $this->executionMode->value,
+            'executableFound' => $this->executableFound,
+            'modelFound' => $this->modelFound,
+            'configured' => $this->configured,
+            'errorReason' => $this->errorReason,
+            'expectedModel' => $this->expectedModel,
+            'ollamaModelTag' => $this->ollamaModelTag,
             'version' => $this->version?->toArray(),
             'binaryName' => $this->binaryName,
             'modelPath' => $this->modelPath,

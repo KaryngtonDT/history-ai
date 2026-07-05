@@ -88,11 +88,11 @@ services:
       DATABASE_URL: ${DATABASE_URL:-postgresql://history_ai:history_ai@postgres:5432/history_ai?serverVersion=17&charset=utf8}
       MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-doctrine://default?auto_setup=0}
       STT_PROVIDER: ${STT_PROVIDER:-faster_whisper}
-      STT_FASTER_WHISPER_MODEL: ${STT_FASTER_WHISPER_MODEL:-base}
+      STT_FASTER_WHISPER_MODEL: ${STT_FASTER_WHISPER_MODEL:-large-v3}
       HF_HOME: /models/whisper
       TRANSLATION_PROVIDER: ${TRANSLATION_PROVIDER:-ollama}
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
-      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:3b}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-gemma3:4b}
       TTS_PROVIDER: ${TTS_PROVIDER:-f5}
       VOICE_CLONE_PROVIDER: ${VOICE_CLONE_PROVIDER:-openvoice}
       LIP_SYNC_PROVIDER: ${LIP_SYNC_PROVIDER:-latentsync}
