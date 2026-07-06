@@ -74,22 +74,114 @@ docker compose -f docker-compose.prod-like.yml exec backend bash /opt/lumen/inst
 | Item | Value |
 |---|---|
 | **Official repo** | https://github.com/myshell-ai/OpenVoice |
-| **Model weights** | https://huggingface.co/myshell-ai/OpenVoiceV2 or S3 zip → `checkpoints_v2/` |
+| **Official MeloTTS** | https://github.com/myshell-ai/MeloTTS |
+| **Model weights (official only)** | https://huggingface.co/myshell-ai/OpenVoiceV2 → `checkpoints_v2/` |
+| **UniDic (MeloTTS JP stack)** | https://github.com/polm/unidic-py — `python -m unidic download` (~526 MB) |
 | **Python** | **3.10** (recommended; upstream 3.9) |
 | **CUDA** | Recommended; **CPU possible** with patches to `se_extractor.py` (Whisper `device=cpu`, `compute_type=float32`) |
-| **System deps** | `ffmpeg`, `git`, `libgl1`, `unidic` (Japanese, via `python -m unidic download`) |
-| **Extra pip** | `git+https://github.com/myshell-ai/MeloTTS.git` |
+| **System deps** | `ffmpeg`, `git`, `libgl1`, `libav*` dev headers (PyAV wheel) |
+| **Extra pip** | `git+https://github.com/myshell-ai/MeloTTS.git` (base speaker for tone conversion) |
 | **Model path** | `models/openvoice/checkpoints_v2/` |
 | **Venv** | `models/venvs/openvoice` — **yes**, isolated |
-| **Disk** | ~5 GB (venv) + ~500 MB checkpoints |
-| **Install time** | 20–60 min (MeloTTS + unidic download) |
+| **Disk** | ~5 GB venv + ~500 MB HF weights + ~775 MB UniDic (forced by installer) |
+| **Install time** | 20–60 min (UniDic + HF weights + MeloTTS deps) |
 | **Minimal test** | See [Verification](#verification) |
 | **Rollback** | Remove venv + `models/openvoice`, restore shim |
+
+### UniDic — dependency chain (verified 2026-07-05)
+
+OpenVoice V2 itself **does not** declare UniDic. The dependency comes entirely from **MeloTTS**, which Lumen uses as the *base-speaker TTS* step inside `openvoice_runner.py` (`from melo.api import TTS` → `TTS(language="EN")`).
+
+#### 1. What triggers UniDic during install?
+
+| Layer | Package | UniDic involvement |
+|---|---|---|
+| Lumen CLI | `openvoice_runner.py` | None — calls MeloTTS API |
+| Voice clone core | `myshell-ai/OpenVoice` (`setup.py`) | **None** — deps are librosa, whisper, jieba, gradio, etc. |
+| Base speaker TTS | `myshell-ai/MeloTTS` (`requirements.txt`) | Declares **`unidic==1.1.0`** and **`unidic_lite==1.0.8`** |
+| Dictionary downloader | `unidic` PyPI package | `python -m unidic download` fetches **~526 MB zip → ~775 MB** into `site-packages/unidic/dicdir/` |
+
+**Precise install triggers in Lumen history:**
+
+1. **`pip install melotts`** (with deps, not `--no-deps`) → pulls `unidic==1.1.0` from `MeloTTS/requirements.txt`.
+2. **Our installer (v1)** explicitly ran `python -m unidic download` — this caused exit **22** (HTTP error on the 526 MB download).
+3. **MeloTTS `setup.py`** defines a `PostInstallCommand` that calls `python -m unidic download`, but **`cmdclass` is not registered** in `setup()` — this hook is **dead code** and does not run on `pip install`.
+
+MeloTTS `requirements.txt` excerpt (both UniDic packages are declared):
+
+```text
+unidic_lite==1.0.8
+unidic==1.1.0
+mecab-python3==1.0.9
+fugashi==1.3.0
+```
+
+Note: **`fugashi` is declared but never imported** anywhere under `melo/` in v0.1.2.
+
+#### 2. Is UniDic used in Lumen's current FR / EN / DE configuration?
+
+**Runtime path today** (`infrastructure/docker/backend/engines/openvoice_runner.py`):
+
+```python
+tts = TTS(language="EN", device=device)
+speaker_id = tts.hps.data.spk2id["EN-US"]
+```
+
+| Language | MeloTTS module | UniDic / MeCab used at inference? |
+|---|---|---|
+| **EN** (Lumen default) | `melo/text/english.py` → `g2p_en`, CMUdict | **No** |
+| **FR** (supported by MeloTTS, not wired in Lumen runner) | `melo/text/french.py` → `fr_phonemizer` | **No** |
+| **DE** (Lumen `TranslationLanguage::German`) | **Not supported** by MeloTTS (`cleaner.py` has no `DE` entry) | **N/A** — pipeline uses EN MeloTTS regardless |
+
+**However**, MeloTTS has two import side-effects that historically forced MeCab/UniDic even for English:
+
+1. `melo/text/cleaner.py` eagerly imports `japanese` (patched by Lumen installer → lazy import).
+2. `melo/text/english.py` does `from .japanese import distribute_phone`, which loads `japanese.py` (patched by Lumen installer → MeCab lazy-init; error only when JP G2P runs).
+
+`mecab-python3` resolves its default dictionary to `site-packages/unidic/dicdir/` (verified in container). Without `--lang-pack jp`, that directory is absent and **must not** be required for EN/FR.
+
+#### 3. Is UniDic only required for Japanese?
+
+**At inference — yes.** Only `melo/text/japanese.py` imports MeCab. The module's own error string confirms:
+
+```python
+raise ImportError("Japanese requires mecab-python3 and unidic-lite.") from e
+```
+
+Two UniDic artifacts exist:
+
+| Package | Size | Role |
+|---|---|---|
+| **`unidic-lite`** | ~249 MB (bundled in wheel) | Lightweight MeCab dictionary; sufficient for MeloTTS JP G2P |
+| **`unidic` + `python -m unidic download`** | ~775 MB on disk | Full UniDic lexicon; same MeCab API, richer morphological features |
+
+Full UniDic download is **only meaningful for Japanese** TTS (`TTS(language="JP")`).
+
+#### 4. Can UniDic become an optional language pack?
+
+**Yes**, without degrading OpenVoice for EN / FR / DE, provided:
+
+1. **Lazy-import patch** for `melo/text/cleaner.py` — do not import `japanese` until `language == "JP"`.
+2. **Lazy MeCab patch** for `melo/text/japanese.py` — required because `english.py` imports `distribute_phone` from `japanese` (both patches applied by Lumen installer).
+3. **Base install** — MeloTTS + OpenVoice stack **without** `mecab-python3`, `unidic-lite`, or `unidic`.
+4. **`--lang-pack jp`** — installs `mecab-python3`, `unidic-lite`, wires MeCab dictionary; optionally `--lang-pack jp-full` or `OPENVOICE_UNIDIC_FULL=1` runs `python -m unidic download` for the full lexicon.
+
+Verified in prod-like container (2026-07-05): symlinking `unidic_lite/dicdir` → `unidic/dicdir` satisfies `MeCab.Tagger()` without the 526 MB download.
+
+#### 5. Installer behaviour
+
+Lumen policy: **code from `myshell-ai/*` GitHub only; weights from `myshell-ai/OpenVoiceV2` on Hugging Face only.**
+
+The installer always runs `python -m unidic download` (official `unidic` PyPI package) so MeloTTS/MeCab can initialize.
+
+```bash
+docker compose -f docker-compose.prod-like.yml exec backend bash /opt/lumen/install-gpu-engines.sh --engine openvoice
+```
 
 ### Known risks
 
 - Default code paths assume **CUDA** for tone extraction (Whisper in `se_extractor.py`).
-- MeloTTS + unidic adds significant download size; Lumen uses **Python 3.10 venv** and prebuilt `av` wheel to avoid PyAV compile failures on 3.11.
+- MeloTTS adds ~2 GB of Python deps; UniDic full download adds ~775 MB (forced by installer).
 - Windows native install unsupported upstream — use Docker/WSL2/Linux only.
 - Multi-speaker reference quality strongly affects clone output.
 

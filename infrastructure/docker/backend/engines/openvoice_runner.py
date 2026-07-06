@@ -8,6 +8,10 @@ import os
 import sys
 import wave
 
+# Non-interactive Hugging Face / torch.hub downloads in Docker
+os.environ.setdefault("HF_HUB_DISABLE_PROMPT", "1")
+os.environ.setdefault("TRANSFORMERS_OFFLINE", "0")
+
 
 def _duration(path: str) -> float:
     with wave.open(path, "rb") as handle:
@@ -53,7 +57,7 @@ def main() -> int:
     converter = ToneColorConverter(f"{ckpt}/converter/config.json", device=device)
     converter.load_ckpt(f"{ckpt}/converter/checkpoint.pth")
 
-    target_se, _ = se_extractor.get_se(args.reference, converter, vad=True)
+    target_se, _ = se_extractor.get_se(args.reference, converter, vad=False)
 
     tts = TTS(language="EN", device=device)
     speaker_id = tts.hps.data.spk2id["EN-US"]
@@ -62,7 +66,7 @@ def main() -> int:
 
     converter.convert(
         audio_src_path=tmp_src,
-        src_se=se_extractor.get_se(tmp_src, converter, vad=True)[0],
+        src_se=se_extractor.get_se(tmp_src, converter, vad=False)[0],
         tgt_se=target_se,
         output_path=args.output,
     )

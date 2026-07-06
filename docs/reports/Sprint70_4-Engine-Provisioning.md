@@ -11,8 +11,8 @@ Installer: `make install-gpu-engines`
 
 | Engine | Venv | Models | Runtime status | Notes |
 |---|---|---|---|---|
-| F5-TTS | `/models/venvs/f5-tts` | `/models/f5` | **READY** (real) | Smoke test may take minutes on CPU (first HF load) |
-| OpenVoice V2 | `/models/venvs/openvoice` | pending | **BLOCKED** | Re-run after script fix (skip 526MB UniDic; PyAV/av==14.1.0) |
+| F5-TTS | `/models/venvs/f5-tts` | `/models/f5` | **READY** (real) | Smoke synthesis verified (`/tmp/f5-smoke.wav`, ~1.2s) |
+| OpenVoice V2 | `/models/venvs/openvoice` | `/models/openvoice/checkpoints_v2` | **READY** (real) | Smoke clone OK (`/tmp/openvoice-smoke.wav`, ~1.6s); UniDic 775MB forced |
 | LatentSync | partial | partial | **BLOCKED** | Install OOM (exit 137); needs GPU + more RAM |
 
 ### Fixes applied during install
@@ -20,6 +20,7 @@ Installer: `make install-gpu-engines`
 - CLI wrappers: venv dispatch + CRLF fix on Windows (`sed -i 's/\r$//'`)
 - Shim detection: bash wrappers no longer false-positive; placeholders under `/opt/lumen/placeholders/`
 - F5 runner uses `/models/venvs/f5-tts/bin/f5-tts_infer-cli`
+- F5 torch pin: `torch==2.4.1` / `torchaudio==2.4.1` (avoids broken `torchcodec` on CPU Docker)
 
 ### Re-run commands
 
