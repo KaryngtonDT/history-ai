@@ -124,6 +124,27 @@ export function formatPipelineFailureSummary(
 	return t("pipeline.shadow.bootstrapPipelineFailed");
 }
 
+export function isNetworkUnavailableDetail(body: unknown): boolean {
+	return (
+		typeof body === "object" &&
+		body !== null &&
+		(body as Record<string, unknown>).networkError === true
+	);
+}
+
+export function formatBackendUnreachableMessage(
+	t: (key: string, params?: Record<string, string | number>) => string,
+	apiBaseUrl: string,
+	detail: unknown,
+): string {
+	const cause = formatApiErrorBody(detail);
+
+	return t("pipeline.shadow.bootstrapBackendUnreachable", {
+		apiUrl: apiBaseUrl,
+		cause: cause || "Failed to fetch",
+	});
+}
+
 export function logTranscriptUnavailableDiagnostics(
 	pushLog: (
 		message: string,
@@ -131,6 +152,7 @@ export function logTranscriptUnavailableDiagnostics(
 	) => void,
 	t: BootstrapTranslator,
 	body: unknown,
+	apiBaseUrl: string,
 ): void {
 	const detail = formatApiErrorBody(body);
 
@@ -146,6 +168,15 @@ export function logTranscriptUnavailableDiagnostics(
 		}),
 		"warn",
 	);
+
+	if (isNetworkUnavailableDetail(body)) {
+		pushLog(
+			t("pipeline.shadow.bootstrapLogBackendHint", {
+				apiUrl: apiBaseUrl,
+			}),
+			"error",
+		);
+	}
 }
 
 export function appendBootstrapLog(

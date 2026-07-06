@@ -379,6 +379,10 @@ export const pipelineDe: PipelineMessages = {
 			bootstrapLogTranscriptMissing: "Transkript noch nicht vorhanden",
 			bootstrapLogTranscriptUnavailableDetail:
 				"Transkript-API-Detail: {{detail}}",
+			bootstrapLogBackendHint:
+				"Backend unter {{apiUrl}} nicht erreichbar — Docker prüfen (`make doctor`) und Port 8000.",
+			bootstrapBackendUnreachable:
+				"Backend unter {{apiUrl}} nicht erreichbar ({{cause}}). `make prod-rebuild && make migrate && make doctor` ausführen.",
 			bootstrapLogFailedStage: "Fehlgeschlagene Stufe: {{stage}}",
 			bootstrapLogFailureMessage: "Pipeline-Ursache: {{message}}",
 			bootstrapLogPreviousFailureMessage:

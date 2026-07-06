@@ -42,6 +42,10 @@ export function formatApiErrorBody(body: unknown): string {
 		);
 	}
 
+	if (record.networkError === true) {
+		parts.push("network: unreachable");
+	}
+
 	if (typeof record.status === "number" && Number.isFinite(record.status)) {
 		parts.push(`httpStatus: ${record.status}`);
 	}

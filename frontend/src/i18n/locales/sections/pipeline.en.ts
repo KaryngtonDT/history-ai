@@ -367,6 +367,10 @@ export const pipelineEn = {
 			bootstrapLogTranscriptReady: "Transcript ready ({{segments}} segments)",
 			bootstrapLogTranscriptMissing: "Transcript not found yet",
 			bootstrapLogTranscriptUnavailableDetail: "Transcript API detail: {{detail}}",
+			bootstrapLogBackendHint:
+				"Backend unreachable at {{apiUrl}} — check Docker (`make doctor`) and port 8000.",
+			bootstrapBackendUnreachable:
+				"Backend unreachable at {{apiUrl}} ({{cause}}). Run `make prod-rebuild && make migrate && make doctor`.",
 			bootstrapLogFailedStage: "Failed stage: {{stage}}",
 			bootstrapLogFailureMessage: "Pipeline cause: {{message}}",
 			bootstrapLogPreviousFailureMessage:

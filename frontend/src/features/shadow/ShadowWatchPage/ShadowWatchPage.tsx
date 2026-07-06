@@ -58,8 +58,10 @@ import {
 import styles from "./ShadowWatchPage.module.css";
 import {
 	appendBootstrapLog,
+	formatBackendUnreachableMessage,
 	formatBootstrapError,
 	formatPipelineFailureSummary,
+	isNetworkUnavailableDetail,
 	logTranscriptUnavailableDiagnostics,
 	logVideoPipelineDiagnostics,
 	updateBootstrapCheck,
@@ -216,7 +218,21 @@ export function ShadowWatchPage() {
 							pushLog,
 							t,
 							transcriptUnavailableDetail,
+							API_BASE_URL,
 						);
+
+						if (
+							isNetworkUnavailableDetail(transcriptUnavailableDetail)
+						) {
+							const failureMessage = formatBackendUnreachableMessage(
+								t,
+								API_BASE_URL,
+								transcriptUnavailableDetail,
+							);
+							pushLog(failureMessage, "error");
+							setBootstrapFailure(failureMessage);
+							return;
+						}
 					} else {
 						pushLog(t("pipeline.shadow.bootstrapLogTranscriptMissing"), "warn");
 					}
@@ -418,6 +434,7 @@ export function ShadowWatchPage() {
 								pushLog,
 								t,
 								polledTranscriptLoad.unavailableDetail,
+								API_BASE_URL,
 							);
 						}
 

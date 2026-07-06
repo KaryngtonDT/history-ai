@@ -1,6 +1,6 @@
 import { videoTranscriptPath } from "@/config/api";
 import type { HttpClient } from "@/services/http/HttpClient";
-import { ApiError } from "@/shared/errors";
+import { ApiError, NetworkError } from "@/shared/errors";
 import type {
 	TranscriptLoadResult,
 	TranscriptRepository,
@@ -46,7 +46,29 @@ export class HttpTranscriptRepository implements TranscriptRepository {
 				};
 			}
 
+			if (error instanceof NetworkError) {
+				return {
+					transcript: null,
+					unavailableDetail: buildNetworkUnavailableDetail(error),
+				};
+			}
+
 			throw error;
 		}
 	}
+}
+
+function buildNetworkUnavailableDetail(error: NetworkError): Record<string, unknown> {
+	const cause =
+		error.cause instanceof Error
+			? error.cause.message.trim()
+			: typeof error.cause === "string"
+				? error.cause.trim()
+				: "";
+
+	return {
+		error: "network_unreachable",
+		message: cause || "Failed to fetch",
+		networkError: true,
+	};
 }

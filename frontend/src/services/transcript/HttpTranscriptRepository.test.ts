@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { HttpClient } from "@/services/http/HttpClient";
-import { ApiError } from "@/shared/errors";
+import { ApiError, NetworkError } from "@/shared/errors";
 import { HttpTranscriptRepository } from "./HttpTranscriptRepository";
 
 describe("HttpTranscriptRepository", () => {
@@ -67,6 +67,24 @@ describe("HttpTranscriptRepository", () => {
 		expect(result.transcript).toBeNull();
 		expect(result.unavailableDetail).toMatchObject({
 			message: "column failure_message does not exist",
+		});
+	});
+
+	it("returns network unavailable detail when fetch fails", async () => {
+		const get = vi
+			.fn()
+			.mockRejectedValue(new NetworkError("GET failed", new TypeError("Failed to fetch")));
+		const httpClient = { get, post: vi.fn() } as unknown as HttpClient;
+		const repository = new HttpTranscriptRepository(httpClient);
+
+		const result = await repository.loadTranscript(
+			"550e8400-e29b-41d4-a716-446655440099",
+		);
+
+		expect(result.transcript).toBeNull();
+		expect(result.unavailableDetail).toMatchObject({
+			networkError: true,
+			message: "Failed to fetch",
 		});
 	});
 });
