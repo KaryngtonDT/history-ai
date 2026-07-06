@@ -50,6 +50,8 @@ final class EngineProvisioner
             'openvoice_v2' => $this->provisionGpuEngine('openvoice', $output),
             'latentsync' => $this->provisionGpuEngine('latentsync', $output),
             'wav2lip' => $this->provisionWav2Lip($output),
+            'whisper_cpp' => $this->provisionWhisperCpp($output),
+            'piper' => $this->provisionPiper($output),
             'ffmpeg', 'ffmpeg_nvenc', 'ffmpeg_av1' => $this->verifyFfmpeg($output),
             default => false,
         };
@@ -152,6 +154,36 @@ final class EngineProvisioner
             'bash /opt/lumen/install-wav2lip.sh 2>&1',
         );
         $process->setTimeout(7200);
+        $process->run();
+        $output[] = trim($process->getOutput().$process->getErrorOutput());
+
+        return $process->isSuccessful();
+    }
+
+    /**
+     * @param list<string> $output
+     */
+    private function provisionWhisperCpp(array &$output): bool
+    {
+        $process = Process::fromShellCommandline(
+            'bash /opt/lumen/install-whisper-cpp.sh 2>&1',
+        );
+        $process->setTimeout(600);
+        $process->run();
+        $output[] = trim($process->getOutput().$process->getErrorOutput());
+
+        return $process->isSuccessful();
+    }
+
+    /**
+     * @param list<string> $output
+     */
+    private function provisionPiper(array &$output): bool
+    {
+        $process = Process::fromShellCommandline(
+            'bash /opt/lumen/install-piper.sh 2>&1',
+        );
+        $process->setTimeout(600);
         $process->run();
         $output[] = trim($process->getOutput().$process->getErrorOutput());
 

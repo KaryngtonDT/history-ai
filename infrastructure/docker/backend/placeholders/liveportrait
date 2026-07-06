@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+"""LivePortrait CLI placeholder."""
+import argparse
+import json
+import os
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="LivePortrait placeholder")
+    parser.add_argument("--source", required=False)
+    parser.add_argument("--driving", required=False)
+    parser.add_argument("--output", required=False)
+    args = parser.parse_args()
+
+    if args.output:
+        os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
+        with open(args.output, "wb") as handle:
+            handle.write(b"\x00\x00\x00\x18ftypmp42\x00\x00\x00\x00mp42isom")
+        print(json.dumps({"output": args.output}))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

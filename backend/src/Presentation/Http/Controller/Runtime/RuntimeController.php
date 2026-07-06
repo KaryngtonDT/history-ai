@@ -206,4 +206,11 @@ final class RuntimeController extends AbstractController
 
         return $this->json($result);
     }
+
+    #[OA\Get(operationId: 'getRuntimeCapabilityMaturity', tags: ['Runtime'])]
+    #[Route('/capabilities/maturity', name: 'api_runtime_capability_maturity', methods: ['GET'])]
+    public function capabilityMaturity(): JsonResponse
+    {
+        return $this->json($this->platform->capabilityMaturity());
+    }
 }

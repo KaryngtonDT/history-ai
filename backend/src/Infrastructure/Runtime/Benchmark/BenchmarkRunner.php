@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Runtime\Benchmark;
 
+use App\Infrastructure\Runtime\Catalog\EngineCatalogDefinitions;
 use App\Infrastructure\Storage\JsonFileStore;
 
 final class BenchmarkRunner
@@ -31,17 +32,8 @@ final class BenchmarkRunner
     public function runFull(): array
     {
         $results = [];
-        $engineIds = [
-            'faster_whisper_large_v3', 'parakeet', 'canary',
-            'ollama_gemma3', 'ollama_qwen3', 'ollama_deepseek_r1_distill',
-            'f5_tts', 'kokoro', 'dia',
-            'openvoice_v2', 'chatterbox', 'xtts_v2',
-            'latentsync', 'echomimic_v2', 'wav2lip',
-            'ffmpeg', 'ffmpeg_nvenc', 'ffmpeg_av1',
-        ];
-
-        foreach ($engineIds as $engineId) {
-            $results[] = $this->runEngine($engineId);
+        foreach (EngineCatalogDefinitions::all() as $definition) {
+            $results[] = $this->runEngine($definition->id);
         }
 
         return [

@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+"""Whisper.cpp CLI placeholder."""
+import argparse
+import json
+import sys
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Whisper.cpp placeholder")
+    parser.add_argument("-m", "--model", default="base")
+    parser.add_argument("-f", "--file", default="")
+    parser.add_argument("--output-json", action="store_true")
+    args = parser.parse_args()
+
+    if "--version" in sys.argv or "-h" in sys.argv:
+        print("whisper-cpp placeholder 0.0.0")
+        return 0
+
+    if args.output_json:
+        print(json.dumps({"text": "placeholder transcription", "segments": []}))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

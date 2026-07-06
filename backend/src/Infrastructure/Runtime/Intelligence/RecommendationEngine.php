@@ -27,6 +27,10 @@ final class RecommendationEngine
         $recommendations = [];
 
         foreach (RuntimeCapability::cases() as $capability) {
+            if (!$capability->isVideoPipeline()) {
+                continue;
+            }
+
             $candidates = $this->engineRepository->findByCapability(
                 \App\Domain\Engine\EngineCatalogCapability::from($capability->value),
             );

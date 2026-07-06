@@ -248,6 +248,7 @@ export const RUNTIME_PROVISION_PLAN_PATH = "/api/runtime/provision/plan";
 export const RUNTIME_HARDWARE_PATH = "/api/runtime/hardware";
 export const RUNTIME_HARDWARE_PROFILE_PATH = "/api/runtime/hardware/profile";
 export const RUNTIME_COMPATIBILITY_PATH = "/api/runtime/compatibility";
+export const RUNTIME_CAPABILITY_MATURITY_PATH = "/api/runtime/capabilities/maturity";
 
 export function runtimeEngineTestPath(engineId: string): string {
 	return `${RUNTIME_PATH}/engines/${engineId}/test`;

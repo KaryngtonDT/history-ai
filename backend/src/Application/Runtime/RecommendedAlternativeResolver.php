@@ -16,12 +16,14 @@ final class RecommendedAlternativeResolver
      */
     private const CAPABILITY_FALLBACKS = [
         'latentsync' => 'wav2lip',
+        'liveportrait' => 'wav2lip',
         'echomimic_v2' => 'wav2lip',
         'musetalk' => 'wav2lip',
         'ffmpeg_nvenc' => 'ffmpeg_av1',
         'parakeet' => 'faster_whisper_large_v3',
         'canary' => 'faster_whisper_large_v3',
         'dia' => 'f5_tts',
+        'qwen2_5_vl' => 'florence_2',
     ];
 
     public function resolve(string $engineId, HardwareCapability $capabilities, bool $hardwareBlocked): ?string

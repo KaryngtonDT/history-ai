@@ -121,6 +121,37 @@ describe("RuntimeCenter", () => {
 			blockedByInstall: ["wav2lip"],
 			readyNow: ["ffmpeg"],
 		});
+		vi.spyOn(runtimeService, "getCapabilityMaturity").mockResolvedValue({
+			principle: "Capability platform",
+			totalEngines: 33,
+			at: "2026-06-26T00:00:00+00:00",
+			capabilities: [
+				{
+					capability: "lip_sync",
+					label: "Lip Sync",
+					maturity: "beta",
+					maturityLabel: "Beta",
+					videoPipeline: true,
+					defaultEngineId: "latentsync",
+					defaultDisplayName: "LatentSync",
+					engineCount: 5,
+					engines: [
+						{
+							id: "wav2lip",
+							displayName: "Wav2Lip",
+							role: "alternative_2",
+							roleLabel: "Alternative 2",
+							tier: "cpu_alternative",
+							tierLabel: "CPU Alternative",
+							hardware: {},
+							provider: "host",
+							providerLabel: "Host",
+							benchmarkModel: "talking-head-10s",
+						},
+					],
+				},
+			],
+		});
 
 		render(<RuntimeCenter />);
 
@@ -137,5 +168,6 @@ describe("RuntimeCenter", () => {
 		expect(screen.getByText(/Recommended for this machine:/)).toBeInTheDocument();
 		expect(screen.getAllByText("wav2lip").length).toBeGreaterThan(0);
 		expect(screen.getByText("NVIDIA GPU")).toBeInTheDocument();
+		expect(screen.getByText(/Capability Maturity \(33 engines\)/)).toBeInTheDocument();
 	});
 });

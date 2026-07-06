@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+if [[ -x /models/venvs/piper/bin/piper ]]; then
+  exec /models/venvs/piper/bin/piper "$@"
+fi
+exec /opt/lumen/placeholders/piper "$@"

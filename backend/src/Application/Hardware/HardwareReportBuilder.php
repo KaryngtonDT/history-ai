@@ -45,7 +45,7 @@ final class HardwareReportBuilder
                 'translation' => 'ollama_gemma3',
                 'tts' => 'f5_tts',
                 'voiceClone' => 'openvoice_v2',
-                'lipSync' => 'wav2lip',
+                'lipSync' => 'liveportrait',
                 'render' => 'ffmpeg_nvenc',
             ],
             HardwareProfileType::HighEndNvidia, HardwareProfileType::EnterpriseGpu => [

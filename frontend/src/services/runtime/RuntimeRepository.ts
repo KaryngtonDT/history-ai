@@ -1,4 +1,5 @@
 import type {
+	RuntimeCapabilityMaturityOverview,
 	RuntimeCatalog,
 	RuntimeCompatibilitySummary,
 	RuntimeEngine,
@@ -30,5 +31,6 @@ export interface RuntimeRepository {
 	validatePipeline(): Promise<RuntimeValidationReport>;
 	getHardware(): Promise<RuntimeHardwareOverview>;
 	getCompatibility(): Promise<RuntimeCompatibilitySummary>;
+	getCapabilityMaturity(): Promise<RuntimeCapabilityMaturityOverview>;
 	getEngineCompatibility(engineId: string): Promise<RuntimeEngineCompatibility>;
 }

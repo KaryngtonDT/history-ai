@@ -27,8 +27,8 @@ final class BlockedReasonResolver
     ): array {
         if ([] !== $missingRequirements) {
             $code = match (true) {
-                in_array('NVIDIA GPU', $missingRequirements, true) || in_array('CUDA', $missingRequirements, true) => BlockedReasonCode::NvidiaCudaRequired,
                 in_array('NVENC', $missingRequirements, true) => BlockedReasonCode::NvencRequiresNvidia,
+                in_array('NVIDIA GPU', $missingRequirements, true) || in_array('CUDA', $missingRequirements, true) => BlockedReasonCode::NvidiaCudaRequired,
                 str_contains(implode(' ', $missingRequirements), 'VRAM') => BlockedReasonCode::VramInsufficient,
                 str_contains(implode(' ', $missingRequirements), 'RAM') => BlockedReasonCode::RamInsufficient,
                 default => BlockedReasonCode::GpuNotFound,

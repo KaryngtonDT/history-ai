@@ -7,6 +7,7 @@ import {
 	RUNTIME_PIPELINE_VALIDATE_PATH,
 	RUNTIME_PROFILES_PATH,
 	RUNTIME_COMPATIBILITY_PATH,
+	RUNTIME_CAPABILITY_MATURITY_PATH,
 	RUNTIME_HARDWARE_PATH,
 	RUNTIME_PROVISION_COMPATIBLE_PATH,
 	RUNTIME_PROVISION_PLAN_PATH,
@@ -32,6 +33,7 @@ import type {
 	RuntimeHardwareOverview,
 	RuntimeCompatibilitySummary,
 	RuntimeEngineCompatibility,
+	RuntimeCapabilityMaturityOverview,
 } from "./types";
 
 export class HttpRuntimeRepository implements RuntimeRepository {
@@ -132,6 +134,12 @@ export class HttpRuntimeRepository implements RuntimeRepository {
 	getCompatibility(): Promise<RuntimeCompatibilitySummary> {
 		return this.httpClient.get<RuntimeCompatibilitySummary>(
 			RUNTIME_COMPATIBILITY_PATH,
+		);
+	}
+
+	getCapabilityMaturity(): Promise<RuntimeCapabilityMaturityOverview> {
+		return this.httpClient.get<RuntimeCapabilityMaturityOverview>(
+			RUNTIME_CAPABILITY_MATURITY_PATH,
 		);
 	}
 

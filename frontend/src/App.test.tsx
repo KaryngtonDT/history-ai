@@ -42,7 +42,8 @@ describe("Sprint 1 — app shell", () => {
 			expect(screen.getAllByText("The Roman Empire").length).toBeGreaterThan(0);
 		});
 
-		await user.click(screen.getByRole("link", { name: /Settings/i }));
+		const settingsLinks = screen.getAllByRole("link", { name: /Settings/i });
+		await user.click(settingsLinks[0]);
 		expect(
 			screen.getByRole("heading", { name: "Settings" }),
 		).toBeInTheDocument();

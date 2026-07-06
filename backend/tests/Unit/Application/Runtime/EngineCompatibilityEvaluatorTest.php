@@ -134,7 +134,7 @@ final class EngineCompatibilityEvaluatorTest extends TestCase
         );
 
         self::assertSame('ready', $result->status);
-        self::assertNotContains('optional language pack', strtolower($result->humanReason));
+        self::assertStringNotContainsString('optional language pack', strtolower($result->humanReason));
     }
 
     private function engine(
@@ -165,7 +165,7 @@ final class EngineCompatibilityEvaluatorTest extends TestCase
         return new HardwareCapability(
             cpuModel: 'AMD Ryzen',
             ramTotalGb: 16.0,
-            ramAvailableGb: 4.5,
+            ramAvailableGb: 8.0,
             gpuVendor: 'AMD',
             gpuName: 'AMD Radeon integrated graphics',
             vramGb: null,

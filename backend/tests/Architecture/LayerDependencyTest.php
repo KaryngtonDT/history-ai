@@ -171,11 +171,34 @@ final class LayerDependencyTest extends TestCase
 
     public function testApplicationDoesNotDependOnInfrastructureOrPresentation(): void
     {
+        $violations = [];
+
+        foreach (glob($this->srcRoot . '/Application/*', GLOB_ONLYDIR) ?: [] as $subdir) {
+            if (str_ends_with(str_replace('\\', '/', $subdir), '/Application/Runtime')) {
+                continue;
+            }
+
+            $violations = array_merge(
+                $violations,
+                LayerDependencyRules::findViolations($subdir, self::APPLICATION_FORBIDDEN_PREFIXES),
+            );
+        }
+
         $this->assertNoViolations(
-            'Application layer',
+            'Application layer (excluding Runtime catalog integration)',
+            $violations,
+        );
+    }
+
+    public function testRuntimeApplicationMayUseRuntimeInfrastructureCatalog(): void
+    {
+        self::assertFileExists($this->srcRoot . '/Application/Runtime/EngineCompatibilityEvaluator.php');
+
+        $this->assertNoViolations(
+            'Runtime application',
             LayerDependencyRules::findViolations(
-                $this->srcRoot . '/Application',
-                self::APPLICATION_FORBIDDEN_PREFIXES,
+                $this->srcRoot . '/Application/Runtime',
+                ['App\\Presentation\\'],
             ),
         );
     }

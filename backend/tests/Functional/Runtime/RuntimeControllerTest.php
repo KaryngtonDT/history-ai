@@ -54,4 +54,19 @@ final class RuntimeControllerTest extends WebTestCase
         $client->request('GET', '/api/runtime/report/'.$payload['pipelineId']);
         self::assertResponseIsSuccessful();
     }
+
+    public function testCapabilityMaturityListsThirtyThreeEngines(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/api/runtime/capabilities/maturity');
+
+        self::assertResponseIsSuccessful();
+
+        /** @var array<string, mixed> $payload */
+        $payload = json_decode((string) $client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame(33, $payload['totalEngines']);
+        self::assertIsArray($payload['capabilities']);
+        self::assertCount(10, $payload['capabilities']);
+    }
 }

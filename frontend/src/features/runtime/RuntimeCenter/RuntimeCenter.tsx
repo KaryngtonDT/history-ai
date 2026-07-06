@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { runtimeService } from "@/services/runtime/RuntimeService";
 import type {
+	RuntimeCapabilityMaturityOverview,
 	RuntimeCompatibilitySummary,
 	RuntimeEngine,
 	RuntimeEngineCompatibility,
@@ -122,6 +123,9 @@ export function RuntimeCenter() {
 	const [hardware, setHardware] = useState<RuntimeHardwareOverview | null>(null);
 	const [compatibility, setCompatibility] =
 		useState<RuntimeCompatibilitySummary | null>(null);
+	const [maturity, setMaturity] = useState<RuntimeCapabilityMaturityOverview | null>(
+		null,
+	);
 	const [recommendations, setRecommendations] = useState<RuntimeRecommendation[]>(
 		[],
 	);
@@ -145,18 +149,21 @@ export function RuntimeCenter() {
 				nextRecommendations,
 				nextHardware,
 				nextCompatibility,
+				nextMaturity,
 			] = await Promise.all([
 				runtimeService.getOverview(),
 				runtimeService.getReadiness(),
 				runtimeService.getRecommendations(),
 				runtimeService.getHardware(),
 				runtimeService.getCompatibility(),
+				runtimeService.getCapabilityMaturity(),
 			]);
 			setOverview(nextOverview);
 			setReadiness(nextReadiness);
 			setRecommendations(nextRecommendations);
 			setHardware(nextHardware);
 			setCompatibility(nextCompatibility);
+			setMaturity(nextMaturity);
 		} catch {
 			setError("Unable to load runtime platform.");
 		} finally {
@@ -370,6 +377,7 @@ export function RuntimeCenter() {
 								</div>
 								<p className={styles.meta}>
 									{engine.roleLabel ?? engine.capability}
+									{engine.tierLabel ? ` · ${engine.tierLabel}` : ""}
 									{engineCompatibility?.providerLabel
 										? ` · ${engineCompatibility.providerLabel}`
 										: ""}
@@ -436,6 +444,33 @@ export function RuntimeCenter() {
 					})}
 				</div>
 			</section>
+
+			{maturity && (
+				<section className={styles.section}>
+					<h3>Capability Maturity ({maturity.totalEngines} engines)</h3>
+					<div className={styles.engineGrid}>
+						{maturity.capabilities.map((cap) => (
+							<Card key={cap.capability} className={styles.engineCard}>
+								<div className={styles.engineHeader}>
+									<strong>{cap.label}</strong>
+									<Badge variant="neutral">{cap.maturityLabel}</Badge>
+								</div>
+								<p className={styles.meta}>
+									Default: {cap.defaultDisplayName ?? "—"}
+									{cap.videoPipeline ? " · video pipeline" : " · platform capability"}
+								</p>
+								<ul className={styles.requirementList}>
+									{cap.engines.map((eng) => (
+										<li key={eng.id}>
+											{eng.displayName} ({eng.tierLabel})
+										</li>
+									))}
+								</ul>
+							</Card>
+						))}
+					</div>
+				</section>
+			)}
 
 			<section className={styles.section}>
 				<h3>Recommendations</h3>

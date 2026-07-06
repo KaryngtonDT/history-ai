@@ -11,8 +11,8 @@ use App\Domain\Engine\EngineRequirement;
 use App\Domain\Engine\EngineVersion;
 use App\Domain\Runtime\EngineExecutionMode;
 use App\Domain\Runtime\RuntimeStatus;
-use App\Infrastructure\Runtime\Catalog\EngineDefinition;
 use App\Infrastructure\Runtime\Catalog\EngineCatalogDefinitions;
+use App\Infrastructure\Runtime\Catalog\EngineDefinition;
 
 final class EngineReadinessAssessor
 {
@@ -272,6 +272,7 @@ final class EngineReadinessAssessor
             capability: $definition->capability,
             family: $definition->family,
             role: $definition->role,
+            tier: $definition->tier,
             installed: $installed,
             compatible: true,
             version: $version,
@@ -312,6 +313,10 @@ final class EngineReadinessAssessor
 
     private function resolveActiveEngineId(EngineCatalogCapability $capability): string
     {
+        if (!$capability->isVideoPipeline()) {
+            return EngineCatalogDefinitions::defaultForCapability($capability)?->id ?? '';
+        }
+
         return match ($capability) {
             EngineCatalogCapability::SpeechToText => $this->normalizeEngineId($this->sttProvider, [
                 'faster_whisper' => 'faster_whisper_large_v3',

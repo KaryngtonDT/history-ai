@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+if [[ -x /models/venvs/whisper-cpp/bin/whisper-cpp ]]; then
+  exec /models/venvs/whisper-cpp/bin/whisper-cpp "$@"
+fi
+exec /opt/lumen/placeholders/whisper-cpp "$@"

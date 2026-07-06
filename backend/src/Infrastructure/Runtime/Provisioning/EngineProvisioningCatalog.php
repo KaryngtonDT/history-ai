@@ -34,6 +34,14 @@ final class EngineProvisioningCatalog
                 documentationPath: 'docs/operations/ENGINE_INSTALLATION.md#speech-to-text',
             ),
             new EngineProvisionSpec(
+                'whisper_cpp',
+                true,
+                installCommand: 'bash /opt/lumen/install-whisper-cpp.sh',
+                modelDownloadHint: 'https://github.com/ggerganov/whisper.cpp',
+                modelPath: '/models/whisper-cpp',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#speech-to-text',
+            ),
+            new EngineProvisionSpec(
                 'parakeet',
                 false,
                 blockedReason: 'NVIDIA Parakeet requires NeMo toolkit, CUDA, and manual model download from NVIDIA NGC.',
@@ -90,6 +98,14 @@ final class EngineProvisioningCatalog
                 documentationPath: 'docs/operations/ENGINE_INSTALLATION.md#kokoro-tts',
             ),
             new EngineProvisionSpec(
+                'piper',
+                true,
+                installCommand: 'bash /opt/lumen/install-piper.sh',
+                modelDownloadHint: 'https://github.com/rhasspy/piper',
+                modelPath: '/models/piper',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#text-to-speech',
+            ),
+            new EngineProvisionSpec(
                 'dia',
                 false,
                 blockedReason: 'Dia TTS requires manual installation from the upstream repository and model download.',
@@ -132,6 +148,15 @@ final class EngineProvisioningCatalog
                 documentationPath: 'docs/operations/LATENTSYNC_INSTALLATION.md',
             ),
             new EngineProvisionSpec(
+                'liveportrait',
+                false,
+                blockedReason: 'LivePortrait requires NVIDIA GPU, manual install, and model weights.',
+                installCommand: 'bash /opt/lumen/install-liveportrait.sh',
+                modelDownloadHint: 'https://github.com/KwaiVGI/LivePortrait',
+                modelPath: '/models/liveportrait',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#lip-sync',
+            ),
+            new EngineProvisionSpec(
                 'echomimic_v2',
                 false,
                 blockedReason: 'EchoMimic V2 requires manual GPU install and model download.',
@@ -146,6 +171,15 @@ final class EngineProvisioningCatalog
                 modelDownloadHint: 'https://github.com/Rudrabha/Wav2Lip',
                 modelPath: '/models/wav2lip',
                 documentationPath: 'docs/operations/ENGINE_PROVISIONING.md#wav2lip',
+            ),
+            new EngineProvisionSpec(
+                'musetalk',
+                false,
+                blockedReason: 'MuseTalk is legacy — requires NVIDIA GPU and manual install. Prefer Wav2Lip on CPU-only hosts.',
+                installCommand: 'bash /opt/lumen/install-musetalk.sh',
+                modelDownloadHint: 'https://github.com/TMElyralab/MuseTalk',
+                modelPath: '/models/musetalk',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#lip-sync',
             ),
             new EngineProvisionSpec(
                 'ffmpeg',
@@ -164,6 +198,102 @@ final class EngineProvisioningCatalog
                 true,
                 installCommand: 'Requires ffmpeg build with libaom-av1 (verify with ffmpeg -encoders)',
                 documentationPath: 'docs/operations/ENGINE_INSTALLATION.md#ffmpeg-av1',
+            ),
+
+            // OCR
+            new EngineProvisionSpec(
+                'paddleocr',
+                false,
+                blockedReason: 'PaddleOCR requires manual pip install and model download.',
+                installCommand: 'pip install paddlepaddle paddleocr',
+                modelPath: '/models/paddleocr',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#ocr',
+            ),
+            new EngineProvisionSpec(
+                'easyocr',
+                false,
+                blockedReason: 'EasyOCR requires manual pip install and language packs.',
+                installCommand: 'pip install easyocr',
+                modelPath: '/models/easyocr',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#ocr',
+            ),
+
+            // Vision
+            new EngineProvisionSpec(
+                'florence_2',
+                false,
+                blockedReason: 'Florence-2 requires HuggingFace model download and GPU for best performance.',
+                installCommand: 'pip install transformers torch && download microsoft/Florence-2-base',
+                modelPath: '/models/florence-2',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#vision',
+            ),
+            new EngineProvisionSpec(
+                'qwen2_5_vl',
+                false,
+                blockedReason: 'Qwen2.5-VL requires NVIDIA GPU and large VRAM.',
+                installCommand: 'See HuggingFace Qwen2.5-VL model card',
+                modelPath: '/models/qwen2-vl',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#vision',
+            ),
+            new EngineProvisionSpec(
+                'smolvlm',
+                false,
+                blockedReason: 'SmolVLM requires manual install from HuggingFace.',
+                installCommand: 'pip install transformers && download HuggingFaceTB/SmolVLM',
+                modelPath: '/models/smolvlm',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#vision',
+            ),
+
+            // Embeddings
+            new EngineProvisionSpec(
+                'bge_m3',
+                false,
+                blockedReason: 'BGE-M3 embedding model requires manual install (FlagEmbedding or sentence-transformers).',
+                installCommand: 'pip install FlagEmbedding',
+                modelPath: '/models/bge-m3',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#embeddings',
+            ),
+            new EngineProvisionSpec(
+                'nomic_embed',
+                false,
+                blockedReason: 'Nomic Embed requires manual model download.',
+                installCommand: 'pip install sentence-transformers',
+                modelPath: '/models/nomic-embed',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#embeddings',
+            ),
+            new EngineProvisionSpec(
+                'jina_embeddings',
+                false,
+                blockedReason: 'Jina Embeddings requires manual install.',
+                installCommand: 'pip install sentence-transformers',
+                modelPath: '/models/jina-embeddings',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#embeddings',
+            ),
+            new EngineProvisionSpec(
+                'e5_large',
+                false,
+                blockedReason: 'E5 Large requires manual model download.',
+                installCommand: 'pip install sentence-transformers',
+                modelPath: '/models/e5-large',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#embeddings',
+            ),
+
+            // Reranking
+            new EngineProvisionSpec(
+                'bge_reranker',
+                false,
+                blockedReason: 'BGE Reranker requires manual install (FlagEmbedding).',
+                installCommand: 'pip install FlagEmbedding',
+                modelPath: '/models/bge-reranker',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#reranking',
+            ),
+            new EngineProvisionSpec(
+                'jina_reranker',
+                false,
+                blockedReason: 'Jina Reranker requires manual install.',
+                installCommand: 'pip install sentence-transformers',
+                modelPath: '/models/jina-reranker',
+                documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#reranking',
             ),
         ];
     }

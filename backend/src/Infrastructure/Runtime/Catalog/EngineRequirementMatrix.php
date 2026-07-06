@@ -16,6 +16,7 @@ final class EngineRequirementMatrix
         return [
             // Speech-to-Text
             new HardwareRequirement('faster_whisper_large_v3', cpuFallbackSupported: true, minimumRamGb: 4.0),
+            new HardwareRequirement('whisper_cpp', cpuFallbackSupported: true, minimumRamGb: 2.0),
             new HardwareRequirement('parakeet', requiredGpuVendor: 'NVIDIA', cudaRequired: true, cpuFallbackSupported: false, minimumRamGb: 8.0),
             new HardwareRequirement('canary', requiredGpuVendor: 'NVIDIA', cudaRequired: true, cpuFallbackSupported: false, minimumRamGb: 8.0),
 
@@ -27,6 +28,7 @@ final class EngineRequirementMatrix
             // TTS
             new HardwareRequirement('f5_tts', cudaRecommended: true, cpuFallbackSupported: true, minimumRamGb: 6.0),
             new HardwareRequirement('kokoro', cpuFallbackSupported: true, minimumRamGb: 4.0),
+            new HardwareRequirement('piper', cpuFallbackSupported: true, minimumRamGb: 2.0),
             new HardwareRequirement('dia', cudaRecommended: true, cpuFallbackSupported: false, minimumRamGb: 8.0),
 
             // Voice Clone
@@ -60,16 +62,51 @@ final class EngineRequirementMatrix
                 minimumRamGb: 16.0,
             ),
             new HardwareRequirement(
+                'liveportrait',
+                requiredGpuVendor: 'NVIDIA',
+                cudaRequired: true,
+                minimumVramGb: 8.0,
+                cpuFallbackSupported: false,
+                minimumRamGb: 12.0,
+            ),
+            new HardwareRequirement(
                 'wav2lip',
                 cudaRecommended: true,
                 cpuFallbackSupported: true,
                 minimumRamGb: 6.0,
+            ),
+            new HardwareRequirement(
+                'musetalk',
+                requiredGpuVendor: 'NVIDIA',
+                cudaRequired: true,
+                minimumVramGb: 8.0,
+                cpuFallbackSupported: false,
+                minimumRamGb: 12.0,
             ),
 
             // Video Render
             new HardwareRequirement('ffmpeg', cpuFallbackSupported: true),
             new HardwareRequirement('ffmpeg_nvenc', requiredGpuVendor: 'NVIDIA', nvencRequired: true, cpuFallbackSupported: false),
             new HardwareRequirement('ffmpeg_av1', cpuFallbackSupported: true, minimumRamGb: 4.0),
+
+            // OCR
+            new HardwareRequirement('paddleocr', cpuFallbackSupported: true, minimumRamGb: 4.0),
+            new HardwareRequirement('easyocr', cudaRecommended: true, cpuFallbackSupported: true, minimumRamGb: 4.0),
+
+            // Vision
+            new HardwareRequirement('florence_2', cudaRecommended: true, cpuFallbackSupported: true, minimumRamGb: 8.0),
+            new HardwareRequirement('qwen2_5_vl', requiredGpuVendor: 'NVIDIA', cudaRequired: true, minimumVramGb: 12.0, cpuFallbackSupported: false, minimumRamGb: 16.0),
+            new HardwareRequirement('smolvlm', cpuFallbackSupported: true, minimumRamGb: 4.0),
+
+            // Embeddings
+            new HardwareRequirement('bge_m3', cpuFallbackSupported: true, minimumRamGb: 4.0),
+            new HardwareRequirement('nomic_embed', cpuFallbackSupported: true, minimumRamGb: 2.0),
+            new HardwareRequirement('jina_embeddings', cpuFallbackSupported: true, minimumRamGb: 4.0),
+            new HardwareRequirement('e5_large', cpuFallbackSupported: true, minimumRamGb: 6.0),
+
+            // Reranking
+            new HardwareRequirement('bge_reranker', cpuFallbackSupported: true, minimumRamGb: 4.0),
+            new HardwareRequirement('jina_reranker', cpuFallbackSupported: true, minimumRamGb: 4.0),
         ];
     }
 

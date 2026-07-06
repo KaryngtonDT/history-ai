@@ -35,6 +35,7 @@ final class EngineStatusFinalizer
             capability: $engine->capability,
             family: $engine->family,
             role: $engine->role,
+            tier: $engine->tier,
             installed: false,
             compatible: $engine->compatible,
             version: $engine->version,

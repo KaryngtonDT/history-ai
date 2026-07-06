@@ -68,7 +68,7 @@ final class IntelligentProvisioningPlannerTest extends TestCase
             gpuName: 'AMD Radeon integrated graphics',
             cudaAvailable: false,
             ramTotalGb: 16.0,
-            ramAvailableGb: 4.5,
+            ramAvailableGb: 8.0,
         );
 
         return new HardwareDetectionReport(

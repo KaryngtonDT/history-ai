@@ -119,4 +119,9 @@ interface RuntimePlatformInterface
      * @return array<string, mixed>|null
      */
     public function engineBlockedReason(string $engineId): ?array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function capabilityMaturity(): array;
 }

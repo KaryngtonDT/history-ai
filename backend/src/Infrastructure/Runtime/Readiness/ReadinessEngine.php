@@ -124,6 +124,8 @@ final class ReadinessEngine
             modelFound: $engine->modelFound,
             role: $engine->role->value,
             roleLabel: $engine->role->label(),
+            tier: $engine->tier->value,
+            tierLabel: $engine->tier->label(),
             version: $engine->version?->value,
             binaryPath: $engine->version?->build,
             errorReason: $engine->errorReason,
@@ -145,6 +147,9 @@ final class ReadinessEngine
             RuntimeCapability::VoiceClone => PipelineStageType::VoiceClone,
             RuntimeCapability::LipSync => PipelineStageType::LipSync,
             RuntimeCapability::VideoRender => PipelineStageType::VideoRender,
+            default => throw new \InvalidArgumentException(
+                sprintf('Capability "%s" is not part of the video pipeline.', $capability->value),
+            ),
         };
     }
 }

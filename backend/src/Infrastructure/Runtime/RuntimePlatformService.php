@@ -19,6 +19,8 @@ use App\Infrastructure\Runtime\Intelligence\AutoSelectionEngine;
 use App\Infrastructure\Runtime\Intelligence\RecommendationEngine;
 use App\Infrastructure\Runtime\Provisioning\EngineProvisioner;
 use App\Infrastructure\Runtime\Readiness\ReadinessEngine;
+use App\Infrastructure\Runtime\Catalog\CapabilityMaturityRegistry;
+use App\Infrastructure\Runtime\Catalog\EngineCatalogDefinitions;
 use App\Infrastructure\Hardware\SystemHardwareRepository;
 
 final class RuntimePlatformService implements RuntimePlatformInterface
@@ -283,6 +285,16 @@ final class RuntimePlatformService implements RuntimePlatformInterface
             'documentationLink' => $result->documentationLink,
             'fixTypes' => array_map(static fn ($type) => $type->value, $result->fixTypes),
             'severity' => $result->severity->value,
+        ];
+    }
+
+    public function capabilityMaturity(): array
+    {
+        return [
+            'principle' => 'Capability-based AI platform — defaults, alternatives, tiers, and maturity.',
+            'capabilities' => CapabilityMaturityRegistry::all(),
+            'totalEngines' => count(EngineCatalogDefinitions::all()),
+            'at' => (new \DateTimeImmutable())->format(DATE_ATOM),
         ];
     }
 }

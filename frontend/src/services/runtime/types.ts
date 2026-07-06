@@ -49,6 +49,8 @@ export interface RuntimeEngine {
 	mode: string;
 	role?: string | null;
 	roleLabel?: string | null;
+	tier?: string | null;
+	tierLabel?: string | null;
 	configured: boolean;
 	discovered: boolean;
 	executableFound: boolean;
@@ -96,6 +98,38 @@ export interface RuntimeCatalog {
 	installed: RuntimeEngine[];
 	available: RuntimeEngine[];
 	compatible: RuntimeEngine[];
+}
+
+export interface RuntimeCapabilityMaturityEngine {
+	id: string;
+	displayName: string;
+	role: string;
+	roleLabel: string;
+	tier: string;
+	tierLabel: string;
+	hardware: Record<string, unknown>;
+	provider: string;
+	providerLabel: string;
+	benchmarkModel: string;
+}
+
+export interface RuntimeCapabilityMaturity {
+	capability: string;
+	label: string;
+	maturity: string;
+	maturityLabel: string;
+	videoPipeline: boolean;
+	defaultEngineId?: string | null;
+	defaultDisplayName?: string | null;
+	engineCount: number;
+	engines: RuntimeCapabilityMaturityEngine[];
+}
+
+export interface RuntimeCapabilityMaturityOverview {
+	principle: string;
+	capabilities: RuntimeCapabilityMaturity[];
+	totalEngines: number;
+	at: string;
 }
 
 export interface RuntimeRecommendation {

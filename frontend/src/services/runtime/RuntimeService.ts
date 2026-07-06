@@ -72,6 +72,10 @@ export class RuntimeService {
 		return this.repository.getCompatibility();
 	}
 
+	getCapabilityMaturity() {
+		return this.repository.getCapabilityMaturity();
+	}
+
 	getEngineCompatibility(engineId: string) {
 		return this.repository.getEngineCompatibility(engineId);
 	}

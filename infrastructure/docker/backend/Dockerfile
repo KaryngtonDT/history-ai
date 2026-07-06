@@ -61,40 +61,76 @@ COPY infrastructure/docker/backend/bin/faster-whisper \
      infrastructure/docker/backend/bin/openvoice \
      infrastructure/docker/backend/bin/latentsync \
      infrastructure/docker/backend/bin/wav2lip \
+     infrastructure/docker/backend/bin/whisper-cpp \
+     infrastructure/docker/backend/bin/piper \
+     infrastructure/docker/backend/bin/liveportrait \
+     infrastructure/docker/backend/bin/musetalk \
      /usr/local/bin/
 COPY infrastructure/docker/backend/placeholders/f5-tts \
      infrastructure/docker/backend/placeholders/openvoice \
      infrastructure/docker/backend/placeholders/latentsync \
      infrastructure/docker/backend/placeholders/wav2lip \
+     infrastructure/docker/backend/placeholders/whisper-cpp \
+     infrastructure/docker/backend/placeholders/piper \
+     infrastructure/docker/backend/placeholders/liveportrait \
+     infrastructure/docker/backend/placeholders/musetalk \
      /opt/lumen/placeholders/
 COPY infrastructure/docker/backend/engines/ /opt/lumen/engines/
 COPY scripts/install-f5-openvoice-latentsync.sh /opt/lumen/install-gpu-engines.sh
 COPY scripts/install-latentsync.sh /opt/lumen/install-latentsync.sh
 COPY scripts/install-wav2lip.sh /opt/lumen/install-wav2lip.sh
+COPY scripts/install-whisper-cpp.sh /opt/lumen/install-whisper-cpp.sh
+COPY scripts/install-piper.sh /opt/lumen/install-piper.sh
+COPY scripts/install-liveportrait.sh /opt/lumen/install-liveportrait.sh
+COPY scripts/install-musetalk.sh /opt/lumen/install-musetalk.sh
 RUN chmod +x /usr/local/bin/faster-whisper \
              /usr/local/bin/f5-tts \
              /usr/local/bin/openvoice \
              /usr/local/bin/latentsync \
              /usr/local/bin/wav2lip \
+             /usr/local/bin/whisper-cpp \
+             /usr/local/bin/piper \
+             /usr/local/bin/liveportrait \
+             /usr/local/bin/musetalk \
              /opt/lumen/placeholders/f5-tts \
              /opt/lumen/placeholders/openvoice \
              /opt/lumen/placeholders/latentsync \
              /opt/lumen/placeholders/wav2lip \
+             /opt/lumen/placeholders/whisper-cpp \
+             /opt/lumen/placeholders/piper \
+             /opt/lumen/placeholders/liveportrait \
+             /opt/lumen/placeholders/musetalk \
              /opt/lumen/install-gpu-engines.sh \
              /opt/lumen/install-latentsync.sh \
              /opt/lumen/install-wav2lip.sh \
+             /opt/lumen/install-whisper-cpp.sh \
+             /opt/lumen/install-piper.sh \
+             /opt/lumen/install-liveportrait.sh \
+             /opt/lumen/install-musetalk.sh \
              /opt/lumen/engines/*.py \
  && sed -i 's/\r$//' /usr/local/bin/f5-tts \
              /usr/local/bin/openvoice \
              /usr/local/bin/latentsync \
              /usr/local/bin/wav2lip \
+             /usr/local/bin/whisper-cpp \
+             /usr/local/bin/piper \
+             /usr/local/bin/liveportrait \
+             /usr/local/bin/musetalk \
              /opt/lumen/placeholders/f5-tts \
              /opt/lumen/placeholders/openvoice \
              /opt/lumen/placeholders/latentsync \
              /opt/lumen/placeholders/wav2lip \
+             /opt/lumen/placeholders/whisper-cpp \
+             /opt/lumen/placeholders/piper \
+             /opt/lumen/placeholders/liveportrait \
+             /opt/lumen/placeholders/musetalk \
              /opt/lumen/install-gpu-engines.sh \
              /opt/lumen/install-latentsync.sh \
              /opt/lumen/install-wav2lip.sh \
+             /opt/lumen/install-whisper-cpp.sh \
+             /opt/lumen/install-piper.sh \
+             /opt/lumen/install-liveportrait.sh \
+             /opt/lumen/install-musetalk.sh \
              /opt/lumen/engines/*.py
 
 COPY infrastructure/docker/backend/nginx.conf /etc/nginx/conf.d/default.conf
