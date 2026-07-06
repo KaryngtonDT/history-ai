@@ -1,9 +1,6 @@
 import { appendActivityLog } from "@/features/activity/activityLogStore";
 import { ApiError, NetworkError } from "@/shared/errors";
-import {
-	formatApiErrorBody,
-	readApiErrorResponse,
-} from "@/shared/errors/formatApiErrorBody";
+import { readApiErrorResponse } from "@/shared/errors/formatApiErrorBody";
 
 export interface PostFormDataOptions {
 	onProgress?: (progress: number) => void;
