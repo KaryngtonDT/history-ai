@@ -1,7 +1,7 @@
 import { ExplainThisButton } from "@/features/help";
+import { PageIntroduction } from "@/features/product";
 import { RuntimeCenter } from "@/features/runtime/RuntimeCenter";
 import { RuntimeHealthDashboard } from "@/features/runtime/RuntimeHealthDashboard";
-import { PageIntroduction } from "@/features/product";
 
 export function RuntimeSettingsPage() {
 	return (

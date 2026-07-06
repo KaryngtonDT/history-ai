@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "@/i18n/useTranslation";
-import type { ActivityLogEntry } from "./activityLogStore";
 import styles from "./ActivityLogPanel.module.css";
+import type { ActivityLogEntry } from "./activityLogStore";
 
 interface ActivityLogPanelProps {
 	entries: ActivityLogEntry[];

@@ -1,4 +1,4 @@
-import { videoProcessPath, videoStatusPath, VIDEOS_PATH } from "@/config/api";
+import { VIDEOS_PATH, videoProcessPath, videoStatusPath } from "@/config/api";
 import type { HttpClient } from "@/services/http/HttpClient";
 import { ApiError, ValidationError } from "@/shared/errors";
 import {

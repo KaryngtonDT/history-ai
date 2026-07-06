@@ -1,5 +1,5 @@
-import { ApiError } from "@/shared/errors/ApiError";
 import { appendActivityLog } from "@/features/activity/activityLogStore";
+import { ApiError } from "@/shared/errors/ApiError";
 import type {
 	BootstrapCheckItem,
 	BootstrapLogEntry,
@@ -7,7 +7,10 @@ import type {
 
 const LOG_PREFIX = "[ShadowWatch]";
 
-export function logBootstrap(message: string, level: BootstrapLogEntry["level"] = "info"): void {
+export function logBootstrap(
+	message: string,
+	level: BootstrapLogEntry["level"] = "info",
+): void {
 	const line = `${LOG_PREFIX} ${message}`;
 	if (level === "error") {
 		console.error(line);

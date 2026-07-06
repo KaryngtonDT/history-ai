@@ -27,7 +27,9 @@ type TranslateFn = (
 	params?: Record<string, string | number>,
 ) => string;
 
-function isProcessing(videoStatus: VideoPipelineProgress["videoStatus"]): boolean {
+function isProcessing(
+	videoStatus: VideoPipelineProgress["videoStatus"],
+): boolean {
 	return videoStatus === "queued" || videoStatus === "processing";
 }
 

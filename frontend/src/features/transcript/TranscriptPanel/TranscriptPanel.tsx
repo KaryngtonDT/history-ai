@@ -69,7 +69,9 @@ export function TranscriptPanel() {
 	return (
 		<div className={styles.root}>
 			{isDeterministicPlaceholder ? (
-				<p className={styles.devNotice}>{t("pipeline.transcript.deterministicNotice")}</p>
+				<p className={styles.devNotice}>
+					{t("pipeline.transcript.deterministicNotice")}
+				</p>
 			) : null}
 			<header className={styles.header}>
 				<div>

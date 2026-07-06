@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import { useTranslation } from "@/i18n/useTranslation";
-import { buildArtifactJourney, type ArtifactStatus } from "../journeyModel";
+import { type ArtifactStatus, buildArtifactJourney } from "../journeyModel";
 import { useVideoPipelineProgress } from "../useVideoPipelineProgress";
 import styles from "./ArtifactJourney.module.css";
 

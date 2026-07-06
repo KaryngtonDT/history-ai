@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
+import { audioService } from "@/services/audio/AudioService";
+import { lipSyncService } from "@/services/lipsync/LipSyncService";
+import { videoRenderService } from "@/services/render/VideoRenderService";
 import { transcriptService } from "@/services/transcript/TranscriptService";
 import { translationService } from "@/services/translation/TranslationService";
-import { videoRenderService } from "@/services/render/VideoRenderService";
-import { videoService } from "@/services/video/VideoService";
 import type { VideoStatus } from "@/services/video/types";
-import { lipSyncService } from "@/services/lipsync/LipSyncService";
+import { videoService } from "@/services/video/VideoService";
 import { voiceCloneService } from "@/services/voice/VoiceCloneService";
-import { audioService } from "@/services/audio/AudioService";
 
 export interface VideoPipelineProgress {
 	loading: boolean;
@@ -93,8 +93,7 @@ export function useVideoPipelineProgress(
 					lipSyncResult.status === "fulfilled" &&
 					lipSyncResult.value.length > 0,
 				hasRender:
-					renderResult.status === "fulfilled" &&
-					renderResult.value.length > 0,
+					renderResult.status === "fulfilled" && renderResult.value.length > 0,
 			});
 		}
 

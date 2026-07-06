@@ -45,8 +45,10 @@ describe("Sprint 1 — app shell", () => {
 		const settingsHub = screen
 			.getAllByRole("link")
 			.find((link) => link.getAttribute("href") === "/settings");
-		expect(settingsHub).toBeDefined();
-		await user.click(settingsHub!);
+		if (!settingsHub) {
+			throw new Error("Settings hub link not found");
+		}
+		await user.click(settingsHub);
 		await waitFor(() => {
 			expect(
 				screen.getByRole("heading", { name: "Settings" }),

@@ -160,14 +160,20 @@ describe("RuntimeCenter", () => {
 		});
 
 		expect(screen.getByText("Low-End Local")).toBeInTheDocument();
-		expect(screen.getByText(/LatentSync requires NVIDIA CUDA/)).toBeInTheDocument();
+		expect(
+			screen.getByText(/LatentSync requires NVIDIA CUDA/),
+		).toBeInTheDocument();
 		expect(screen.getByText(/Blocked by hardware/)).toBeInTheDocument();
 
 		await userEvent.click(screen.getByRole("button", { name: "Why blocked?" }));
 
-		expect(screen.getByText(/Recommended for this machine:/)).toBeInTheDocument();
+		expect(
+			screen.getByText(/Recommended for this machine:/),
+		).toBeInTheDocument();
 		expect(screen.getAllByText("wav2lip").length).toBeGreaterThan(0);
 		expect(screen.getByText("NVIDIA GPU")).toBeInTheDocument();
-		expect(screen.getByText(/Capability Maturity \(33 engines\)/)).toBeInTheDocument();
+		expect(
+			screen.getByText(/Capability Maturity \(33 engines\)/),
+		).toBeInTheDocument();
 	});
 });

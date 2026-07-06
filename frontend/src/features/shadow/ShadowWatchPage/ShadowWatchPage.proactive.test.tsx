@@ -24,7 +24,9 @@ const defaultTranscript = {
 
 function mockShadowWatchBootstrap(): void {
 	vi.spyOn(videoRenderService, "listRenders").mockResolvedValue([]);
-	vi.spyOn(transcriptService, "getTranscript").mockResolvedValue(defaultTranscript);
+	vi.spyOn(transcriptService, "getTranscript").mockResolvedValue(
+		defaultTranscript,
+	);
 	vi.spyOn(videoService, "getStatus").mockResolvedValue({
 		videoId: VIDEO_ID,
 		status: "completed",
@@ -32,7 +34,9 @@ function mockShadowWatchBootstrap(): void {
 		language: "unknown",
 		createdAt: new Date().toISOString(),
 	});
-	vi.spyOn(videoService, "processVideo").mockResolvedValue({ status: "queued" });
+	vi.spyOn(videoService, "processVideo").mockResolvedValue({
+		status: "queued",
+	});
 }
 
 const defaultPolicy = {

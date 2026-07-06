@@ -369,7 +369,8 @@ export const pipelineEn = {
 				"GET render stream for language {{language}}",
 			bootstrapLogRenderStreamReady: "Render stream URL resolved",
 			bootstrapLogNoRender: "No final render available",
-			bootstrapLogOriginalStream: "GET /api/videos/{id}/stream — original upload",
+			bootstrapLogOriginalStream:
+				"GET /api/videos/{id}/stream — original upload",
 			bootstrapOriginalStreamDetail:
 				"Using uploaded source video (no final render yet)",
 			bootstrapLogStartSession: "POST /api/videos/{id}/shadow/sessions",

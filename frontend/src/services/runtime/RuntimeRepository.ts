@@ -5,6 +5,7 @@ import type {
 	RuntimeDashboard,
 	RuntimeEngine,
 	RuntimeEngineCompatibility,
+	RuntimeEngineTestResult,
 	RuntimeHardwareOverview,
 	RuntimeHealth,
 	RuntimeOverview,
@@ -12,7 +13,6 @@ import type {
 	RuntimeReadiness,
 	RuntimeRecommendation,
 	RuntimeValidationReport,
-	RuntimeEngineTestResult,
 } from "./types";
 
 export interface RuntimeRepository {

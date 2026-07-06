@@ -1,16 +1,16 @@
 import {
 	createContext,
+	type ReactNode,
 	useCallback,
 	useContext,
 	useMemo,
 	useSyncExternalStore,
-	type ReactNode,
 } from "react";
 import {
-	activityLogStore,
-	appendActivityLog,
 	type ActivityLogEntry,
 	type ActivityLogLevel,
+	activityLogStore,
+	appendActivityLog,
 } from "./activityLogStore";
 
 interface ActivityLogContextValue {

@@ -51,16 +51,16 @@ import {
 } from "../shadowVoice";
 import { VocabularyPanel } from "../VocabularyPanel";
 import {
-	ShadowWatchBootstrapPanel,
 	type BootstrapCheckItem,
 	type BootstrapLogEntry,
+	ShadowWatchBootstrapPanel,
 } from "./ShadowWatchBootstrapPanel";
+import styles from "./ShadowWatchPage.module.css";
 import {
 	appendBootstrapLog,
 	formatBootstrapError,
 	updateBootstrapCheck,
 } from "./shadowWatchBootstrap";
-import styles from "./ShadowWatchPage.module.css";
 
 const CONTEXT_DEBOUNCE_MS = 400;
 const INTERVENTION_DEBOUNCE_MS = 900;
@@ -379,8 +379,7 @@ export function ShadowWatchPage() {
 						}
 
 						pushLog(t("pipeline.shadow.bootstrapLogPollTranscript"));
-						transcriptResult =
-							await transcriptService.getTranscript(videoId);
+						transcriptResult = await transcriptService.getTranscript(videoId);
 						setTranscript(transcriptResult);
 
 						if (transcriptResult) {
@@ -431,7 +430,9 @@ export function ShadowWatchPage() {
 					} catch (error) {
 						const message = formatBootstrapError(error);
 						pushLog(
-							t("pipeline.shadow.bootstrapLogSessionFailed", { error: message }),
+							t("pipeline.shadow.bootstrapLogSessionFailed", {
+								error: message,
+							}),
 							"error",
 						);
 						patchCheck("session", {
@@ -819,9 +820,9 @@ export function ShadowWatchPage() {
 						<details className={styles.bootstrapFailureDetails}>
 							<summary>{t("pipeline.shadow.bootstrapLogTitle")}</summary>
 							<ul className={styles.bootstrapFailureLog}>
-								{bootstrapLog.map((entry, index) => (
+								{bootstrapLog.map((entry) => (
 									<li
-										key={`${entry.time}-${index}`}
+										key={`${entry.time}-${entry.level}-${entry.message}`}
 										data-level={entry.level}
 									>
 										<span>{entry.time}</span> {entry.message}

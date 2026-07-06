@@ -51,7 +51,9 @@ export function ShadowTranscriptPanel({
 							);
 						})
 					) : (
-						<li className={styles.empty}>{t("pipeline.shadow.transcriptEmpty")}</li>
+						<li className={styles.empty}>
+							{t("pipeline.shadow.transcriptEmpty")}
+						</li>
 					)}
 				</ul>
 			) : null}

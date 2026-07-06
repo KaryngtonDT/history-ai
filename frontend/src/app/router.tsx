@@ -13,8 +13,8 @@ import { LearningSettingsPage } from "@/pages/LearningSettings/LearningSettingsP
 import { LibraryItemPage } from "@/pages/Library/LibraryItemPage";
 import { LibraryPage } from "@/pages/Library/LibraryPage";
 import { PipelineSettingsPage } from "@/pages/PipelineSettings/PipelineSettingsPage";
-import { RuntimeSettingsPage } from "@/pages/RuntimeSettings/RuntimeSettingsPage";
 import { ProcessingPage } from "@/pages/Processing/ProcessingPage";
+import { RuntimeSettingsPage } from "@/pages/RuntimeSettings/RuntimeSettingsPage";
 import { ServerSettingsPage } from "@/pages/ServerSettings/ServerSettingsPage";
 import { SettingsPage } from "@/pages/Settings/SettingsPage";
 import { ShadowSettingsPage } from "@/pages/ShadowSettings/ShadowSettingsPage";

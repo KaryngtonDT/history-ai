@@ -81,9 +81,9 @@ export function ShadowWatchBootstrapPanel({
 				<div className={styles.logPanel}>
 					<p className={styles.logTitle}>{logTitle}</p>
 					<ul className={styles.logList}>
-						{log.map((entry, index) => (
+						{log.map((entry) => (
 							<li
-								key={`${entry.time}-${index}`}
+								key={`${entry.time}-${entry.level}-${entry.message}`}
 								className={styles.logEntry}
 								data-level={entry.level}
 							>

@@ -198,7 +198,10 @@ export function RuntimeHealthDashboard() {
 							(item) => item.capability === capability.capability,
 						);
 						return (
-							<Card key={capability.capability} className={styles.capabilityCard}>
+							<Card
+								key={capability.capability}
+								className={styles.capabilityCard}
+							>
 								<div className={styles.capabilityHeader}>
 									<strong>{capability.label}</strong>
 									<Badge variant={capabilityVariant(capability.status)}>
@@ -206,7 +209,9 @@ export function RuntimeHealthDashboard() {
 									</Badge>
 								</div>
 								{score && (
-									<p className={styles.meta}>Capability score: {score.score}%</p>
+									<p className={styles.meta}>
+										Capability score: {score.score}%
+									</p>
 								)}
 								{score?.reason && (
 									<p className={styles.meta}>Reason: {score.reason}</p>
@@ -219,13 +224,15 @@ export function RuntimeHealthDashboard() {
 								{capability.recommendedEngineId && (
 									<p className={styles.meta}>
 										Recommended:{" "}
-										{capability.recommendedDisplayName ?? capability.recommendedEngineId}
+										{capability.recommendedDisplayName ??
+											capability.recommendedEngineId}
 									</p>
 								)}
 								{capability.currentEngineId && (
 									<p className={styles.meta}>
 										Current:{" "}
-										{capability.currentDisplayName ?? capability.currentEngineId}
+										{capability.currentDisplayName ??
+											capability.currentEngineId}
 									</p>
 								)}
 								{(capability.installedEngineIds?.length ?? 0) > 0 && (
@@ -234,7 +241,9 @@ export function RuntimeHealthDashboard() {
 									</p>
 								)}
 								{capability.blockedReason && (
-									<p className={styles.meta}>Blocked: {capability.blockedReason}</p>
+									<p className={styles.meta}>
+										Blocked: {capability.blockedReason}
+									</p>
 								)}
 								{capability.benchmark && (
 									<p className={styles.meta}>
@@ -242,10 +251,14 @@ export function RuntimeHealthDashboard() {
 									</p>
 								)}
 								{capability.providerLabel && (
-									<p className={styles.meta}>Provider: {capability.providerLabel}</p>
+									<p className={styles.meta}>
+										Provider: {capability.providerLabel}
+									</p>
 								)}
 								{capability.improvement && (
-									<p className={styles.meta}>Improvement: {capability.improvement}</p>
+									<p className={styles.meta}>
+										Improvement: {capability.improvement}
+									</p>
 								)}
 							</Card>
 						);
@@ -259,7 +272,10 @@ export function RuntimeHealthDashboard() {
 					<p className={styles.meta}>
 						Profile:{" "}
 						<strong>
-							{String(dashboard.hardware.profile?.label ?? summary.hardwareProfileLabel)}
+							{String(
+								dashboard.hardware.profile?.label ??
+									summary.hardwareProfileLabel,
+							)}
 						</strong>
 					</p>
 					<UtilizationBar
@@ -294,12 +310,8 @@ export function RuntimeHealthDashboard() {
 							Docker GPU {boolIcon(dashboard.hardware.dockerGpuAccess)}
 						</span>
 						<span>WSL {boolIcon(dashboard.hardware.wsl2)}</span>
-						<span>
-							FFmpeg {boolIcon(dashboard.hardware.ffmpegAvailable)}
-						</span>
-						<span>
-							Ollama {boolIcon(dashboard.hardware.ollamaAvailable)}
-						</span>
+						<span>FFmpeg {boolIcon(dashboard.hardware.ffmpegAvailable)}</span>
+						<span>Ollama {boolIcon(dashboard.hardware.ollamaAvailable)}</span>
 						{dashboard.hardware.pythonVersion && (
 							<span>Python {dashboard.hardware.pythonVersion}</span>
 						)}
@@ -366,9 +378,9 @@ export function RuntimeHealthDashboard() {
 				<section className={styles.section}>
 					<h2 className={styles.sectionTitle}>Runtime Timeline</h2>
 					<Card className={styles.timeline}>
-						{dashboard.timeline.map((event, index) => (
+						{dashboard.timeline.map((event) => (
 							<div
-								key={`${event.at}-${event.type}-${index}`}
+								key={`${event.at}-${event.type}-${event.detail}`}
 								className={styles.timelineItem}
 							>
 								<span>{formatTimelineDate(event.at)}</span>

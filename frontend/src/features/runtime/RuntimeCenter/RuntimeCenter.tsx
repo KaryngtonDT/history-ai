@@ -18,7 +18,9 @@ import type {
 } from "@/services/runtime/types";
 import styles from "./RuntimeCenter.module.css";
 
-function statusVariant(status: string): "success" | "warning" | "danger" | "neutral" {
+function statusVariant(
+	status: string,
+): "success" | "warning" | "danger" | "neutral" {
 	if (status === "ready" || status === "pass") return "success";
 	if (status === "mock" || status === "degraded") return "warning";
 	if (
@@ -120,15 +122,16 @@ function EngineBlockedExplanation({
 export function RuntimeCenter() {
 	const [overview, setOverview] = useState<RuntimeOverview | null>(null);
 	const [readiness, setReadiness] = useState<RuntimeReadiness | null>(null);
-	const [hardware, setHardware] = useState<RuntimeHardwareOverview | null>(null);
-	const [compatibility, setCompatibility] =
-		useState<RuntimeCompatibilitySummary | null>(null);
-	const [maturity, setMaturity] = useState<RuntimeCapabilityMaturityOverview | null>(
+	const [hardware, setHardware] = useState<RuntimeHardwareOverview | null>(
 		null,
 	);
-	const [recommendations, setRecommendations] = useState<RuntimeRecommendation[]>(
-		[],
-	);
+	const [compatibility, setCompatibility] =
+		useState<RuntimeCompatibilitySummary | null>(null);
+	const [maturity, setMaturity] =
+		useState<RuntimeCapabilityMaturityOverview | null>(null);
+	const [recommendations, setRecommendations] = useState<
+		RuntimeRecommendation[]
+	>([]);
 	const [testResults, setTestResults] = useState<
 		Record<string, RuntimeEngineTestResult>
 	>({});
@@ -281,7 +284,9 @@ export function RuntimeCenter() {
 				<Card className={styles.card}>
 					<div className={styles.engineHeader}>
 						<strong>{hardware.profile.label}</strong>
-						<Badge variant="neutral">{hardware.profile.type.toUpperCase()}</Badge>
+						<Badge variant="neutral">
+							{hardware.profile.type.toUpperCase()}
+						</Badge>
 					</div>
 					<p className={styles.meta}>{hardware.profile.summary}</p>
 					<ul className={styles.machineList}>
@@ -357,7 +362,9 @@ export function RuntimeCenter() {
 										<Badge variant={statusVariant(engine.status)}>
 											{engine.status.toUpperCase()}
 										</Badge>
-										<Badge variant={engine.mode === "real" ? "success" : "warning"}>
+										<Badge
+											variant={engine.mode === "real" ? "success" : "warning"}
+										>
 											{modeLabel(engine.mode)}
 										</Badge>
 										{engineCompatibility && (
@@ -382,12 +389,17 @@ export function RuntimeCenter() {
 										? ` · ${engineCompatibility.providerLabel}`
 										: ""}
 									{engine.configured ? " · configured" : ""}
-									{engine.executableFound ? " · executable" : " · no executable"}
+									{engine.executableFound
+										? " · executable"
+										: " · no executable"}
 									{engine.modelFound ? " · model ok" : " · model missing"}
 								</p>
-								{engineCompatibility && engineCompatibility.status !== "ready" && (
-									<p className={styles.warning}>{engineCompatibility.humanReason}</p>
-								)}
+								{engineCompatibility &&
+									engineCompatibility.status !== "ready" && (
+										<p className={styles.warning}>
+											{engineCompatibility.humanReason}
+										</p>
+									)}
 								{engine.errorReason && !engineCompatibility && (
 									<p className={styles.warning}>{engine.errorReason}</p>
 								)}
@@ -417,7 +429,9 @@ export function RuntimeCenter() {
 									</p>
 								)}
 								{engine.installCommand && (
-									<p className={styles.meta}>Install: {engine.installCommand}</p>
+									<p className={styles.meta}>
+										Install: {engine.installCommand}
+									</p>
 								)}
 								<div className={styles.engineActions}>
 									{engine.autoProvisionSupported && (
@@ -427,7 +441,9 @@ export function RuntimeCenter() {
 											onClick={() => void provisionEngine(engine)}
 											disabled={busy !== null}
 										>
-											{busy === `provision-${engine.id}` ? "Installing…" : "Install"}
+											{busy === `provision-${engine.id}`
+												? "Installing…"
+												: "Install"}
 										</Button>
 									)}
 									<Button
@@ -457,7 +473,9 @@ export function RuntimeCenter() {
 								</div>
 								<p className={styles.meta}>
 									Default: {cap.defaultDisplayName ?? "—"}
-									{cap.videoPipeline ? " · video pipeline" : " · platform capability"}
+									{cap.videoPipeline
+										? " · video pipeline"
+										: " · platform capability"}
 								</p>
 								<ul className={styles.requirementList}>
 									{cap.engines.map((eng) => (

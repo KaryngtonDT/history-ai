@@ -243,12 +243,14 @@ export const RUNTIME_PROFILE_PATH = "/api/runtime/profile";
 export const RUNTIME_SELECTION_PATH = "/api/runtime/selection";
 
 export const RUNTIME_PROVISION_PATH = "/api/runtime/provision";
-export const RUNTIME_PROVISION_COMPATIBLE_PATH = "/api/runtime/provision/compatible";
+export const RUNTIME_PROVISION_COMPATIBLE_PATH =
+	"/api/runtime/provision/compatible";
 export const RUNTIME_PROVISION_PLAN_PATH = "/api/runtime/provision/plan";
 export const RUNTIME_HARDWARE_PATH = "/api/runtime/hardware";
 export const RUNTIME_HARDWARE_PROFILE_PATH = "/api/runtime/hardware/profile";
 export const RUNTIME_COMPATIBILITY_PATH = "/api/runtime/compatibility";
-export const RUNTIME_CAPABILITY_MATURITY_PATH = "/api/runtime/capabilities/maturity";
+export const RUNTIME_CAPABILITY_MATURITY_PATH =
+	"/api/runtime/capabilities/maturity";
 export const RUNTIME_DASHBOARD_PATH = "/api/runtime/dashboard";
 
 export function runtimeEngineTestPath(engineId: string): string {

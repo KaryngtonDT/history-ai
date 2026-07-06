@@ -372,7 +372,8 @@ export const pipelineFr: PipelineMessages = {
 			bootstrapLogTitle: "Journal d'activité",
 			bootstrapLogStart: "Démarrage pour la vidéo {{videoId}}",
 			bootstrapLogFetchTranscript: "GET /api/videos/{id}/transcript",
-			bootstrapLogTranscriptReady: "Transcription prête ({{segments}} segments)",
+			bootstrapLogTranscriptReady:
+				"Transcription prête ({{segments}} segments)",
 			bootstrapLogTranscriptMissing: "Transcription introuvable pour l'instant",
 			bootstrapLogFetchRenders: "GET /api/videos/{id}/render",
 			bootstrapLogRendersLoaded: "{{count}} rendu(s) trouvé(s)",
@@ -388,7 +389,8 @@ export const pipelineFr: PipelineMessages = {
 			bootstrapLogSessionReady: "Session Shadow démarrée ({{sessionId}})",
 			bootstrapLogSessionFailed: "Échec session Shadow : {{error}}",
 			bootstrapLogLoadContext: "GET /api/videos/{id}/shadow/context",
-			bootstrapLogPollTranscript: "Nouvelle vérification de la transcription...",
+			bootstrapLogPollTranscript:
+				"Nouvelle vérification de la transcription...",
 			bootstrapLogFetchStatus: "GET /api/videos/{id}/status",
 			bootstrapLogPipelineStatus: "Statut pipeline : {{status}}",
 			bootstrapLogRequeuePipeline:

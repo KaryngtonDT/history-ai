@@ -41,7 +41,11 @@ const mockDashboard = {
 		premiumEnginesReady: 0,
 		premiumEnginesTotal: 8,
 		benchmarksPassedPercent: 100,
-		lastValidation: { relative: "2 min ago", status: "pass", at: "2026-07-06T11:58:00+00:00" },
+		lastValidation: {
+			relative: "2 min ago",
+			status: "pass",
+			at: "2026-07-06T11:58:00+00:00",
+		},
 	},
 	capabilityStatuses: [
 		{
@@ -105,12 +109,14 @@ const mockDashboard = {
 	],
 	warnings: [],
 	recommendations: {
-		summary: "Premium features remain unavailable because of hardware limitations.",
+		summary:
+			"Premium features remain unavailable because of hardware limitations.",
 		pipeline: [{ stage: "lipSync", engineId: "wav2lip", installed: true }],
 	},
 	shadowCommentary: {
 		speaker: "Shadow",
-		message: "Your Runtime is healthy.\n\nAll compatible engines are operational.",
+		message:
+			"Your Runtime is healthy.\n\nAll compatible engines are operational.",
 		paragraphs: [
 			"Your Runtime is healthy.",
 			"All compatible engines are operational.",
