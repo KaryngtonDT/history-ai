@@ -22,6 +22,7 @@ parameters:
     stt.provider_default: 'faster_whisper'
     stt.faster_whisper.binary_default: 'faster-whisper'
     stt.faster_whisper.model_default: 'large-v3'
+    stt.faster_whisper.timeout_default: 7200
     translation.provider_default: 'ollama'
     translation.languages_default: 'fr,de'
     ollama.base_url_default: 'http://ollama:11434'
@@ -532,6 +533,10 @@ services:
 
     App\Infrastructure\Speech\FasterWhisperProcessRunnerInterface:
         alias: App\Infrastructure\Speech\ShellFasterWhisperProcessRunner
+
+    App\Infrastructure\Speech\ShellFasterWhisperProcessRunner:
+        arguments:
+            $timeoutSeconds: '%env(float:default:stt.faster_whisper.timeout_default:STT_FASTER_WHISPER_TIMEOUT_SECONDS)%'
 
     App\Application\Video\Ports\VideoStorageInterface:
         alias: App\Infrastructure\Video\LocalVideoStorage

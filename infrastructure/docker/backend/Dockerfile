@@ -108,7 +108,8 @@ RUN chmod +x /usr/local/bin/faster-whisper \
              /opt/lumen/install-liveportrait.sh \
              /opt/lumen/install-musetalk.sh \
              /opt/lumen/engines/*.py \
- && sed -i 's/\r$//' /usr/local/bin/f5-tts \
+ && sed -i 's/\r$//' /usr/local/bin/faster-whisper \
+             /usr/local/bin/f5-tts \
              /usr/local/bin/openvoice \
              /usr/local/bin/latentsync \
              /usr/local/bin/wav2lip \
