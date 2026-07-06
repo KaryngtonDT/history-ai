@@ -13,7 +13,7 @@ Installer: `make install-gpu-engines`
 |---|---|---|---|---|
 | F5-TTS | `/models/venvs/f5-tts` | `/models/f5` | **READY** (real) | Smoke synthesis verified (`/tmp/f5-smoke.wav`, ~1.2s) |
 | OpenVoice V2 | `/models/venvs/openvoice` | `/models/openvoice/checkpoints_v2` | **READY** (real) | Smoke clone OK (`/tmp/openvoice-smoke.wav`, ~1.6s); UniDic 775MB forced |
-| LatentSync | partial | partial | **BLOCKED** | Install OOM (exit 137); needs GPU + more RAM |
+| LatentSync | — | — | **BLOCKED** | No GPU in Docker; exit 137 was RAM OOM during pip — see `docs/reports/LatentSync-Installation-Report.md` |
 
 ### Fixes applied during install
 

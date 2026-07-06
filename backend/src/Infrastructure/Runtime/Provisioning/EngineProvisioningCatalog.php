@@ -129,7 +129,7 @@ final class EngineProvisioningCatalog
                 installCommand: 'make install-gpu-engines or: docker compose exec backend bash /opt/lumen/install-gpu-engines.sh --engine latentsync',
                 modelDownloadHint: 'https://github.com/bytedance/LatentSync',
                 modelPath: '/models/latentsync',
-                documentationPath: 'docs/operations/ENGINE_INSTALL_F5_OPENVOICE_LATENTSYNC.md#3-latentsync',
+                documentationPath: 'docs/operations/LATENTSYNC_INSTALLATION.md',
             ),
             new EngineProvisionSpec(
                 'echomimic_v2',

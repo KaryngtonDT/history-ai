@@ -301,40 +301,15 @@ PY
 }
 
 install_latentsync() {
-  log "=== Installing LatentSync ==="
-  local venv="${VENVS}/latentsync"
-  mkdir -p "${SRC}" "${MODELS_ROOT}/latentsync/checkpoints"
-  if [[ ! -d "${SRC}/LatentSync/.git" ]]; then
-    git clone --depth 1 https://github.com/bytedance/LatentSync.git "${SRC}/LatentSync"
+  local installer
+  installer="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/install-latentsync.sh"
+  if [[ ! -x "${installer}" && ! -f "${installer}" ]]; then
+    installer="/opt/lumen/install-latentsync.sh"
   fi
-  python3 -m venv "${venv}"
-  # shellcheck disable=SC1091
-  source "${venv}/bin/activate"
-  pip install -q --upgrade pip wheel
-  local idx="https://download.pytorch.org/whl/cu121"
-  if ! detect_gpu; then
-    idx="https://download.pytorch.org/whl/cpu"
-    log "WARN: No GPU — LatentSync will install but inference needs CUDA."
+  if [[ ! -f "${installer}" ]]; then
+    die "install-latentsync.sh not found"
   fi
-  pip install -q torch torchvision torchaudio --index-url "${idx}"
-  pip install -q -r "${SRC}/LatentSync/requirements.txt" || pip install -q huggingface_hub omegaconf diffusers transformers accelerate opencv-python-headless
-  pip install -q huggingface_hub
-  if [[ ! -f "${MODELS_ROOT}/latentsync/checkpoints/latentsync_unet.pt" ]]; then
-    log "Downloading LatentSync checkpoints..."
-    huggingface-cli download ByteDance/LatentSync-1.6 whisper/tiny.pt \
-      --local-dir "${MODELS_ROOT}/latentsync/checkpoints" --local-dir-use-symlinks False
-    huggingface-cli download ByteDance/LatentSync-1.6 latentsync_unet.pt \
-      --local-dir "${MODELS_ROOT}/latentsync/checkpoints" --local-dir-use-symlinks False
-  fi
-  mkdir -p "${MODELS_ROOT}/latentsync/refs"
-  if [[ ! -f "${MODELS_ROOT}/latentsync/refs/demo.mp4" ]]; then
-    ffmpeg -f lavfi -i "color=c=black:s=320x240:d=2" -f lavfi -i "sine=frequency=440:duration=2" \
-      -shortest -y "${MODELS_ROOT}/latentsync/refs/demo.mp4" 2>/dev/null || true
-    ffmpeg -i "${MODELS_ROOT}/latentsync/refs/demo.mp4" -vn -y "${MODELS_ROOT}/latentsync/refs/demo.wav" 2>/dev/null || true
-  fi
-  deactivate
-  mark_installed latentsync
-  log "LatentSync install done."
+  bash "${installer}"
 }
 
 ENGINE="all"

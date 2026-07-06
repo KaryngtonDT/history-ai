@@ -1,7 +1,7 @@
 .PHONY: help install up down ps logs config \
 	dev dev-stop prod prod-stop prod-rebuild prod-fresh prod-restart setup-engines \
 	prod-backend prod-frontend prod-worker prod-migrate prod-prune-backend-run prod-logs \
-	test test-backend test-frontend test-worker test-all ci runtime-validate runtime-benchmark provision-engines install-gpu-engines \
+	test test-backend test-frontend test-worker test-all ci runtime-validate runtime-benchmark provision-engines install-gpu-engines provision \
 	backup restore verify-backup health doctor status migrate shell-backend
 
 COMPOSE ?= docker compose
@@ -28,6 +28,7 @@ help:
 	@echo "  make setup-engines    Alias for provision-engines"
 	@echo "  make provision-engines Pull models + auto-provision supported engines"
 	@echo "  make install-gpu-engines Install F5-TTS, OpenVoice, LatentSync venvs"
+	@echo "  make provision ENGINE=latentsync  Strict LatentSync install (GPU required)"
 	@echo "  make prod-restart     Restart prod-like stack"
 	@echo "  make prod-fresh       DESTROY volumes + reset (confirmation)"
 	@echo ""
@@ -108,6 +109,14 @@ provision-engines:
 
 install-gpu-engines:
 	$(BACKEND_EXEC) bash /opt/lumen/install-gpu-engines.sh --engine all
+
+ENGINE ?= all
+provision:
+	@if [ "$(ENGINE)" = "all" ]; then bash scripts/provision-engines.sh; \
+	elif [ "$(ENGINE)" = "latentsync" ]; then $(BACKEND_EXEC) bash /opt/lumen/install-latentsync.sh; \
+	elif [ "$(ENGINE)" = "openvoice" ]; then $(BACKEND_EXEC) bash /opt/lumen/install-gpu-engines.sh --engine openvoice; \
+	elif [ "$(ENGINE)" = "f5-tts" ] || [ "$(ENGINE)" = "f5" ]; then $(BACKEND_EXEC) bash /opt/lumen/install-gpu-engines.sh --engine f5; \
+	else echo "Unknown ENGINE=$(ENGINE). Use: latentsync, openvoice, f5-tts, or all"; exit 1; fi
 
 prod-restart:
 	$(COMPOSE_PROD) restart
