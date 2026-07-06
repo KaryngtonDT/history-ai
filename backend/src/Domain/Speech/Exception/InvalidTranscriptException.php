@@ -6,6 +6,6 @@ namespace App\Domain\Speech\Exception;
 
 use DomainException;
 
-final class InvalidTranscriptException extends DomainException
+class InvalidTranscriptException extends DomainException
 {
 }
