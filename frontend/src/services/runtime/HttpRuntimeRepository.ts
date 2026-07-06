@@ -6,9 +6,14 @@ import {
 	RUNTIME_PATH,
 	RUNTIME_PIPELINE_VALIDATE_PATH,
 	RUNTIME_PROFILES_PATH,
+	RUNTIME_COMPATIBILITY_PATH,
+	RUNTIME_HARDWARE_PATH,
+	RUNTIME_PROVISION_COMPATIBLE_PATH,
+	RUNTIME_PROVISION_PLAN_PATH,
 	RUNTIME_PROVISION_PATH,
 	RUNTIME_READINESS_PATH,
 	RUNTIME_RECOMMENDATIONS_PATH,
+	runtimeEngineCompatibilityPath,
 	runtimeEngineProvisionPath,
 	runtimeEngineTestPath,
 } from "@/config/api";
@@ -24,6 +29,9 @@ import type {
 	RuntimeRecommendation,
 	RuntimeValidationReport,
 	RuntimeEngineTestResult,
+	RuntimeHardwareOverview,
+	RuntimeCompatibilitySummary,
+	RuntimeEngineCompatibility,
 } from "./types";
 
 export class HttpRuntimeRepository implements RuntimeRepository {
@@ -90,6 +98,19 @@ export class HttpRuntimeRepository implements RuntimeRepository {
 		);
 	}
 
+	provisionCompatibleAll(): Promise<Record<string, unknown>> {
+		return this.httpClient.post<Record<string, unknown>>(
+			RUNTIME_PROVISION_COMPATIBLE_PATH,
+			{},
+		);
+	}
+
+	getProvisioningPlan(): Promise<Record<string, unknown>> {
+		return this.httpClient.get<Record<string, unknown>>(
+			RUNTIME_PROVISION_PLAN_PATH,
+		);
+	}
+
 	runFullBenchmark(): Promise<Record<string, unknown>> {
 		return this.httpClient.post<Record<string, unknown>>(
 			RUNTIME_BENCHMARK_FULL_PATH,
@@ -101,6 +122,22 @@ export class HttpRuntimeRepository implements RuntimeRepository {
 		return this.httpClient.post<RuntimeValidationReport>(
 			RUNTIME_PIPELINE_VALIDATE_PATH,
 			{},
+		);
+	}
+
+	getHardware(): Promise<RuntimeHardwareOverview> {
+		return this.httpClient.get<RuntimeHardwareOverview>(RUNTIME_HARDWARE_PATH);
+	}
+
+	getCompatibility(): Promise<RuntimeCompatibilitySummary> {
+		return this.httpClient.get<RuntimeCompatibilitySummary>(
+			RUNTIME_COMPATIBILITY_PATH,
+		);
+	}
+
+	getEngineCompatibility(engineId: string): Promise<RuntimeEngineCompatibility> {
+		return this.httpClient.get<RuntimeEngineCompatibility>(
+			runtimeEngineCompatibilityPath(engineId),
 		);
 	}
 }

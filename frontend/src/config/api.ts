@@ -243,6 +243,11 @@ export const RUNTIME_PROFILE_PATH = "/api/runtime/profile";
 export const RUNTIME_SELECTION_PATH = "/api/runtime/selection";
 
 export const RUNTIME_PROVISION_PATH = "/api/runtime/provision";
+export const RUNTIME_PROVISION_COMPATIBLE_PATH = "/api/runtime/provision/compatible";
+export const RUNTIME_PROVISION_PLAN_PATH = "/api/runtime/provision/plan";
+export const RUNTIME_HARDWARE_PATH = "/api/runtime/hardware";
+export const RUNTIME_HARDWARE_PROFILE_PATH = "/api/runtime/hardware/profile";
+export const RUNTIME_COMPATIBILITY_PATH = "/api/runtime/compatibility";
 
 export function runtimeEngineTestPath(engineId: string): string {
 	return `${RUNTIME_PATH}/engines/${engineId}/test`;
@@ -254,6 +259,14 @@ export function runtimeEngineProvisionPath(engineId: string): string {
 
 export function runtimeReportPath(pipelineId: string): string {
 	return `${RUNTIME_PATH}/report/${pipelineId}`;
+}
+
+export function runtimeEngineCompatibilityPath(engineId: string): string {
+	return `${RUNTIME_PATH}/engines/${engineId}/compatibility`;
+}
+
+export function runtimeEngineBlockedReasonPath(engineId: string): string {
+	return `${RUNTIME_PATH}/engines/${engineId}/blocked-reason`;
 }
 
 export const PIPELINE_PATH = "/api/pipeline";

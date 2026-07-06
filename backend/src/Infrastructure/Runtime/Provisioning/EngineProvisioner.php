@@ -14,6 +14,7 @@ final class EngineProvisioner
     public function __construct(
         private readonly EngineRepositoryInterface $engineRepository,
         private readonly EngineTestRunner $engineTestRunner,
+        private readonly ProvisioningCompatibilityGate $compatibilityGate,
         private readonly string $ollamaBaseUrl,
     ) {
     }
@@ -23,6 +24,11 @@ final class EngineProvisioner
      */
     public function provision(string $engineId): array
     {
+        $blocked = $this->compatibilityGate->blockedPayload($engineId);
+        if (null !== $blocked) {
+            return $blocked;
+        }
+
         $spec = EngineProvisioningCatalog::find($engineId);
 
         if (null === $spec) {
@@ -43,6 +49,7 @@ final class EngineProvisioner
             'f5_tts' => $this->provisionGpuEngine('f5', $output),
             'openvoice_v2' => $this->provisionGpuEngine('openvoice', $output),
             'latentsync' => $this->provisionGpuEngine('latentsync', $output),
+            'wav2lip' => $this->provisionWav2Lip($output),
             'ffmpeg', 'ffmpeg_nvenc', 'ffmpeg_av1' => $this->verifyFfmpeg($output),
             default => false,
         };
@@ -130,6 +137,21 @@ final class EngineProvisioner
             escapeshellarg($payload),
         ));
         $process->setTimeout(900);
+        $process->run();
+        $output[] = trim($process->getOutput().$process->getErrorOutput());
+
+        return $process->isSuccessful();
+    }
+
+    /**
+     * @param list<string> $output
+     */
+    private function provisionWav2Lip(array &$output): bool
+    {
+        $process = Process::fromShellCommandline(
+            'bash /opt/lumen/install-wav2lip.sh 2>&1',
+        );
+        $process->setTimeout(7200);
         $process->run();
         $output[] = trim($process->getOutput().$process->getErrorOutput());
 

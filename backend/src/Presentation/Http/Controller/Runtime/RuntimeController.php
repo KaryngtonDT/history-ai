@@ -133,6 +133,20 @@ final class RuntimeController extends AbstractController
         return $this->json($this->platform->provisionAll());
     }
 
+    #[OA\Post(operationId: 'provisionCompatibleRuntimeEngines', tags: ['Runtime'])]
+    #[Route('/provision/compatible', name: 'api_runtime_provision_compatible', methods: ['POST'])]
+    public function provisionCompatible(): JsonResponse
+    {
+        return $this->json($this->platform->provisionCompatibleAll());
+    }
+
+    #[OA\Get(operationId: 'getRuntimeProvisioningPlan', tags: ['Runtime'])]
+    #[Route('/provision/plan', name: 'api_runtime_provision_plan', methods: ['GET'])]
+    public function provisioningPlan(): JsonResponse
+    {
+        return $this->json($this->platform->provisioningPlan());
+    }
+
     #[OA\Get(operationId: 'getRuntimeReport', tags: ['Runtime'])]
     #[Route('/report/{pipelineId}', name: 'api_runtime_report', methods: ['GET'])]
     public function report(string $pipelineId): JsonResponse
@@ -144,5 +158,52 @@ final class RuntimeController extends AbstractController
         }
 
         return $this->json($report);
+    }
+
+    #[OA\Get(operationId: 'getRuntimeHardware', tags: ['Runtime'])]
+    #[Route('/hardware', name: 'api_runtime_hardware', methods: ['GET'])]
+    public function hardware(): JsonResponse
+    {
+        return $this->json($this->platform->hardware());
+    }
+
+    #[OA\Get(operationId: 'getRuntimeHardwareProfile', tags: ['Runtime'])]
+    #[Route('/hardware/profile', name: 'api_runtime_hardware_profile', methods: ['GET'])]
+    public function hardwareProfile(): JsonResponse
+    {
+        return $this->json($this->platform->hardwareProfile());
+    }
+
+    #[OA\Get(operationId: 'getRuntimeCompatibility', tags: ['Runtime'])]
+    #[Route('/compatibility', name: 'api_runtime_compatibility', methods: ['GET'])]
+    public function compatibility(): JsonResponse
+    {
+        return $this->json($this->platform->compatibility());
+    }
+
+    #[OA\Get(operationId: 'getRuntimeEngineCompatibility', tags: ['Runtime'])]
+    #[Route('/engines/{id}/compatibility', name: 'api_runtime_engine_compatibility', methods: ['GET'])]
+    public function engineCompatibility(string $id): JsonResponse
+    {
+        $result = $this->platform->engineCompatibility($id);
+
+        if (null === $result) {
+            return $this->json(['error' => 'Engine not found'], 404);
+        }
+
+        return $this->json($result);
+    }
+
+    #[OA\Get(operationId: 'getRuntimeEngineBlockedReason', tags: ['Runtime'])]
+    #[Route('/engines/{id}/blocked-reason', name: 'api_runtime_engine_blocked_reason', methods: ['GET'])]
+    public function engineBlockedReason(string $id): JsonResponse
+    {
+        $result = $this->platform->engineBlockedReason($id);
+
+        if (null === $result) {
+            return $this->json(['error' => 'Engine not found'], 404);
+        }
+
+        return $this->json($result);
     }
 }

@@ -27,6 +27,7 @@ help:
 	@echo "  make prod-rebuild     Rebuild all prod-like images"
 	@echo "  make setup-engines    Alias for provision-engines"
 	@echo "  make provision-engines Pull models + auto-provision supported engines"
+	@echo "  make provision-compatible  Install hardware-compatible engines only"
 	@echo "  make install-gpu-engines Install F5-TTS, OpenVoice, LatentSync venvs"
 	@echo "  make provision ENGINE=latentsync  Strict LatentSync install (GPU required)"
 	@echo "  make prod-restart     Restart prod-like stack"
@@ -106,6 +107,9 @@ setup-engines: provision-engines
 
 provision-engines:
 	bash scripts/provision-engines.sh
+
+provision-compatible:
+	bash scripts/provision-compatible-engines.sh
 
 install-gpu-engines:
 	$(BACKEND_EXEC) bash /opt/lumen/install-gpu-engines.sh --engine all

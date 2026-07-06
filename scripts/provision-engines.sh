@@ -29,7 +29,7 @@ echo "[2/5] Creating model and storage directories..."
   /models/whisper /models/parakeet /models/canary \
   /models/f5 /models/kokoro /models/dia \
   /models/openvoice /models/chatterbox /models/xtts \
-  /models/latentsync /models/echomimic /models/musetalk \
+  /models/latentsync /models/echomimic /models/wav2lip \
   /var/www/html/storage/runtime /var/www/html/storage/runtime/benchmark /var/www/html/storage/cache /var/www/html/storage/logs'
 
 echo ""

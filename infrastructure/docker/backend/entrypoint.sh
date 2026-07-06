@@ -21,7 +21,7 @@ mkdir -p \
 
 chown -R www-data:www-data /var/www/html/storage
 
-mkdir -p /models/whisper /models/parakeet /models/canary /models/f5 /models/kokoro /models/dia /models/openvoice /models/chatterbox /models/xtts /models/latentsync /models/echomimic /models/musetalk
+mkdir -p /models/whisper /models/parakeet /models/canary /models/f5 /models/kokoro /models/dia /models/openvoice /models/chatterbox /models/xtts /models/latentsync /models/echomimic /models/wav2lip
 
 php bin/console messenger:setup-transports --no-interaction 2>/dev/null || true
 

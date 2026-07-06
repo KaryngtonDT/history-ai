@@ -186,13 +186,13 @@ final class EngineCatalogDefinitions
                 'echomimic',
             ),
             new EngineDefinition(
-                'musetalk',
-                'MuseTalk',
+                'wav2lip',
+                'Wav2Lip',
                 EngineCatalogCapability::LipSync,
                 EngineFamily::LipSync,
                 EngineCatalogRole::Alternative2,
-                'musetalk',
-                'musetalk',
+                'wav2lip',
+                'wav2lip',
             ),
 
             // Video Render

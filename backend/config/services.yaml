@@ -741,6 +741,17 @@ services:
     App\Application\Runtime\RuntimePlatformInterface:
         alias: App\Infrastructure\Runtime\RuntimePlatformService
 
+    App\Domain\Hardware\HardwareRepositoryInterface:
+        alias: App\Infrastructure\Hardware\SystemHardwareRepository
+
+    App\Infrastructure\Hardware\HardwareReportStore:
+        arguments:
+            $store: '@app.storage.runtime'
+
+    App\Infrastructure\Runtime\Provisioning\IntelligentEngineProvisioner:
+        arguments:
+            $projectDir: '%kernel.project_dir%/..'
+
     App\Infrastructure\Runtime\Persistence\FileRuntimeRepository:
         arguments:
             $store: '@app.storage.runtime'

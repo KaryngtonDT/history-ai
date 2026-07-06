@@ -48,12 +48,32 @@ export class RuntimeService {
 		return this.repository.provisionAll();
 	}
 
+	provisionCompatibleAll() {
+		return this.repository.provisionCompatibleAll();
+	}
+
+	getProvisioningPlan() {
+		return this.repository.getProvisioningPlan();
+	}
+
 	runFullBenchmark() {
 		return this.repository.runFullBenchmark();
 	}
 
 	validatePipeline() {
 		return this.repository.validatePipeline();
+	}
+
+	getHardware() {
+		return this.repository.getHardware();
+	}
+
+	getCompatibility() {
+		return this.repository.getCompatibility();
+	}
+
+	getEngineCompatibility(engineId: string) {
+		return this.repository.getEngineCompatibility(engineId);
 	}
 }
 

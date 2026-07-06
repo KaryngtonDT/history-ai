@@ -11,12 +11,15 @@ use App\Domain\Runtime\RuntimeConfiguration;
 use App\Domain\Runtime\RuntimeRepositoryInterface;
 use App\Domain\Runtime\RuntimeStatus;
 use App\Infrastructure\Runtime\Benchmark\BenchmarkRunner;
+use App\Infrastructure\Runtime\Compatibility\RuntimeCompatibilityService;
+use App\Infrastructure\Runtime\Provisioning\IntelligentEngineProvisioner;
 use App\Infrastructure\Runtime\Discovery\EngineDiscovery;
 use App\Infrastructure\Runtime\Health\HealthMonitor;
 use App\Infrastructure\Runtime\Intelligence\AutoSelectionEngine;
 use App\Infrastructure\Runtime\Intelligence\RecommendationEngine;
 use App\Infrastructure\Runtime\Provisioning\EngineProvisioner;
 use App\Infrastructure\Runtime\Readiness\ReadinessEngine;
+use App\Infrastructure\Hardware\SystemHardwareRepository;
 
 final class RuntimePlatformService implements RuntimePlatformInterface
 {
@@ -29,6 +32,9 @@ final class RuntimePlatformService implements RuntimePlatformInterface
         private readonly BenchmarkRunner $benchmarkRunner,
         private readonly RuntimeRepositoryInterface $runtimeRepository,
         private readonly EngineProvisioner $engineProvisioner,
+        private readonly RuntimeCompatibilityService $compatibilityService,
+        private readonly SystemHardwareRepository $hardwareRepository,
+        private readonly IntelligentEngineProvisioner $intelligentEngineProvisioner,
     ) {
     }
 
@@ -49,7 +55,23 @@ final class RuntimePlatformService implements RuntimePlatformInterface
 
     public function readiness(): array
     {
-        return $this->readinessEngine->evaluate()->toArray();
+        $readiness = $this->readinessEngine->evaluate()->toArray();
+        $compatibilityByEngine = [];
+
+        foreach ($this->compatibilityService->evaluateAll() as $result) {
+            $compatibilityByEngine[$result->engineId] = $result->toArray();
+        }
+
+        $readiness['engines'] = array_map(
+            static function (array $engine) use ($compatibilityByEngine): array {
+                $engine['compatibility'] = $compatibilityByEngine[$engine['id']] ?? null;
+
+                return $engine;
+            },
+            $readiness['engines'],
+        );
+
+        return $readiness;
     }
 
     public function health(): array
@@ -204,5 +226,63 @@ final class RuntimePlatformService implements RuntimePlatformInterface
     public function provisionAll(): array
     {
         return $this->engineProvisioner->provisionAll();
+    }
+
+    public function provisionCompatibleAll(): array
+    {
+        return $this->intelligentEngineProvisioner->provisionCompatibleAll();
+    }
+
+    public function provisioningPlan(): array
+    {
+        return $this->intelligentEngineProvisioner->buildPlan()->toArray();
+    }
+
+    public function hardware(): array
+    {
+        return $this->hardwareRepository->overview();
+    }
+
+    public function hardwareProfile(): array
+    {
+        $report = $this->hardwareRepository->detect();
+
+        return $report->profile->toArray();
+    }
+
+    public function compatibility(): array
+    {
+        return $this->compatibilityService->compatibilitySummary();
+    }
+
+    public function engineCompatibility(string $engineId): ?array
+    {
+        $result = $this->compatibilityService->evaluateEngine($engineId);
+
+        return $result?->toArray();
+    }
+
+    public function engineBlockedReason(string $engineId): ?array
+    {
+        $result = $this->compatibilityService->evaluateEngine($engineId);
+        if (null === $result) {
+            return null;
+        }
+
+        return [
+            'engineId' => $result->engineId,
+            'status' => $result->status,
+            'hardwareProfile' => $result->hardwareProfile->value,
+            'blockedReasonCode' => $result->blockedReasonCode->value,
+            'humanReason' => $result->humanReason,
+            'missingRequirements' => $result->missingRequirements,
+            'recommendedAlternative' => $result->recommendedAlternative,
+            'canBeFixedByInstall' => $result->canBeFixedByInstall,
+            'canBeFixedByHardware' => $result->canBeFixedByHardware,
+            'canBeFixedByRemoteProvider' => $result->canBeFixedByRemoteProvider,
+            'documentationLink' => $result->documentationLink,
+            'fixTypes' => array_map(static fn ($type) => $type->value, $result->fixTypes),
+            'severity' => $result->severity->value,
+        ];
     }
 }

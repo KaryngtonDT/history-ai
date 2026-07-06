@@ -1,6 +1,9 @@
 import type {
 	RuntimeCatalog,
+	RuntimeCompatibilitySummary,
 	RuntimeEngine,
+	RuntimeEngineCompatibility,
+	RuntimeHardwareOverview,
 	RuntimeHealth,
 	RuntimeOverview,
 	RuntimeProfile,
@@ -21,6 +24,11 @@ export interface RuntimeRepository {
 	testEngine(engineId: string): Promise<RuntimeEngineTestResult>;
 	provisionEngine(engineId: string): Promise<Record<string, unknown>>;
 	provisionAll(): Promise<Record<string, unknown>>;
+	provisionCompatibleAll(): Promise<Record<string, unknown>>;
+	getProvisioningPlan(): Promise<Record<string, unknown>>;
 	runFullBenchmark(): Promise<Record<string, unknown>>;
 	validatePipeline(): Promise<RuntimeValidationReport>;
+	getHardware(): Promise<RuntimeHardwareOverview>;
+	getCompatibility(): Promise<RuntimeCompatibilitySummary>;
+	getEngineCompatibility(engineId: string): Promise<RuntimeEngineCompatibility>;
 }

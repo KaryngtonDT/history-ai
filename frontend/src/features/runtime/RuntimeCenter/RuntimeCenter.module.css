@@ -99,3 +99,33 @@
 .error {
 	color: var(--color-danger);
 }
+
+.machineList {
+	margin: 0.5rem 0 0;
+	padding-left: 1.25rem;
+	font-size: 0.875rem;
+}
+
+.summaryGrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 0.75rem;
+	margin-top: 0.75rem;
+	font-size: 0.875rem;
+}
+
+.blockedBox {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.blockedDetails {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 0.75rem;
+	border: 1px solid var(--color-border);
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+}

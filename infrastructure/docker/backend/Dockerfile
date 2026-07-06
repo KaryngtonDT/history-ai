@@ -60,32 +60,41 @@ COPY infrastructure/docker/backend/bin/faster-whisper \
      infrastructure/docker/backend/bin/f5-tts \
      infrastructure/docker/backend/bin/openvoice \
      infrastructure/docker/backend/bin/latentsync \
+     infrastructure/docker/backend/bin/wav2lip \
      /usr/local/bin/
 COPY infrastructure/docker/backend/placeholders/f5-tts \
      infrastructure/docker/backend/placeholders/openvoice \
      infrastructure/docker/backend/placeholders/latentsync \
+     infrastructure/docker/backend/placeholders/wav2lip \
      /opt/lumen/placeholders/
 COPY infrastructure/docker/backend/engines/ /opt/lumen/engines/
 COPY scripts/install-f5-openvoice-latentsync.sh /opt/lumen/install-gpu-engines.sh
 COPY scripts/install-latentsync.sh /opt/lumen/install-latentsync.sh
+COPY scripts/install-wav2lip.sh /opt/lumen/install-wav2lip.sh
 RUN chmod +x /usr/local/bin/faster-whisper \
              /usr/local/bin/f5-tts \
              /usr/local/bin/openvoice \
              /usr/local/bin/latentsync \
+             /usr/local/bin/wav2lip \
              /opt/lumen/placeholders/f5-tts \
              /opt/lumen/placeholders/openvoice \
              /opt/lumen/placeholders/latentsync \
+             /opt/lumen/placeholders/wav2lip \
              /opt/lumen/install-gpu-engines.sh \
              /opt/lumen/install-latentsync.sh \
+             /opt/lumen/install-wav2lip.sh \
              /opt/lumen/engines/*.py \
  && sed -i 's/\r$//' /usr/local/bin/f5-tts \
              /usr/local/bin/openvoice \
              /usr/local/bin/latentsync \
+             /usr/local/bin/wav2lip \
              /opt/lumen/placeholders/f5-tts \
              /opt/lumen/placeholders/openvoice \
              /opt/lumen/placeholders/latentsync \
+             /opt/lumen/placeholders/wav2lip \
              /opt/lumen/install-gpu-engines.sh \
              /opt/lumen/install-latentsync.sh \
+             /opt/lumen/install-wav2lip.sh \
              /opt/lumen/engines/*.py
 
 COPY infrastructure/docker/backend/nginx.conf /etc/nginx/conf.d/default.conf

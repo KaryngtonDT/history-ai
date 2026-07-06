@@ -1,0 +1,9 @@
+#!/bin/bash
+set -euo pipefail
+VENV_PYTHON="/models/venvs/wav2lip/bin/python"
+RUNNER="/opt/lumen/engines/wav2lip_runner.py"
+if [[ -x "${VENV_PYTHON}" && -f "${RUNNER}" && -f "/models/wav2lip/wav2lip_gan.pth" ]]; then
+  export WAV2LIP_SRC="/models/src/Wav2Lip"
+  exec "${VENV_PYTHON}" "${RUNNER}" "$@"
+fi
+exec /opt/lumen/placeholders/wav2lip "$@"

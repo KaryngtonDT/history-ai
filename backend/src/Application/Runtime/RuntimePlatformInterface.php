@@ -84,4 +84,39 @@ interface RuntimePlatformInterface
      * @return array<string, mixed>
      */
     public function provisionAll(): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function provisionCompatibleAll(): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function provisioningPlan(): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function hardware(): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function hardwareProfile(): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function compatibility(): array;
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function engineCompatibility(string $engineId): ?array;
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function engineBlockedReason(string $engineId): ?array;
 }

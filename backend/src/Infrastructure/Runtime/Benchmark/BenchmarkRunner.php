@@ -36,7 +36,7 @@ final class BenchmarkRunner
             'ollama_gemma3', 'ollama_qwen3', 'ollama_deepseek_r1_distill',
             'f5_tts', 'kokoro', 'dia',
             'openvoice_v2', 'chatterbox', 'xtts_v2',
-            'latentsync', 'echomimic_v2', 'musetalk',
+            'latentsync', 'echomimic_v2', 'wav2lip',
             'ffmpeg', 'ffmpeg_nvenc', 'ffmpeg_av1',
         ];
 

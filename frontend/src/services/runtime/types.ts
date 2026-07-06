@@ -19,6 +19,28 @@ export interface RuntimeEngineTestResult {
 	at?: string;
 }
 
+export interface RuntimeEngineCompatibility {
+	engineId: string;
+	status: string;
+	hardwareProfile: string;
+	hardwareProfileLabel?: string;
+	blockedReasonCode: string;
+	blockedReasonLabel?: string;
+	humanReason: string;
+	missingRequirements: string[];
+	recommendedAlternative?: string | null;
+	canBeFixedByInstall: boolean;
+	canBeFixedByHardware: boolean;
+	canBeFixedByRemoteProvider: boolean;
+	severity: string;
+	provider: string;
+	providerLabel?: string;
+	fixTypes?: string[];
+	fixTypeLabels?: string[];
+	documentationLink?: string | null;
+	hardwareCompatible?: boolean;
+}
+
 export interface RuntimeEngine {
 	id: string;
 	displayName: string;
@@ -42,6 +64,7 @@ export interface RuntimeEngine {
 	modelDownloadHint?: string | null;
 	documentationPath?: string | null;
 	lastTestResult?: RuntimeEngineTestResult | null;
+	compatibility?: RuntimeEngineCompatibility | null;
 }
 
 export interface RuntimeReadiness {
@@ -110,4 +133,46 @@ export interface RuntimeValidationReport {
 	status: string;
 	steps: RuntimeValidationStep[];
 	validatedAt: string;
+}
+
+export interface RuntimeHardwareCapabilities {
+	cpuModel?: string | null;
+	ramTotalGb?: number | null;
+	ramAvailableGb?: number | null;
+	gpuVendor?: string | null;
+	gpuName?: string | null;
+	vramGb?: number | null;
+	cudaAvailable: boolean;
+	rocmAvailable: boolean;
+	directMlAvailable: boolean;
+	dockerGpuAccess: boolean;
+	wsl2: boolean;
+	dockerMemoryLimitGb?: number | null;
+	os?: string | null;
+	pythonVersion?: string | null;
+	ffmpegAvailable: boolean;
+	ollamaAvailable: boolean;
+	diskFreeGb?: number | null;
+}
+
+export interface RuntimeHardwareProfile {
+	type: string;
+	label: string;
+	summary: string;
+	capabilities: RuntimeHardwareCapabilities;
+}
+
+export interface RuntimeHardwareOverview {
+	profile: RuntimeHardwareProfile;
+	capabilities: RuntimeHardwareCapabilities;
+	detectedAt: string;
+	recommendedPipeline: Record<string, string>;
+}
+
+export interface RuntimeCompatibilitySummary {
+	hardwareProfile: RuntimeHardwareProfile;
+	engines: RuntimeEngineCompatibility[];
+	blockedByHardware: string[];
+	blockedByInstall: string[];
+	readyNow: string[];
 }
