@@ -35,6 +35,15 @@ class VideoJobRecord
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_IMMUTABLE)]
     private DateTimeImmutable $createdAt;
 
+    #[ORM\Column(name: 'failure_message', type: Types::TEXT, nullable: true)]
+    private ?string $failureMessage = null;
+
+    #[ORM\Column(name: 'failed_stage', length: 64, nullable: true)]
+    private ?string $failedStage = null;
+
+    #[ORM\Column(name: 'last_processing_duration_seconds', type: Types::FLOAT, nullable: true)]
+    private ?float $lastProcessingDurationSeconds = null;
+
     private function __construct()
     {
     }
@@ -55,6 +64,9 @@ class VideoJobRecord
         $this->language = $job->language();
         $this->status = $job->status();
         $this->storagePath = $job->storagePath() ?? '';
+        $this->failureMessage = $job->failureMessage();
+        $this->failedStage = $job->failedStage();
+        $this->lastProcessingDurationSeconds = $job->lastProcessingDurationSeconds();
     }
 
     public function toDomain(): VideoJob
@@ -66,6 +78,9 @@ class VideoJobRecord
             $this->status,
             $this->createdAt,
             $this->storagePath,
+            $this->failureMessage,
+            $this->failedStage,
+            $this->lastProcessingDurationSeconds,
         );
     }
 }

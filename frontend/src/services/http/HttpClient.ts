@@ -1,5 +1,9 @@
 import { appendActivityLog } from "@/features/activity/activityLogStore";
 import { ApiError, NetworkError } from "@/shared/errors";
+import {
+	formatApiErrorBody,
+	readApiErrorResponse,
+} from "@/shared/errors/formatApiErrorBody";
 
 export interface PostFormDataOptions {
 	onProgress?: (progress: number) => void;
@@ -21,14 +25,17 @@ export class HttpClient {
 			});
 
 			if (!response.ok) {
+				const { body, detail } = await readApiErrorResponse(response);
+				const detailSuffix = detail ? `: ${detail}` : "";
 				appendActivityLog(
-					`GET ${path} failed (${response.status})`,
+					`GET ${path} failed (${response.status})${detailSuffix}`,
 					"error",
 					"http",
 				);
 				throw new ApiError(
 					`GET ${path} failed (${response.status})`,
 					response.status,
+					body,
 				);
 			}
 
@@ -166,14 +173,17 @@ export class HttpClient {
 			});
 
 			if (!response.ok) {
+				const { body, detail } = await readApiErrorResponse(response);
+				const detailSuffix = detail ? `: ${detail}` : "";
 				appendActivityLog(
-					`${method} ${path} failed (${response.status})`,
+					`${method} ${path} failed (${response.status})${detailSuffix}`,
 					"error",
 					"http",
 				);
 				throw new ApiError(
 					`${method} ${path} failed (${response.status})`,
 					response.status,
+					body,
 				);
 			}
 

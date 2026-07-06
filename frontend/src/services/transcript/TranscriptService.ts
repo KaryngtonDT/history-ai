@@ -1,4 +1,4 @@
-import type { TranscriptRepository } from "./TranscriptRepository";
+import type { TranscriptLoadResult, TranscriptRepository } from "./TranscriptRepository";
 import { createTranscriptRepository } from "./TranscriptRepositoryFactory";
 import type { VideoTranscript } from "./types";
 
@@ -20,6 +20,16 @@ export class TranscriptService {
 		}
 
 		return this.repository.getTranscript(normalizedVideoId);
+	}
+
+	loadTranscript(videoId: string): Promise<TranscriptLoadResult> {
+		const normalizedVideoId = videoId.trim();
+
+		if (normalizedVideoId === "" || !UUID_PATTERN.test(normalizedVideoId)) {
+			return Promise.resolve({ transcript: null });
+		}
+
+		return this.repository.loadTranscript(normalizedVideoId);
 	}
 }
 

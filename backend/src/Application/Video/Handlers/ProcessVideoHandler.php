@@ -58,6 +58,8 @@ final class ProcessVideoHandler
 
     private float $initialQueueTimeSeconds = 0.0;
 
+    private ?PipelineStageType $currentStage = null;
+
     public function __construct(
         private readonly VideoRepositoryInterface $videoRepository,
         private readonly AIProviderResolverInterface $aiProviderResolver,
@@ -177,7 +179,11 @@ final class ProcessVideoHandler
             $succeeded = true;
         } catch (Throwable $throwable) {
             $failureMessage = $throwable->getMessage();
-            $this->videoRepository->save($processing->fail());
+            $this->videoRepository->save($processing->fail(
+                $failureMessage,
+                $this->currentStage?->value,
+                microtime(true) - $this->pipelineStartedAt,
+            ));
         } finally {
             $this->pipelineTelemetryRecorder->record(
                 $videoId,
@@ -243,6 +249,7 @@ final class ProcessVideoHandler
      */
     private function runScheduledStage(PipelineStageType $stage, callable $callback): void
     {
+        $this->currentStage = $stage;
         $this->runtimeScheduleContext->updateStage($stage, ScheduledStageStatus::Running);
         $startedAt = microtime(true);
 

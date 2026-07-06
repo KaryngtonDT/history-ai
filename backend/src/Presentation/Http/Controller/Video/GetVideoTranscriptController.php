@@ -7,6 +7,7 @@ namespace App\Presentation\Http\Controller\Video;
 use App\Application\Speech\Handlers\GetVideoTranscriptHandler;
 use App\Application\Speech\Queries\GetVideoTranscriptQuery;
 use App\Domain\Speech\Exception\InvalidTranscriptException;
+use App\Domain\Speech\Exception\TranscriptNotFoundException;
 use App\Presentation\Http\Response\Speech\VideoTranscriptResponse;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -48,8 +49,13 @@ final class GetVideoTranscriptController extends AbstractController
     {
         try {
             $result = $handler(new GetVideoTranscriptQuery($videoId));
-        } catch (InvalidTranscriptException) {
-            return $this->json(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
+        } catch (TranscriptNotFoundException $exception) {
+            return $this->json($exception->toPayload(), Response::HTTP_BAD_REQUEST);
+        } catch (InvalidTranscriptException $exception) {
+            return $this->json([
+                'error' => 'invalid_transcript_request',
+                'message' => $exception->getMessage(),
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         return $this->json(VideoTranscriptResponse::fromResult($result)->toArray());

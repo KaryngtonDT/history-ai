@@ -14,6 +14,9 @@ final readonly class GetVideoStatusResult
         public string $originalFilename,
         public string $language,
         public string $createdAt,
+        public ?string $failureMessage = null,
+        public ?string $failedStage = null,
+        public ?float $lastProcessingDurationSeconds = null,
     ) {
     }
 
@@ -25,6 +28,9 @@ final readonly class GetVideoStatusResult
             $job->originalFilename(),
             $job->language()->value,
             $job->createdAt()->format(DATE_ATOM),
+            $job->failureMessage(),
+            $job->failedStage(),
+            $job->lastProcessingDurationSeconds(),
         );
     }
 }

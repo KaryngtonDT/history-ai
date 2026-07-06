@@ -1,8 +1,23 @@
 import type { TranscriptRepository } from "./TranscriptRepository";
+import type { TranscriptLoadResult } from "./TranscriptRepository";
 import type { VideoTranscript } from "./types";
 
 export class MockTranscriptRepository implements TranscriptRepository {
 	async getTranscript(videoId: string): Promise<VideoTranscript | null> {
+		const result = await this.loadTranscript(videoId);
+
+		return result.transcript;
+	}
+
+	async loadTranscript(videoId: string): Promise<TranscriptLoadResult> {
+		const transcript = await this.loadMockTranscript(videoId);
+
+		return { transcript };
+	}
+
+	private async loadMockTranscript(
+		videoId: string,
+	): Promise<VideoTranscript | null> {
 		if (videoId.trim() === "") {
 			return null;
 		}

@@ -7,6 +7,7 @@ function createRepositoryMock(
 ): TranscriptRepository {
 	return {
 		getTranscript: vi.fn().mockResolvedValue(null),
+		loadTranscript: vi.fn().mockResolvedValue({ transcript: null }),
 		...overrides,
 	};
 }

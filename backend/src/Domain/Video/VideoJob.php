@@ -18,6 +18,9 @@ final readonly class VideoJob
         private VideoStatus $status,
         private DateTimeImmutable $createdAt,
         private ?string $storagePath = null,
+        private ?string $failureMessage = null,
+        private ?string $failedStage = null,
+        private ?float $lastProcessingDurationSeconds = null,
     ) {
         $this->originalFilename = self::normalizeFilename($originalFilename);
     }
@@ -44,6 +47,9 @@ final readonly class VideoJob
         VideoStatus $status,
         DateTimeImmutable $createdAt,
         string $storagePath,
+        ?string $failureMessage = null,
+        ?string $failedStage = null,
+        ?float $lastProcessingDurationSeconds = null,
     ): self {
         return new self(
             $id,
@@ -52,6 +58,9 @@ final readonly class VideoJob
             $status,
             $createdAt,
             $storagePath,
+            $failureMessage,
+            $failedStage,
+            $lastProcessingDurationSeconds,
         );
     }
 
@@ -90,7 +99,7 @@ final readonly class VideoJob
     {
         $this->assertStatus(VideoStatus::Queued, 'start processing');
 
-        return $this->withStatus(VideoStatus::Processing);
+        return $this->withStatus(VideoStatus::Processing)->withoutFailureDetails();
     }
 
     public function complete(): self
@@ -100,11 +109,31 @@ final readonly class VideoJob
         return $this->withStatus(VideoStatus::Completed);
     }
 
-    public function fail(): self
-    {
+    public function fail(
+        ?string $failureMessage = null,
+        ?string $failedStage = null,
+        ?float $processingDurationSeconds = null,
+    ): self {
         $this->assertStatus(VideoStatus::Processing, 'fail');
 
-        return $this->withStatus(VideoStatus::Failed);
+        $normalizedMessage = null !== $failureMessage ? trim($failureMessage) : null;
+
+        if ('' === $normalizedMessage) {
+            $normalizedMessage = null;
+        }
+
+        $normalizedStage = null !== $failedStage ? trim($failedStage) : null;
+
+        if ('' === $normalizedStage) {
+            $normalizedStage = null;
+        }
+
+        return $this->withStatus(VideoStatus::Failed)
+            ->withFailureDetails(
+                $normalizedMessage,
+                $normalizedStage,
+                null !== $processingDurationSeconds ? max(0.0, $processingDurationSeconds) : null,
+            );
     }
 
     public function requeue(): self
@@ -153,6 +182,21 @@ final readonly class VideoJob
         return $this->storagePath;
     }
 
+    public function failureMessage(): ?string
+    {
+        return $this->failureMessage;
+    }
+
+    public function failedStage(): ?string
+    {
+        return $this->failedStage;
+    }
+
+    public function lastProcessingDurationSeconds(): ?float
+    {
+        return $this->lastProcessingDurationSeconds;
+    }
+
     private function withStatus(VideoStatus $status): self
     {
         return new self(
@@ -162,6 +206,42 @@ final readonly class VideoJob
             $status,
             $this->createdAt,
             $this->storagePath,
+            $this->failureMessage,
+            $this->failedStage,
+            $this->lastProcessingDurationSeconds,
+        );
+    }
+
+    private function withFailureDetails(
+        ?string $failureMessage,
+        ?string $failedStage,
+        ?float $lastProcessingDurationSeconds,
+    ): self {
+        return new self(
+            $this->id,
+            $this->originalFilename,
+            $this->language,
+            $this->status,
+            $this->createdAt,
+            $this->storagePath,
+            $failureMessage,
+            $failedStage,
+            $lastProcessingDurationSeconds,
+        );
+    }
+
+    private function withoutFailureDetails(): self
+    {
+        return new self(
+            $this->id,
+            $this->originalFilename,
+            $this->language,
+            $this->status,
+            $this->createdAt,
+            $this->storagePath,
+            null,
+            null,
+            null,
         );
     }
 

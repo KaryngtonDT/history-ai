@@ -357,12 +357,22 @@ export const pipelineEn = {
 				"Transcript not ready after 5 minutes. Run the video pipeline from Lumen.",
 			bootstrapPipelineFailed:
 				"Video pipeline failed. Re-open Watch after fixing STT or retry from Lumen.",
+			bootstrapPipelineFailedDetail:
+				"Pipeline failed at stage {{stage}}: {{message}}",
+			bootstrapUnknownStage: "unknown",
 			bootstrapPipelineStatusDetail: "Pipeline status: {{status}}",
 			bootstrapLogTitle: "Activity log",
 			bootstrapLogStart: "Bootstrap started for video {{videoId}}",
 			bootstrapLogFetchTranscript: "GET /api/videos/{id}/transcript",
 			bootstrapLogTranscriptReady: "Transcript ready ({{segments}} segments)",
 			bootstrapLogTranscriptMissing: "Transcript not found yet",
+			bootstrapLogTranscriptUnavailableDetail: "Transcript API detail: {{detail}}",
+			bootstrapLogFailedStage: "Failed stage: {{stage}}",
+			bootstrapLogFailureMessage: "Pipeline cause: {{message}}",
+			bootstrapLogPreviousFailureMessage:
+				"Previous pipeline error (last run): {{message}}",
+			bootstrapLogProcessingDuration:
+				"Last processing duration: {{seconds}} s",
 			bootstrapLogFetchRenders: "GET /api/videos/{id}/render",
 			bootstrapLogRendersLoaded: "Found {{count}} render(s)",
 			bootstrapLogFetchRenderStream:

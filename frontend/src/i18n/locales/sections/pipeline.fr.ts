@@ -368,6 +368,9 @@ export const pipelineFr: PipelineMessages = {
 				"Transcription non prête après 5 minutes. Lancez le pipeline vidéo depuis Lumen.",
 			bootstrapPipelineFailed:
 				"Le pipeline vidéo a échoué. Rouvrez Watch après correction STT ou relancez depuis Lumen.",
+			bootstrapPipelineFailedDetail:
+				"Pipeline échoué à l'étape {{stage}} : {{message}}",
+			bootstrapUnknownStage: "inconnue",
 			bootstrapPipelineStatusDetail: "Statut pipeline : {{status}}",
 			bootstrapLogTitle: "Journal d'activité",
 			bootstrapLogStart: "Démarrage pour la vidéo {{videoId}}",
@@ -375,6 +378,13 @@ export const pipelineFr: PipelineMessages = {
 			bootstrapLogTranscriptReady:
 				"Transcription prête ({{segments}} segments)",
 			bootstrapLogTranscriptMissing: "Transcription introuvable pour l'instant",
+			bootstrapLogTranscriptUnavailableDetail: "Détail API transcript : {{detail}}",
+			bootstrapLogFailedStage: "Étape en échec : {{stage}}",
+			bootstrapLogFailureMessage: "Cause pipeline : {{message}}",
+			bootstrapLogPreviousFailureMessage:
+				"Dernière erreur pipeline (run précédent) : {{message}}",
+			bootstrapLogProcessingDuration:
+				"Durée du dernier traitement : {{seconds}} s",
 			bootstrapLogFetchRenders: "GET /api/videos/{id}/render",
 			bootstrapLogRendersLoaded: "{{count}} rendu(s) trouvé(s)",
 			bootstrapLogFetchRenderStream:

@@ -16,6 +16,9 @@ export interface VideoJobStatus {
 	originalFilename: string;
 	language: string;
 	createdAt: string;
+	failureMessage?: string | null;
+	failedStage?: string | null;
+	lastProcessingDurationSeconds?: number | null;
 }
 
 export interface VideoProcessResult {

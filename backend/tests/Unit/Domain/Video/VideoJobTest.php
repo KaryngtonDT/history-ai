@@ -67,6 +67,43 @@ final class VideoJobTest extends TestCase
             ->withStoragePath('/var/video-storage/lecture.mp4')
             ->queue()
             ->startProcessing()
+            ->fail('Speech process returned no output.', 'speech_to_text', 12.5);
+
+        self::assertSame(VideoStatus::Failed, $failed->status());
+        self::assertSame('Speech process returned no output.', $failed->failureMessage());
+        self::assertSame('speech_to_text', $failed->failedStage());
+        self::assertSame(12.5, $failed->lastProcessingDurationSeconds());
+    }
+
+    public function testFailTransitionClearsDetailsOnRestart(): void
+    {
+        $reprocessing = VideoJob::createUploaded(
+            new VideoId(self::VIDEO_ID),
+            'lecture.mp4',
+            VideoLanguage::German,
+        )
+            ->withStoragePath('/var/video-storage/lecture.mp4')
+            ->queue()
+            ->startProcessing()
+            ->fail('Speech process returned no output.', 'speech_to_text', 12.5)
+            ->requeue()
+            ->startProcessing();
+
+        self::assertSame(VideoStatus::Processing, $reprocessing->status());
+        self::assertNull($reprocessing->failureMessage());
+        self::assertNull($reprocessing->failedStage());
+    }
+
+    public function testFailTransitionFromProcessingWithDefaults(): void
+    {
+        $failed = VideoJob::createUploaded(
+            new VideoId(self::VIDEO_ID),
+            'lecture.mp4',
+            VideoLanguage::German,
+        )
+            ->withStoragePath('/var/video-storage/lecture.mp4')
+            ->queue()
+            ->startProcessing()
             ->fail();
 
         self::assertSame(VideoStatus::Failed, $failed->status());

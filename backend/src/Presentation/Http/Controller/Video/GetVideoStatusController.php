@@ -56,6 +56,9 @@ final class GetVideoStatusController extends AbstractController
             'originalFilename' => $result->originalFilename,
             'language' => $result->language,
             'createdAt' => $result->createdAt,
+            'failureMessage' => $result->failureMessage,
+            'failedStage' => $result->failedStage,
+            'lastProcessingDurationSeconds' => $result->lastProcessingDurationSeconds,
         ]);
     }
 }

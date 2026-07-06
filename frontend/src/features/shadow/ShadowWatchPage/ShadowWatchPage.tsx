@@ -59,6 +59,9 @@ import styles from "./ShadowWatchPage.module.css";
 import {
 	appendBootstrapLog,
 	formatBootstrapError,
+	formatPipelineFailureSummary,
+	logTranscriptUnavailableDiagnostics,
+	logVideoPipelineDiagnostics,
 	updateBootstrapCheck,
 } from "./shadowWatchBootstrap";
 
@@ -185,7 +188,9 @@ export function ShadowWatchPage() {
 				pushLog(t("pipeline.shadow.bootstrapLogFetchTranscript"));
 				setLoadingSubtitle(t("pipeline.shadow.bootstrapLoadingTranscript"));
 
-				let transcriptResult = await transcriptService.getTranscript(videoId);
+				const transcriptLoad = await transcriptService.loadTranscript(videoId);
+				let transcriptResult = transcriptLoad.transcript;
+				const transcriptUnavailableDetail = transcriptLoad.unavailableDetail;
 
 				if (cancelled) {
 					return;
@@ -206,11 +211,32 @@ export function ShadowWatchPage() {
 						}),
 					});
 				} else {
-					pushLog(t("pipeline.shadow.bootstrapLogTranscriptMissing"), "warn");
+					if (transcriptUnavailableDetail) {
+						logTranscriptUnavailableDiagnostics(
+							pushLog,
+							t,
+							transcriptUnavailableDetail,
+						);
+					} else {
+						pushLog(t("pipeline.shadow.bootstrapLogTranscriptMissing"), "warn");
+					}
 					patchCheck("transcript", {
 						status: "warning",
 						detail: t("pipeline.shadow.bootstrapTranscriptMissingDetail"),
 					});
+
+					try {
+						pushLog(t("pipeline.shadow.bootstrapLogFetchStatus"));
+						const initialStatus = await videoService.getStatus(videoId);
+						logVideoPipelineDiagnostics(pushLog, t, initialStatus);
+					} catch (error) {
+						pushLog(
+							t("pipeline.shadow.bootstrapLogStatusFailed", {
+								error: formatBootstrapError(error),
+							}),
+							"warn",
+						);
+					}
 				}
 
 				patchCheck("renders", { status: "active" });
@@ -280,16 +306,16 @@ export function ShadowWatchPage() {
 				while (!cancelled) {
 					if (transcriptResult === null) {
 						let pipelineStatus: VideoStatus | null = null;
+						let latestJobStatus: Awaited<
+							ReturnType<typeof videoService.getStatus>
+						> | null = null;
 
 						try {
 							pushLog(t("pipeline.shadow.bootstrapLogFetchStatus"));
 							const jobStatus = await videoService.getStatus(videoId);
+							latestJobStatus = jobStatus;
 							pipelineStatus = jobStatus.status;
-							pushLog(
-								t("pipeline.shadow.bootstrapLogPipelineStatus", {
-									status: jobStatus.status,
-								}),
-							);
+							logVideoPipelineDiagnostics(pushLog, t, jobStatus);
 							patchCheck("transcript", {
 								status:
 									jobStatus.status === "failed"
@@ -320,9 +346,9 @@ export function ShadowWatchPage() {
 									continue;
 								}
 
-								const failedMessage = t(
-									"pipeline.shadow.bootstrapPipelineFailed",
-								);
+								const failedMessage = latestJobStatus
+									? formatPipelineFailureSummary(t, latestJobStatus)
+									: t("pipeline.shadow.bootstrapPipelineFailed");
 								pushLog(failedMessage, "error");
 								setBootstrapFailure(failedMessage);
 								return;
@@ -379,8 +405,21 @@ export function ShadowWatchPage() {
 						}
 
 						pushLog(t("pipeline.shadow.bootstrapLogPollTranscript"));
-						transcriptResult = await transcriptService.getTranscript(videoId);
+						const polledTranscriptLoad =
+							await transcriptService.loadTranscript(videoId);
+						transcriptResult = polledTranscriptLoad.transcript;
 						setTranscript(transcriptResult);
+
+						if (
+							transcriptResult === null &&
+							polledTranscriptLoad.unavailableDetail
+						) {
+							logTranscriptUnavailableDiagnostics(
+								pushLog,
+								t,
+								polledTranscriptLoad.unavailableDetail,
+							);
+						}
 
 						if (transcriptResult) {
 							pushLog(
