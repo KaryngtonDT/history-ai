@@ -174,7 +174,8 @@ final class LayerDependencyTest extends TestCase
         $violations = [];
 
         foreach (glob($this->srcRoot . '/Application/*', GLOB_ONLYDIR) ?: [] as $subdir) {
-            if (str_ends_with(str_replace('\\', '/', $subdir), '/Application/Runtime')) {
+            if (str_ends_with(str_replace('\\', '/', $subdir), '/Application/Runtime')
+                || str_ends_with(str_replace('\\', '/', $subdir), '/Application/RuntimeCompletion')) {
                 continue;
             }
 

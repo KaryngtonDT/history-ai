@@ -27,7 +27,7 @@ final class EngineCompatibilityEvaluatorTest extends TestCase
     {
         $this->evaluator = new EngineCompatibilityEvaluator(
             new RequirementDiffBuilder(),
-            new BlockedReasonResolver(),
+            new BlockedReasonResolver('/models'),
             new RecommendedAlternativeResolver(),
         );
     }

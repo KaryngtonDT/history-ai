@@ -40,7 +40,7 @@ final class ModelScanner
         );
 
         foreach ($iterator as $file) {
-            if ($file->isFile() && $file->getSize() > 0) {
+            if ($file->isFile() && $file->getSize() > 0 && !str_starts_with($file->getFilename(), '.')) {
                 return true;
             }
         }

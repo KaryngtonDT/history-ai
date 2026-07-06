@@ -2,6 +2,7 @@ import type {
 	RuntimeCapabilityMaturityOverview,
 	RuntimeCatalog,
 	RuntimeCompatibilitySummary,
+	RuntimeDashboard,
 	RuntimeEngine,
 	RuntimeEngineCompatibility,
 	RuntimeHardwareOverview,
@@ -32,5 +33,6 @@ export interface RuntimeRepository {
 	getHardware(): Promise<RuntimeHardwareOverview>;
 	getCompatibility(): Promise<RuntimeCompatibilitySummary>;
 	getCapabilityMaturity(): Promise<RuntimeCapabilityMaturityOverview>;
+	getDashboard(): Promise<RuntimeDashboard>;
 	getEngineCompatibility(engineId: string): Promise<RuntimeEngineCompatibility>;
 }

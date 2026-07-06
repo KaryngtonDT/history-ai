@@ -12,6 +12,7 @@ enum BlockedReasonCode: string
     case VramInsufficient = 'vram_insufficient';
     case RamInsufficient = 'ram_insufficient';
     case ModelMissing = 'model_missing';
+    case ModelDownloadFailed = 'model_download_failed';
     case BinaryMissing = 'binary_missing';
     case PythonEnvMissing = 'python_env_missing';
     case DockerGpuNotAvailable = 'docker_gpu_not_available';
@@ -29,6 +30,7 @@ enum BlockedReasonCode: string
             self::VramInsufficient => 'Insufficient VRAM',
             self::RamInsufficient => 'Insufficient RAM',
             self::ModelMissing => 'Model files missing',
+            self::ModelDownloadFailed => 'Model download failed',
             self::BinaryMissing => 'Binary not found',
             self::PythonEnvMissing => 'Python environment missing',
             self::DockerGpuNotAvailable => 'Docker GPU access unavailable',

@@ -46,7 +46,7 @@ final class IntelligentProvisioningPlannerTest extends TestCase
             $repository,
             new EngineCompatibilityEvaluator(
                 new RequirementDiffBuilder(),
-                new BlockedReasonResolver(),
+                new BlockedReasonResolver('/models'),
                 new RecommendedAlternativeResolver(),
             ),
         );

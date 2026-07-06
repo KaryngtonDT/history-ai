@@ -13,6 +13,10 @@ use App\Infrastructure\Runtime\Catalog\EngineCatalogDefinitions;
 
 final class BlockedReasonResolver
 {
+    public function __construct(private readonly string $modelsRoot)
+    {
+    }
+
     /**
      * @param list<string> $missingRequirements
      */
@@ -53,6 +57,15 @@ final class BlockedReasonResolver
             return [
                 'code' => BlockedReasonCode::BinaryMissing,
                 'humanReason' => sprintf('%s binary is not installed or not on PATH.', $this->displayName($engineId)),
+                'severity' => 'blocking',
+            ];
+        }
+
+        $downloadFailed = $this->modelDownloadFailureReason($engineId);
+        if (null !== $downloadFailed) {
+            return [
+                'code' => BlockedReasonCode::ModelDownloadFailed,
+                'humanReason' => $downloadFailed,
                 'severity' => 'blocking',
             ];
         }
@@ -130,5 +143,23 @@ final class BlockedReasonResolver
         }
 
         return EngineExecutionMode::Real === $definition->installedMode && null !== $definition->binaryName;
+    }
+
+    private function modelDownloadFailureReason(string $engineId): ?string
+    {
+        if ('wav2lip' !== $engineId) {
+            return null;
+        }
+
+        $marker = rtrim($this->modelsRoot, '/\\').'/wav2lip/.download-failed';
+        if (!is_readable($marker)) {
+            return null;
+        }
+
+        $detail = trim((string) file_get_contents($marker));
+
+        return '' !== $detail
+            ? $detail
+            : 'Wav2Lip checkpoint download failed. See docs/operations/WAV2LIP_INSTALLATION.md for manual install.';
     }
 }

@@ -210,3 +210,175 @@ export interface RuntimeCompatibilitySummary {
 	blockedByInstall: string[];
 	readyNow: string[];
 }
+
+export interface RuntimeScoreBreakdown {
+	key: string;
+	label: string;
+	score: number;
+	weight: number;
+	weightedContribution: number;
+	explanation: string;
+	improvement?: string | null;
+}
+
+export interface RuntimeOverallScore {
+	score: number;
+	grade: string;
+	summary: string;
+	breakdown: RuntimeScoreBreakdown[];
+}
+
+export interface RuntimePlatformScoreComponent {
+	key: string;
+	label: string;
+	score: number | null;
+	status: string;
+}
+
+export interface RuntimePlatformScore {
+	score: number;
+	grade: string;
+	components: RuntimePlatformScoreComponent[];
+}
+
+export interface RuntimeDashboardSummary {
+	overallHealth: number;
+	hardwareProfile: string;
+	hardwareProfileLabel: string;
+	runtimeStatus: string;
+	provisioningPercent: number;
+	compatibleEnginesReady: number;
+	compatibleEnginesTotal: number;
+	premiumEnginesReady: number;
+	premiumEnginesTotal: number;
+	benchmarksPassedPercent: number;
+	lastValidation?: {
+		at?: string | null;
+		status?: string | null;
+		relative?: string | null;
+	} | null;
+}
+
+export interface RuntimeDashboardCapability {
+	capability: string;
+	label: string;
+	status: string;
+	statusLabel: string;
+	videoPipeline: boolean;
+	referenceEngineId?: string | null;
+	referenceDisplayName?: string | null;
+	recommendedEngineId?: string | null;
+	recommendedDisplayName?: string | null;
+	currentEngineId?: string | null;
+	currentDisplayName?: string | null;
+	installedEngineIds?: string[];
+	readyCount: number;
+	engineCount: number;
+	score?: number;
+	blockedReason?: string | null;
+	hardwareCompatible?: boolean | null;
+	provider?: string | null;
+	providerLabel?: string | null;
+	benchmark?: { ok: boolean; status: string; at?: string | null } | null;
+	health?: string | null;
+	improvement?: string | null;
+	alternative?: string | null;
+}
+
+export interface RuntimeDashboardCapabilityScore {
+	capability: string;
+	label: string;
+	score: number;
+	reason?: string | null;
+}
+
+export interface RuntimeDashboardHardware {
+	profile: Record<string, unknown>;
+	cpuModel: string;
+	gpuName: string;
+	gpuVendor?: string | null;
+	cudaAvailable: boolean;
+	rocmAvailable: boolean;
+	directMlAvailable: boolean;
+	dockerGpuAccess: boolean;
+	wsl2: boolean;
+	ramTotalGb: number;
+	ramAvailableGb: number;
+	ramUtilization: number;
+	diskFreeGb: number;
+	diskUtilization: number;
+	ffmpegAvailable: boolean;
+	ollamaAvailable: boolean;
+	pythonVersion?: string | null;
+	recommendedPipeline: Record<string, string>;
+}
+
+export interface RuntimeDashboardEngineRecommendation {
+	capability: string;
+	label: string;
+	referenceEngineId?: string | null;
+	referenceDisplayName?: string | null;
+	recommendedEngineId?: string | null;
+	recommendedDisplayName?: string | null;
+	currentEngineId?: string | null;
+	currentDisplayName?: string | null;
+	reason: string;
+}
+
+export interface RuntimeDashboardPremiumFeature {
+	engineId: string;
+	displayName: string;
+	status: string;
+	humanReason: string;
+	needs: string[];
+	recommendedAlternative?: string | null;
+}
+
+export interface RuntimeDashboardTimelineEvent {
+	at: string;
+	type: string;
+	label: string;
+	detail: string;
+}
+
+export interface RuntimeDashboardWarning {
+	engineId: string;
+	severity: string;
+	humanReason: string;
+	recommendedAlternative?: string | null;
+}
+
+export interface RuntimeDashboardPipelineRecommendation {
+	stage: string;
+	engineId: string;
+	installed: boolean;
+}
+
+export interface RuntimeDashboardRecommendations {
+	summary: string;
+	pipeline: RuntimeDashboardPipelineRecommendation[];
+}
+
+export interface RuntimeDashboardShadowCommentary {
+	speaker: string;
+	message: string;
+	paragraphs: string[];
+}
+
+export interface RuntimeDashboard {
+	title: string;
+	generatedAt: string;
+	overallRuntimeScore: RuntimeOverallScore;
+	platformScore: RuntimePlatformScore;
+	summary: RuntimeDashboardSummary;
+	capabilityStatuses: RuntimeDashboardCapability[];
+	capabilityScores: RuntimeDashboardCapabilityScore[];
+	hardware: RuntimeDashboardHardware;
+	engineRecommendations: RuntimeDashboardEngineRecommendation[];
+	premiumFeatures: RuntimeDashboardPremiumFeature[];
+	timeline: RuntimeDashboardTimelineEvent[];
+	warnings: RuntimeDashboardWarning[];
+	recommendations: RuntimeDashboardRecommendations;
+	shadowCommentary: RuntimeDashboardShadowCommentary;
+	maturity: RuntimeCapabilityMaturityOverview;
+}

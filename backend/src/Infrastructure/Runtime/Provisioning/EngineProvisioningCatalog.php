@@ -167,10 +167,10 @@ final class EngineProvisioningCatalog
             new EngineProvisionSpec(
                 'wav2lip',
                 true,
-                installCommand: 'bash /opt/lumen/install-wav2lip.sh',
-                modelDownloadHint: 'https://github.com/Rudrabha/Wav2Lip',
+                installCommand: 'runuser -u www-data -- bash /opt/lumen/install-wav2lip.sh --runtime-only',
+                modelDownloadHint: 'https://huggingface.co/Nekochu/Wav2Lip/resolve/main/wav2lip_gan.pth',
                 modelPath: '/models/wav2lip',
-                documentationPath: 'docs/operations/ENGINE_PROVISIONING.md#wav2lip',
+                documentationPath: 'docs/operations/WAV2LIP_INSTALLATION.md',
             ),
             new EngineProvisionSpec(
                 'musetalk',

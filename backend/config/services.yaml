@@ -741,6 +741,25 @@ services:
     App\Application\Runtime\RuntimePlatformInterface:
         alias: App\Infrastructure\Runtime\RuntimePlatformService
 
+    App\Application\RuntimeDashboard\RuntimeDashboardInterface:
+        alias: App\Infrastructure\RuntimeDashboard\RuntimeDashboardAssembler
+
+    App\Infrastructure\RuntimeDashboard\RuntimeDashboardAssembler:
+        arguments:
+            $projectDir: '%kernel.project_dir%/..'
+
+    App\Application\RuntimeCompletion\RuntimeCompletionInterface:
+        alias: App\Infrastructure\RuntimeCompletion\RuntimeCompletionService
+
+    App\Infrastructure\RuntimeCompletion\RuntimeCompletionService:
+        arguments:
+            $projectDir: '%kernel.project_dir%/..'
+
+    App\Infrastructure\RuntimeCompletion\RuntimeTechnologyReviewGenerator:
+        arguments:
+            $projectDir: '%kernel.project_dir%/..'
+            $backendStorageDir: '%kernel.project_dir%/storage'
+
     App\Domain\Hardware\HardwareRepositoryInterface:
         alias: App\Infrastructure\Hardware\SystemHardwareRepository
 
@@ -791,6 +810,11 @@ services:
     App\Infrastructure\Runtime\Provisioning\EngineProvisioner:
         arguments:
             $ollamaBaseUrl: '%env(default:ollama.base_url_default:OLLAMA_BASE_URL)%'
+            $modelsRoot: '%models.root%'
+
+    App\Application\Runtime\BlockedReasonResolver:
+        arguments:
+            $modelsRoot: '%models.root%'
 
     App\Infrastructure\Runtime\Readiness\EngineStatusFinalizer: ~
 

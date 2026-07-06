@@ -69,4 +69,41 @@ final class RuntimeControllerTest extends WebTestCase
         self::assertIsArray($payload['capabilities']);
         self::assertCount(10, $payload['capabilities']);
     }
+
+    public function testRuntimeDashboardAggregatesLiveRuntimeData(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/api/runtime/dashboard');
+
+        self::assertResponseIsSuccessful();
+
+        /** @var array<string, mixed> $payload */
+        $payload = json_decode((string) $client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame('Lumen Runtime Health', $payload['title']);
+        self::assertArrayHasKey('overallRuntimeScore', $payload);
+        self::assertArrayHasKey('platformScore', $payload);
+        self::assertArrayHasKey('summary', $payload);
+        self::assertArrayHasKey('capabilityStatuses', $payload);
+        self::assertArrayHasKey('hardware', $payload);
+        self::assertArrayHasKey('shadowCommentary', $payload);
+        self::assertIsArray($payload['capabilityStatuses']);
+        self::assertGreaterThanOrEqual(10, count($payload['capabilityStatuses']));
+    }
+
+    public function testRuntimeCompletionPlanUsesDashboard(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/api/runtime/completion/plan');
+
+        self::assertResponseIsSuccessful();
+
+        /** @var array<string, mixed> $payload */
+        $payload = json_decode((string) $client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame('Runtime Completion Plan', $payload['title']);
+        self::assertFalse($payload['hardwareRedetected']);
+        self::assertArrayHasKey('compatibleEngineCompletionPlan', $payload);
+        self::assertArrayHasKey('capabilities', $payload);
+    }
 }

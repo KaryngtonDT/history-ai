@@ -103,4 +103,38 @@ final class FileRuntimeRepository implements RuntimeRepositoryInterface
 
         return $reports[$pipelineId];
     }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function listValidationReports(): array
+    {
+        $reports = $this->store->read(self::REPORTS_FILE);
+
+        if (!is_array($reports)) {
+            return [];
+        }
+
+        $items = [];
+        foreach ($reports as $pipelineId => $report) {
+            if (!is_array($report)) {
+                continue;
+            }
+
+            $items[] = [
+                'pipelineId' => (string) $pipelineId,
+                ...$report,
+            ];
+        }
+
+        usort(
+            $items,
+            static fn (array $a, array $b): int => strcmp(
+                (string) ($b['validatedAt'] ?? ''),
+                (string) ($a['validatedAt'] ?? ''),
+            ),
+        );
+
+        return $items;
+    }
 }

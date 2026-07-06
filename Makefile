@@ -1,7 +1,7 @@
 .PHONY: help install up down ps logs config \
 	dev dev-stop prod prod-stop prod-rebuild prod-fresh prod-restart setup-engines \
 	prod-backend prod-frontend prod-worker prod-migrate prod-prune-backend-run prod-logs \
-	test test-backend test-frontend test-worker test-all ci runtime-validate runtime-benchmark provision-engines install-gpu-engines provision \
+	test test-backend test-frontend test-worker test-all ci runtime-validate runtime-benchmark runtime-completion runtime-completion-execute provision-engines install-gpu-engines provision \
 	backup restore verify-backup health doctor status migrate shell-backend
 
 COMPOSE ?= docker compose
@@ -195,6 +195,12 @@ runtime-validate:
 
 runtime-benchmark:
 	curl -sf -X POST http://localhost:8000/api/runtime/benchmark/full | python -m json.tool
+
+runtime-completion:
+	curl -sf http://localhost:8000/api/runtime/completion/plan | python -m json.tool
+
+runtime-completion-execute:
+	curl -sf -X POST http://localhost:8000/api/runtime/completion/execute | python -m json.tool
 
 doctor:
 	bash scripts/doctor.sh

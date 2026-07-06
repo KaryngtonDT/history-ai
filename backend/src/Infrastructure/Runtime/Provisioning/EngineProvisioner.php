@@ -16,6 +16,7 @@ final class EngineProvisioner
         private readonly EngineTestRunner $engineTestRunner,
         private readonly ProvisioningCompatibilityGate $compatibilityGate,
         private readonly string $ollamaBaseUrl,
+        private readonly string $modelsRoot,
     ) {
     }
 
@@ -150,14 +151,27 @@ final class EngineProvisioner
      */
     private function provisionWav2Lip(array &$output): bool
     {
-        $process = Process::fromShellCommandline(
-            'bash /opt/lumen/install-wav2lip.sh 2>&1',
-        );
+        $systemMarker = rtrim($this->modelsRoot, '/').'/wav2lip/.system-ready';
+        if (!is_file($systemMarker)) {
+            $system = Process::fromShellCommandline(
+                'bash /opt/lumen/install-wav2lip.sh --system-only 2>&1',
+            );
+            $system->setTimeout(600);
+            $system->run();
+            $output[] = trim($system->getOutput().$system->getErrorOutput());
+        }
+
+        $command = 'runuser -u www-data -- bash /opt/lumen/install-wav2lip.sh --runtime-only 2>&1';
+        if (!is_executable('/usr/sbin/runuser') && !is_executable('/bin/runuser')) {
+            $command = 'bash /opt/lumen/install-wav2lip.sh --runtime-only 2>&1';
+        }
+
+        $process = Process::fromShellCommandline($command);
         $process->setTimeout(7200);
         $process->run();
         $output[] = trim($process->getOutput().$process->getErrorOutput());
 
-        return $process->isSuccessful();
+        return $process->isSuccessful() && is_file(rtrim($this->modelsRoot, '/').'/wav2lip/wav2lip_gan.pth');
     }
 
     /**

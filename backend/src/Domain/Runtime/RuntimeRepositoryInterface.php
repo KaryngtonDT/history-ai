@@ -28,4 +28,9 @@ interface RuntimeRepositoryInterface
      * @return array<string, mixed>|null
      */
     public function findValidationReport(string $pipelineId): ?array;
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function listValidationReports(): array;
 }
