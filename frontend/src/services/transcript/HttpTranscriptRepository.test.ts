@@ -49,4 +49,24 @@ describe("HttpTranscriptRepository", () => {
 			failureMessage: "Speech process returned no output.",
 		});
 	});
+
+	it("returns unavailable detail when API responds with 500", async () => {
+		const get = vi.fn().mockRejectedValue(
+			new ApiError("GET failed (500)", 500, {
+				error: "server_error",
+				message: "column failure_message does not exist",
+			}),
+		);
+		const httpClient = { get, post: vi.fn() } as unknown as HttpClient;
+		const repository = new HttpTranscriptRepository(httpClient);
+
+		const result = await repository.loadTranscript(
+			"550e8400-e29b-41d4-a716-446655440099",
+		);
+
+		expect(result.transcript).toBeNull();
+		expect(result.unavailableDetail).toMatchObject({
+			message: "column failure_message does not exist",
+		});
+	});
 });

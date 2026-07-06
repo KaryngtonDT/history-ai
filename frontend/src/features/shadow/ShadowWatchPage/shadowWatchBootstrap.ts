@@ -1,6 +1,7 @@
 import { appendActivityLog } from "@/features/activity/activityLogStore";
 import type { VideoJobStatus } from "@/services/video/types";
 import { ApiError } from "@/shared/errors/ApiError";
+import { NetworkError } from "@/shared/errors/NetworkError";
 import { formatApiErrorBody } from "@/shared/errors/formatApiErrorBody";
 import type {
 	BootstrapCheckItem,
@@ -33,6 +34,19 @@ export function formatBootstrapError(error: unknown): string {
 		return detail
 			? `API ${error.status} — ${detail}`
 			: `API ${error.status} — ${error.message}`;
+	}
+
+	if (error instanceof NetworkError) {
+		const parts = [error.message];
+		const cause = error.cause;
+
+		if (cause instanceof Error && cause.message.trim() !== "") {
+			parts.push(cause.message.trim());
+		} else if (typeof cause === "string" && cause.trim() !== "") {
+			parts.push(cause.trim());
+		}
+
+		return parts.join(" — ");
 	}
 
 	if (error instanceof Error) {

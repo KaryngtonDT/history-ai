@@ -34,10 +34,15 @@ export class HttpTranscriptRepository implements TranscriptRepository {
 				transcript: mapVideoTranscriptFromApi(dto),
 			};
 		} catch (error) {
-			if (error instanceof ApiError && error.status === 400) {
+			if (error instanceof ApiError) {
 				return {
 					transcript: null,
-					unavailableDetail: error.body,
+					unavailableDetail:
+						error.body ??
+						({
+							status: error.status,
+							message: error.message,
+						} as const),
 				};
 			}
 

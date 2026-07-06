@@ -42,6 +42,10 @@ export function formatApiErrorBody(body: unknown): string {
 		);
 	}
 
+	if (typeof record.status === "number" && Number.isFinite(record.status)) {
+		parts.push(`httpStatus: ${record.status}`);
+	}
+
 	if (typeof record.error === "string" && record.error.trim() !== "") {
 		parts.push(`error: ${record.error.trim()}`);
 	}
@@ -73,12 +77,23 @@ export async function readApiErrorResponse(
 		}
 
 		const text = (await response.text()).trim();
+		const detail = truncateErrorText(text || response.statusText);
 
 		return {
 			body: text || undefined,
-			detail: text || response.statusText,
+			detail,
 		};
 	} catch {
 		return { detail: response.statusText };
 	}
+}
+
+const MAX_ERROR_TEXT_LENGTH = 500;
+
+function truncateErrorText(text: string): string {
+	if (text.length <= MAX_ERROR_TEXT_LENGTH) {
+		return text;
+	}
+
+	return `${text.slice(0, MAX_ERROR_TEXT_LENGTH)}…`;
 }
