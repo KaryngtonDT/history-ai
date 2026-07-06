@@ -4,6 +4,7 @@ export const NAV_ICONS: Record<string, string> = {
 	import: "📄",
 	workspace: "📁",
 	"pipeline-settings": "⚙️",
+	"runtime-settings": "📊",
 	"ai-engines": "🤖",
 	transcript: "📜",
 	translations: "🌍",

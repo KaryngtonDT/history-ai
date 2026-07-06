@@ -72,6 +72,10 @@ export const shellFr: ShellMessages = {
 					label: "Configuration du pipeline",
 					description: "Choisissez les moteurs IA par étape.",
 				},
+				"runtime-settings": {
+					label: "Centre Runtime",
+					description: "Découvrir, vérifier et benchmarker les moteurs IA.",
+				},
 				"ai-engines": {
 					label: "Modèles IA",
 					description:

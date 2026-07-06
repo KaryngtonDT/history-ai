@@ -42,10 +42,15 @@ describe("Sprint 1 — app shell", () => {
 			expect(screen.getAllByText("The Roman Empire").length).toBeGreaterThan(0);
 		});
 
-		const settingsLinks = screen.getAllByRole("link", { name: /Settings/i });
-		await user.click(settingsLinks[0]);
-		expect(
-			screen.getByRole("heading", { name: "Settings" }),
-		).toBeInTheDocument();
+		const settingsHub = screen
+			.getAllByRole("link")
+			.find((link) => link.getAttribute("href") === "/settings");
+		expect(settingsHub).toBeDefined();
+		await user.click(settingsHub!);
+		await waitFor(() => {
+			expect(
+				screen.getByRole("heading", { name: "Settings" }),
+			).toBeInTheDocument();
+		});
 	});
 });
