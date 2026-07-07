@@ -72,6 +72,11 @@ final class ReprocessExecutionHandlerTest extends TestCase
                 self::callback(fn (PipelineConfiguration $configuration): bool => 'openvoice_v3' === $configuration->providerFor(PipelineStageType::VoiceClone)),
             );
 
+        $this->videoProcessingQueue
+            ->expects(self::once())
+            ->method('enqueue')
+            ->with($videoId, ProcessingMode::Manual, null, null);
+
         $this->handler()->__invoke(new ReprocessExecutionCommand(
             $videoId->value,
             1,
@@ -81,6 +86,9 @@ final class ReprocessExecutionHandlerTest extends TestCase
 
     public function testMissingVersionThrows(): void
     {
+        $this->replayContext->expects(self::never())->method('arm');
+        $this->videoProcessingQueue->expects(self::never())->method('enqueue');
+
         $this->expectException(InvalidExecutionHistoryException::class);
 
         $this->handler()->__invoke(new ReprocessExecutionCommand(

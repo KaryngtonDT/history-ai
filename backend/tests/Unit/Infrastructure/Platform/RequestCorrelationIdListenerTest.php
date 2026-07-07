@@ -26,7 +26,7 @@ final class RequestCorrelationIdListenerTest extends TestCase
         $correlationId = 'c6f98b8a-3f2e-4a1b-9c8d-1e2f3a4b5c6d';
         $request = Request::create('/api/health');
         $request->headers->set(RequestCorrelationIdListener::HEADER_NAME, $correlationId);
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $this->listener->onKernelRequest($event);
 
@@ -40,7 +40,7 @@ final class RequestCorrelationIdListenerTest extends TestCase
     public function testGeneratesCorrelationIdWhenHeaderIsMissing(): void
     {
         $request = Request::create('/api/health');
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $this->listener->onKernelRequest($event);
 
@@ -55,7 +55,7 @@ final class RequestCorrelationIdListenerTest extends TestCase
     {
         $request = Request::create('/api/health');
         $request->headers->set(RequestCorrelationIdListener::HEADER_NAME, 'invalid');
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $this->listener->onKernelRequest($event);
 
@@ -70,7 +70,7 @@ final class RequestCorrelationIdListenerTest extends TestCase
     public function testIgnoresSubRequests(): void
     {
         $request = Request::create('/api/health');
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::SUB_REQUEST);
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::SUB_REQUEST);
 
         $this->listener->onKernelRequest($event);
 

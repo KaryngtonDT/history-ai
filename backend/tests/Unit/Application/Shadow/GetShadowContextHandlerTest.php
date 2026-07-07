@@ -35,22 +35,22 @@ final class GetShadowContextHandlerTest extends TestCase
             ]),
         );
 
-        $transcriptRepository = $this->createMock(TranscriptRepositoryInterface::class);
+        $transcriptRepository = $this->createStub(TranscriptRepositoryInterface::class);
         $transcriptRepository
             ->method('findByVideoId')
             ->willReturn($transcript);
 
-        $translationRepository = $this->createMock(TranslationRepositoryInterface::class);
+        $translationRepository = $this->createStub(TranslationRepositoryInterface::class);
         $translationRepository
             ->method('findByVideoIdAndLanguage')
             ->willReturn(null);
 
-        $sessionRepository = $this->createMock(ShadowSessionRepositoryInterface::class);
+        $sessionRepository = $this->createStub(ShadowSessionRepositoryInterface::class);
         $sessionRepository
             ->method('findByVideoId')
             ->willReturn([]);
 
-        $conversationContext = $this->createMock(ShadowConversationContextInterface::class);
+        $conversationContext = $this->createStub(ShadowConversationContextInterface::class);
 
         $factory = new ShadowContextFactory(
             $transcriptRepository,
@@ -70,10 +70,10 @@ final class GetShadowContextHandlerTest extends TestCase
 
     public function testRejectsInvalidVideoId(): void
     {
-        $transcriptRepository = $this->createMock(TranscriptRepositoryInterface::class);
-        $translationRepository = $this->createMock(TranslationRepositoryInterface::class);
-        $sessionRepository = $this->createMock(ShadowSessionRepositoryInterface::class);
-        $conversationContext = $this->createMock(ShadowConversationContextInterface::class);
+        $transcriptRepository = $this->createStub(TranscriptRepositoryInterface::class);
+        $translationRepository = $this->createStub(TranslationRepositoryInterface::class);
+        $sessionRepository = $this->createStub(ShadowSessionRepositoryInterface::class);
+        $conversationContext = $this->createStub(ShadowConversationContextInterface::class);
 
         $factory = new ShadowContextFactory(
             $transcriptRepository,

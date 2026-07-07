@@ -43,8 +43,8 @@ final class MultiDocumentChatToolExecutorTest extends TestCase
     public function testImplementsAgentToolExecutorInterface(): void
     {
         $handler = $this->createHandler(
-            $this->createMock(ConversationRepositoryInterface::class),
-            $this->createMock(ArtifactRepositoryInterface::class),
+            $this->createStub(ConversationRepositoryInterface::class),
+            $this->createStub(ArtifactRepositoryInterface::class),
         );
 
         self::assertInstanceOf(
@@ -67,7 +67,7 @@ final class MultiDocumentChatToolExecutorTest extends TestCase
         $result = (new MultiDocumentChatToolExecutor(
             $this->createHandler(
                 $conversationRepository,
-                $this->createMock(ArtifactRepositoryInterface::class),
+                $this->createStub(ArtifactRepositoryInterface::class),
             ),
         ))->execute($execution);
 
@@ -91,7 +91,7 @@ final class MultiDocumentChatToolExecutorTest extends TestCase
         $result = (new MultiDocumentChatToolExecutor(
             $this->createHandler(
                 $conversationRepository,
-                $this->createMock(ArtifactRepositoryInterface::class),
+                $this->createStub(ArtifactRepositoryInterface::class),
             ),
         ))->execute($execution);
 
@@ -162,7 +162,7 @@ final class MultiDocumentChatToolExecutorTest extends TestCase
         $conversationRepository->method('findById')->willReturn($existing);
         $conversationRepository->expects(self::once())->method('save');
 
-        $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+        $artifactRepository = $this->createStub(ArtifactRepositoryInterface::class);
         $artifactRepository
             ->method('findByContentId')
             ->willReturnCallback(static function (ContentId $contentId) use (

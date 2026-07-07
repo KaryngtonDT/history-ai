@@ -178,7 +178,7 @@ final class LearningIntegrationTest extends TestCase
             ],
         ]);
 
-        $inner = $this->createMock(\App\Domain\Orchestrator\PipelinePlannerInterface::class);
+        $inner = $this->createStub(\App\Domain\Orchestrator\PipelinePlannerInterface::class);
         $registry = (new \App\Infrastructure\AI\AIEngineRegistryFactory())->create();
 
         $recommendation = \App\Domain\Orchestrator\PipelineRecommendation::create(

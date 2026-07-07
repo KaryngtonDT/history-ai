@@ -22,7 +22,7 @@ final class SpeechToTextProviderFactoryTest extends TestCase
     {
         $parser = new FasterWhisperOutputParser();
         $this->fasterWhisperProvider = new FasterWhisperProvider(
-            $this->createMock(FasterWhisperProcessRunnerInterface::class),
+            $this->createStub(FasterWhisperProcessRunnerInterface::class),
             $parser,
             'faster-whisper',
             'base',

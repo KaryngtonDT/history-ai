@@ -33,7 +33,7 @@ final class IntelligentProvisioningPlannerTest extends TestCase
             $this->engine('ffmpeg', EngineCatalogCapability::VideoRender, RuntimeStatus::Ready),
         ];
 
-        $repository = $this->createMock(EngineRepositoryInterface::class);
+        $repository = $this->createStub(EngineRepositoryInterface::class);
         $repository->method('all')->willReturn($engines);
         $repository->method('findById')->willReturnCallback(
             static fn (string $id): ?Engine => array_values(array_filter(

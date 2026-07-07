@@ -30,7 +30,7 @@ final class LoadPipelineConfigurationHandlerTest extends TestCase
             ],
         );
 
-        $repository = $this->createMock(PipelineConfigurationRepositoryInterface::class);
+        $repository = $this->createStub(PipelineConfigurationRepositoryInterface::class);
         $repository->method('findLatest')->willReturn($configuration);
 
         $handler = new LoadPipelineConfigurationHandler(
@@ -45,7 +45,7 @@ final class LoadPipelineConfigurationHandlerTest extends TestCase
 
     public function testFallsBackToDefaultsWhenMissing(): void
     {
-        $repository = $this->createMock(PipelineConfigurationRepositoryInterface::class);
+        $repository = $this->createStub(PipelineConfigurationRepositoryInterface::class);
         $repository->method('findLatest')->willReturn(null);
 
         $handler = new LoadPipelineConfigurationHandler(

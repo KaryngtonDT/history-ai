@@ -89,22 +89,22 @@ final class ShadowContextFactoryTest extends TestCase
 
     private function createFactory(?Transcript $transcript, ?Translation $translation): ShadowContextFactory
     {
-        $transcriptRepository = $this->createMock(TranscriptRepositoryInterface::class);
+        $transcriptRepository = $this->createStub(TranscriptRepositoryInterface::class);
         $transcriptRepository
             ->method('findByVideoId')
             ->willReturn($transcript);
 
-        $translationRepository = $this->createMock(TranslationRepositoryInterface::class);
+        $translationRepository = $this->createStub(TranslationRepositoryInterface::class);
         $translationRepository
             ->method('findByVideoIdAndLanguage')
             ->willReturn($translation);
 
-        $sessionRepository = $this->createMock(ShadowSessionRepositoryInterface::class);
+        $sessionRepository = $this->createStub(ShadowSessionRepositoryInterface::class);
         $sessionRepository
             ->method('findByVideoId')
             ->willReturn([]);
 
-        $conversationContext = $this->createMock(ShadowConversationContextInterface::class);
+        $conversationContext = $this->createStub(ShadowConversationContextInterface::class);
         $conversationContext
             ->method('loadRecentMessages')
             ->willReturn([]);

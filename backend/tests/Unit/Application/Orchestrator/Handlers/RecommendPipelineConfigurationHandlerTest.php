@@ -70,10 +70,10 @@ final class RecommendPipelineConfigurationHandlerTest extends TestCase
             ['Balanced strategy selected.'],
         );
 
-        $planner = $this->createMock(PipelinePlannerInterface::class);
+        $planner = $this->createStub(PipelinePlannerInterface::class);
         $planner->method('recommend')->willReturn($recommendation);
 
-        $profileRepository = $this->createMock(UserPreferenceProfileRepositoryInterface::class);
+        $profileRepository = $this->createStub(UserPreferenceProfileRepositoryInterface::class);
         $profileRepository->method('findCurrent')->willReturn(null);
 
         $handler = new RecommendPipelineConfigurationHandler($planner, $profileRepository);

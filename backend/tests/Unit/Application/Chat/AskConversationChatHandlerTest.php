@@ -104,7 +104,7 @@ final class AskConversationChatHandlerTest extends TestCase
                     && MockChatProvider::MOCK_ANSWER === $conversation->messages()[3]->content();
             }));
 
-        $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+        $artifactRepository = $this->createStub(ArtifactRepositoryInterface::class);
         $artifactRepository->method('findByContentId')->willReturn([]);
 
         $result = $this->createHandler($conversationRepository, $artifactRepository)
@@ -136,7 +136,7 @@ final class AskConversationChatHandlerTest extends TestCase
                 );
             }));
 
-        $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+        $artifactRepository = $this->createStub(ArtifactRepositoryInterface::class);
         $artifactRepository->method('findByContentId')->willReturn([]);
 
         $this->createHandler($conversationRepository, $artifactRepository)
@@ -174,7 +174,7 @@ final class AskConversationChatHandlerTest extends TestCase
         $conversationRepository->method('findById')->willReturn($existing);
         $conversationRepository->expects(self::once())->method('save');
 
-        $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+        $artifactRepository = $this->createStub(ArtifactRepositoryInterface::class);
         $artifactRepository->method('findByContentId')->willReturn([]);
 
         $result = $this->createHandler($conversationRepository, $artifactRepository)
@@ -205,7 +205,7 @@ final class AskConversationChatHandlerTest extends TestCase
         $conversationRepository->expects(self::once())->method('save');
 
         $lookupOrder = [];
-        $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+        $artifactRepository = $this->createStub(ArtifactRepositoryInterface::class);
         $artifactRepository
             ->method('findByContentId')
             ->willReturnCallback(static function (ContentId $contentId) use (
@@ -242,7 +242,7 @@ final class AskConversationChatHandlerTest extends TestCase
         $conversationRepository->method('findById')->willReturn($existing);
         $conversationRepository->expects(self::once())->method('save');
 
-        $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
+        $artifactRepository = $this->createStub(ArtifactRepositoryInterface::class);
         $artifactRepository->method('findByContentId')->willReturn([]);
 
         $result = $this->createHandler($conversationRepository, $artifactRepository)

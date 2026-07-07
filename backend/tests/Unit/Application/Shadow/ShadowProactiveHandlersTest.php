@@ -256,9 +256,9 @@ final class ShadowProactiveHandlersTest extends TestCase
 
     private function contextBuilder(): ShadowInterventionContextBuilder
     {
-        $videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $videoRepository->method('findById')->willReturn(null);
-        $intelligenceFactory = $this->createMock(VideoIntelligenceFactoryInterface::class);
+        $intelligenceFactory = $this->createStub(VideoIntelligenceFactoryInterface::class);
 
         return new ShadowInterventionContextBuilder(
             $this->shadowContextFactory(),
@@ -271,7 +271,7 @@ final class ShadowProactiveHandlersTest extends TestCase
 
     private function shadowContextFactory(): ShadowContextFactory
     {
-        $conversationContext = $this->createMock(ShadowConversationContextInterface::class);
+        $conversationContext = $this->createStub(ShadowConversationContextInterface::class);
         $conversationContext->method('loadRecentMessages')->willReturn([]);
 
         return new ShadowContextFactory(
@@ -286,7 +286,7 @@ final class ShadowProactiveHandlersTest extends TestCase
 
     private function transcriptRepository(): TranscriptRepositoryInterface
     {
-        $repository = $this->createMock(TranscriptRepositoryInterface::class);
+        $repository = $this->createStub(TranscriptRepositoryInterface::class);
         $repository
             ->method('findByVideoId')
             ->willReturn(Transcript::create(
@@ -303,7 +303,7 @@ final class ShadowProactiveHandlersTest extends TestCase
 
     private function translationRepository(): TranslationRepositoryInterface
     {
-        $repository = $this->createMock(TranslationRepositoryInterface::class);
+        $repository = $this->createStub(TranslationRepositoryInterface::class);
         $repository->method('findByVideoIdAndLanguage')->willReturn(null);
 
         return $repository;

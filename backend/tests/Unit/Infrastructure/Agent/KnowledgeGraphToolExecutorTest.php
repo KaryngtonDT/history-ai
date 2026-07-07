@@ -22,7 +22,7 @@ final class KnowledgeGraphToolExecutorTest extends TestCase
 {
     public function testImplementsAgentToolExecutorInterface(): void
     {
-        $handler = new GetKnowledgeGraphHandler($this->createMock(ArtifactRepositoryInterface::class));
+        $handler = new GetKnowledgeGraphHandler($this->createStub(ArtifactRepositoryInterface::class));
 
         self::assertInstanceOf(
             AgentToolExecutorInterface::class,

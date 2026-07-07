@@ -17,10 +17,10 @@ final class CompositeAgentToolExecutorTest extends TestCase
     public function testImplementsAgentToolExecutorInterface(): void
     {
         $composite = new CompositeAgentToolExecutor(
-            $this->createMock(AgentToolExecutorInterface::class),
-            $this->createMock(AgentToolExecutorInterface::class),
-            $this->createMock(AgentToolExecutorInterface::class),
-            $this->createMock(AgentToolExecutorInterface::class),
+            $this->createStub(AgentToolExecutorInterface::class),
+            $this->createStub(AgentToolExecutorInterface::class),
+            $this->createStub(AgentToolExecutorInterface::class),
+            $this->createStub(AgentToolExecutorInterface::class),
             new NullAgentToolExecutor(),
         );
 

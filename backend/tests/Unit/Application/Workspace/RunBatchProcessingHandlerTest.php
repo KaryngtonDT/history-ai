@@ -28,7 +28,7 @@ final class RunBatchProcessingHandlerTest extends TestCase
     public function testProcessesAllProjectVideos(): void
     {
         $project = $this->sampleProject();
-        $videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $videoRepository->method('findById')->willReturnCallback(
             fn (VideoId $videoId): VideoJob => VideoJob::createUploaded(
                 $videoId,
@@ -65,7 +65,7 @@ final class RunBatchProcessingHandlerTest extends TestCase
         $project = $this->sampleProject();
         $missingId = new VideoId('550e8400-e29b-41d4-a716-446655440011');
 
-        $videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $videoRepository->method('findById')->willReturnCallback(
             fn (VideoId $videoId): ?VideoJob => $videoId->equals($missingId)
                 ? null
@@ -93,7 +93,7 @@ final class RunBatchProcessingHandlerTest extends TestCase
     public function testAllDispatchFailuresMarkBatchFailed(): void
     {
         $project = $this->sampleProject();
-        $videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $videoRepository->method('findById')->willReturn(null);
 
         $queue = $this->createMock(VideoProcessingQueueInterface::class);
@@ -119,8 +119,8 @@ final class RunBatchProcessingHandlerTest extends TestCase
         $handler = new RunBatchProcessingHandler(
             $this->projectRepository($project),
             $this->batchJobRepository(),
-            $this->createMock(VideoRepositoryInterface::class),
-            $this->createMock(VideoProcessingQueueInterface::class),
+            $this->createStub(VideoRepositoryInterface::class),
+            $this->createStub(VideoProcessingQueueInterface::class),
             $this->allowAllAuthorizationGuard(),
         );
 
@@ -144,7 +144,7 @@ final class RunBatchProcessingHandlerTest extends TestCase
 
     private function projectRepository(Project $project): ProjectRepositoryInterface
     {
-        $repository = $this->createMock(ProjectRepositoryInterface::class);
+        $repository = $this->createStub(ProjectRepositoryInterface::class);
         $repository->method('findById')->willReturn($project);
 
         return $repository;
@@ -153,7 +153,7 @@ final class RunBatchProcessingHandlerTest extends TestCase
     private function batchJobRepository(): BatchJobRepositoryInterface
     {
         $saved = null;
-        $repository = $this->createMock(BatchJobRepositoryInterface::class);
+        $repository = $this->createStub(BatchJobRepositoryInterface::class);
         $repository->method('save')->willReturnCallback(function (BatchJob $batchJob) use (&$saved): void {
             $saved = $batchJob;
         });

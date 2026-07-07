@@ -23,7 +23,7 @@ final class ConversationMemoryToolExecutorTest extends TestCase
     public function testImplementsConversationMemoryToolExecutorInterface(): void
     {
         $executor = new ConversationMemoryToolExecutor(
-            $this->createMock(ConversationRepositoryInterface::class),
+            $this->createStub(ConversationRepositoryInterface::class),
         );
 
         self::assertInstanceOf(ConversationMemoryToolExecutorInterface::class, $executor);

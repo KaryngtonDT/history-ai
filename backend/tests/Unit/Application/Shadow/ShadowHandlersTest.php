@@ -346,7 +346,7 @@ final class ShadowHandlersTest extends TestCase
 
     private function shadowContextFactory(): ShadowContextFactory
     {
-        $conversationContext = $this->createMock(ShadowConversationContextInterface::class);
+        $conversationContext = $this->createStub(ShadowConversationContextInterface::class);
         $conversationContext->method('loadRecentMessages')->willReturn([]);
 
         return new ShadowContextFactory(
@@ -361,7 +361,7 @@ final class ShadowHandlersTest extends TestCase
 
     private function transcriptRepository(): TranscriptRepositoryInterface
     {
-        $repository = $this->createMock(TranscriptRepositoryInterface::class);
+        $repository = $this->createStub(TranscriptRepositoryInterface::class);
         $repository
             ->method('findByVideoId')
             ->willReturn(Transcript::create(
@@ -378,7 +378,7 @@ final class ShadowHandlersTest extends TestCase
 
     private function translationRepository(): TranslationRepositoryInterface
     {
-        $repository = $this->createMock(TranslationRepositoryInterface::class);
+        $repository = $this->createStub(TranslationRepositoryInterface::class);
         $repository->method('findByVideoIdAndLanguage')->willReturn(null);
 
         return $repository;

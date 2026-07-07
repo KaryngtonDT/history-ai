@@ -50,22 +50,21 @@ use App\Infrastructure\VoiceClone\VoiceCloneMapper;
 use App\Infrastructure\VoiceClone\VoiceCloneProcessingContext;
 use App\Infrastructure\VoiceClone\VoiceCloneProviderFactory;
 use App\Domain\Pipeline\PipelineConfigurationResolverInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class AIProviderResolverTest extends TestCase
 {
     private AIProviderResolver $resolver;
 
-    private PipelineConfigurationResolverInterface&MockObject $pipelineConfigurationResolver;
+    private PipelineConfigurationResolverInterface $pipelineConfigurationResolver;
 
     protected function setUp(): void
     {
         $registryFactory = new AIEngineRegistryFactory();
-        $this->pipelineConfigurationResolver = $this->createMock(PipelineConfigurationResolverInterface::class);
+        $this->pipelineConfigurationResolver = $this->createStub(PipelineConfigurationResolverInterface::class);
         $this->pipelineConfigurationResolver->method('resolve')->willReturn(null);
         $fasterWhisper = new FasterWhisperProvider(
-            $this->createMock(FasterWhisperProcessRunnerInterface::class),
+            $this->createStub(FasterWhisperProcessRunnerInterface::class),
             new FasterWhisperOutputParser(),
             'faster-whisper',
             'base',

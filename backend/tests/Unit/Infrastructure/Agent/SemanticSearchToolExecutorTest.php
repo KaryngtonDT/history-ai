@@ -32,7 +32,7 @@ final class SemanticSearchToolExecutorTest extends TestCase
 {
     public function testImplementsAgentToolExecutorInterface(): void
     {
-        $handler = $this->createHandler($this->createMock(ArtifactRepositoryInterface::class));
+        $handler = $this->createHandler($this->createStub(ArtifactRepositoryInterface::class));
 
         self::assertInstanceOf(
             AgentToolExecutorInterface::class,

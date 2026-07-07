@@ -19,7 +19,7 @@ final class FasterWhisperProviderTest extends TestCase
     public function testImplementsSpeechToTextProviderInterface(): void
     {
         $provider = new FasterWhisperProvider(
-            $this->createMock(FasterWhisperProcessRunnerInterface::class),
+            $this->createStub(FasterWhisperProcessRunnerInterface::class),
             new FasterWhisperOutputParser(),
             'faster-whisper',
             'base',
@@ -79,7 +79,7 @@ final class FasterWhisperProviderTest extends TestCase
     public function testRejectsVideoWithoutStoragePath(): void
     {
         $provider = new FasterWhisperProvider(
-            $this->createMock(FasterWhisperProcessRunnerInterface::class),
+            $this->createStub(FasterWhisperProcessRunnerInterface::class),
             new FasterWhisperOutputParser(),
             'faster-whisper',
             'base',

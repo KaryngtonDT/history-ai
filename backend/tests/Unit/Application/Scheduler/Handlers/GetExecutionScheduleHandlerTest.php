@@ -57,17 +57,17 @@ final class GetExecutionScheduleHandlerTest extends TestCase
         $job = VideoJob::createUploaded($videoId, 'clip.mp4', VideoLanguage::English);
         $runtimeSchedule = $this->sampleSchedule(PipelineStageType::VoiceClone, ResourceType::Gpu);
 
-        $videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $videoRepository->method('findById')->willReturn($job);
 
-        $runtimeContext = $this->createMock(RuntimeExecutionScheduleContextInterface::class);
+        $runtimeContext = $this->createStub(RuntimeExecutionScheduleContextInterface::class);
         $runtimeContext->method('get')->willReturn($runtimeSchedule);
 
         $handler = new GetExecutionScheduleHandler(
             $videoRepository,
-            $this->createMock(VideoIntelligenceFactoryInterface::class),
-            $this->createMock(ExecutionOptimizerInterface::class),
-            $this->createMock(PipelineSchedulerInterface::class),
+            $this->createStub(VideoIntelligenceFactoryInterface::class),
+            $this->createStub(ExecutionOptimizerInterface::class),
+            $this->createStub(PipelineSchedulerInterface::class),
             $runtimeContext,
         );
 
@@ -85,19 +85,19 @@ final class GetExecutionScheduleHandlerTest extends TestCase
         $optimization = $this->optimization();
         $schedule = $this->sampleSchedule(null, null);
 
-        $videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $videoRepository->method('findById')->willReturn($job);
 
-        $intelligenceFactory = $this->createMock(VideoIntelligenceFactoryInterface::class);
+        $intelligenceFactory = $this->createStub(VideoIntelligenceFactoryInterface::class);
         $intelligenceFactory->method('fromVideoJob')->willReturn($intelligence);
 
-        $optimizer = $this->createMock(ExecutionOptimizerInterface::class);
+        $optimizer = $this->createStub(ExecutionOptimizerInterface::class);
         $optimizer->method('optimize')->willReturn($optimization);
 
-        $scheduler = $this->createMock(PipelineSchedulerInterface::class);
+        $scheduler = $this->createStub(PipelineSchedulerInterface::class);
         $scheduler->method('schedule')->willReturn($schedule);
 
-        $runtimeContext = $this->createMock(RuntimeExecutionScheduleContextInterface::class);
+        $runtimeContext = $this->createStub(RuntimeExecutionScheduleContextInterface::class);
         $runtimeContext->method('get')->willReturn(null);
 
         $handler = new GetExecutionScheduleHandler(
@@ -117,15 +117,15 @@ final class GetExecutionScheduleHandlerTest extends TestCase
 
     public function testThrowsWhenVideoMissing(): void
     {
-        $videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $videoRepository->method('findById')->willReturn(null);
 
         $handler = new GetExecutionScheduleHandler(
             $videoRepository,
-            $this->createMock(VideoIntelligenceFactoryInterface::class),
-            $this->createMock(ExecutionOptimizerInterface::class),
-            $this->createMock(PipelineSchedulerInterface::class),
-            $this->createMock(RuntimeExecutionScheduleContextInterface::class),
+            $this->createStub(VideoIntelligenceFactoryInterface::class),
+            $this->createStub(ExecutionOptimizerInterface::class),
+            $this->createStub(PipelineSchedulerInterface::class),
+            $this->createStub(RuntimeExecutionScheduleContextInterface::class),
         );
 
         $this->expectException(InvalidVideoJobException::class);

@@ -47,7 +47,7 @@ final class GetVideoIntelligenceHandlerTest extends TestCase
             8.0,
         );
 
-        $videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $videoRepository->method('findById')->willReturn($job);
 
         $factory = $this->createMock(VideoIntelligenceFactoryInterface::class);
@@ -66,12 +66,12 @@ final class GetVideoIntelligenceHandlerTest extends TestCase
 
     public function testThrowsWhenVideoMissing(): void
     {
-        $videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $videoRepository->method('findById')->willReturn(null);
 
         $handler = new GetVideoIntelligenceHandler(
             $videoRepository,
-            $this->createMock(VideoIntelligenceFactoryInterface::class),
+            $this->createStub(VideoIntelligenceFactoryInterface::class),
         );
 
         $this->expectException(InvalidVideoJobException::class);

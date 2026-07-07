@@ -60,10 +60,10 @@ final class GetExecutionOptimizationHandlerTest extends TestCase
             ['Low STT confidence: beam size increased to 5.'],
         );
 
-        $videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $videoRepository->method('findById')->willReturn($job);
 
-        $intelligenceFactory = $this->createMock(VideoIntelligenceFactoryInterface::class);
+        $intelligenceFactory = $this->createStub(VideoIntelligenceFactoryInterface::class);
         $intelligenceFactory->method('fromVideoJob')->willReturn($intelligence);
 
         $optimizer = $this->createMock(ExecutionOptimizerInterface::class);
@@ -82,13 +82,13 @@ final class GetExecutionOptimizationHandlerTest extends TestCase
 
     public function testThrowsWhenVideoMissing(): void
     {
-        $videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $videoRepository->method('findById')->willReturn(null);
 
         $handler = new GetExecutionOptimizationHandler(
             $videoRepository,
-            $this->createMock(VideoIntelligenceFactoryInterface::class),
-            $this->createMock(ExecutionOptimizerInterface::class),
+            $this->createStub(VideoIntelligenceFactoryInterface::class),
+            $this->createStub(ExecutionOptimizerInterface::class),
         );
 
         $this->expectException(InvalidVideoJobException::class);

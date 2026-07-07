@@ -15,11 +15,11 @@ trait AllowAllAuthorizationGuardTrait
     private function allowAllAuthorizationGuard(): WorkspaceAuthorizationGuard
     {
         /** @var WorkspaceMemberRepositoryInterface $memberRepository */
-        $memberRepository = $this->createMock(WorkspaceMemberRepositoryInterface::class);
+        $memberRepository = $this->createStub(WorkspaceMemberRepositoryInterface::class);
         $memberRepository->method('findByWorkspaceId')->willReturn(WorkspaceMemberCollection::empty());
 
         /** @var ProjectRepositoryInterface $projectRepository */
-        $projectRepository = $this->createMock(ProjectRepositoryInterface::class);
+        $projectRepository = $this->createStub(ProjectRepositoryInterface::class);
         $projectRepository->method('findProjectIdByVideoId')->willReturn(null);
 
         return new WorkspaceAuthorizationGuard(

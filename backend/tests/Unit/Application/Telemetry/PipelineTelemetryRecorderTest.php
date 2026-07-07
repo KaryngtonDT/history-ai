@@ -111,7 +111,7 @@ final class PipelineTelemetryRecorderTest extends TestCase
         PipelineTelemetryRepositoryInterface $repository,
         bool $withProject,
     ): PipelineTelemetryRecorder {
-        $projectRepository = $this->createMock(ProjectRepositoryInterface::class);
+        $projectRepository = $this->createStub(ProjectRepositoryInterface::class);
         $projectRepository->method('findProjectIdByVideoId')->willReturn(
             $withProject ? new ProjectId('550e8400-e29b-41d4-a716-446655490001') : null,
         );

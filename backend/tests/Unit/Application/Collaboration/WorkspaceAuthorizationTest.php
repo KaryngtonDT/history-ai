@@ -60,7 +60,7 @@ final class WorkspaceAuthorizationTest extends TestCase
             new WorkspaceAuthorizationService($this->memberRepository([
                 $this->member($workspaceId, 'david', WorkspaceRole::Viewer),
             ])),
-            $this->createMock(ProjectRepositoryInterface::class),
+            $this->createStub(ProjectRepositoryInterface::class),
         );
 
         $this->expectException(InvalidWorkspaceMemberException::class);
@@ -70,7 +70,7 @@ final class WorkspaceAuthorizationTest extends TestCase
 
     public function testGuardAllowsVideoActionWhenVideoNotInProject(): void
     {
-        $projectRepository = $this->createMock(ProjectRepositoryInterface::class);
+        $projectRepository = $this->createStub(ProjectRepositoryInterface::class);
         $projectRepository->method('findProjectIdByVideoId')->willReturn(null);
 
         $guard = new WorkspaceAuthorizationGuard(
@@ -92,7 +92,7 @@ final class WorkspaceAuthorizationTest extends TestCase
         $project = Project::create(new ProjectId($workspaceId->value), 'Campaign')
             ->addVideo(ProjectVideo::create($videoId, 'clip.mp4'));
 
-        $projectRepository = $this->createMock(ProjectRepositoryInterface::class);
+        $projectRepository = $this->createStub(ProjectRepositoryInterface::class);
         $projectRepository->method('findProjectIdByVideoId')->willReturn($project->id());
 
         $guard = new WorkspaceAuthorizationGuard(
@@ -121,7 +121,7 @@ final class WorkspaceAuthorizationTest extends TestCase
                 : WorkspaceMemberCollection::empty()->append($member);
         }
 
-        $repository = $this->createMock(WorkspaceMemberRepositoryInterface::class);
+        $repository = $this->createStub(WorkspaceMemberRepositoryInterface::class);
         $repository->method('findByWorkspaceId')->willReturnCallback(
             fn (WorkspaceId $workspaceId): WorkspaceMemberCollection => $collections[$workspaceId->value]
                 ?? WorkspaceMemberCollection::empty(),

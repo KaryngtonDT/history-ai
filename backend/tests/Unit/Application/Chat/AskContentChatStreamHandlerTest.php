@@ -172,7 +172,7 @@ final class AskContentChatStreamHandlerTest extends TestCase
             new ChatStreamEvent(0, new ChatToken('Mock ')),
         ]));
 
-        $repository = $this->createMock(ArtifactRepositoryInterface::class);
+        $repository = $this->createStub(ArtifactRepositoryInterface::class);
         $repository
             ->method('findByContentId')
             ->willReturn([]);
@@ -210,7 +210,7 @@ final class AskContentChatStreamHandlerTest extends TestCase
         $contextProvider = new FixedRequestContextProvider(new CorrelationId('c6f98b8a-3f2e-4a1b-9c8d-1e2f3a4b5c6d'));
         $platformLogger = new RecordingPlatformLogger($contextProvider);
 
-        $repository = $this->createMock(ArtifactRepositoryInterface::class);
+        $repository = $this->createStub(ArtifactRepositoryInterface::class);
         $repository
             ->method('findByContentId')
             ->willReturn([]);
@@ -241,7 +241,7 @@ final class AskContentChatStreamHandlerTest extends TestCase
             ),
         ];
 
-        $repository = $this->createMock(ArtifactRepositoryInterface::class);
+        $repository = $this->createStub(ArtifactRepositoryInterface::class);
         $repository
             ->method('findByContentId')
             ->willReturn($artifacts);
@@ -261,7 +261,7 @@ final class AskContentChatStreamHandlerTest extends TestCase
         $contentId = ContentId::generate();
         $metricsRecorder = new RecordingPerformanceMetricsRecorder();
 
-        $repository = $this->createMock(ArtifactRepositoryInterface::class);
+        $repository = $this->createStub(ArtifactRepositoryInterface::class);
         $repository
             ->method('findByContentId')
             ->willReturn([]);

@@ -24,7 +24,7 @@ final class StreamUploadedVideoHandlerTest extends TestCase
             $job = VideoJob::createUploaded($videoId, 'clip.mp4', VideoLanguage::English)
                 ->withStoragePath($path);
 
-            $repository = $this->createMock(VideoRepositoryInterface::class);
+            $repository = $this->createStub(VideoRepositoryInterface::class);
             $repository->method('findById')->willReturn($job);
 
             $handler = new StreamUploadedVideoHandler($repository);
@@ -41,7 +41,7 @@ final class StreamUploadedVideoHandlerTest extends TestCase
         $job = VideoJob::createUploaded($videoId, 'clip.mp4', VideoLanguage::English)
             ->withStoragePath('/tmp/missing-video.mp4');
 
-        $repository = $this->createMock(VideoRepositoryInterface::class);
+        $repository = $this->createStub(VideoRepositoryInterface::class);
         $repository->method('findById')->willReturn($job);
 
         $handler = new StreamUploadedVideoHandler($repository);

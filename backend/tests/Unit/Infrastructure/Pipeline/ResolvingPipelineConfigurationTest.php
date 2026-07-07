@@ -18,7 +18,7 @@ final class ResolvingPipelineConfigurationTest extends TestCase
     public function testPrefersRuntimeOverrideOverRepository(): void
     {
         $runtime = new RuntimePipelineConfigurationContext();
-        $repository = $this->createMock(PipelineConfigurationRepositoryInterface::class);
+        $repository = $this->createStub(PipelineConfigurationRepositoryInterface::class);
 
         $runtimeConfiguration = PipelineConfiguration::create(
             new PipelineConfigurationId('550e8400-e29b-41d4-a716-446655440011'),
@@ -55,7 +55,7 @@ final class ResolvingPipelineConfigurationTest extends TestCase
     public function testFallsBackToRepositoryWhenRuntimeEmpty(): void
     {
         $runtime = new RuntimePipelineConfigurationContext();
-        $repository = $this->createMock(PipelineConfigurationRepositoryInterface::class);
+        $repository = $this->createStub(PipelineConfigurationRepositoryInterface::class);
         $repository->method('findLatest')->willReturn(null);
 
         $resolver = new ResolvingPipelineConfiguration($runtime, $repository);

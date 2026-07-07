@@ -13,8 +13,8 @@ final class RuntimeCompletionPlannerTest extends TestCase
 {
     public function testPlansOnlyRecommendedMissingEngines(): void
     {
-        $dashboard = $this->createMock(RuntimeDashboardInterface::class);
-        $platform = $this->createMock(RuntimePlatformInterface::class);
+        $dashboard = $this->createStub(RuntimeDashboardInterface::class);
+        $platform = $this->createStub(RuntimePlatformInterface::class);
 
         $dashboard->method('dashboard')->willReturn([
             'summary' => [

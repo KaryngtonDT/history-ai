@@ -284,6 +284,7 @@ final class RunAgentHandlerTest extends TestCase
     public function testProducesDeterministicExecutionTrace(): void
     {
         $this->toolExecutor
+            ->expects(self::atLeastOnce())
             ->method('execute')
             ->willReturnCallback(static function (AgentToolExecution $execution): AgentToolExecutionResult {
                 return match ($execution->tool()) {

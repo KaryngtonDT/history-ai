@@ -59,19 +59,19 @@ final class VideoQualityAssessmentRunnerTest extends TestCase
         );
         $report = $this->sampleReport();
 
-        $videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $videoRepository->method('findById')->willReturn($job);
 
-        $intelligenceFactory = $this->createMock(VideoIntelligenceFactoryInterface::class);
+        $intelligenceFactory = $this->createStub(VideoIntelligenceFactoryInterface::class);
         $intelligenceFactory->method('fromVideoJob')->willReturn($intelligence);
 
         $optimizer = $this->createMock(ExecutionOptimizerInterface::class);
         $optimizer->expects(self::never())->method('optimize');
 
-        $evaluator = $this->createMock(QualityEvaluatorInterface::class);
+        $evaluator = $this->createStub(QualityEvaluatorInterface::class);
         $evaluator->method('evaluate')->willReturn($report);
 
-        $finalVideoRepository = $this->createMock(FinalVideoRepositoryInterface::class);
+        $finalVideoRepository = $this->createStub(FinalVideoRepositoryInterface::class);
         $finalVideoRepository->method('findAllDetailedByVideoId')->willReturn([]);
 
         $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
@@ -101,16 +101,16 @@ final class VideoQualityAssessmentRunnerTest extends TestCase
 
     public function testReturnsNullWhenVideoMissing(): void
     {
-        $videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $videoRepository->method('findById')->willReturn(null);
 
         $runner = new VideoQualityAssessmentRunner(
             $videoRepository,
-            $this->createMock(VideoIntelligenceFactoryInterface::class),
-            $this->createMock(ExecutionOptimizerInterface::class),
-            $this->createMock(QualityEvaluatorInterface::class),
-            $this->createMock(FinalVideoRepositoryInterface::class),
-            $this->createMock(ArtifactRepositoryInterface::class),
+            $this->createStub(VideoIntelligenceFactoryInterface::class),
+            $this->createStub(ExecutionOptimizerInterface::class),
+            $this->createStub(QualityEvaluatorInterface::class),
+            $this->createStub(FinalVideoRepositoryInterface::class),
+            $this->createStub(ArtifactRepositoryInterface::class),
             new QualityReportJsonMapper(),
         );
 
@@ -122,13 +122,13 @@ final class VideoQualityAssessmentRunnerTest extends TestCase
         $videoId = new VideoId('550e8400-e29b-41d4-a716-446655440099');
         $job = VideoJob::createUploaded($videoId, 'clip.mp4', VideoLanguage::English);
 
-        $videoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $videoRepository->method('findById')->willReturn($job);
 
-        $intelligenceFactory = $this->createMock(VideoIntelligenceFactoryInterface::class);
+        $intelligenceFactory = $this->createStub(VideoIntelligenceFactoryInterface::class);
         $intelligenceFactory->method('fromVideoJob')->willReturn($this->intelligence());
 
-        $evaluator = $this->createMock(QualityEvaluatorInterface::class);
+        $evaluator = $this->createStub(QualityEvaluatorInterface::class);
         $evaluator->method('evaluate')->willThrowException(new \RuntimeException('evaluation failed'));
 
         $artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
@@ -137,9 +137,9 @@ final class VideoQualityAssessmentRunnerTest extends TestCase
         $runner = new VideoQualityAssessmentRunner(
             $videoRepository,
             $intelligenceFactory,
-            $this->createMock(ExecutionOptimizerInterface::class),
+            $this->createStub(ExecutionOptimizerInterface::class),
             $evaluator,
-            $this->createMock(FinalVideoRepositoryInterface::class),
+            $this->createStub(FinalVideoRepositoryInterface::class),
             $artifactRepository,
             new QualityReportJsonMapper(),
         );

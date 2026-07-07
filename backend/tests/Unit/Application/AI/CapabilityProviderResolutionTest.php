@@ -49,7 +49,7 @@ final class CapabilityProviderResolutionTest extends TestCase
     protected function setUp(): void
     {
         $registryFactory = new AIEngineRegistryFactory();
-        $pipelineConfigurationResolver = $this->createMock(PipelineConfigurationResolverInterface::class);
+        $pipelineConfigurationResolver = $this->createStub(PipelineConfigurationResolverInterface::class);
         $pipelineConfigurationResolver->method('resolve')->willReturn(null);
         $this->resolver = new AIProviderResolver(
             $registryFactory->create(),
@@ -57,7 +57,7 @@ final class CapabilityProviderResolutionTest extends TestCase
             new SpeechToTextProviderFactory(
                 'faster_whisper',
                 new FasterWhisperProvider(
-                    $this->createMock(FasterWhisperProcessRunnerInterface::class),
+                    $this->createStub(FasterWhisperProcessRunnerInterface::class),
                     new FasterWhisperOutputParser(),
                     'faster-whisper',
                     'base',

@@ -119,11 +119,11 @@ final class ProcessVideoHandlerTest extends TestCase
 
     private VideoAudioGenerator&MockObject $videoAudioGenerator;
 
-    private VideoVoiceCloneGenerator&MockObject $videoVoiceCloneGenerator;
+    private VideoVoiceCloneGenerator $videoVoiceCloneGenerator;
 
-    private VideoLipSyncGenerator&MockObject $videoLipSyncGenerator;
+    private VideoLipSyncGenerator $videoLipSyncGenerator;
 
-    private VideoFinalRenderGenerator&MockObject $videoFinalRenderGenerator;
+    private VideoFinalRenderGenerator $videoFinalRenderGenerator;
 
     private RuntimeExecutionScheduleContextInterface&MockObject $runtimeScheduleContext;
 
@@ -140,35 +140,35 @@ final class ProcessVideoHandlerTest extends TestCase
         $this->artifactRepository = $this->createMock(ArtifactRepositoryInterface::class);
         $this->videoTranslationGenerator = $this->createMock(VideoTranslationGenerator::class);
         $this->videoAudioGenerator = $this->createMock(VideoAudioGenerator::class);
-        $this->videoVoiceCloneGenerator = $this->createMock(VideoVoiceCloneGenerator::class);
-        $this->videoLipSyncGenerator = $this->createMock(VideoLipSyncGenerator::class);
-        $this->videoFinalRenderGenerator = $this->createMock(VideoFinalRenderGenerator::class);
+        $this->videoVoiceCloneGenerator = $this->createStub(VideoVoiceCloneGenerator::class);
+        $this->videoLipSyncGenerator = $this->createStub(VideoLipSyncGenerator::class);
+        $this->videoFinalRenderGenerator = $this->createStub(VideoFinalRenderGenerator::class);
         $this->runtimeScheduleContext = $this->createMock(RuntimeExecutionScheduleContextInterface::class);
 
-        $qualityVideoRepository = $this->createMock(VideoRepositoryInterface::class);
+        $qualityVideoRepository = $this->createStub(VideoRepositoryInterface::class);
         $qualityVideoRepository->method('findById')->willReturn(null);
 
         $this->qualityAssessmentRunner = new VideoQualityAssessmentRunner(
             $qualityVideoRepository,
-            $this->createMock(VideoIntelligenceFactoryInterface::class),
-            $this->createMock(ExecutionOptimizerInterface::class),
-            $this->createMock(QualityEvaluatorInterface::class),
-            $this->createMock(FinalVideoRepositoryInterface::class),
-            $this->createMock(ArtifactRepositoryInterface::class),
+            $this->createStub(VideoIntelligenceFactoryInterface::class),
+            $this->createStub(ExecutionOptimizerInterface::class),
+            $this->createStub(QualityEvaluatorInterface::class),
+            $this->createStub(FinalVideoRepositoryInterface::class),
+            $this->createStub(ArtifactRepositoryInterface::class),
             new QualityReportJsonMapper(),
         );
 
         $batchJobProgressUpdater = new BatchJobProgressUpdater(
-            $this->createMock(BatchJobRepositoryInterface::class),
+            $this->createStub(BatchJobRepositoryInterface::class),
         );
 
-        $intelligenceFactory = $this->createMock(VideoIntelligenceFactoryInterface::class);
+        $intelligenceFactory = $this->createStub(VideoIntelligenceFactoryInterface::class);
         $intelligenceFactory->method('fromVideoJob')->willReturn($this->sampleIntelligence());
 
-        $optimizer = $this->createMock(ExecutionOptimizerInterface::class);
+        $optimizer = $this->createStub(ExecutionOptimizerInterface::class);
         $optimizer->method('optimize')->willReturn($this->sampleOptimization());
 
-        $scheduler = $this->createMock(PipelineSchedulerInterface::class);
+        $scheduler = $this->createStub(PipelineSchedulerInterface::class);
         $scheduler->method('schedule')->willReturn($this->sampleSchedule());
 
         $historyStore = new InMemoryExecutionHistoryStore();
@@ -182,21 +182,21 @@ final class ProcessVideoHandlerTest extends TestCase
 
         $executionHistoryRecorder = new ExecutionHistoryRecorder(
             $recordHandler,
-            $this->createMock(RuntimePipelineConfigurationContextInterface::class),
-            $this->createMock(RuntimeExecutionOptimizationContextInterface::class),
-            $this->createMock(PipelineConfigurationResolverInterface::class),
-            $this->createMock(FinalVideoRepositoryInterface::class),
+            $this->createStub(RuntimePipelineConfigurationContextInterface::class),
+            $this->createStub(RuntimeExecutionOptimizationContextInterface::class),
+            $this->createStub(PipelineConfigurationResolverInterface::class),
+            $this->createStub(FinalVideoRepositoryInterface::class),
         );
 
         $telemetryRecorder = new PipelineTelemetryRecorder(
             new CollectPipelineMetricsHandler(new InMemoryPipelineTelemetryRepository()),
-            $this->createMock(\App\Domain\Workspace\ProjectRepositoryInterface::class),
-            $this->createMock(RuntimePipelineConfigurationContextInterface::class),
+            $this->createStub(\App\Domain\Workspace\ProjectRepositoryInterface::class),
+            $this->createStub(RuntimePipelineConfigurationContextInterface::class),
             $this->runtimeScheduleContext,
         );
 
-        $pipelineJobRepository = $this->createMock(PipelineJobRepositoryInterface::class);
-        $pipelineNotificationRepository = $this->createMock(PipelineNotificationRepositoryInterface::class);
+        $pipelineJobRepository = $this->createStub(PipelineJobRepositoryInterface::class);
+        $pipelineNotificationRepository = $this->createStub(PipelineNotificationRepositoryInterface::class);
         $notificationService = new PipelineNotificationService($pipelineNotificationRepository);
         $dependencyResolver = new PipelineDependencyResolver();
         $invalidationService = new PipelineInvalidationService(
@@ -217,7 +217,7 @@ final class ProcessVideoHandlerTest extends TestCase
             $notificationService,
             $progressService,
             $durationEstimator,
-            $this->createMock(VideoProcessingQueueInterface::class),
+            $this->createStub(VideoProcessingQueueInterface::class),
             $this->videoRepository,
         );
 
@@ -237,11 +237,11 @@ final class ProcessVideoHandlerTest extends TestCase
             new GenerateLipSyncConfiguration(false),
             $this->videoFinalRenderGenerator,
             new GenerateFinalVideoConfiguration(false),
-            $this->createMock(PipelinePlannerInterface::class),
+            $this->createStub(PipelinePlannerInterface::class),
             $intelligenceFactory,
             $optimizer,
-            $this->createMock(RuntimeExecutionOptimizationContextInterface::class),
-            $this->createMock(RuntimePipelineConfigurationContextInterface::class),
+            $this->createStub(RuntimeExecutionOptimizationContextInterface::class),
+            $this->createStub(RuntimePipelineConfigurationContextInterface::class),
             $scheduler,
             $this->runtimeScheduleContext,
             $this->qualityAssessmentRunner,
@@ -389,16 +389,25 @@ final class ProcessVideoHandlerTest extends TestCase
             ->queue();
 
         $this->videoRepository
+            ->expects(self::once())
             ->method('findById')
             ->willReturn($queued);
 
         $this->aiProviderResolver
+            ->expects(self::once())
             ->method('resolveSpeechToText')
             ->willReturn($this->speechToTextProvider);
 
         $this->speechToTextProvider
+            ->expects(self::once())
             ->method('transcribe')
             ->willThrowException(new \RuntimeException('transcription failed'));
+
+        $this->videoTranslationGenerator->expects(self::never())->method('generate');
+        $this->videoAudioGenerator->expects(self::never())->method('generate');
+        $this->runtimeScheduleContext
+            ->expects(self::atLeastOnce())
+            ->method('updateStage');
 
         $this->videoRepository
             ->expects(self::exactly(2))

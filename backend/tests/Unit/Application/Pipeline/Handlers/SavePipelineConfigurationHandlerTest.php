@@ -17,7 +17,7 @@ final class SavePipelineConfigurationHandlerTest extends TestCase
 {
     private PipelineConfigurationRepositoryInterface&MockObject $repository;
 
-    private AIProviderResolverInterface&MockObject $aiProviderResolver;
+    private AIProviderResolverInterface $aiProviderResolver;
 
     private SavePipelineConfigurationHandler $handler;
 
@@ -26,7 +26,7 @@ final class SavePipelineConfigurationHandlerTest extends TestCase
         $this->repository = $this->createMock(PipelineConfigurationRepositoryInterface::class);
         $registry = (new AIEngineRegistryFactory())->create();
 
-        $this->aiProviderResolver = $this->createMock(AIProviderResolverInterface::class);
+        $this->aiProviderResolver = $this->createStub(AIProviderResolverInterface::class);
         $this->aiProviderResolver->method('registry')->willReturn($registry);
 
         $this->handler = new SavePipelineConfigurationHandler(
