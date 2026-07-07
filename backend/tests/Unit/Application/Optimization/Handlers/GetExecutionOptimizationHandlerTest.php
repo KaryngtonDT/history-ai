@@ -67,7 +67,10 @@ final class GetExecutionOptimizationHandlerTest extends TestCase
         $intelligenceFactory->method('fromVideoJob')->willReturn($intelligence);
 
         $optimizer = $this->createMock(ExecutionOptimizerInterface::class);
-        $optimizer->method('optimize')->with($intelligence)->willReturn($optimization);
+        $optimizer->expects(self::once())
+            ->method('optimize')
+            ->with($intelligence)
+            ->willReturn($optimization);
 
         $handler = new GetExecutionOptimizationHandler($videoRepository, $intelligenceFactory, $optimizer);
         $result = $handler(new GetExecutionOptimizationQuery($videoId->value));

@@ -51,7 +51,10 @@ final class GetVideoIntelligenceHandlerTest extends TestCase
         $videoRepository->method('findById')->willReturn($job);
 
         $factory = $this->createMock(VideoIntelligenceFactoryInterface::class);
-        $factory->method('fromVideoJob')->with($job)->willReturn($intelligence);
+        $factory->expects(self::once())
+            ->method('fromVideoJob')
+            ->with($job)
+            ->willReturn($intelligence);
 
         $handler = new GetVideoIntelligenceHandler($videoRepository, $factory);
         $result = $handler(new GetVideoIntelligenceQuery($videoId->value));
