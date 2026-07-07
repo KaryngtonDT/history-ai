@@ -1,13 +1,31 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
+import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
 import { TranscriptPanel } from "@/features/transcript/TranscriptPanel/TranscriptPanel";
 import { transcriptService } from "@/services/transcript/TranscriptService";
 import { renderWithProviders } from "@/test/render";
 
 describe("TranscriptPanel", () => {
+	beforeEach(() => {
+		vi.restoreAllMocks();
+	});
+
 	it("renders transcript segments and highlights selection", async () => {
+		vi.spyOn(pipelineJobService, "loadStatus").mockResolvedValue({
+			sourceId: "550e8400-e29b-41d4-a716-446655440099",
+			activeJobs: [],
+			completedJobs: [],
+			jobsWaitingUserChoice: [],
+			jobsWaitingConfirmation: [],
+			failedJobs: [],
+			cancelledJobs: [],
+			staleArtifacts: [],
+			blockedStages: [],
+			requiresUserAction: false,
+			message: "",
+		});
 		vi.spyOn(transcriptService, "getTranscript").mockResolvedValue({
 			videoId: "550e8400-e29b-41d4-a716-446655440099",
 			transcriptId: "550e8400-e29b-41d4-a716-446655440010",
@@ -62,7 +80,72 @@ describe("TranscriptPanel", () => {
 		).toContain("segmentActive");
 	});
 
+	it("shows choice panel instead of polling transcript when waiting for user choice", async () => {
+		vi.spyOn(pipelineJobService, "loadStatus").mockResolvedValue({
+			sourceId: "550e8400-e29b-41d4-a716-446655440099",
+			activeJobs: [],
+			completedJobs: [],
+			jobsWaitingUserChoice: [
+				{
+					jobId: "job-1",
+					sourceId: "550e8400-e29b-41d4-a716-446655440099",
+					stage: "speech_to_text",
+					status: "waiting_user_choice",
+					progressPercent: 0,
+				},
+			],
+			jobsWaitingConfirmation: [],
+			failedJobs: [],
+			cancelledJobs: [],
+			staleArtifacts: [],
+			blockedStages: [],
+			requiresUserAction: true,
+			message: "Choose",
+		});
+		const getTranscriptSpy = vi
+			.spyOn(transcriptService, "getTranscript")
+			.mockResolvedValue(null);
+
+		renderWithProviders(
+			<MemoryRouter
+				initialEntries={[
+					"/video/550e8400-e29b-41d4-a716-446655440099/transcript",
+				]}
+			>
+				<Routes>
+					<Route
+						path="/video/:videoId/transcript"
+						element={<TranscriptPanel />}
+					/>
+				</Routes>
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(
+				screen.getByRole("dialog", {
+					name: /original youtube transcript found/i,
+				}),
+			).toBeInTheDocument();
+		});
+
+		expect(getTranscriptSpy).not.toHaveBeenCalled();
+	});
+
 	it("shows empty state when transcript is unavailable", async () => {
+		vi.spyOn(pipelineJobService, "loadStatus").mockResolvedValue({
+			sourceId: "550e8400-e29b-41d4-a716-446655440099",
+			activeJobs: [],
+			completedJobs: [],
+			jobsWaitingUserChoice: [],
+			jobsWaitingConfirmation: [],
+			failedJobs: [],
+			cancelledJobs: [],
+			staleArtifacts: [],
+			blockedStages: [],
+			requiresUserAction: false,
+			message: "",
+		});
 		vi.spyOn(transcriptService, "getTranscript").mockResolvedValue(null);
 
 		renderWithProviders(

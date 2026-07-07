@@ -8,6 +8,14 @@ import { useTranslation } from "@/i18n/useTranslation";
 import { resolveVideoRenderStreamUrl } from "@/services/render/types";
 import { videoRenderService } from "@/services/render/VideoRenderService";
 import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
+import {
+	computeNonNegativeElapsedSeconds,
+	isPipelineWaitingForTranscriptChoice,
+} from "@/features/pipeline/pipelineChoiceUtils";
+import {
+	PipelineProgressPanel,
+	PipelineTranscriptChoicePanel,
+} from "@/features/pipeline";
 import { shadowService } from "@/services/shadow/ShadowService";
 import type {
 	SessionLearningState,
@@ -91,6 +99,8 @@ export function ShadowWatchPage() {
 	const interventionBusyRef = useRef(false);
 
 	const [loading, setLoading] = useState(true);
+	const [bootstrapAttempt, setBootstrapAttempt] = useState(0);
+	const [awaitingTranscriptChoice, setAwaitingTranscriptChoice] = useState(false);
 	const [loadingSubtitle, setLoadingSubtitle] = useState("");
 	const [bootstrapChecks, setBootstrapChecks] = useState<BootstrapCheckItem[]>(
 		[],
@@ -158,7 +168,9 @@ export function ShadowWatchPage() {
 		};
 
 		async function bootstrap() {
+			let pausedForUserChoice = false;
 			setLoading(true);
+			setAwaitingTranscriptChoice(false);
 			setBootstrapFailure(null);
 			setBootstrapLog([]);
 			setLoadingSubtitle(t("pipeline.shadow.bootstrapStarting"));
@@ -320,9 +332,14 @@ export function ShadowWatchPage() {
 				let deadline = Date.now() + TRANSCRIPT_INITIAL_WAIT_MS;
 				let pollAttempt = 0;
 				let reprocessAttempted = false;
+				let pollStartedAt: number | null = null;
 
 				while (!cancelled) {
 					if (transcriptResult === null) {
+						if (pollStartedAt === null) {
+							pollStartedAt = Date.now();
+						}
+
 						let pipelineStatus: VideoStatus | null = null;
 						let latestJobStatus: Awaited<
 							ReturnType<typeof videoService.getStatus>
@@ -330,31 +347,34 @@ export function ShadowWatchPage() {
 						let backgroundSttActive = false;
 
 						try {
-							pushLog(t("pipeline.shadow.bootstrapLogFetchStatus"));
-							const jobStatus = await videoService.getStatus(videoId);
-							latestJobStatus = jobStatus;
-							pipelineStatus = jobStatus.status;
-							logVideoPipelineDiagnostics(pushLog, t, jobStatus);
-							patchCheck("transcript", {
-								status:
-									jobStatus.status === "failed"
-										? "error"
-										: jobStatus.status === "completed"
-											? "warning"
-											: "active",
-								detail: t("pipeline.shadow.bootstrapPipelineStatusDetail", {
-									status: jobStatus.status,
-								}),
-							});
-
 							try {
-								const orchestration = await pipelineJobService.loadStatus(videoId);
+								const orchestration =
+									await pipelineJobService.loadStatus(videoId);
+
+								if (isPipelineWaitingForTranscriptChoice(orchestration)) {
+									pausedForUserChoice = true;
+									pushLog(
+										t("pipeline.shadow.bootstrapTranscriptChoiceRequired"),
+										"warn",
+									);
+									patchCheck("transcript", {
+										status: "warning",
+										detail: t("pipeline.shadow.bootstrapWaitingUserChoice"),
+									});
+									setAwaitingTranscriptChoice(true);
+									setLoadingSubtitle(
+										t("pipeline.shadow.bootstrapWaitingUserChoice"),
+									);
+									return;
+								}
+
 								const activeStt = orchestration.activeJobs.find(
 									(job) => job.stage === "speech_to_text",
 								);
 								backgroundSttActive =
 									activeStt?.status === "running" ||
-									activeStt?.status === "queued";
+									(activeStt?.status === "queued" &&
+										activeStt.userChoiceRequired !== true);
 
 								if (backgroundSttActive && activeStt) {
 									const estimateMs =
@@ -371,17 +391,26 @@ export function ShadowWatchPage() {
 										"warn",
 									);
 								}
-
-								if (orchestration.jobsWaitingUserChoice.length > 0) {
-									deadline = Date.now() + 24 * 60 * 60 * 1000;
-									pushLog(
-										t("pipeline.shadow.bootstrapTranscriptChoiceRequired"),
-										"warn",
-									);
-								}
 							} catch {
 								// Pipeline orchestration API may be unavailable in mock mode.
 							}
+
+							pushLog(t("pipeline.shadow.bootstrapLogFetchStatus"));
+							const jobStatus = await videoService.getStatus(videoId);
+							latestJobStatus = jobStatus;
+							pipelineStatus = jobStatus.status;
+							logVideoPipelineDiagnostics(pushLog, t, jobStatus);
+							patchCheck("transcript", {
+								status:
+									jobStatus.status === "failed"
+										? "error"
+										: jobStatus.status === "completed"
+											? "warning"
+											: "active",
+								detail: t("pipeline.shadow.bootstrapPipelineStatusDetail", {
+									status: jobStatus.status,
+								}),
+							});
 
 							if (jobStatus.status === "failed") {
 								if (!reprocessAttempted) {
@@ -440,10 +469,8 @@ export function ShadowWatchPage() {
 						}
 
 						pollAttempt += 1;
-						const elapsedSeconds = Math.round(
-							(TRANSCRIPT_INITIAL_WAIT_MS - Math.max(0, deadline - Date.now())) /
-								1000,
-						);
+						const elapsedSeconds =
+							computeNonNegativeElapsedSeconds(pollStartedAt) ?? 0;
 						const waitingMessage = t(
 							"pipeline.shadow.bootstrapWaitingTranscript",
 							{
@@ -556,7 +583,7 @@ export function ShadowWatchPage() {
 				);
 				setBootstrapFailure(message);
 			} finally {
-				if (!cancelled) {
+				if (!cancelled && !pausedForUserChoice) {
 					setLoading(false);
 				}
 			}
@@ -567,7 +594,7 @@ export function ShadowWatchPage() {
 		return () => {
 			cancelled = true;
 		};
-	}, [videoId, refreshContext, t]);
+	}, [videoId, refreshContext, t, bootstrapAttempt]);
 
 	const refreshSessionLearning = useCallback(
 		async (activeSession: ShadowSession) => {
@@ -905,7 +932,22 @@ export function ShadowWatchPage() {
 				checks={bootstrapChecks}
 				log={bootstrapLog}
 				logTitle={t("pipeline.shadow.bootstrapLogTitle")}
-			/>
+			>
+				{videoId ? (
+					<>
+						<PipelineTranscriptChoicePanel
+							sourceId={videoId}
+							onChoiceSubmitted={() => {
+								setAwaitingTranscriptChoice(false);
+								setBootstrapAttempt((attempt) => attempt + 1);
+							}}
+						/>
+						{awaitingTranscriptChoice ? (
+							<PipelineProgressPanel sourceId={videoId} pollMs={8000} />
+						) : null}
+					</>
+				) : null}
+			</ShadowWatchBootstrapPanel>
 		);
 	}
 
@@ -943,6 +985,7 @@ export function ShadowWatchPage() {
 
 	return (
 		<div className={styles.page}>
+			{videoId ? <PipelineProgressPanel sourceId={videoId} /> : null}
 			<header className={styles.header}>
 				<div>
 					<p className={styles.eyebrow}>{t("pipeline.shadow.eyebrow")}</p>

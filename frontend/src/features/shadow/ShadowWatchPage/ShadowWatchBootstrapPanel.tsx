@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Spinner } from "@/components/ui/Spinner";
 import styles from "./ShadowWatchBootstrapPanel.module.css";
 
@@ -27,6 +28,7 @@ export interface ShadowWatchBootstrapPanelProps {
 	checks: BootstrapCheckItem[];
 	log: BootstrapLogEntry[];
 	logTitle: string;
+	children?: ReactNode;
 }
 
 function statusSymbol(status: BootstrapCheckStatus): string {
@@ -50,6 +52,7 @@ export function ShadowWatchBootstrapPanel({
 	checks,
 	log,
 	logTitle,
+	children,
 }: ShadowWatchBootstrapPanelProps) {
 	return (
 		<div className={styles.root} role="status" aria-live="polite">
@@ -57,6 +60,8 @@ export function ShadowWatchBootstrapPanel({
 			<div className={styles.content}>
 				<h2 className={styles.title}>{title}</h2>
 				<p className={styles.subtitle}>{subtitle}</p>
+
+				{children}
 
 				<ul className={styles.checklist}>
 					{checks.map((item) => (

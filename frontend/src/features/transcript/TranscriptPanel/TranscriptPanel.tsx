@@ -4,6 +4,9 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { PipelineProgressPanel } from "@/features/pipeline";
+import { isPipelineWaitingForTranscriptChoice } from "@/features/pipeline/pipelineChoiceUtils";
+import { usePipelineChoiceState } from "@/features/pipeline/usePipelineChoiceState";
 import { useTranslation } from "@/i18n/useTranslation";
 import { transcriptService } from "@/services/transcript/TranscriptService";
 import type { VideoTranscript } from "@/services/transcript/types";
@@ -18,6 +21,8 @@ export function TranscriptPanel() {
 	const [transcript, setTranscript] = useState<VideoTranscript | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [activeIndex, setActiveIndex] = useState(0);
+	const { isWaitingForChoice, loading: pipelineLoading, status: pipelineStatus } =
+		usePipelineChoiceState(videoId || null);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -25,6 +30,18 @@ export function TranscriptPanel() {
 		setLoading(true);
 		setTranscript(null);
 		setActiveIndex(0);
+
+		if (
+			!resourceId ||
+			pipelineLoading ||
+			pipelineStatus === null ||
+			isPipelineWaitingForTranscriptChoice(pipelineStatus)
+		) {
+			setLoading(false);
+			return () => {
+				cancelled = true;
+			};
+		}
 
 		transcriptService.getTranscript(resourceId).then((result) => {
 			if (!cancelled) {
@@ -36,7 +53,39 @@ export function TranscriptPanel() {
 		return () => {
 			cancelled = true;
 		};
-	}, [resourceId]);
+	}, [pipelineLoading, pipelineStatus, resourceId]);
+
+	if (videoId) {
+		return (
+			<div className={styles.root}>
+				<PipelineProgressPanel sourceId={videoId} />
+				{loading ? (
+					<Spinner label={t("pipeline.transcript.loading")} />
+				) : !transcript && isWaitingForChoice ? (
+					<EmptyState
+						title={t("pipeline.progress.youtubeChoiceTitle")}
+						description={t("pipeline.progress.youtubeChoiceDescription")}
+					/>
+				) : !transcript ? (
+					<EmptyState
+						title={t("pipeline.transcript.unavailableTitle")}
+						description={t("pipeline.transcript.unavailableDescription")}
+						action={
+							<Link to="/video/upload">
+								{t("pipeline.transcript.emptyAction")} →
+							</Link>
+						}
+					/>
+				) : (
+					<TranscriptContent
+						transcript={transcript}
+						activeIndex={activeIndex}
+						onSegmentSelect={setActiveIndex}
+					/>
+				)}
+			</div>
+		);
+	}
 
 	if (loading) {
 		return (
@@ -62,12 +111,31 @@ export function TranscriptPanel() {
 		);
 	}
 
+	return (
+		<TranscriptContent
+			transcript={transcript}
+			activeIndex={activeIndex}
+			onSegmentSelect={setActiveIndex}
+		/>
+	);
+}
+
+function TranscriptContent({
+	transcript,
+	activeIndex,
+	onSegmentSelect,
+}: {
+	transcript: VideoTranscript;
+	activeIndex: number;
+	onSegmentSelect: (index: number) => void;
+}) {
+	const { t } = useTranslation();
 	const isDeterministicPlaceholder = transcript.text.includes(
 		"Deterministic transcript",
 	);
 
 	return (
-		<div className={styles.root}>
+		<>
 			{isDeterministicPlaceholder ? (
 				<p className={styles.devNotice}>
 					{t("pipeline.transcript.deterministicNotice")}
@@ -100,8 +168,8 @@ export function TranscriptPanel() {
 			<TranscriptTimeline
 				segments={transcript.segments}
 				activeIndex={activeIndex}
-				onSegmentSelect={setActiveIndex}
+				onSegmentSelect={onSegmentSelect}
 			/>
-		</div>
+		</>
 	);
 }

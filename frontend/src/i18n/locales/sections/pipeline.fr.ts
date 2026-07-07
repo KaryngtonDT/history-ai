@@ -372,6 +372,8 @@ export const pipelineFr: PipelineMessages = {
 				"La transcription continue en arrière-plan. Vous pouvez quitter et revenir plus tard.",
 			bootstrapTranscriptChoiceRequired:
 				"Sous-titres YouTube originaux trouvés — choisissez dans le panneau pipeline avant de continuer.",
+			bootstrapWaitingUserChoice:
+				"En attente de votre choix de transcription. Utilisez le panneau ci-dessous pour continuer.",
 			bootstrapPipelineFailed:
 				"Le pipeline vidéo a échoué. Rouvrez Watch après correction STT ou relancez depuis Lumen.",
 			bootstrapPipelineFailedDetail:
@@ -533,6 +535,9 @@ export const pipelineFr: PipelineMessages = {
 				"Utiliser la transcription YouTube ou lancer le moteur local.",
 			useYoutubeTranscript: "Utiliser la transcription YouTube",
 			runLocalEngine: "Lancer la transcription locale",
+			continueToTranslation: "Continuer vers la traduction",
+			transcriptReadyNotice:
+				"Transcription enregistrée. Passez à la traduction quand vous êtes prêt.",
 		},
 		create: {
 			videoEyebrow: "Créer",

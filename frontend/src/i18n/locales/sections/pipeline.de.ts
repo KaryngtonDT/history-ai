@@ -371,7 +371,9 @@ export const pipelineDe: PipelineMessages = {
 			bootstrapBackgroundStillRunning:
 				"Transkription läuft im Hintergrund weiter. Seite kann verlassen werden.",
 			bootstrapTranscriptChoiceRequired:
-				"Original-YouTube-Transkript gefunden — Auswahl im Pipeline-Panel erforderlich.",
+				"Originales YouTube-Transkript gefunden — wählen Sie im Pipeline-Panel, bevor Sie fortfahren.",
+			bootstrapWaitingUserChoice:
+				"Warte auf Ihre Transkriptwahl. Nutzen Sie das Panel unten, um fortzufahren.",
 			bootstrapPipelineFailed:
 				"Video-Pipeline fehlgeschlagen. Watch erneut öffnen oder in Lumen neu starten.",
 			bootstrapPipelineFailedDetail:
@@ -531,6 +533,9 @@ export const pipelineDe: PipelineMessages = {
 				"YouTube-Transkript oder lokale Transkription wählen.",
 			useYoutubeTranscript: "YouTube-Transkript verwenden",
 			runLocalEngine: "Lokale Transkription starten",
+			continueToTranslation: "Weiter zur Übersetzung",
+			transcriptReadyNotice:
+				"Transkript gespeichert. Fahren Sie fort, wenn Sie bereit sind.",
 		},
 		create: {
 			videoEyebrow: "Erstellen",

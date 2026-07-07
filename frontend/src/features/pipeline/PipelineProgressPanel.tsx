@@ -4,6 +4,10 @@ import type { PipelineJob, PipelineSourceStatus } from "@/services/pipeline/jobT
 import { useTranslation } from "@/i18n/useTranslation";
 import styles from "./PipelineComponents.module.css";
 import {
+	isPipelineWaitingForTranscriptChoice,
+	resolveJobsWaitingUserChoice,
+} from "./pipelineChoiceUtils";
+import {
 	StageNotification,
 	StageProgressBar,
 	StageStatusBadge,
@@ -25,11 +29,13 @@ function PipelineStageCard({
 	onContinue,
 	onCancel,
 	onRestart,
+	continueLabel,
 }: {
 	job: PipelineJob;
 	onContinue?: (job: PipelineJob) => void;
 	onCancel?: (job: PipelineJob) => void;
 	onRestart?: (job: PipelineJob) => void;
+	continueLabel?: string;
 }) {
 	const { t } = useTranslation();
 	const remaining = formatRemaining(job.estimatedRemainingSeconds);
@@ -54,7 +60,7 @@ function PipelineStageCard({
 						className={styles.buttonPrimary}
 						onClick={() => onContinue(job)}
 					>
-						{t("pipeline.progress.continue")}
+						{continueLabel ?? t("pipeline.progress.continue")}
 					</button>
 				) : null}
 				{(job.status === "running" || job.status === "queued") && onCancel ? (
@@ -96,9 +102,9 @@ export function TranscriptSourceChoiceDialog({
 	}
 
 	return (
-		<div className={styles.dialogBackdrop}>
+		<div className={styles.dialogBackdrop} role="dialog" aria-modal="true" aria-labelledby="transcript-choice-title">
 			<div className={styles.dialog}>
-				<h3>{t("pipeline.progress.youtubeChoiceTitle")}</h3>
+				<h3 id="transcript-choice-title">{t("pipeline.progress.youtubeChoiceTitle")}</h3>
 				<p>{t("pipeline.progress.youtubeChoiceDescription")}</p>
 				<div className={styles.dialogActions}>
 					<button type="button" className={styles.buttonPrimary} onClick={onChooseYoutube}>
@@ -125,6 +131,7 @@ export function PipelineProgressPanel({
 	const { t } = useTranslation();
 	const [status, setStatus] = useState<PipelineSourceStatus | null>(null);
 	const [error, setError] = useState<string | null>(null);
+	const [choiceNotice, setChoiceNotice] = useState<string | null>(null);
 
 	const refresh = useCallback(async () => {
 		try {
@@ -139,12 +146,19 @@ export function PipelineProgressPanel({
 
 	useEffect(() => {
 		void refresh();
+	}, [refresh]);
+
+	useEffect(() => {
+		if (isPipelineWaitingForTranscriptChoice(status)) {
+			return;
+		}
+
 		const timer = window.setInterval(() => {
 			void refresh();
 		}, pollMs);
 
 		return () => window.clearInterval(timer);
-	}, [pollMs, refresh]);
+	}, [pollMs, refresh, status]);
 
 	const handleContinue = async (job: PipelineJob) => {
 		await pipelineJobService.continueStage(sourceId, job.stage);
@@ -167,19 +181,41 @@ export function PipelineProgressPanel({
 		await refresh();
 	};
 
-	const waitingChoice = status?.jobsWaitingUserChoice ?? [];
+	const waitingChoice = status ? resolveJobsWaitingUserChoice(status) : [];
+	const waitingConfirmation = status?.jobsWaitingConfirmation ?? [];
+	const activeJobs = (status?.activeJobs ?? []).filter(
+		(job) => !waitingChoice.some((choiceJob) => choiceJob.jobId === job.jobId),
+	);
 	const visibleJobs = [
-		...(status?.activeJobs ?? []),
-		...(status?.jobsWaitingConfirmation ?? []),
+		...activeJobs,
+		...waitingConfirmation,
 		...(status?.failedJobs ?? []),
 	];
 
+	const handleYoutubeChoice = () => {
+		void pipelineJobService
+			.submitChoice(sourceId, "speech_to_text", "youtube_transcript")
+			.then(() => {
+				setChoiceNotice(t("pipeline.progress.transcriptReadyNotice"));
+				return refresh();
+			});
+	};
+
+	const handleLocalChoice = () => {
+		void pipelineJobService
+			.submitChoice(sourceId, "speech_to_text", "local_engine")
+			.then(() => refresh());
+	};
+
 	return (
-		<div className={styles.root}>
+		<div className={styles.root} data-testid="pipeline-progress-panel">
 			<div className={styles.header}>
 				<h3>{t("pipeline.progress.title")}</h3>
 				<p className={styles.safeMessage}>{t("pipeline.progress.refreshSafe")}</p>
 				{status?.message ? <StageNotification title="Pipeline" message={status.message} /> : null}
+				{choiceNotice ? (
+					<StageNotification title={t("pipeline.progress.title")} message={choiceNotice} />
+				) : null}
 				{error ? <StageNotification title="Error" message={error} /> : null}
 			</div>
 			<StaleArtifactWarning artifactIds={status?.staleArtifacts ?? []} />
@@ -190,20 +226,17 @@ export function PipelineProgressPanel({
 					onContinue={handleContinue}
 					onCancel={handleCancel}
 					onRestart={handleRestart}
+					continueLabel={
+						job.stage === "speech_to_text"
+							? t("pipeline.progress.continueToTranslation")
+							: undefined
+					}
 				/>
 			))}
 			<TranscriptSourceChoiceDialog
 				open={waitingChoice.length > 0}
-				onChooseYoutube={() => {
-					void pipelineJobService
-						.submitChoice(sourceId, "speech_to_text", "youtube_transcript")
-						.then(refresh);
-				}}
-				onChooseLocal={() => {
-					void pipelineJobService
-						.submitChoice(sourceId, "speech_to_text", "local_engine")
-						.then(refresh);
-				}}
+				onChooseYoutube={handleYoutubeChoice}
+				onChooseLocal={handleLocalChoice}
 			/>
 		</div>
 	);

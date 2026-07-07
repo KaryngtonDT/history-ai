@@ -210,14 +210,18 @@ final class PipelineOrchestrator
         foreach ($jobs as $job) {
             $payload = $this->serializeJob($job);
 
-            match ($job->status()) {
-                PipelineJobStatus::Queued, PipelineJobStatus::Running => $activeJobs[] = $payload,
-                PipelineJobStatus::Completed => $completedJobs[] = $payload,
-                PipelineJobStatus::WaitingUserChoice => $jobsWaitingUserChoice[] = $payload,
-                PipelineJobStatus::WaitingUserConfirmation => $jobsWaitingConfirmation[] = $payload,
-                PipelineJobStatus::Failed => $failedJobs[] = $payload,
-                PipelineJobStatus::Cancelled => $cancelledJobs[] = $payload,
-            };
+            if ($this->isWaitingForTranscriptChoice($job)) {
+                $jobsWaitingUserChoice[] = $payload;
+            } else {
+                match ($job->status()) {
+                    PipelineJobStatus::Queued, PipelineJobStatus::Running => $activeJobs[] = $payload,
+                    PipelineJobStatus::Completed => $completedJobs[] = $payload,
+                    PipelineJobStatus::WaitingUserChoice => $jobsWaitingUserChoice[] = $payload,
+                    PipelineJobStatus::WaitingUserConfirmation => $jobsWaitingConfirmation[] = $payload,
+                    PipelineJobStatus::Failed => $failedJobs[] = $payload,
+                    PipelineJobStatus::Cancelled => $cancelledJobs[] = $payload,
+                };
+            }
 
             $staleArtifacts = [...$staleArtifacts, ...$job->staleArtifactIds()];
         }
@@ -277,6 +281,15 @@ final class PipelineOrchestrator
             'userChoiceOptions' => $job->userChoiceOptions(),
             'staleArtifactIds' => $job->staleArtifactIds(),
         ];
+    }
+
+    private function isWaitingForTranscriptChoice(PipelineJob $job): bool
+    {
+        if (PipelineJobStatus::WaitingUserChoice === $job->status()) {
+            return true;
+        }
+
+        return PipelineJobStatus::Queued === $job->status() && $job->userChoiceRequired();
     }
 
     private function requireJob(PipelineJobId $jobId): PipelineJob

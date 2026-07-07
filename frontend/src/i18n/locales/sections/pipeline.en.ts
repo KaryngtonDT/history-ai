@@ -361,6 +361,8 @@ export const pipelineEn = {
 				"Transcription still running in the background. You can safely leave and return later.",
 			bootstrapTranscriptChoiceRequired:
 				"Original YouTube transcript found — choose in the pipeline panel before continuing.",
+			bootstrapWaitingUserChoice:
+				"Waiting for your transcript choice. Use the panel below to continue.",
 			bootstrapPipelineFailed:
 				"Video pipeline failed. Re-open Watch after fixing STT or retry from Lumen.",
 			bootstrapPipelineFailedDetail:
@@ -519,6 +521,9 @@ export const pipelineEn = {
 				"Use the original YouTube transcript or run the local transcription engine.",
 			useYoutubeTranscript: "Use YouTube transcript",
 			runLocalEngine: "Run local transcription engine",
+			continueToTranslation: "Continue to Translation",
+			transcriptReadyNotice:
+				"Transcript saved. Continue to translation when you are ready.",
 		},
 		create: {
 			videoEyebrow: "Create",

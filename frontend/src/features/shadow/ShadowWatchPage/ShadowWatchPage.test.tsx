@@ -2,6 +2,7 @@ import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it, vi } from "vitest";
+import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
 import { ShadowWatchPage } from "@/features/shadow/ShadowWatchPage";
 import { videoRenderService } from "@/services/render/VideoRenderService";
 import { shadowService } from "@/services/shadow/ShadowService";
@@ -206,5 +207,58 @@ describe("ShadowWatchPage", () => {
 		await waitFor(() => {
 			expect(askSpy).toHaveBeenCalled();
 		});
+	});
+
+	it("shows transcript choice panel and stops transcript polling while waiting", async () => {
+		const getTranscriptSpy = vi
+			.spyOn(transcriptService, "loadTranscript")
+			.mockResolvedValue({ transcript: null, unavailableDetail: null });
+		vi.spyOn(videoRenderService, "listRenders").mockResolvedValue([]);
+		vi.spyOn(videoService, "getStatus").mockResolvedValue({
+			videoId: VIDEO_ID,
+			status: "queued",
+			originalFilename: "lecture.mp4",
+			language: "unknown",
+			createdAt: new Date().toISOString(),
+		});
+		vi.spyOn(pipelineJobService, "loadStatus").mockResolvedValue({
+			sourceId: VIDEO_ID,
+			activeJobs: [],
+			completedJobs: [],
+			jobsWaitingUserChoice: [
+				{
+					jobId: "job-1",
+					sourceId: VIDEO_ID,
+					stage: "speech_to_text",
+					status: "waiting_user_choice",
+					progressPercent: 0,
+				},
+			],
+			jobsWaitingConfirmation: [],
+			failedJobs: [],
+			cancelledJobs: [],
+			staleArtifacts: [],
+			blockedStages: ["speech_to_text"],
+			requiresUserAction: true,
+			message: "Choose transcript source",
+		});
+
+		renderWithProviders(
+			<MemoryRouter initialEntries={[`/video/${VIDEO_ID}/watch`]}>
+				<Routes>
+					<Route path="/video/:videoId/watch" element={<ShadowWatchPage />} />
+				</Routes>
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(
+				screen.getByRole("dialog", {
+					name: /original youtube transcript found/i,
+				}),
+			).toBeInTheDocument();
+		});
+
+		expect(getTranscriptSpy).toHaveBeenCalledTimes(1);
 	});
 });

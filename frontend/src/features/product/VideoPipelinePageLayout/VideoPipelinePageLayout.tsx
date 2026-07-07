@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { useParams } from "react-router";
 import { ArtifactJourney } from "@/features/artifacts";
 import { ExplainThisButton } from "@/features/help";
+import { PipelineProgressPanel } from "@/features/pipeline";
 import type { FeatureHelpId } from "@/features/help/content/features";
 import { getFeatureHelp } from "@/features/help/content/features";
 import { useTranslation } from "@/i18n/useTranslation";
@@ -49,6 +50,7 @@ export function VideoPipelinePageLayout({
 				videoId={videoId || null}
 				title={t("pipeline.layouts.journeyPipeline")}
 			/>
+			{videoId ? <PipelineProgressPanel sourceId={videoId} /> : null}
 			<div className={styles.content}>{children}</div>
 		</div>
 	);
