@@ -23,6 +23,13 @@ describe("VideoOverview", () => {
 			"href",
 			"/video/vid-123/transcript",
 		);
-		expect(screen.getByText("Pipeline progress")).toBeInTheDocument();
+		expect(
+			screen.getByRole("region", { name: "Pipeline progress" }),
+		).toBeInTheDocument();
+		expect(
+			screen.getByText(
+				"You can safely leave this page. Refreshing will not restart background jobs.",
+			),
+		).toBeInTheDocument();
 	});
 });
