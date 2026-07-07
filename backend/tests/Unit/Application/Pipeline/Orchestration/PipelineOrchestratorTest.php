@@ -20,6 +20,8 @@ use App\Domain\PipelineJob\PipelineJobRepositoryInterface;
 use App\Domain\PipelineJob\PipelineJobStatus;
 use App\Domain\PipelineJob\PipelineNotificationRepositoryInterface;
 use App\Domain\PipelineJob\PipelineSourceType;
+use App\Domain\Orchestrator\ProcessingMode;
+use App\Domain\Video\VideoId;
 use App\Domain\Video\VideoRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -91,8 +93,75 @@ final class PipelineOrchestratorTest extends TestCase
         self::assertSame([], $status['jobsWaitingUserChoice']);
     }
 
-    private function createOrchestrator(PipelineJobRepositoryInterface $repository): PipelineOrchestrator
+    public function testContinueToNextStageStartsAndEnqueuesTranslation(): void
     {
+        $sourceId = '550e8400-e29b-41d4-a716-446655440099';
+        $sttJob = PipelineJob::createQueued(
+            PipelineJobId::generate(),
+            $sourceId,
+            PipelineSourceType::Video,
+            PipelineStageType::SpeechToText,
+            $sourceId,
+        )
+            ->start('processing')
+            ->complete('transcript-artifact');
+
+        /** @var array<string, PipelineJob> $jobs */
+        $jobs = [$sttJob->jobId()->value => $sttJob];
+
+        $repository = $this->createMock(PipelineJobRepositoryInterface::class);
+        $repository->method('findById')->willReturnCallback(
+            static fn (PipelineJobId $jobId): ?PipelineJob => $jobs[$jobId->value] ?? null,
+        );
+        $repository->method('save')->willReturnCallback(
+            static function (PipelineJob $job) use (&$jobs): void {
+                $jobs[$job->jobId()->value] = $job;
+            },
+        );
+        $repository->method('findActiveBySourceAndStage')->willReturnCallback(
+            static function (string $source, PipelineStageType $stage) use (&$jobs): ?PipelineJob {
+                foreach ($jobs as $job) {
+                    if ($job->sourceId() !== $source) {
+                        continue;
+                    }
+
+                    if ($job->stage() !== $stage) {
+                        continue;
+                    }
+
+                    if ($job->status()->isActive() || $job->status()->isWaitingForUser()) {
+                        return $job;
+                    }
+                }
+
+                return null;
+            },
+        );
+
+        $queue = $this->createMock(VideoProcessingQueueInterface::class);
+        $queue->expects(self::once())
+            ->method('enqueue')
+            ->with(
+                self::callback(static fn (VideoId $videoId): bool => $sourceId === $videoId->value),
+                ProcessingMode::Manual,
+                null,
+                null,
+                PipelineStageType::Translation,
+                self::isType('string'),
+            );
+
+        $orchestrator = $this->createOrchestrator($repository, $queue);
+        $started = $orchestrator->continueToNextStage($sttJob->jobId());
+
+        self::assertNotNull($started);
+        self::assertSame(PipelineStageType::Translation, $started->stage());
+        self::assertSame(PipelineJobStatus::Running, $started->status());
+    }
+
+    private function createOrchestrator(
+        PipelineJobRepositoryInterface $repository,
+        ?VideoProcessingQueueInterface $queue = null,
+    ): PipelineOrchestrator {
         $notificationRepository = $this->createStub(PipelineNotificationRepositoryInterface::class);
         $notificationService = new PipelineNotificationService($notificationRepository);
         $dependencyResolver = new PipelineDependencyResolver();
@@ -116,7 +185,7 @@ final class PipelineOrchestratorTest extends TestCase
             $notificationService,
             new PipelineProgressService($repository),
             $durationEstimator,
-            $this->createStub(VideoProcessingQueueInterface::class),
+            $queue ?? $this->createStub(VideoProcessingQueueInterface::class),
             $videoRepository,
         );
     }

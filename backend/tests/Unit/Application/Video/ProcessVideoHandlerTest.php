@@ -14,6 +14,12 @@ use App\Application\Pipeline\Orchestration\PipelineOrchestrator;
 use App\Application\Pipeline\Orchestration\PipelineProgressService;
 use App\Application\Video\Handlers\ProcessVideoHandler;
 use App\Application\Video\Messages\ProcessVideoMessage;
+use App\Domain\Orchestrator\ProcessingMode;
+use App\Domain\PipelineJob\PipelineJob;
+use App\Domain\PipelineJob\PipelineJobId;
+use App\Domain\PipelineJob\PipelineJobRepositoryInterface;
+use App\Domain\PipelineJob\PipelineJobStatus;
+use App\Domain\PipelineJob\PipelineSourceType;
 use App\Application\Video\Ports\VideoProcessingQueueInterface;
 use App\Domain\AI\AIProviderResolverInterface;
 use App\Domain\Artifact\ArtifactRepositoryInterface;
@@ -425,5 +431,139 @@ final class ProcessVideoHandlerTest extends TestCase
         $this->artifactRepository->expects(self::never())->method('save');
 
         ($this->handler)(new ProcessVideoMessage($videoId->value));
+    }
+
+    public function testProcessesOrchestratedTranslationStage(): void
+    {
+        $videoId = new VideoId('550e8400-e29b-41d4-a716-446655440099');
+        $pipelineJobId = PipelineJobId::generate();
+        $queued = VideoJob::createUploaded($videoId, 'lecture.mp4', VideoLanguage::English)
+            ->withStoragePath('/var/video-storage/lecture.mp4')
+            ->queue();
+        $translationJob = PipelineJob::createQueued(
+            $pipelineJobId,
+            $videoId->value,
+            PipelineSourceType::Video,
+            PipelineStageType::Translation,
+            $videoId->value,
+        )->start('processing');
+
+        $pipelineJobRepository = $this->createMock(PipelineJobRepositoryInterface::class);
+        $pipelineJobRepository->method('findById')->willReturn($translationJob);
+        $pipelineJobRepository->method('save')->willReturnCallback(
+            static function (PipelineJob $job) use (&$translationJob): void {
+                $translationJob = $job;
+            },
+        );
+
+        $notificationService = new PipelineNotificationService(
+            $this->createStub(PipelineNotificationRepositoryInterface::class),
+        );
+        $dependencyResolver = new PipelineDependencyResolver();
+        $invalidationService = new PipelineInvalidationService(
+            $pipelineJobRepository,
+            $dependencyResolver,
+            $notificationService,
+        );
+        $progressService = new PipelineProgressService($pipelineJobRepository);
+        $pipelineOrchestrator = new PipelineOrchestrator(
+            $pipelineJobRepository,
+            $dependencyResolver,
+            $invalidationService,
+            $notificationService,
+            $progressService,
+            new TranscriptionDurationEstimator(
+                new MediaDurationResolver($this->videoRepository),
+                new HardwareAwareEstimateResolver(false),
+                'large-v3',
+            ),
+            $this->createStub(VideoProcessingQueueInterface::class),
+            $this->videoRepository,
+        );
+
+        $intelligenceFactory = $this->createStub(VideoIntelligenceFactoryInterface::class);
+        $intelligenceFactory->method('fromVideoJob')->willReturn($this->sampleIntelligence());
+
+        $optimizer = $this->createStub(ExecutionOptimizerInterface::class);
+        $optimizer->method('optimize')->willReturn($this->sampleOptimization());
+
+        $scheduler = $this->createStub(PipelineSchedulerInterface::class);
+        $scheduler->method('schedule')->willReturn($this->sampleSchedule());
+
+        $handler = new ProcessVideoHandler(
+            $this->videoRepository,
+            $this->aiProviderResolver,
+            $this->transcriptRepository,
+            $this->artifactRepository,
+            new TranscriptJsonMapper(),
+            $this->videoTranslationGenerator,
+            new DefaultTranslationLanguagesProvider('french'),
+            $this->videoAudioGenerator,
+            new GenerateAudioConfiguration(false),
+            $this->videoVoiceCloneGenerator,
+            new GenerateVoiceCloneConfiguration(false),
+            $this->videoLipSyncGenerator,
+            new GenerateLipSyncConfiguration(false),
+            $this->videoFinalRenderGenerator,
+            new GenerateFinalVideoConfiguration(false),
+            $this->createStub(PipelinePlannerInterface::class),
+            $intelligenceFactory,
+            $optimizer,
+            $this->createStub(RuntimeExecutionOptimizationContextInterface::class),
+            $this->createStub(RuntimePipelineConfigurationContextInterface::class),
+            $scheduler,
+            $this->runtimeScheduleContext,
+            $this->qualityAssessmentRunner,
+            new BatchJobProgressUpdater($this->createStub(BatchJobRepositoryInterface::class)),
+            $this->createStub(ExecutionHistoryRecorder::class),
+            new ExecutionReplayContext(),
+            $this->createStub(PipelineTelemetryRecorder::class),
+            $pipelineOrchestrator,
+            $progressService,
+        );
+
+        $this->videoRepository
+            ->expects(self::once())
+            ->method('findById')
+            ->with($videoId)
+            ->willReturn($queued);
+
+        $this->aiProviderResolver->expects(self::never())->method('resolveSpeechToText');
+
+        $this->videoTranslationGenerator
+            ->expects(self::once())
+            ->method('generate')
+            ->with($videoId, self::anything());
+
+        $this->videoRepository
+            ->expects(self::exactly(2))
+            ->method('save')
+            ->willReturnCallback(function (VideoJob $job) use ($videoId): void {
+                static $call = 0;
+                ++$call;
+
+                if (2 === $call) {
+                    self::assertSame(VideoStatus::Completed, $job->status());
+                    self::assertTrue($job->id()->equals($videoId));
+                }
+            });
+
+        $this->runtimeScheduleContext
+            ->expects(self::atLeastOnce())
+            ->method('updateStage');
+
+        ($handler)(new ProcessVideoMessage(
+            $videoId->value,
+            ProcessingMode::Manual,
+            null,
+            null,
+            PipelineStageType::Translation->value,
+            $pipelineJobId->value,
+        ));
+
+        self::assertSame(
+            PipelineJobStatus::WaitingUserConfirmation,
+            $translationJob->status(),
+        );
     }
 }

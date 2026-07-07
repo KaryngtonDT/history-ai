@@ -178,6 +178,14 @@ final class ProcessVideoHandler
             }
 
             if (!$runFullPipeline) {
+                if (
+                    null !== $pipelineJobId
+                    && null !== $targetStage
+                    && PipelineStageType::SpeechToText !== $targetStage
+                ) {
+                    $this->runOrchestratedStage($targetStage, $videoId, $pipelineJobId);
+                }
+
                 $this->videoRepository->save($processing->complete());
                 $succeeded = true;
 
@@ -324,5 +332,63 @@ final class ProcessVideoHandler
             $this->stageDurations[$stage->value] = microtime(true) - $startedAt;
             throw $throwable;
         }
+    }
+
+    private function runOrchestratedStage(
+        PipelineStageType $stage,
+        VideoId $videoId,
+        PipelineJobId $pipelineJobId,
+    ): void {
+        $this->pipelineProgressService->updateProgress($pipelineJobId, 10, $stage->value.'_started');
+
+        match ($stage) {
+            PipelineStageType::Translation => $this->runScheduledStage(
+                PipelineStageType::Translation,
+                function () use ($videoId, $pipelineJobId): void {
+                    $this->pipelineProgressService->updateProgress($pipelineJobId, 40, 'translating');
+
+                    if ([] !== $this->defaultTranslationLanguages->all()) {
+                        $this->videoTranslationGenerator->generate(
+                            $videoId,
+                            $this->defaultTranslationLanguages->all(),
+                        );
+                    }
+
+                    $this->pipelineOrchestrator->completeStage($pipelineJobId);
+                },
+            ),
+            PipelineStageType::TextToSpeech => $this->runScheduledStage(
+                PipelineStageType::TextToSpeech,
+                function () use ($videoId, $pipelineJobId): void {
+                    $this->videoAudioGenerator->generate($videoId);
+                    $this->pipelineOrchestrator->completeStage($pipelineJobId);
+                },
+            ),
+            PipelineStageType::VoiceClone => $this->runScheduledStage(
+                PipelineStageType::VoiceClone,
+                function () use ($videoId, $pipelineJobId): void {
+                    $this->videoVoiceCloneGenerator->generate($videoId);
+                    $this->pipelineOrchestrator->completeStage($pipelineJobId);
+                },
+            ),
+            PipelineStageType::LipSync => $this->runScheduledStage(
+                PipelineStageType::LipSync,
+                function () use ($videoId, $pipelineJobId): void {
+                    $this->videoLipSyncGenerator->generate($videoId);
+                    $this->pipelineOrchestrator->completeStage($pipelineJobId);
+                },
+            ),
+            PipelineStageType::VideoRender => $this->runScheduledStage(
+                PipelineStageType::VideoRender,
+                function () use ($videoId, $pipelineJobId): void {
+                    $this->videoFinalRenderGenerator->generate($videoId);
+                    $this->pipelineOrchestrator->completeStage($pipelineJobId);
+                },
+            ),
+            default => throw new \RuntimeException(sprintf(
+                'Unsupported orchestrated stage "%s".',
+                $stage->value,
+            )),
+        };
     }
 }

@@ -91,27 +91,32 @@ final class PipelineOrchestrator
 
         $started = $job->start('processing');
         $this->jobRepository->save($started);
+        $this->dispatchStageProcessing($started);
+
+        return $started;
+    }
+
+    private function dispatchStageProcessing(PipelineJob $started): void
+    {
+        $videoId = new VideoId($started->videoId() ?? $started->sourceId());
 
         if (PipelineStageType::SpeechToText === $started->stage()) {
-            $videoId = new VideoId($started->videoId() ?? $started->sourceId());
             $videoJob = $this->videoRepository->findById($videoId);
 
             if (null !== $videoJob && VideoStatus::Uploaded === $videoJob->status()) {
                 $queued = $videoJob->queue();
                 $this->videoRepository->save($queued);
             }
-
-            $this->videoProcessingQueue->enqueue(
-                $videoId,
-                ProcessingMode::Manual,
-                null,
-                null,
-                $started->stage(),
-                $started->jobId()->value,
-            );
         }
 
-        return $started;
+        $this->videoProcessingQueue->enqueue(
+            $videoId,
+            ProcessingMode::Manual,
+            null,
+            null,
+            $started->stage(),
+            $started->jobId()->value,
+        );
     }
 
     public function completeStage(PipelineJobId $jobId, ?string $resultArtifactId = null): PipelineJob
@@ -151,12 +156,14 @@ final class PipelineOrchestrator
             return null;
         }
 
-        return $this->getOrCreateJob(
+        $next = $this->getOrCreateJob(
             $job->sourceId(),
             $next,
             $job->sourceType(),
             $job->videoId(),
         );
+
+        return $this->startStage($next->jobId());
     }
 
     public function requireUserTranscriptChoice(PipelineJobId $jobId): PipelineJob
