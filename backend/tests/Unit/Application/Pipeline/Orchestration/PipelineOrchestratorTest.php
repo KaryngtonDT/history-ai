@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Pipeline\Orchestration;
 
+use App\Application\Pipeline\Estimation\HardwareAwareEstimateResolver;
+use App\Application\Pipeline\Estimation\MediaDurationResolver;
 use App\Application\Pipeline\Estimation\TranscriptionDurationEstimator;
 use App\Application\Pipeline\Orchestration\PipelineDependencyResolver;
 use App\Application\Pipeline\Orchestration\PipelineInvalidationService;
@@ -16,6 +18,7 @@ use App\Domain\PipelineJob\PipelineJob;
 use App\Domain\PipelineJob\PipelineJobId;
 use App\Domain\PipelineJob\PipelineJobRepositoryInterface;
 use App\Domain\PipelineJob\PipelineJobStatus;
+use App\Domain\PipelineJob\PipelineNotificationRepositoryInterface;
 use App\Domain\PipelineJob\PipelineSourceType;
 use App\Domain\Video\VideoRepositoryInterface;
 use PHPUnit\Framework\TestCase;
@@ -90,12 +93,20 @@ final class PipelineOrchestratorTest extends TestCase
 
     private function createOrchestrator(PipelineJobRepositoryInterface $repository): PipelineOrchestrator
     {
-        $notificationService = $this->createStub(PipelineNotificationService::class);
+        $notificationRepository = $this->createStub(PipelineNotificationRepositoryInterface::class);
+        $notificationService = new PipelineNotificationService($notificationRepository);
         $dependencyResolver = new PipelineDependencyResolver();
         $invalidationService = new PipelineInvalidationService(
             $repository,
             $dependencyResolver,
             $notificationService,
+        );
+
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
+        $durationEstimator = new TranscriptionDurationEstimator(
+            new MediaDurationResolver($videoRepository),
+            new HardwareAwareEstimateResolver(false),
+            'large-v3',
         );
 
         return new PipelineOrchestrator(
@@ -104,9 +115,9 @@ final class PipelineOrchestratorTest extends TestCase
             $invalidationService,
             $notificationService,
             new PipelineProgressService($repository),
-            $this->createStub(TranscriptionDurationEstimator::class),
+            $durationEstimator,
             $this->createStub(VideoProcessingQueueInterface::class),
-            $this->createStub(VideoRepositoryInterface::class),
+            $videoRepository,
         );
     }
 }
