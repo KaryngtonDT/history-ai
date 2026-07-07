@@ -4,10 +4,17 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Video;
 
+use App\Application\Pipeline\Estimation\HardwareAwareEstimateResolver;
+use App\Application\Pipeline\Estimation\MediaDurationResolver;
+use App\Application\Pipeline\Estimation\TranscriptionDurationEstimator;
+use App\Application\Pipeline\Orchestration\PipelineDependencyResolver;
+use App\Application\Pipeline\Orchestration\PipelineInvalidationService;
+use App\Application\Pipeline\Orchestration\PipelineNotificationService;
 use App\Application\Pipeline\Orchestration\PipelineOrchestrator;
 use App\Application\Pipeline\Orchestration\PipelineProgressService;
 use App\Application\Video\Handlers\ProcessVideoHandler;
 use App\Application\Video\Messages\ProcessVideoMessage;
+use App\Application\Video\Ports\VideoProcessingQueueInterface;
 use App\Domain\AI\AIProviderResolverInterface;
 use App\Domain\Artifact\ArtifactRepositoryInterface;
 use App\Domain\Artifact\ArtifactType;
@@ -78,6 +85,8 @@ use App\Domain\VideoIntelligence\VisualCharacteristics;
 use App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface;
 use App\Domain\VideoRender\FinalVideoRepositoryInterface;
 use App\Domain\Pipeline\PipelineConfigurationResolverInterface;
+use App\Domain\PipelineJob\PipelineJobRepositoryInterface;
+use App\Domain\PipelineJob\PipelineNotificationRepositoryInterface;
 use App\Domain\Scheduler\ExecutionSchedule;
 use App\Domain\Scheduler\ExecutionScheduleId;
 use App\Domain\Scheduler\PipelineSchedulerInterface;
@@ -186,6 +195,32 @@ final class ProcessVideoHandlerTest extends TestCase
             $this->runtimeScheduleContext,
         );
 
+        $pipelineJobRepository = $this->createMock(PipelineJobRepositoryInterface::class);
+        $pipelineNotificationRepository = $this->createMock(PipelineNotificationRepositoryInterface::class);
+        $notificationService = new PipelineNotificationService($pipelineNotificationRepository);
+        $dependencyResolver = new PipelineDependencyResolver();
+        $invalidationService = new PipelineInvalidationService(
+            $pipelineJobRepository,
+            $dependencyResolver,
+            $notificationService,
+        );
+        $progressService = new PipelineProgressService($pipelineJobRepository);
+        $durationEstimator = new TranscriptionDurationEstimator(
+            new MediaDurationResolver($this->videoRepository),
+            new HardwareAwareEstimateResolver(false),
+            'large-v3',
+        );
+        $pipelineOrchestrator = new PipelineOrchestrator(
+            $pipelineJobRepository,
+            $dependencyResolver,
+            $invalidationService,
+            $notificationService,
+            $progressService,
+            $durationEstimator,
+            $this->createMock(VideoProcessingQueueInterface::class),
+            $this->videoRepository,
+        );
+
         $this->handler = new ProcessVideoHandler(
             $this->videoRepository,
             $this->aiProviderResolver,
@@ -214,8 +249,8 @@ final class ProcessVideoHandlerTest extends TestCase
             $executionHistoryRecorder,
             new ExecutionReplayContext(),
             $telemetryRecorder,
-            $this->createMock(PipelineOrchestrator::class),
-            $this->createMock(PipelineProgressService::class),
+            $pipelineOrchestrator,
+            $progressService,
         );
     }
 
