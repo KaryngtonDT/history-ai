@@ -536,6 +536,9 @@ export const pipelineDe: PipelineMessages = {
 			continueToTranslation: "Weiter zur Übersetzung",
 			transcriptReadyNotice:
 				"Transkript gespeichert. Fahren Sie fort, wenn Sie bereit sind.",
+			submittingChoice: "Wird gesendet…",
+			choiceFailed:
+				"Transkriptwahl konnte nicht angewendet werden. Bitte erneut versuchen.",
 		},
 		create: {
 			videoEyebrow: "Erstellen",

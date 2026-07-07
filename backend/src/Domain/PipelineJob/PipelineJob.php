@@ -249,7 +249,7 @@ final class PipelineJob
 
     public function applyUserChoice(TranscriptSource $source): self
     {
-        $this->assertStatus(PipelineJobStatus::WaitingUserChoice, 'apply choice');
+        $this->assertAwaitingTranscriptChoice('apply choice');
 
         return $this->with(
             status: PipelineJobStatus::WaitingUserConfirmation,
@@ -259,6 +259,18 @@ final class PipelineJob
             progressPercent: 100,
             completedAt: new DateTimeImmutable(),
             currentStep: 'transcript_ready',
+        );
+    }
+
+    public function acceptLocalSttChoice(): self
+    {
+        $this->assertAwaitingTranscriptChoice('accept local STT choice');
+
+        return $this->with(
+            status: PipelineJobStatus::Queued,
+            userChoiceRequired: false,
+            userChoiceOptions: [],
+            currentStep: 'local_stt_queued',
         );
     }
 
@@ -441,6 +453,23 @@ final class PipelineJob
     public function userChoiceOptions(): array
     {
         return $this->userChoiceOptions;
+    }
+
+    private function assertAwaitingTranscriptChoice(string $action): void
+    {
+        if (PipelineJobStatus::WaitingUserChoice === $this->status) {
+            return;
+        }
+
+        if (PipelineJobStatus::Queued === $this->status && $this->userChoiceRequired) {
+            return;
+        }
+
+        throw new InvalidPipelineJobException(sprintf(
+            'Cannot %s pipeline job in status "%s".',
+            $action,
+            $this->status->value,
+        ));
     }
 
     private function assertStatus(PipelineJobStatus $expected, string $action): void

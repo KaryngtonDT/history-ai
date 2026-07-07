@@ -176,6 +176,12 @@ final class PipelineOrchestrator
     public function beginLocalStt(PipelineJobId $jobId, string $estimateMessage): PipelineJob
     {
         $job = $this->requireJob($jobId);
+
+        if (PipelineJobStatus::WaitingUserChoice === $job->status()
+            || (PipelineJobStatus::Queued === $job->status() && $job->userChoiceRequired())) {
+            $job = $job->acceptLocalSttChoice();
+        }
+
         $started = PipelineJobStatus::Queued === $job->status() ? $job->start('local_stt') : $job;
         $this->jobRepository->save($started);
         $this->notificationService->notifyLocalSttStarted($job->sourceId(), $estimateMessage);

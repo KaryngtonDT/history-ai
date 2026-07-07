@@ -8,10 +8,15 @@ use App\Application\Pipeline\Estimation\TranscriptionDurationEstimator;
 use App\Application\Pipeline\Orchestration\PipelineChoiceService;
 use App\Application\Pipeline\Orchestration\PipelineOrchestrator;
 use App\Domain\Pipeline\PipelineStageType;
+use App\Domain\PipelineJob\PipelineJob;
 use App\Domain\PipelineJob\PipelineJobRepositoryInterface;
+use App\Domain\PipelineJob\PipelineJobStatus;
 use App\Domain\PipelineJob\TranscriptUserChoice;
 use App\Domain\Video\VideoId;
+use App\Domain\YouTube\YouTubeCaptionFetcherInterface;
+use App\Domain\YouTube\YouTubeCaptionResult;
 use App\Domain\YouTube\YouTubePendingCaptionStoreInterface;
+use App\Domain\YouTube\YouTubeVideoRepositoryInterface;
 
 final class SubmitPipelineChoiceHandler
 {
@@ -21,6 +26,8 @@ final class SubmitPipelineChoiceHandler
         private readonly PipelineChoiceService $choiceService,
         private readonly YouTubePendingCaptionStoreInterface $pendingCaptionStore,
         private readonly TranscriptionDurationEstimator $durationEstimator,
+        private readonly YouTubeVideoRepositoryInterface $youtubeVideoRepository,
+        private readonly YouTubeCaptionFetcherInterface $captionFetcher,
     ) {
     }
 
@@ -41,17 +48,12 @@ final class SubmitPipelineChoiceHandler
 
         $job = $this->jobRepository->findActiveBySourceAndStage($sourceId, $stageType);
 
-        if (null === $job) {
+        if (null === $job || !$this->isAwaitingTranscriptChoice($job)) {
             throw new \RuntimeException('No pipeline job waiting for choice.');
         }
 
         if (TranscriptUserChoice::YoutubeTranscript === $userChoice) {
-            $captions = $this->pendingCaptionStore->load($sourceId);
-
-            if (null === $captions) {
-                throw new \RuntimeException('Pending YouTube captions not found.');
-            }
-
+            $captions = $this->resolvePendingCaptions($sourceId);
             $updated = $this->choiceService->applyYoutubeTranscript($job, $captions);
             $this->pendingCaptionStore->clear($sourceId);
 
@@ -63,5 +65,42 @@ final class SubmitPipelineChoiceHandler
         $this->pendingCaptionStore->clear($sourceId);
 
         return $this->orchestrator->serializeJob($updated);
+    }
+
+    private function isAwaitingTranscriptChoice(PipelineJob $job): bool
+    {
+        if (PipelineJobStatus::WaitingUserChoice === $job->status()) {
+            return true;
+        }
+
+        return PipelineJobStatus::Queued === $job->status() && $job->userChoiceRequired();
+    }
+
+    private function resolvePendingCaptions(string $sourceId): YouTubeCaptionResult
+    {
+        $captions = $this->pendingCaptionStore->load($sourceId);
+
+        if (null !== $captions) {
+            return $captions;
+        }
+
+        $youtubeVideo = $this->youtubeVideoRepository->findByVideoId(new VideoId($sourceId));
+
+        if (null === $youtubeVideo) {
+            throw new \RuntimeException('Pending YouTube captions not found.');
+        }
+
+        $captions = $this->captionFetcher->fetchOriginalCaptions(
+            $youtubeVideo->url(),
+            $youtubeVideo->metadata()->language,
+        );
+
+        if (null === $captions) {
+            throw new \RuntimeException('Pending YouTube captions not found.');
+        }
+
+        $this->pendingCaptionStore->save($sourceId, $captions);
+
+        return $captions;
     }
 }

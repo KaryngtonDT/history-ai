@@ -524,6 +524,8 @@ export const pipelineEn = {
 			continueToTranslation: "Continue to Translation",
 			transcriptReadyNotice:
 				"Transcript saved. Continue to translation when you are ready.",
+			submittingChoice: "Submitting…",
+			choiceFailed: "Could not apply your transcript choice. Please try again.",
 		},
 		create: {
 			videoEyebrow: "Create",

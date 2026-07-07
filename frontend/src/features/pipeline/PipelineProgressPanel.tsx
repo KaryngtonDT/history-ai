@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
 import type { PipelineJob, PipelineSourceStatus } from "@/services/pipeline/jobTypes";
 import { useTranslation } from "@/i18n/useTranslation";
@@ -90,10 +91,14 @@ export function TranscriptSourceChoiceDialog({
 	open,
 	onChooseYoutube,
 	onChooseLocal,
+	submitting = false,
+	error = null,
 }: {
 	open: boolean;
 	onChooseYoutube: () => void;
 	onChooseLocal: () => void;
+	submitting?: boolean;
+	error?: string | null;
 }) {
 	const { t } = useTranslation();
 
@@ -101,32 +106,51 @@ export function TranscriptSourceChoiceDialog({
 		return null;
 	}
 
-	return (
+	const dialog = (
 		<div className={styles.dialogBackdrop} role="dialog" aria-modal="true" aria-labelledby="transcript-choice-title">
 			<div className={styles.dialog}>
 				<h3 id="transcript-choice-title">{t("pipeline.progress.youtubeChoiceTitle")}</h3>
 				<p>{t("pipeline.progress.youtubeChoiceDescription")}</p>
+				{error ? <p className={styles.choiceError}>{error}</p> : null}
 				<div className={styles.dialogActions}>
-					<button type="button" className={styles.buttonPrimary} onClick={onChooseYoutube}>
-						{t("pipeline.progress.useYoutubeTranscript")}
+					<button
+						type="button"
+						className={styles.buttonPrimary}
+						onClick={onChooseYoutube}
+						disabled={submitting}
+					>
+						{submitting
+							? t("pipeline.progress.submittingChoice")
+							: t("pipeline.progress.useYoutubeTranscript")}
 					</button>
-					<button type="button" className={styles.button} onClick={onChooseLocal}>
-						{t("pipeline.progress.runLocalEngine")}
+					<button
+						type="button"
+						className={styles.button}
+						onClick={onChooseLocal}
+						disabled={submitting}
+					>
+						{submitting
+							? t("pipeline.progress.submittingChoice")
+							: t("pipeline.progress.runLocalEngine")}
 					</button>
 				</div>
 			</div>
 		</div>
 	);
+
+	return createPortal(dialog, document.body);
 }
 
 export function PipelineProgressPanel({
 	sourceId,
 	pollMs = 5000,
 	onStatusChange,
+	hideChoiceDialog = false,
 }: {
 	sourceId: string;
 	pollMs?: number;
 	onStatusChange?: (status: PipelineSourceStatus) => void;
+	hideChoiceDialog?: boolean;
 }) {
 	const { t } = useTranslation();
 	const [status, setStatus] = useState<PipelineSourceStatus | null>(null);
@@ -192,19 +216,27 @@ export function PipelineProgressPanel({
 		...(status?.failedJobs ?? []),
 	];
 
-	const handleYoutubeChoice = () => {
-		void pipelineJobService
-			.submitChoice(sourceId, "speech_to_text", "youtube_transcript")
-			.then(() => {
-				setChoiceNotice(t("pipeline.progress.transcriptReadyNotice"));
-				return refresh();
-			});
+	const handleYoutubeChoice = async () => {
+		try {
+			await pipelineJobService.submitChoice(
+				sourceId,
+				"speech_to_text",
+				"youtube_transcript",
+			);
+			setChoiceNotice(t("pipeline.progress.transcriptReadyNotice"));
+			await refresh();
+		} catch {
+			setError(t("pipeline.progress.choiceFailed"));
+		}
 	};
 
-	const handleLocalChoice = () => {
-		void pipelineJobService
-			.submitChoice(sourceId, "speech_to_text", "local_engine")
-			.then(() => refresh());
+	const handleLocalChoice = async () => {
+		try {
+			await pipelineJobService.submitChoice(sourceId, "speech_to_text", "local_engine");
+			await refresh();
+		} catch {
+			setError(t("pipeline.progress.choiceFailed"));
+		}
 	};
 
 	return (
@@ -234,9 +266,13 @@ export function PipelineProgressPanel({
 				/>
 			))}
 			<TranscriptSourceChoiceDialog
-				open={waitingChoice.length > 0}
-				onChooseYoutube={handleYoutubeChoice}
-				onChooseLocal={handleLocalChoice}
+				open={!hideChoiceDialog && waitingChoice.length > 0}
+				onChooseYoutube={() => {
+					void handleYoutubeChoice();
+				}}
+				onChooseLocal={() => {
+					void handleLocalChoice();
+				}}
 			/>
 		</div>
 	);

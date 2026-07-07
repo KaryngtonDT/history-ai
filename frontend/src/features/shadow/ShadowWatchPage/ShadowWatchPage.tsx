@@ -943,7 +943,7 @@ export function ShadowWatchPage() {
 							}}
 						/>
 						{awaitingTranscriptChoice ? (
-							<PipelineProgressPanel sourceId={videoId} pollMs={8000} />
+							<PipelineProgressPanel sourceId={videoId} pollMs={8000} hideChoiceDialog />
 						) : null}
 					</>
 				) : null}

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Doctrine\YouTube;
 
+use App\Domain\Video\VideoId;
 use App\Domain\YouTube\YouTubeVideo;
 use App\Domain\YouTube\YouTubeVideoId;
 use App\Domain\YouTube\YouTubeVideoRepositoryInterface;
@@ -35,6 +36,15 @@ final class DoctrineYouTubeVideoRepository implements YouTubeVideoRepositoryInte
         $record = $this->entityManager->find(YouTubeImportRecord::class, $id->value);
 
         return $record?->toDomain();
+    }
+
+    public function findByVideoId(VideoId $videoId): ?YouTubeVideo
+    {
+        $record = $this->entityManager->getRepository(YouTubeImportRecord::class)->findOneBy([
+            'videoId' => $videoId->value,
+        ]);
+
+        return $record instanceof YouTubeImportRecord ? $record->toDomain() : null;
     }
 
     public function findRecent(int $limit = 20): array

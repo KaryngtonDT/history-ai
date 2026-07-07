@@ -538,6 +538,9 @@ export const pipelineFr: PipelineMessages = {
 			continueToTranslation: "Continuer vers la traduction",
 			transcriptReadyNotice:
 				"Transcription enregistrée. Passez à la traduction quand vous êtes prêt.",
+			submittingChoice: "Envoi en cours…",
+			choiceFailed:
+				"Impossible d'appliquer votre choix de transcription. Réessayez.",
 		},
 		create: {
 			videoEyebrow: "Créer",
