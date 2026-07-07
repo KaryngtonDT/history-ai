@@ -1,0 +1,124 @@
+.root {
+	display: grid;
+	gap: 1rem;
+}
+
+.header {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.safeMessage {
+	color: var(--color-text-muted, #64748b);
+	font-size: 0.9rem;
+}
+
+.stageCard {
+	border: 1px solid var(--color-border, #e2e8f0);
+	border-radius: 0.75rem;
+	padding: 1rem;
+	display: grid;
+	gap: 0.75rem;
+}
+
+.stageTitle {
+	font-weight: 600;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.button {
+	border: 1px solid var(--color-border, #cbd5e1);
+	background: white;
+	border-radius: 0.5rem;
+	padding: 0.45rem 0.75rem;
+	cursor: pointer;
+}
+
+.buttonPrimary {
+	border: 1px solid var(--color-primary, #2563eb);
+	background: var(--color-primary, #2563eb);
+	border-radius: 0.5rem;
+	padding: 0.45rem 0.75rem;
+	cursor: pointer;
+	color: white;
+}
+
+.progressRoot {
+	display: grid;
+	gap: 0.35rem;
+}
+
+.progressLabel {
+	font-size: 0.85rem;
+}
+
+.progressTrack {
+	height: 0.5rem;
+	background: #e2e8f0;
+	border-radius: 999px;
+	overflow: hidden;
+}
+
+.progressFill {
+	height: 100%;
+	background: #2563eb;
+	transition: width 0.3s ease;
+}
+
+.progressValue {
+	font-size: 0.8rem;
+	color: #64748b;
+}
+
+.badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.15rem 0.5rem;
+	border-radius: 999px;
+	background: #eef2ff;
+	color: #3730a3;
+	font-size: 0.75rem;
+	text-transform: capitalize;
+}
+
+.notification {
+	border-left: 3px solid #2563eb;
+	padding: 0.5rem 0.75rem;
+	background: #f8fafc;
+}
+
+.staleWarning {
+	color: #b45309;
+	font-size: 0.85rem;
+}
+
+.dialogBackdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(15, 23, 42, 0.45);
+	display: grid;
+	place-items: center;
+	z-index: 40;
+}
+
+.dialog {
+	background: white;
+	border-radius: 0.75rem;
+	padding: 1.25rem;
+	max-width: 32rem;
+	width: calc(100% - 2rem);
+	display: grid;
+	gap: 1rem;
+}
+
+.dialogActions {
+	display: flex;
+	gap: 0.5rem;
+	justify-content: flex-end;
+}

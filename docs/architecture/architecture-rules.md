@@ -1349,6 +1349,42 @@ Audit: `node frontend/scripts/localization-audit.mjs`
 
 See [Sprint53-Verification.md](../reports/Sprint53-Verification.md).
 
+## Background pipeline orchestration (Sprint 70.8)
+
+Persistent pipeline jobs replace fire-and-forget queueing for user-visible stages.
+
+```text
+Import / Upload
+        │
+        ▼
+PipelineOrchestrator.getOrCreateJob (one active job per source + stage)
+        │
+        ├── YouTube original captions → waiting_user_choice
+        ├── No captions → local STT background job + duration estimate
+        └── Stage complete → waiting_user_confirmation
+        │
+        ▼
+GET /api/pipeline/jobs/{sourceId} → PipelineProgressPanel
+```
+
+| Component | Role |
+| --------- | ---- |
+| `PipelineJob` | Persistent aggregate: stage, status, progress, estimates |
+| `PipelineOrchestrator` | Locking, start/complete/fail, choice + confirmation gates |
+| `PipelineDependencyResolver` | Next stage + invalidation cascade rules |
+| `PipelineInvalidationService` | Marks downstream artifacts stale (does not delete) |
+| `PipelineNotificationService` | User-visible notifications per stage event |
+| `TranscriptionDurationEstimator` | Hardware-aware STT duration ranges |
+| `YtDlpYouTubeCaptionFetcher` | Original-language captions only (no translated imports) |
+| `PipelineJobService` | Frontend port for progress API |
+| `PipelineProgressPanel` | Shared progress, choice, and confirmation UX |
+
+Feature components must use `pipelineJobService` for job status/actions, not `HttpClient` directly.
+
+Restarting an earlier stage invalidates later stages; page refresh must read existing job state, never create duplicates.
+
+See [BACKGROUND_PIPELINE_ORCHESTRATION.md](./BACKGROUND_PIPELINE_ORCHESTRATION.md).
+
 ## Enforcement
 
 | Tool | Location | Command |

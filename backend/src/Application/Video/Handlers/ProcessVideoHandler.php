@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Application\Video\Handlers;
 
 use App\Application\History\ExecutionHistoryRecorder;
+use App\Application\Pipeline\Orchestration\PipelineOrchestrator;
+use App\Application\Pipeline\Orchestration\PipelineProgressService;
 use App\Application\Quality\VideoQualityAssessmentRunner;
 use App\Application\Telemetry\PipelineTelemetryRecorder;
 use App\Application\Workspace\BatchJobProgressUpdater;
@@ -39,12 +41,17 @@ use App\Domain\Processing\ProcessingJobId;
 use App\Domain\Scheduler\PipelineSchedulerInterface;
 use App\Domain\Scheduler\RuntimeExecutionScheduleContextInterface;
 use App\Domain\Scheduler\ScheduledStageStatus;
+use App\Domain\PipelineJob\PipelineJobId;
+use App\Domain\PipelineJob\TranscriptSource;
+use App\Domain\PipelineJob\TranscriptUserChoice;
+use App\Domain\Speech\TranscriptMetadata;
 use App\Domain\Speech\TranscriptRepositoryInterface;
 use App\Domain\Video\VideoId;
 use App\Domain\Video\VideoJob;
 use App\Domain\Video\VideoRepositoryInterface;
 use App\Domain\VideoIntelligence\VideoIntelligence;
 use App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface;
+use DateTimeImmutable;
 use Throwable;
 
 final class ProcessVideoHandler
@@ -88,6 +95,8 @@ final class ProcessVideoHandler
         private readonly ExecutionHistoryRecorder $executionHistoryRecorder,
         private readonly ExecutionReplayContextInterface $executionReplayContext,
         private readonly PipelineTelemetryRecorder $pipelineTelemetryRecorder,
+        private readonly PipelineOrchestrator $pipelineOrchestrator,
+        private readonly PipelineProgressService $pipelineProgressService,
     ) {
     }
 
@@ -114,21 +123,66 @@ final class ProcessVideoHandler
             $this->configurePipelineForMessage($message, $processing);
             $this->initialQueueTimeSeconds = $this->pipelineTelemetryRecorder->resolveInitialQueueTimeSeconds();
 
-            $this->runScheduledStage(PipelineStageType::SpeechToText, function () use ($processing, $videoId): void {
-                $transcript = $this->aiProviderResolver
-                    ->resolveSpeechToText()
-                    ->transcribe($processing);
-                $this->transcriptRepository->save($videoId, $transcript);
+            $pipelineJobId = null !== $message->pipelineJobId
+                ? new PipelineJobId($message->pipelineJobId)
+                : null;
 
-                $artifact = Artifact::create(
-                    ArtifactId::generate(),
-                    new ContentId($videoId->value),
-                    new ProcessingJobId($videoId->value),
-                    ArtifactType::Transcript,
-                    ArtifactContent::fromString($this->transcriptJsonMapper->toJson($transcript)),
-                );
-                $this->artifactRepository->save($artifact);
-            });
+            if (null !== $pipelineJobId) {
+                $this->pipelineProgressService->heartbeat($pipelineJobId);
+            }
+
+            $runFullPipeline = ProcessingMode::Automatic === $message->processingMode
+                && null === $message->pipelineJobId;
+            $targetStage = null !== $message->stage
+                ? PipelineStageType::tryFrom($message->stage)
+                : PipelineStageType::SpeechToText;
+
+            if ($runFullPipeline || PipelineStageType::SpeechToText === $targetStage) {
+                $this->runScheduledStage(PipelineStageType::SpeechToText, function () use ($processing, $videoId, $pipelineJobId): void {
+                    if (null !== $pipelineJobId) {
+                        $this->pipelineProgressService->updateProgress($pipelineJobId, 5, 'extracting_audio');
+                    }
+
+                    $transcript = $this->aiProviderResolver
+                        ->resolveSpeechToText()
+                        ->transcribe($processing);
+
+                    if (null !== $pipelineJobId) {
+                        $this->pipelineProgressService->updateProgress($pipelineJobId, 90, 'saving_transcript');
+                    }
+
+                    $this->transcriptRepository->save($videoId, $transcript, new TranscriptMetadata(
+                        transcriptSource: TranscriptSource::FasterWhisper,
+                        sourceLanguage: $transcript->language()->value,
+                        confidence: null,
+                        generatedAt: new DateTimeImmutable(),
+                        selectedByUser: true,
+                        fallbackReason: 'No original YouTube transcript selected or available.',
+                        originalCaptionAvailable: false,
+                        userChoice: TranscriptUserChoice::LocalEngine,
+                    ));
+
+                    $artifact = Artifact::create(
+                        ArtifactId::generate(),
+                        new ContentId($videoId->value),
+                        new ProcessingJobId($videoId->value),
+                        ArtifactType::Transcript,
+                        ArtifactContent::fromString($this->transcriptJsonMapper->toJson($transcript)),
+                    );
+                    $this->artifactRepository->save($artifact);
+
+                    if (null !== $pipelineJobId) {
+                        $this->pipelineOrchestrator->completeStage($pipelineJobId, $artifact->id()->value);
+                    }
+                });
+            }
+
+            if (!$runFullPipeline) {
+                $this->videoRepository->save($processing->complete());
+                $succeeded = true;
+
+                return;
+            }
 
             if ([] !== $this->defaultTranslationLanguages->all()) {
                 $this->runScheduledStage(
@@ -179,6 +233,14 @@ final class ProcessVideoHandler
             $succeeded = true;
         } catch (Throwable $throwable) {
             $failureMessage = $throwable->getMessage();
+
+            if (null !== $message->pipelineJobId) {
+                $this->pipelineOrchestrator->failStage(
+                    new PipelineJobId($message->pipelineJobId),
+                    $failureMessage,
+                );
+            }
+
             $this->videoRepository->save($processing->fail(
                 $failureMessage,
                 $this->currentStage?->value,

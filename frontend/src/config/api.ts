@@ -54,6 +54,46 @@ export const SEARCH_LIBRARY_PATH = "/api/search/library";
 
 export const VIDEOS_PATH = "/api/videos";
 
+export function pipelineJobsPath(sourceId: string): string {
+	return `/api/pipeline/jobs/${sourceId}`;
+}
+
+export function pipelineJobStagePath(sourceId: string, stage: string): string {
+	return `/api/pipeline/jobs/${sourceId}/${stage}`;
+}
+
+export function pipelineJobStageStartPath(
+	sourceId: string,
+	stage: string,
+): string {
+	return `/api/pipeline/jobs/${sourceId}/${stage}/start`;
+}
+
+export function pipelineJobStageCancelPath(
+	sourceId: string,
+	stage: string,
+): string {
+	return `/api/pipeline/jobs/${sourceId}/${stage}/cancel`;
+}
+
+export function pipelineJobStageContinuePath(
+	sourceId: string,
+	stage: string,
+): string {
+	return `/api/pipeline/jobs/${sourceId}/${stage}/continue`;
+}
+
+export function pipelineJobStageChoicePath(
+	sourceId: string,
+	stage: string,
+): string {
+	return `/api/pipeline/jobs/${sourceId}/${stage}/choice`;
+}
+
+export function pipelineJobEventsPath(sourceId: string): string {
+	return `/api/pipeline/jobs/${sourceId}/events`;
+}
+
 export function videoStreamPath(videoId: string): string {
 	return `${VIDEOS_PATH}/${videoId}/stream`;
 }

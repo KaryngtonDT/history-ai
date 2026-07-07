@@ -117,6 +117,10 @@ when@test:
             class: App\Infrastructure\YouTube\MockYouTubeImporter
             public: true
 
+        App\Domain\YouTube\YouTubeCaptionFetcherInterface:
+            class: App\Infrastructure\YouTube\NullYouTubeCaptionFetcher
+            public: true
+
         App\Domain\Source\SourceRepositoryInterface:
             alias: App\Infrastructure\Persistence\Doctrine\Source\DoctrineSourceRepository
             public: true

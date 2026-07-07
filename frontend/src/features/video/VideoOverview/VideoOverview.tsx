@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { ArtifactJourney } from "@/features/artifacts";
 import { ExplainThisButton } from "@/features/help";
+import { PipelineProgressPanel } from "@/features/pipeline";
 import { PageIntroduction } from "@/features/product";
 import {
 	getVideoPipelineStepLabel,
@@ -122,6 +123,8 @@ export function VideoOverview() {
 				videoId={videoId}
 				title={t("pipeline.videoOverview.journeyTitle")}
 			/>
+
+			{videoId ? <PipelineProgressPanel sourceId={videoId} /> : null}
 
 			<div className={styles.grid}>
 				<Card className={styles.panel}>

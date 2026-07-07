@@ -7,6 +7,7 @@ import { ExecutiveWatchBar } from "@/features/shadowExecutive/ExecutiveWatchBar"
 import { useTranslation } from "@/i18n/useTranslation";
 import { resolveVideoRenderStreamUrl } from "@/services/render/types";
 import { videoRenderService } from "@/services/render/VideoRenderService";
+import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
 import { shadowService } from "@/services/shadow/ShadowService";
 import type {
 	SessionLearningState,
@@ -72,7 +73,8 @@ const INTERVENTION_DEBOUNCE_MS = 900;
 const LEARNING_POLL_MS = 5000;
 const DEFAULT_TARGET_LANGUAGE = "fr";
 const TRANSCRIPT_POLL_INTERVAL_MS = 3000;
-const TRANSCRIPT_WAIT_TIMEOUT_MS = 5 * 60 * 1000;
+const TRANSCRIPT_INITIAL_WAIT_MS = 5 * 60 * 1000;
+const TRANSCRIPT_BACKGROUND_EXTENSION_MS = 30 * 60 * 1000;
 
 function sleep(ms: number): Promise<void> {
 	return new Promise((resolve) => {
@@ -315,7 +317,7 @@ export function ShadowWatchPage() {
 					});
 				}
 
-				const deadline = Date.now() + TRANSCRIPT_WAIT_TIMEOUT_MS;
+				let deadline = Date.now() + TRANSCRIPT_INITIAL_WAIT_MS;
 				let pollAttempt = 0;
 				let reprocessAttempted = false;
 
@@ -325,6 +327,7 @@ export function ShadowWatchPage() {
 						let latestJobStatus: Awaited<
 							ReturnType<typeof videoService.getStatus>
 						> | null = null;
+						let backgroundSttActive = false;
 
 						try {
 							pushLog(t("pipeline.shadow.bootstrapLogFetchStatus"));
@@ -343,6 +346,42 @@ export function ShadowWatchPage() {
 									status: jobStatus.status,
 								}),
 							});
+
+							try {
+								const orchestration = await pipelineJobService.loadStatus(videoId);
+								const activeStt = orchestration.activeJobs.find(
+									(job) => job.stage === "speech_to_text",
+								);
+								backgroundSttActive =
+									activeStt?.status === "running" ||
+									activeStt?.status === "queued";
+
+								if (backgroundSttActive && activeStt) {
+									const estimateMs =
+										(activeStt.estimatedDurationSeconds ?? 7200) * 1000;
+									deadline = Math.max(
+										deadline,
+										Date.now() + estimateMs,
+									);
+									pushLog(
+										t("pipeline.shadow.bootstrapBackgroundTranscription", {
+											progress: activeStt.progressPercent,
+											remaining: activeStt.estimatedRemainingSeconds ?? 0,
+										}),
+										"warn",
+									);
+								}
+
+								if (orchestration.jobsWaitingUserChoice.length > 0) {
+									deadline = Date.now() + 24 * 60 * 60 * 1000;
+									pushLog(
+										t("pipeline.shadow.bootstrapTranscriptChoiceRequired"),
+										"warn",
+									);
+								}
+							} catch {
+								// Pipeline orchestration API may be unavailable in mock mode.
+							}
 
 							if (jobStatus.status === "failed") {
 								if (!reprocessAttempted) {
@@ -378,7 +417,11 @@ export function ShadowWatchPage() {
 							);
 						}
 
-						if (Date.now() >= deadline) {
+						if (
+							Date.now() >= deadline &&
+							!backgroundSttActive &&
+							pipelineStatus !== "processing"
+						) {
 							const timeoutMessage = t(
 								"pipeline.shadow.bootstrapTranscriptTimeout",
 							);
@@ -391,9 +434,15 @@ export function ShadowWatchPage() {
 							return;
 						}
 
+						if (Date.now() >= deadline && backgroundSttActive) {
+							deadline = Date.now() + TRANSCRIPT_BACKGROUND_EXTENSION_MS;
+							pushLog(t("pipeline.shadow.bootstrapBackgroundStillRunning"), "warn");
+						}
+
 						pollAttempt += 1;
 						const elapsedSeconds = Math.round(
-							(TRANSCRIPT_WAIT_TIMEOUT_MS - (deadline - Date.now())) / 1000,
+							(TRANSCRIPT_INITIAL_WAIT_MS - Math.max(0, deadline - Date.now())) /
+								1000,
 						);
 						const waitingMessage = t(
 							"pipeline.shadow.bootstrapWaitingTranscript",

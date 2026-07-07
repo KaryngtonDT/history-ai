@@ -365,7 +365,13 @@ export const pipelineFr: PipelineMessages = {
 			bootstrapWaitingTranscript:
 				"Attente de la transcription (tentative {{attempt}}, {{elapsed}} s, pipeline : {{status}})...",
 			bootstrapTranscriptTimeout:
-				"Transcription non prête après 5 minutes. Lancez le pipeline vidéo depuis Lumen.",
+				"Transcription pas encore prête. Consultez l'aperçu vidéo pour suivre la transcription en arrière-plan.",
+			bootstrapBackgroundTranscription:
+				"Transcription en arrière-plan ({{progress}} %, ~{{remaining}} s restants estimés).",
+			bootstrapBackgroundStillRunning:
+				"La transcription continue en arrière-plan. Vous pouvez quitter et revenir plus tard.",
+			bootstrapTranscriptChoiceRequired:
+				"Sous-titres YouTube originaux trouvés — choisissez dans le panneau pipeline avant de continuer.",
 			bootstrapPipelineFailed:
 				"Le pipeline vidéo a échoué. Rouvrez Watch après correction STT ou relancez depuis Lumen.",
 			bootstrapPipelineFailedDetail:
@@ -511,6 +517,22 @@ export const pipelineFr: PipelineMessages = {
 				previewFailed: "Impossible de prévisualiser cette voix.",
 				presetFailed: "Impossible d'appliquer le préréglage vocal.",
 			},
+		},
+		progress: {
+			title: "Progression du pipeline",
+			refreshSafe:
+				"Vous pouvez quitter cette page en toute sécurité. Un rafraîchissement ne relancera pas les jobs.",
+			loadFailed: "Impossible de charger la progression du pipeline.",
+			continue: "Continuer",
+			cancel: "Annuler",
+			restart: "Relancer l'étape",
+			restartConfirm:
+				"Relancer cette étape invalidera les étapes suivantes. Continuer ?",
+			youtubeChoiceTitle: "Transcription YouTube originale trouvée",
+			youtubeChoiceDescription:
+				"Utiliser la transcription YouTube ou lancer le moteur local.",
+			useYoutubeTranscript: "Utiliser la transcription YouTube",
+			runLocalEngine: "Lancer la transcription locale",
 		},
 		create: {
 			videoEyebrow: "Créer",

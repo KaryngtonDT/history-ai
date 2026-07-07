@@ -19,6 +19,7 @@ final readonly class VideoTranscriptResponse
         public float $duration,
         public int $segmentCount,
         public array $segments,
+        public ?array $metadata = null,
     ) {
     }
 
@@ -32,6 +33,7 @@ final readonly class VideoTranscriptResponse
             duration: $result->duration,
             segmentCount: $result->segmentCount,
             segments: $result->segments,
+            metadata: $result->metadata,
         );
     }
 
@@ -56,6 +58,7 @@ final readonly class VideoTranscriptResponse
             'duration' => $this->duration,
             'segmentCount' => $this->segmentCount,
             'segments' => $this->segments,
+            'metadata' => $this->metadata,
         ];
     }
 }

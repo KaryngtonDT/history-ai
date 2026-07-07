@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Persistence\Doctrine\Speech;
 
 use App\Domain\Speech\Transcript;
+use App\Domain\Speech\TranscriptMetadata;
 use App\Domain\Speech\TranscriptRepositoryInterface;
 use App\Domain\Video\VideoId;
 use App\Application\Speech\TranscriptJsonMapper;
@@ -18,7 +19,7 @@ final class DoctrineTranscriptRepository implements TranscriptRepositoryInterfac
     ) {
     }
 
-    public function save(VideoId $videoId, Transcript $transcript): void
+    public function save(VideoId $videoId, Transcript $transcript, ?TranscriptMetadata $metadata = null): void
     {
         $repository = $this->entityManager->getRepository(TranscriptRecord::class);
         $record = $repository->find($videoId->value);
@@ -28,9 +29,10 @@ final class DoctrineTranscriptRepository implements TranscriptRepositoryInterfac
                 $videoId,
                 $transcript,
                 $this->transcriptJsonMapper,
+                $metadata,
             ));
         } else {
-            $record->syncFromDomain($transcript, $this->transcriptJsonMapper);
+            $record->syncFromDomain($transcript, $this->transcriptJsonMapper, $metadata);
         }
 
         $this->entityManager->flush();
@@ -41,5 +43,12 @@ final class DoctrineTranscriptRepository implements TranscriptRepositoryInterfac
         $record = $this->entityManager->find(TranscriptRecord::class, $videoId->value);
 
         return $record?->toDomain($this->transcriptJsonMapper);
+    }
+
+    public function findMetadataByVideoId(VideoId $videoId): ?TranscriptMetadata
+    {
+        $record = $this->entityManager->find(TranscriptRecord::class, $videoId->value);
+
+        return $record?->metadata();
     }
 }

@@ -19,10 +19,11 @@ final readonly class VideoTranscriptResult
         public float $duration,
         public int $segmentCount,
         public array $segments,
+        public ?array $metadata = null,
     ) {
     }
 
-    public static function fromDomain(string $videoId, Transcript $transcript): self
+    public static function fromDomain(string $videoId, Transcript $transcript, ?\App\Domain\Speech\TranscriptMetadata $metadata = null): self
     {
         /** @var list<array{index: int, startTime: float, endTime: float, text: string}> $segments */
         $segments = [];
@@ -44,6 +45,7 @@ final readonly class VideoTranscriptResult
             duration: $transcript->duration(),
             segmentCount: $transcript->segmentCount(),
             segments: $segments,
+            metadata: $metadata?->toArray(),
         );
     }
 }

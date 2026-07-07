@@ -14,6 +14,8 @@ final readonly class ProcessVideoMessage
         public ProcessingMode $processingMode = ProcessingMode::Manual,
         public ?ProcessingStrategy $strategy = null,
         public ?string $batchJobId = null,
+        public ?string $stage = null,
+        public ?string $pipelineJobId = null,
     ) {
     }
 }

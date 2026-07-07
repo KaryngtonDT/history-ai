@@ -8,7 +8,9 @@ use App\Domain\Video\VideoId;
 
 interface TranscriptRepositoryInterface
 {
-    public function save(VideoId $videoId, Transcript $transcript): void;
+    public function save(VideoId $videoId, Transcript $transcript, ?TranscriptMetadata $metadata = null): void;
 
     public function findByVideoId(VideoId $videoId): ?Transcript;
+
+    public function findMetadataByVideoId(VideoId $videoId): ?TranscriptMetadata;
 }

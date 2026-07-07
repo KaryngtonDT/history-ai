@@ -43,6 +43,10 @@ final class GetVideoTranscriptHandler
             );
         }
 
-        return VideoTranscriptResult::fromDomain($videoId->value, $transcript);
+        return VideoTranscriptResult::fromDomain(
+            $videoId->value,
+            $transcript,
+            $this->transcriptRepository->findMetadataByVideoId($videoId),
+        );
     }
 }

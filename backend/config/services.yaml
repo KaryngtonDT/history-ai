@@ -172,6 +172,31 @@ services:
         arguments:
             $binary: '%env(default:youtube.yt_dlp.binary_default:YOUTUBE_YT_DLP_BINARY)%'
 
+    App\Domain\YouTube\YouTubeCaptionFetcherInterface:
+        alias: App\Infrastructure\YouTube\YtDlpYouTubeCaptionFetcher
+
+    App\Infrastructure\YouTube\YtDlpYouTubeCaptionFetcher:
+        arguments:
+            $binary: '%env(default:youtube.yt_dlp.binary_default:YOUTUBE_YT_DLP_BINARY)%'
+
+    App\Infrastructure\YouTube\YouTubePendingCaptionStore:
+        arguments:
+            $directory: '%youtube.download_dir%'
+
+    App\Domain\PipelineJob\PipelineJobRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\PipelineJob\DoctrinePipelineJobRepository
+
+    App\Domain\PipelineJob\PipelineNotificationRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\PipelineJob\DoctrinePipelineNotificationRepository
+
+    App\Application\Pipeline\Estimation\HardwareAwareEstimateResolver:
+        arguments:
+            $hasGpu: false
+
+    App\Application\Pipeline\Estimation\TranscriptionDurationEstimator:
+        arguments:
+            $sttModel: '%env(default:stt.faster_whisper.model_default:STT_FASTER_WHISPER_MODEL)%'
+
     App\Application\YouTube\Handlers\ImportYouTubeHandler:
         arguments:
             $downloadDirectory: '%youtube.download_dir%'

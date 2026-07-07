@@ -14,6 +14,8 @@ use App\Domain\Video\VideoRepositoryInterface;
 use App\Domain\Video\VideoStatus;
 use App\Infrastructure\Persistence\Doctrine\Artifact\ArtifactRecord;
 use App\Infrastructure\Persistence\Doctrine\Pipeline\PipelineConfigurationRecord;
+use App\Infrastructure\Persistence\Doctrine\PipelineJob\PipelineJobRecord;
+use App\Infrastructure\Persistence\Doctrine\PipelineJob\PipelineNotificationRecord;
 use App\Infrastructure\Persistence\Doctrine\Source\SourceRecord;
 use App\Infrastructure\Persistence\Doctrine\Speech\TranscriptRecord;
 use App\Infrastructure\Persistence\Doctrine\Translation\TranslationRecord;
@@ -62,6 +64,8 @@ final class YouTubeVideoPipelineFlowTest extends WebTestCase
             $entityManager->getClassMetadata(TranslationRecord::class),
             $entityManager->getClassMetadata(ArtifactRecord::class),
             $entityManager->getClassMetadata(PipelineConfigurationRecord::class),
+            $entityManager->getClassMetadata(PipelineJobRecord::class),
+            $entityManager->getClassMetadata(PipelineNotificationRecord::class),
             $entityManager->getClassMetadata(FinalVideoRecord::class),
         ];
         $schemaTool = new SchemaTool($entityManager);

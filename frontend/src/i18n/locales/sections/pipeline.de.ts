@@ -365,7 +365,13 @@ export const pipelineDe: PipelineMessages = {
 			bootstrapWaitingTranscript:
 				"Warte auf Transkript (Versuch {{attempt}}, {{elapsed}} s, Pipeline: {{status}})...",
 			bootstrapTranscriptTimeout:
-				"Transkript nach 5 Minuten nicht bereit. Starten Sie die Video-Pipeline in Lumen.",
+				"Transkript noch nicht bereit. Video-Übersicht für Hintergrund-Transkription öffnen.",
+			bootstrapBackgroundTranscription:
+				"Hintergrund-Transkription läuft ({{progress}} %, ~{{remaining}} s geschätzt).",
+			bootstrapBackgroundStillRunning:
+				"Transkription läuft im Hintergrund weiter. Seite kann verlassen werden.",
+			bootstrapTranscriptChoiceRequired:
+				"Original-YouTube-Transkript gefunden — Auswahl im Pipeline-Panel erforderlich.",
 			bootstrapPipelineFailed:
 				"Video-Pipeline fehlgeschlagen. Watch erneut öffnen oder in Lumen neu starten.",
 			bootstrapPipelineFailedDetail:
@@ -509,6 +515,22 @@ export const pipelineDe: PipelineMessages = {
 				previewFailed: "Diese Stimme konnte nicht angehört werden.",
 				presetFailed: "Sprachpreset konnte nicht angewendet werden.",
 			},
+		},
+		progress: {
+			title: "Pipeline-Fortschritt",
+			refreshSafe:
+				"Seite kann sicher verlassen werden. Aktualisieren startet keine Jobs neu.",
+			loadFailed: "Pipeline-Fortschritt konnte nicht geladen werden.",
+			continue: "Weiter",
+			cancel: "Abbrechen",
+			restart: "Stufe neu starten",
+			restartConfirm:
+				"Neustart invalidiert nachfolgende Stufen. Fortfahren?",
+			youtubeChoiceTitle: "Originales YouTube-Transkript gefunden",
+			youtubeChoiceDescription:
+				"YouTube-Transkript oder lokale Transkription wählen.",
+			useYoutubeTranscript: "YouTube-Transkript verwenden",
+			runLocalEngine: "Lokale Transkription starten",
 		},
 		create: {
 			videoEyebrow: "Erstellen",

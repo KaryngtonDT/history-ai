@@ -354,7 +354,13 @@ export const pipelineEn = {
 			bootstrapWaitingTranscript:
 				"Waiting for transcript (attempt {{attempt}}, {{elapsed}}s elapsed, pipeline: {{status}})...",
 			bootstrapTranscriptTimeout:
-				"Transcript not ready after 5 minutes. Run the video pipeline from Lumen.",
+				"Transcript not ready yet. Open the video overview to monitor background transcription.",
+			bootstrapBackgroundTranscription:
+				"Background transcription running ({{progress}}%, ~{{remaining}}s remaining estimated).",
+			bootstrapBackgroundStillRunning:
+				"Transcription still running in the background. You can safely leave and return later.",
+			bootstrapTranscriptChoiceRequired:
+				"Original YouTube transcript found — choose in the pipeline panel before continuing.",
 			bootstrapPipelineFailed:
 				"Video pipeline failed. Re-open Watch after fixing STT or retry from Lumen.",
 			bootstrapPipelineFailedDetail:
@@ -497,6 +503,22 @@ export const pipelineEn = {
 				previewFailed: "Unable to preview this voice.",
 				presetFailed: "Unable to apply voice preset.",
 			},
+		},
+		progress: {
+			title: "Pipeline progress",
+			refreshSafe:
+				"You can safely leave this page. Refreshing will not restart background jobs.",
+			loadFailed: "Could not load pipeline progress.",
+			continue: "Continue",
+			cancel: "Cancel",
+			restart: "Restart stage",
+			restartConfirm:
+				"Restarting this stage will invalidate later dependent stages. Continue?",
+			youtubeChoiceTitle: "Original YouTube transcript found",
+			youtubeChoiceDescription:
+				"Use the original YouTube transcript or run the local transcription engine.",
+			useYoutubeTranscript: "Use YouTube transcript",
+			runLocalEngine: "Run local transcription engine",
 		},
 		create: {
 			videoEyebrow: "Create",
