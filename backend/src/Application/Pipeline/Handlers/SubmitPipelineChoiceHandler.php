@@ -11,7 +11,7 @@ use App\Domain\Pipeline\PipelineStageType;
 use App\Domain\PipelineJob\PipelineJobRepositoryInterface;
 use App\Domain\PipelineJob\TranscriptUserChoice;
 use App\Domain\Video\VideoId;
-use App\Infrastructure\YouTube\YouTubePendingCaptionStore;
+use App\Domain\YouTube\YouTubePendingCaptionStoreInterface;
 
 final class SubmitPipelineChoiceHandler
 {
@@ -19,7 +19,7 @@ final class SubmitPipelineChoiceHandler
         private readonly PipelineJobRepositoryInterface $jobRepository,
         private readonly PipelineOrchestrator $orchestrator,
         private readonly PipelineChoiceService $choiceService,
-        private readonly YouTubePendingCaptionStore $pendingCaptionStore,
+        private readonly YouTubePendingCaptionStoreInterface $pendingCaptionStore,
         private readonly TranscriptionDurationEstimator $durationEstimator,
     ) {
     }

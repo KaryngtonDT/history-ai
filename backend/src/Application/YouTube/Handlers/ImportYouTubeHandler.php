@@ -27,14 +27,14 @@ use App\Domain\YouTube\YouTubeUrl;
 use App\Domain\YouTube\YouTubeVideo;
 use App\Domain\YouTube\YouTubeVideoId;
 use App\Domain\YouTube\YouTubeVideoRepositoryInterface;
-use App\Infrastructure\YouTube\YouTubePendingCaptionStore;
+use App\Domain\YouTube\YouTubePendingCaptionStoreInterface;
 
 final class ImportYouTubeHandler
 {
     public function __construct(
         private readonly YouTubeImporterInterface $importer,
         private readonly YouTubeCaptionFetcherInterface $captionFetcher,
-        private readonly YouTubePendingCaptionStore $pendingCaptionStore,
+        private readonly YouTubePendingCaptionStoreInterface $pendingCaptionStore,
         private readonly PipelineOrchestrator $pipelineOrchestrator,
         private readonly TranscriptionDurationEstimator $durationEstimator,
         private readonly string $downloadDirectory,

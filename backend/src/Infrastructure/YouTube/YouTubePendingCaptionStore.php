@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Infrastructure\YouTube;
 
 use App\Domain\YouTube\YouTubeCaptionResult;
+use App\Domain\YouTube\YouTubePendingCaptionStoreInterface;
 
-final class YouTubePendingCaptionStore
+final class YouTubePendingCaptionStore implements YouTubePendingCaptionStoreInterface
 {
     public function __construct(
         private readonly string $directory,

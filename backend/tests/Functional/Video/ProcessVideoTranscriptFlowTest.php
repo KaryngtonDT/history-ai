@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Video;
 
 use App\Application\Video\Handlers\ProcessVideoHandler;
 use App\Application\Video\Messages\ProcessVideoMessage;
+use App\Domain\Orchestrator\ProcessingMode;
 use App\Domain\Artifact\ArtifactRepositoryInterface;
 use App\Domain\Artifact\ArtifactType;
 use App\Domain\Content\ContentId;
@@ -42,7 +43,7 @@ final class ProcessVideoTranscriptFlowTest extends WebTestCase
         $videoRepository->save($job);
 
         $handler = static::getContainer()->get(ProcessVideoHandler::class);
-        ($handler)(new ProcessVideoMessage($videoId->value));
+        ($handler)(new ProcessVideoMessage($videoId->value, ProcessingMode::Automatic));
 
         $updatedJob = $videoRepository->findById($videoId);
         self::assertNotNull($updatedJob);

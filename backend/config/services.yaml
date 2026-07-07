@@ -179,6 +179,9 @@ services:
         arguments:
             $binary: '%env(default:youtube.yt_dlp.binary_default:YOUTUBE_YT_DLP_BINARY)%'
 
+    App\Domain\YouTube\YouTubePendingCaptionStoreInterface:
+        alias: App\Infrastructure\YouTube\YouTubePendingCaptionStore
+
     App\Infrastructure\YouTube\YouTubePendingCaptionStore:
         arguments:
             $directory: '%youtube.download_dir%'
