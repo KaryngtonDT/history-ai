@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Video;
 
+use App\Application\Pipeline\Orchestration\PipelineOrchestrator;
+use App\Application\Pipeline\Orchestration\PipelineProgressService;
 use App\Application\Video\Handlers\ProcessVideoHandler;
 use App\Application\Video\Messages\ProcessVideoMessage;
 use App\Domain\AI\AIProviderResolverInterface;
@@ -212,6 +214,8 @@ final class ProcessVideoHandlerTest extends TestCase
             $executionHistoryRecorder,
             new ExecutionReplayContext(),
             $telemetryRecorder,
+            $this->createMock(PipelineOrchestrator::class),
+            $this->createMock(PipelineProgressService::class),
         );
     }
 
@@ -322,7 +326,7 @@ final class ProcessVideoHandlerTest extends TestCase
         $this->transcriptRepository
             ->expects(self::once())
             ->method('save')
-            ->with($videoId, $transcript);
+            ->with($videoId, $transcript, self::anything());
 
         $this->artifactRepository
             ->expects(self::once())
