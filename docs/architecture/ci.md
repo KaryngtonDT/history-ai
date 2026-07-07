@@ -62,7 +62,7 @@ Jobs run **in parallel**. Each job fails fast: the first failing step stops that
 | Step | Command | Notes |
 | ---- | ------- | ----- |
 | Install | `composer install` | Cached via `backend/vendor` + `composer.lock` hash |
-| PHPUnit | `php bin/phpunit` | SQLite in-memory (`phpunit.dist.xml`); no Postgres required |
+| PHPUnit | `php bin/phpunit` | SQLite in-memory (`phpunit.dist.xml`); no Postgres required; **fails on any deprecation or notice** (PHP and PHPUnit) |
 | Architecture | `composer architecture` | Layer dependency rules (`tests/Architecture/`) |
 
 **Runtime:** PHP 8.4, extensions `ctype`, `iconv`, `intl`, `pdo_sqlite`.
@@ -155,7 +155,7 @@ docker compose exec worker ruff check .
 
 | Failed job | Likely cause | What to check |
 | ---------- | ------------ | ------------- |
-| Backend PHPUnit | Business logic or functional test regression | Failing test class name in log |
+| Backend PHPUnit | Business logic, functional test regression, or PHPUnit deprecation/notice | Failing test class name in log; mock without `expects()` triggers notice |
 | Backend Architecture | Forbidden layer import (e.g. Doctrine in Domain) | [architecture-rules.md](./architecture-rules.md) |
 | Frontend Build | TypeScript or Vite compile error | `npm run build` output locally |
 | Frontend Test | Component or architecture rule violation | Test file path in Vitest output |

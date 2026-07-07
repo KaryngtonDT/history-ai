@@ -46,6 +46,7 @@ Presentation may reference Domain value objects and exceptions when parsing HTTP
 
 | Tool | Location | Command |
 | ---- | -------- | ------- |
+| PHPUnit (strict) | `backend/phpunit.dist.xml` | `make test-backend` — fails on PHP/PHPUnit deprecations and notices |
 | PHPUnit architecture tests | `backend/tests/Architecture/` | `docker compose exec backend php bin/phpunit tests/Architecture` |
 | Deptrac config (reference) | `backend/deptrac.yaml` | Optional: `vendor/bin/deptrac analyse` after installing Deptrac |
 
