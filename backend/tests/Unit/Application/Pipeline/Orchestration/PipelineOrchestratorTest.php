@@ -107,43 +107,7 @@ final class PipelineOrchestratorTest extends TestCase
             ->start('processing')
             ->complete('transcript-artifact');
 
-        /** @var array<string, PipelineJob> $jobs */
-        $jobs = [$sttJob->jobId()->value => $sttJob];
-
-        $repository = $this->createMock(PipelineJobRepositoryInterface::class);
-        $repository->expects(self::any())
-            ->method('findById')
-            ->willReturnCallback(
-                static fn (PipelineJobId $jobId): ?PipelineJob => $jobs[$jobId->value] ?? null,
-            );
-        $repository->expects(self::any())
-            ->method('save')
-            ->willReturnCallback(
-                static function (PipelineJob $job) use (&$jobs): void {
-                    $jobs[$job->jobId()->value] = $job;
-                },
-            );
-        $repository->expects(self::any())
-            ->method('findActiveBySourceAndStage')
-            ->willReturnCallback(
-                static function (string $source, PipelineStageType $stage) use (&$jobs): ?PipelineJob {
-                    foreach ($jobs as $job) {
-                        if ($job->sourceId() !== $source) {
-                            continue;
-                        }
-
-                        if ($job->stage() !== $stage) {
-                            continue;
-                        }
-
-                        if ($job->status()->isActive() || $job->status()->isWaitingForUser()) {
-                            return $job;
-                        }
-                    }
-
-                    return null;
-                },
-            );
+        $repository = new InMemoryPipelineJobRepository($sttJob);
 
         $queue = $this->createMock(VideoProcessingQueueInterface::class);
         $queue->expects(self::once())
@@ -200,5 +164,64 @@ final class PipelineOrchestratorTest extends TestCase
             $queue ?? $this->createStub(VideoProcessingQueueInterface::class),
             $videoRepository,
         );
+    }
+}
+
+final class InMemoryPipelineJobRepository implements PipelineJobRepositoryInterface
+{
+    /** @var array<string, PipelineJob> */
+    private array $jobs = [];
+
+    public function __construct(PipelineJob ...$seedJobs)
+    {
+        foreach ($seedJobs as $job) {
+            $this->jobs[$job->jobId()->value] = $job;
+        }
+    }
+
+    public function save(PipelineJob $job): void
+    {
+        $this->jobs[$job->jobId()->value] = $job;
+    }
+
+    public function findById(PipelineJobId $jobId): ?PipelineJob
+    {
+        return $this->jobs[$jobId->value] ?? null;
+    }
+
+    public function findActiveBySourceAndStage(string $sourceId, PipelineStageType $stage): ?PipelineJob
+    {
+        foreach ($this->jobs as $job) {
+            if ($job->sourceId() !== $sourceId) {
+                continue;
+            }
+
+            if ($job->stage() !== $stage) {
+                continue;
+            }
+
+            if ($job->status()->isActive() || $job->status()->isWaitingForUser()) {
+                return $job;
+            }
+        }
+
+        return null;
+    }
+
+    public function findBySourceId(string $sourceId): array
+    {
+        return array_values(array_filter(
+            $this->jobs,
+            static fn (PipelineJob $job): bool => $job->sourceId() === $sourceId,
+        ));
+    }
+
+    public function findActiveBySourceId(string $sourceId): array
+    {
+        return array_values(array_filter(
+            $this->jobs,
+            static fn (PipelineJob $job): bool => $job->sourceId() === $sourceId
+                && ($job->status()->isActive() || $job->status()->isWaitingForUser()),
+        ));
     }
 }
