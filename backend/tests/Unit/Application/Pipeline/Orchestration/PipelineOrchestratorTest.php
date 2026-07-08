@@ -110,7 +110,7 @@ final class PipelineOrchestratorTest extends TestCase
         /** @var array<string, PipelineJob> $jobs */
         $jobs = [$sttJob->jobId()->value => $sttJob];
 
-        $repository = $this->createMock(PipelineJobRepositoryInterface::class);
+        $repository = $this->createStub(PipelineJobRepositoryInterface::class);
         $repository->method('findById')->willReturnCallback(
             static fn (PipelineJobId $jobId): ?PipelineJob => $jobs[$jobId->value] ?? null,
         );
