@@ -22,6 +22,11 @@ interface RuntimePlatformInterface
     public function health(): array;
 
     /**
+     * @return array<string, mixed>
+     */
+    public function platformHealth(): array;
+
+    /**
      * @return list<array<string, mixed>>
      */
     public function engines(): array;

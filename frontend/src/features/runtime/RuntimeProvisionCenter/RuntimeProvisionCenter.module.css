@@ -4,6 +4,22 @@
 	gap: 2rem;
 }
 
+.filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	align-items: center;
+}
+
+.checkbox {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	font-size: 0.9rem;
+	color: var(--color-text-muted);
+	margin-left: 0.5rem;
+}
+
 .principle {
 	color: var(--color-text-muted);
 	margin: 0 0 1rem;

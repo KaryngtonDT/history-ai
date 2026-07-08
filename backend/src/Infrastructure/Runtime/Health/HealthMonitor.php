@@ -13,23 +13,39 @@ final class HealthMonitor
     /** @var list<array{engineId: string, message: string, at: string}> */
     private array $failureHistory = [];
 
-    public function __construct(private readonly ReadinessEngine $readinessEngine)
-    {
+    public function __construct(
+        private readonly ReadinessEngine $readinessEngine,
+        private readonly RuntimePlatformHealthService $platformHealthService,
+    ) {
     }
 
     public function heartbeat(): RuntimeHealth
     {
         $report = $this->readinessEngine->evaluate();
-        $score = 0 === $report->totalCount
-            ? 0.0
-            : round(($report->readyCount / $report->totalCount) * 100, 1);
+        $platformHealth = $this->platformHealthService->evaluate();
+        $coreHealth = is_array($platformHealth['coreHealth'] ?? null) ? $platformHealth['coreHealth'] : [];
+        $score = (float) ($coreHealth['percent'] ?? 0.0);
+        $coreReady = 'ready' === ($coreHealth['status'] ?? 'fail');
+
+        $issues = array_values(array_filter(
+            $report->issues,
+            static function (string $issue): bool {
+                foreach (['OCR', 'Vision', 'Embeddings', 'Reranking', 'LatentSync', 'Lip Sync', 'Premium'] as $optionalMarker) {
+                    if (str_contains($issue, $optionalMarker)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            },
+        ));
 
         return new RuntimeHealth(
-            status: $report->status,
+            status: $coreReady ? RuntimeStatus::Ready : RuntimeStatus::Degraded,
             score: $score,
-            healthyEngines: $report->readyCount,
-            totalEngines: $report->totalCount,
-            issues: $report->issues,
+            healthyEngines: (int) ($coreHealth['readyCount'] ?? 0),
+            totalEngines: (int) ($coreHealth['totalCount'] ?? 0),
+            issues: $issues,
             lastCheckedAt: (new \DateTimeImmutable())->format(DATE_ATOM),
         );
     }

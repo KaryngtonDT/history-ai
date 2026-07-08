@@ -12,6 +12,7 @@ use App\Domain\Engine\EngineCatalogCapability;
 use App\Domain\Engine\EngineRepositoryInterface;
 use App\Domain\Runtime\RuntimeRepositoryInterface;
 use App\Infrastructure\Runtime\Catalog\EngineCatalogDefinitions;
+use App\Infrastructure\Runtime\Catalog\RuntimeCapabilityClassificationRegistry;
 use App\Infrastructure\Runtime\Compatibility\RuntimeCompatibilityService;
 use App\Infrastructure\Runtime\Discovery\EngineDiscovery;
 use App\Infrastructure\Runtime\Health\HealthMonitor;
@@ -80,9 +81,18 @@ final class RuntimeEngineManagementAssembler
                 );
             }
 
+            $meta = RuntimeCapabilityClassificationRegistry::for($capability);
+
             $capabilities[] = [
                 'capability' => $capability->value,
                 'label' => $capability->label(),
+                'classification' => $meta->classification->value,
+                'classificationLabel' => $meta->classification->label(),
+                'required' => $meta->required,
+                'enabledByDefault' => $meta->enabledByDefault,
+                'hardwareDependent' => $meta->hardwareDependent,
+                'installable' => $meta->installable,
+                'recommended' => $meta->recommended,
                 'videoPipeline' => $capability->isVideoPipeline(),
                 'selectionMode' => $mode->value,
                 'selectionModeLabel' => $mode->label(),

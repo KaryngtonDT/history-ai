@@ -16,7 +16,9 @@ use App\Infrastructure\Runtime\Benchmark\BenchmarkRunner;
 use App\Infrastructure\Runtime\Catalog\CapabilityMaturityRegistry;
 use App\Infrastructure\Runtime\Catalog\EngineCatalogDefinitions;
 use App\Infrastructure\Runtime\Catalog\EngineRequirementMatrix;
+use App\Infrastructure\Runtime\Catalog\RuntimeCapabilityClassificationRegistry;
 use App\Infrastructure\Runtime\Compatibility\RuntimeCompatibilityService;
+use App\Infrastructure\Runtime\Health\RuntimePlatformHealthService;
 use App\Infrastructure\Runtime\Provisioning\EngineProvisioningCatalog;
 
 final class RuntimeDashboardAssembler implements RuntimeDashboardInterface
@@ -29,12 +31,15 @@ final class RuntimeDashboardAssembler implements RuntimeDashboardInterface
         private readonly PlatformHealthCheckerInterface $platformHealthChecker,
         private readonly RuntimeScoreCalculator $runtimeScoreCalculator,
         private readonly PlatformScoreCalculator $platformScoreCalculator,
+        private readonly RuntimePlatformHealthService $platformHealthService,
         private readonly string $projectDir,
     ) {
     }
 
     public function dashboard(): array
     {
+        $platformHealth = $this->platformHealthService->evaluate();
+        $coreHealth = is_array($platformHealth['coreHealth'] ?? null) ? $platformHealth['coreHealth'] : [];
         $readiness = $this->platform->readiness();
         $hardware = $this->platform->hardware();
         $compatibility = $this->platform->compatibility();
@@ -68,12 +73,15 @@ final class RuntimeDashboardAssembler implements RuntimeDashboardInterface
             $hardwareCompatibleIds,
             $compatibleReady,
             $provisioningPlan,
+            $coreHealth,
         );
         $runtimeScore = $this->runtimeScoreCalculator->calculate($scoreInputs);
+        $scoreModel = $this->runtimeScoreCalculator->calculateScoreModel($scoreInputs, $platformHealth);
+        $coreScore = (float) ($coreHealth['percent'] ?? $runtimeScore->score);
 
         $platformReadiness = $this->platformHealthChecker->productionReadiness();
         $platformScore = $this->platformScoreCalculator->calculate([
-            'runtime' => $runtimeScore->score,
+            'runtime' => $coreScore,
             'shadow' => $this->shadowScore($platformReadiness),
             'storage' => $this->checkScore($platformReadiness, 'storageWritable'),
             'worker' => $this->checkScore($platformReadiness, 'worker'),
@@ -83,15 +91,16 @@ final class RuntimeDashboardAssembler implements RuntimeDashboardInterface
             'documentation' => $scoreInputs['documentation'],
         ]);
 
-        $capabilities = $this->buildCapabilities($engines, $compatById, $hardware, $recommendations);
+        $capabilities = $this->buildCapabilities($engines, $compatById, $hardware, $recommendations, $platformHealth);
         $capabilityScores = $this->buildCapabilityScores($capabilities);
         $premiumFeatures = $this->buildPremiumFeatures($compatById);
         $timeline = $this->buildTimeline();
         $shadowCommentary = $this->buildShadowCommentary(
-            $runtimeScore->score,
+            $coreScore,
             $compatibility,
             $hardware,
             $premiumFeatures,
+            $platformHealth,
         );
 
         $lastValidation = $this->lastValidationSummary();
@@ -99,10 +108,20 @@ final class RuntimeDashboardAssembler implements RuntimeDashboardInterface
         return [
             'title' => 'Lumen Runtime Health',
             'generatedAt' => (new \DateTimeImmutable())->format(DATE_ATOM),
-            'overallRuntimeScore' => $runtimeScore->toArray(),
+            'overallRuntimeScore' => [
+                ...$runtimeScore->toArray(),
+                'score' => $coreScore,
+                'summary' => ($coreHealth['status'] ?? '') === 'ready'
+                    ? 'Core Runtime is healthy. Optional and premium capabilities are tracked separately.'
+                    : 'Core Runtime needs attention. Optional capabilities do not affect core health.',
+            ],
+            'scoreModel' => $scoreModel->toArray(),
+            'platformHealth' => $platformHealth,
             'platformScore' => $platformScore,
             'summary' => [
-                'overallHealth' => $runtimeScore->score,
+                'overallHealth' => $coreScore,
+                'coreHealthPercent' => $coreScore,
+                'coreStatus' => $coreHealth['status'] ?? 'fail',
                 'hardwareProfile' => $hardware['profile']['type'] ?? 'unknown',
                 'hardwareProfileLabel' => $hardware['profile']['label'] ?? 'Unknown',
                 'runtimeStatus' => strtoupper((string) ($readiness['status'] ?? 'unknown')),
@@ -112,6 +131,7 @@ final class RuntimeDashboardAssembler implements RuntimeDashboardInterface
                 'premiumEnginesReady' => count($premiumReady),
                 'premiumEnginesTotal' => count($premiumIds),
                 'benchmarksPassedPercent' => $scoreInputs['benchmarks'],
+                'counters' => $platformHealth['counters'] ?? [],
                 'lastValidation' => $lastValidation,
             ],
             'capabilityStatuses' => $capabilities,
@@ -134,6 +154,7 @@ final class RuntimeDashboardAssembler implements RuntimeDashboardInterface
      * @param list<string> $hardwareCompatibleIds
      * @param list<string> $compatibleReady
      * @param array<string, mixed> $provisioningPlan
+     * @param array<string, mixed> $coreHealth
      *
      * @return array{
      *   runtimeHealth: float,
@@ -152,10 +173,14 @@ final class RuntimeDashboardAssembler implements RuntimeDashboardInterface
         array $hardwareCompatibleIds,
         array $compatibleReady,
         array $provisioningPlan,
+        array $coreHealth = [],
     ): array {
         $totalEngines = (int) ($readiness['totalCount'] ?? 0);
         $readyCount = (int) ($readiness['readyCount'] ?? 0);
-        $runtimeHealth = $totalEngines > 0 ? ($readyCount / $totalEngines) * 100 : 0.0;
+        $runtimeHealth = (float) ($coreHealth['percent'] ?? 0.0);
+        if ($runtimeHealth <= 0.0) {
+            $runtimeHealth = $totalEngines > 0 ? ($readyCount / $totalEngines) * 100 : 0.0;
+        }
 
         $compatibleTotal = count($hardwareCompatibleIds);
         $compatibleInstalled = $compatibleTotal > 0
@@ -242,6 +267,7 @@ final class RuntimeDashboardAssembler implements RuntimeDashboardInterface
      * @param array<string, array<string, mixed>> $compatById
      * @param array<string, mixed> $hardware
      * @param list<array<string, mixed>> $recommendations
+     * @param array<string, mixed> $platformHealth
      *
      * @return list<array<string, mixed>>
      */
@@ -250,7 +276,15 @@ final class RuntimeDashboardAssembler implements RuntimeDashboardInterface
         array $compatById,
         array $hardware,
         array $recommendations,
+        array $platformHealth,
     ): array {
+        $classifiedByCap = [];
+        foreach ($platformHealth['capabilities'] ?? [] as $capState) {
+            if (is_array($capState) && isset($capState['capability'])) {
+                $classifiedByCap[$capState['capability']] = $capState;
+            }
+        }
+
         $recommendedPipeline = is_array($hardware['recommendedPipeline'] ?? null)
             ? $hardware['recommendedPipeline']
             : [];
@@ -310,9 +344,19 @@ final class RuntimeDashboardAssembler implements RuntimeDashboardInterface
                 ? (int) round((count($readyInCap) / max(1, count($capEngines))) * 100)
                 : 0;
 
+            $classified = $classifiedByCap[$capKey] ?? null;
+            $meta = RuntimeCapabilityClassificationRegistry::for($capability);
+
             $items[] = [
                 'capability' => $capKey,
                 'label' => $capability->label(),
+                'classification' => $classified['classification'] ?? $meta->classification->value,
+                'classificationLabel' => $classified['classificationLabel'] ?? $meta->classification->label(),
+                'required' => $classified['required'] ?? $meta->required,
+                'availability' => $classified['availability'] ?? null,
+                'availabilityLabel' => $classified['availabilityLabel'] ?? null,
+                'reason' => $classified['reason'] ?? null,
+                'futureHardware' => $classified['futureHardware'] ?? null,
                 'status' => $status,
                 'statusLabel' => strtoupper(str_replace('_', ' ', $status)),
                 'videoPipeline' => $capability->isVideoPipeline(),
@@ -395,17 +439,18 @@ final class RuntimeDashboardAssembler implements RuntimeDashboardInterface
             $ready = (int) ($cap['readyCount'] ?? 0);
             $total = max(1, (int) ($cap['engineCount'] ?? 1));
             $percent = round(($ready / $total) * 100, 0);
-            $reason = null;
-            if (($cap['status'] ?? '') === 'partial') {
+            $reason = $cap['reason'] ?? null;
+            if (null === $reason && ($cap['status'] ?? '') === 'partial') {
                 $reason = 'Premium engine unavailable on current hardware';
             }
-            if (($cap['status'] ?? '') === 'not_installed') {
-                $reason = 'Capability catalogued — install when needed';
+            if (null === $reason && ($cap['status'] ?? '') === 'not_installed') {
+                $reason = 'Optional capability — install when needed';
             }
 
             $scores[] = [
                 'capability' => $cap['capability'],
                 'label' => $cap['label'],
+                'classification' => $cap['classification'] ?? null,
                 'score' => $percent,
                 'reason' => $reason,
             ];
@@ -622,6 +667,9 @@ final class RuntimeDashboardAssembler implements RuntimeDashboardInterface
             if (!in_array($compat['status'] ?? '', ['blocked', 'missing', 'misconfigured'], true)) {
                 continue;
             }
+            if (($compat['canBeFixedByHardware'] ?? false) && !($compat['canBeFixedByInstall'] ?? false)) {
+                continue;
+            }
             $warnings[] = [
                 'engineId' => $engineId,
                 'severity' => $compat['severity'] ?? 'blocking',
@@ -671,34 +719,30 @@ final class RuntimeDashboardAssembler implements RuntimeDashboardInterface
         array $compatibility,
         array $hardware,
         array $premiumFeatures,
+        array $platformHealth,
     ): array {
         $profileLabel = $hardware['profile']['label'] ?? 'this machine';
-        $blockedHw = is_array($compatibility['blockedByHardware'] ?? null)
-            ? $compatibility['blockedByHardware']
-            : [];
+        $coreHealth = is_array($platformHealth['coreHealth'] ?? null) ? $platformHealth['coreHealth'] : [];
+        $coreReady = 'ready' === ($coreHealth['status'] ?? 'fail');
 
         $paragraphs = [];
-        if ($runtimeScore >= 85.0) {
-            $paragraphs[] = 'Your Runtime is healthy.';
-            $paragraphs[] = 'All compatible engines are operational.';
+        if ($coreReady) {
+            $paragraphs[] = 'Runtime Core is healthy — all required capabilities are operational.';
+            $paragraphs[] = 'Optional and premium capabilities are tracked separately and do not reduce core health.';
         } else {
-            $paragraphs[] = 'Your Runtime needs attention on compatible engines.';
+            $paragraphs[] = 'Runtime Core needs attention on required capabilities.';
         }
 
-        if ([] !== $blockedHw) {
-            $paragraphs[] = 'Your only limitations are hardware-related.';
-            $lipAlt = null;
-            foreach ($premiumFeatures as $feature) {
-                if (str_contains((string) ($feature['engineId'] ?? ''), 'latent') || str_contains((string) ($feature['engineId'] ?? ''), 'lip')) {
-                    $lipAlt = $feature['recommendedAlternative'] ?? 'Wav2Lip';
-                }
-            }
-            if (null !== $lipAlt) {
-                $paragraphs[] = sprintf(
-                    'For premium lip synchronization, a CUDA-enabled NVIDIA GPU is required. Until then, %s is the recommended engine.',
-                    $lipAlt,
-                );
-            }
+        $optionalCaps = array_filter(
+            is_array($platformHealth['capabilities'] ?? null) ? $platformHealth['capabilities'] : [],
+            static fn (array $cap): bool => ($cap['classification'] ?? '') === 'optional',
+        );
+        if ([] !== $optionalCaps) {
+            $paragraphs[] = 'OCR, Vision, Embeddings and Reranking are optional — not installed by default.';
+        }
+
+        if ([] !== $premiumFeatures) {
+            $paragraphs[] = 'Premium engines remain visible when blocked by hardware. They become available with compatible GPU hardware without penalizing core health.';
         }
 
         $paragraphs[] = sprintf('Hardware profile: %s.', $profileLabel);

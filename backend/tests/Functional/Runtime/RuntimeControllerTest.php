@@ -50,6 +50,9 @@ final class RuntimeControllerTest extends WebTestCase
 
         self::assertArrayHasKey('pipelineId', $payload);
         self::assertArrayHasKey('steps', $payload);
+        self::assertArrayHasKey('coreRuntime', $payload);
+        self::assertArrayHasKey('extensions', $payload);
+        self::assertArrayHasKey('premium', $payload);
 
         $client->request('GET', '/api/runtime/report/'.$payload['pipelineId']);
         self::assertResponseIsSuccessful();
@@ -82,6 +85,8 @@ final class RuntimeControllerTest extends WebTestCase
 
         self::assertSame('Lumen Runtime Health', $payload['title']);
         self::assertArrayHasKey('overallRuntimeScore', $payload);
+        self::assertArrayHasKey('platformHealth', $payload);
+        self::assertArrayHasKey('scoreModel', $payload);
         self::assertArrayHasKey('platformScore', $payload);
         self::assertArrayHasKey('summary', $payload);
         self::assertArrayHasKey('capabilityStatuses', $payload);

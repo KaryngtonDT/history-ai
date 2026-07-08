@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import type {
+	CapabilityClassification,
 	CapabilitySelectionMode,
 	RuntimeEngineManagement,
 	RuntimeManagedCapability,
@@ -137,7 +138,8 @@ function CapabilitySection({
 				<div>
 					<h3>{capability.label}</h3>
 					<p className={styles.meta}>
-						Current: {capability.currentEngineId ?? "—"} · Recommended:{" "}
+						{capability.classificationLabel ?? capability.classification ?? "—"}{" "}
+						· Current: {capability.currentEngineId ?? "—"} · Recommended:{" "}
 						{capability.recommendedEngineId ?? "—"}
 					</p>
 				</div>
@@ -200,6 +202,10 @@ export function RuntimeProvisionCenter() {
 	);
 	const [error, setError] = useState<string | null>(null);
 	const [busy, setBusy] = useState<string | null>(null);
+	const [classificationFilter, setClassificationFilter] = useState<
+		CapabilityClassification | "all"
+	>("all");
+	const [hideOptional, setHideOptional] = useState(false);
 
 	const load = useCallback(async () => {
 		setError(null);
@@ -287,10 +293,70 @@ export function RuntimeProvisionCenter() {
 		return null;
 	}
 
+	const counters = {
+		core: management.capabilities.filter((c) => c.classification === "core"),
+		optional: management.capabilities.filter(
+			(c) => c.classification === "optional",
+		),
+		premium: management.capabilities.filter(
+			(c) => c.classification === "premium",
+		),
+		experimental: management.capabilities.filter(
+			(c) => c.classification === "experimental",
+		),
+	};
+
+	const visibleCapabilities = management.capabilities.filter((capability) => {
+		if (hideOptional && capability.classification === "optional") {
+			return false;
+		}
+		if (
+			classificationFilter !== "all" &&
+			capability.classification !== classificationFilter
+		) {
+			return false;
+		}
+		return true;
+	});
+
 	return (
 		<div className={styles.root}>
 			<p className={styles.principle}>{management.principle}</p>
-			{management.capabilities.map((capability) => (
+			<div className={styles.filters}>
+				{(
+					[
+						"all",
+						"core",
+						"optional",
+						"premium",
+						"experimental",
+						"deprecated",
+					] as const
+				).map((filter) => (
+					<Button
+						key={filter}
+						type="button"
+						variant={classificationFilter === filter ? "primary" : "secondary"}
+						onClick={() => setClassificationFilter(filter)}
+					>
+						{filter}
+					</Button>
+				))}
+				<label className={styles.checkbox}>
+					<input
+						type="checkbox"
+						checked={hideOptional}
+						onChange={(event) => setHideOptional(event.target.checked)}
+					/>
+					Hide optional
+				</label>
+			</div>
+			<p className={styles.meta}>
+				Core {counters.core.length} · Optional {counters.optional.length} ·
+				Premium {counters.premium.length} · Experimental{" "}
+				{counters.experimental.length}
+			</p>
+			{visibleCapabilities.map((capability) => (
 				<CapabilitySection
 					key={capability.capability}
 					capability={capability}

@@ -46,4 +46,27 @@ final class RuntimeScoreCalculatorTest extends TestCase
         self::assertLessThanOrEqual(100.0, $score->score);
         self::assertNotSame('', $score->summary);
     }
+
+    public function testCalculatesSplitScoreModel(): void
+    {
+        $calculator = new RuntimeScoreCalculator();
+
+        $model = $calculator->calculateScoreModel(
+            [
+                'runtimeHealth' => 90.0,
+                'compatibleInstalled' => 80.0,
+                'benchmarks' => 70.0,
+                'hardwareCompatibility' => 85.0,
+            ],
+            [
+                'coreHealth' => ['readyCount' => 5, 'totalCount' => 5],
+                'extensionCoverage' => ['readyCount' => 1, 'totalCount' => 4],
+                'premiumAvailability' => ['availableCount' => 0, 'totalCount' => 1],
+            ],
+        );
+
+        self::assertSame(100.0, $model->coreScore);
+        self::assertSame(25.0, $model->extensionScore);
+        self::assertSame(0.0, $model->premiumScore);
+    }
 }

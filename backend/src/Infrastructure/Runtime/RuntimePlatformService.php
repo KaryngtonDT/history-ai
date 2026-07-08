@@ -21,6 +21,7 @@ use App\Infrastructure\Runtime\Management\RuntimeDoctorReportService;
 use App\Infrastructure\Runtime\Management\RuntimeEngineManagementAssembler;
 use App\Infrastructure\Runtime\Discovery\EngineDiscovery;
 use App\Infrastructure\Runtime\Health\HealthMonitor;
+use App\Infrastructure\Runtime\Health\RuntimePlatformHealthService;
 use App\Infrastructure\Runtime\Intelligence\AutoSelectionEngine;
 use App\Infrastructure\Runtime\Intelligence\RecommendationEngine;
 use App\Infrastructure\Runtime\Provisioning\EngineProvisioner;
@@ -50,6 +51,7 @@ final class RuntimePlatformService implements RuntimePlatformInterface
         private readonly RuntimeRecommendationProfilesService $recommendationProfilesService,
         private readonly RuntimeDoctorReportService $doctorReportService,
         private readonly RuntimeNotificationService $notificationService,
+        private readonly RuntimePlatformHealthService $platformHealthService,
     ) {
     }
 
@@ -92,11 +94,18 @@ final class RuntimePlatformService implements RuntimePlatformInterface
     public function health(): array
     {
         $health = $this->healthMonitor->heartbeat();
+        $platformHealth = $this->platformHealthService->evaluate();
 
         return [
             ...$health->toArray(),
+            'platformHealth' => $platformHealth,
             'failureHistory' => $this->healthMonitor->failureHistory(),
         ];
+    }
+
+    public function platformHealth(): array
+    {
+        return $this->platformHealthService->evaluate();
     }
 
     public function engines(): array
@@ -159,11 +168,12 @@ final class RuntimePlatformService implements RuntimePlatformInterface
             substr($pipelineId, 16, 4),
             substr($pipelineId, 20, 12),
         );
+
+        $platformHealth = $this->platformHealthService->evaluate();
         $readiness = $this->readinessEngine->evaluate();
         $config = $this->runtimeRepository->getConfiguration();
         $selections = $this->autoSelectionEngine->resolveSelections($config);
         $steps = [];
-        $passed = true;
 
         foreach ($readiness->engines as $engine) {
             if (!$engine->configured) {
@@ -171,7 +181,6 @@ final class RuntimePlatformService implements RuntimePlatformInterface
             }
 
             $stepOk = $engine->isReady();
-            $passed = $passed && $stepOk;
             $steps[] = [
                 'capability' => $engine->capability->value,
                 'requestedEngineId' => $selections[$engine->capability->value] ?? $engine->id,
@@ -186,9 +195,26 @@ final class RuntimePlatformService implements RuntimePlatformInterface
             ];
         }
 
+        $coreHealth = is_array($platformHealth['coreHealth'] ?? null) ? $platformHealth['coreHealth'] : [];
+        $coreReady = 'ready' === ($coreHealth['status'] ?? 'fail');
+
         $report = [
             'pipelineId' => $pipelineId,
-            'status' => $passed ? 'pass' : 'fail',
+            'status' => $coreReady ? 'pass' : 'fail',
+            'coreRuntime' => [
+                'status' => $coreReady ? 'ready' : 'fail',
+                'percent' => $coreHealth['percent'] ?? 0,
+                'readyCount' => $coreHealth['readyCount'] ?? 0,
+                'totalCount' => $coreHealth['totalCount'] ?? 0,
+                'capabilities' => array_values(array_filter(
+                    is_array($platformHealth['capabilities'] ?? null) ? $platformHealth['capabilities'] : [],
+                    static fn (array $cap): bool => ($cap['classification'] ?? '') === 'core',
+                )),
+            ],
+            'extensions' => $platformHealth['extensionCoverage'] ?? [],
+            'premium' => $platformHealth['premiumAvailability'] ?? [],
+            'experimental' => $platformHealth['experimentalCoverage'] ?? [],
+            'deprecatedCount' => $platformHealth['deprecatedCount'] ?? 0,
             'steps' => $steps,
             'validatedAt' => (new \DateTimeImmutable())->format(DATE_ATOM),
         ];

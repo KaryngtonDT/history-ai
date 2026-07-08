@@ -7,13 +7,13 @@ namespace App\Infrastructure\Runtime\Intelligence;
 use App\Domain\Engine\EngineProfileName;
 use App\Domain\Engine\EngineRepositoryInterface;
 use App\Domain\Runtime\RuntimeCapability;
+use App\Domain\Runtime\RuntimeCapabilityClassification;
 use App\Domain\Runtime\RuntimeConfiguration;
-use App\Infrastructure\Runtime\Readiness\ReadinessEngine;
+use App\Infrastructure\Runtime\Catalog\RuntimeCapabilityClassificationRegistry;
 
 final class RecommendationEngine
 {
     public function __construct(
-        private readonly ReadinessEngine $readinessEngine,
         private readonly EngineRepositoryInterface $engineRepository,
     ) {
     }
@@ -23,14 +23,10 @@ final class RecommendationEngine
      */
     public function recommend(RuntimeConfiguration $configuration): array
     {
-        $report = $this->readinessEngine->evaluate();
         $recommendations = [];
 
         foreach (RuntimeCapability::cases() as $capability) {
-            if (!$capability->isVideoPipeline()) {
-                continue;
-            }
-
+            $meta = RuntimeCapabilityClassificationRegistry::for($capability);
             $candidates = $this->engineRepository->findByCapability(
                 \App\Domain\Engine\EngineCatalogCapability::from($capability->value),
             );
@@ -41,19 +37,56 @@ final class RecommendationEngine
             $recommendations[] = [
                 'capability' => $capability->value,
                 'label' => $capability->label(),
+                'classification' => $meta->classification->value,
+                'classificationLabel' => $meta->classification->label(),
                 'recommendedEngineId' => $selected?->id,
                 'recommendedDisplayName' => $selected?->displayName,
                 'requestedEngineId' => $requested,
                 'selectionMode' => $configuration->selectionMode->value,
                 'profile' => $configuration->profile->value,
-                'reason' => null === $selected
-                    ? 'No ready engine found for this capability.'
-                    : sprintf('Selected for %s profile.', $configuration->profile->label()),
+                'reason' => $this->reasonFor($meta->classification, $selected),
+                'suggestionType' => $this->suggestionTypeFor($meta->classification, $selected, $ready),
                 'confidence' => null === $selected ? 0 : 100,
             ];
         }
 
         return $recommendations;
+    }
+
+    /**
+     * @param list<\App\Domain\Engine\Engine> $ready
+     */
+    private function suggestionTypeFor(
+        RuntimeCapabilityClassification $classification,
+        ?\App\Domain\Engine\Engine $selected,
+        array $ready,
+    ): string {
+        if (null !== $selected) {
+            return 'operational';
+        }
+
+        return match ($classification) {
+            RuntimeCapabilityClassification::Optional => 'optional',
+            RuntimeCapabilityClassification::Premium => 'future_upgrade',
+            RuntimeCapabilityClassification::Experimental => 'disabled',
+            default => [] === $ready ? 'missing' : 'blocked',
+        };
+    }
+
+    private function reasonFor(
+        RuntimeCapabilityClassification $classification,
+        ?\App\Domain\Engine\Engine $selected,
+    ): string {
+        if (null === $selected) {
+            return match ($classification) {
+                RuntimeCapabilityClassification::Optional => 'Optional capability — install when needed.',
+                RuntimeCapabilityClassification::Premium => 'Premium capability may require additional hardware.',
+                RuntimeCapabilityClassification::Experimental => 'Experimental capability is disabled by default.',
+                default => 'No ready engine found for this capability.',
+            };
+        }
+
+        return sprintf('Selected for capability classification (%s).', $classification->label());
     }
 
     /**

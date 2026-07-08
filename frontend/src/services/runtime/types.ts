@@ -243,6 +243,8 @@ export interface RuntimePlatformScore {
 
 export interface RuntimeDashboardSummary {
 	overallHealth: number;
+	coreHealthPercent?: number;
+	coreStatus?: string;
 	hardwareProfile: string;
 	hardwareProfileLabel: string;
 	runtimeStatus: string;
@@ -252,6 +254,13 @@ export interface RuntimeDashboardSummary {
 	premiumEnginesReady: number;
 	premiumEnginesTotal: number;
 	benchmarksPassedPercent: number;
+	counters?: {
+		core?: { ready: number; total: number };
+		optional?: { installed: number; total: number };
+		premium?: { available: number; total: number };
+		experimental?: { ready: number; disabled: number; total: number };
+		deprecated?: { count: number };
+	};
 	lastValidation?: {
 		at?: string | null;
 		status?: string | null;
@@ -259,9 +268,43 @@ export interface RuntimeDashboardSummary {
 	} | null;
 }
 
+export interface RuntimeScoreModel {
+	coreScore: number;
+	extensionScore: number;
+	premiumScore: number;
+	recommendationScore: number;
+	hardwareCompatibilityScore: number;
+	installationCoverage: number;
+	benchmarkCoverage: number;
+	predictionAccuracy: number;
+}
+
+export interface RuntimePlatformHealth {
+	coreHealth: {
+		status: string;
+		percent: number;
+		readyCount: number;
+		totalCount: number;
+		label: string;
+	};
+	extensionCoverage: Record<string, unknown>;
+	premiumAvailability: Record<string, unknown>;
+	experimentalCoverage: Record<string, unknown>;
+	deprecatedCount: number;
+	counters: RuntimeDashboardSummary["counters"];
+	capabilities: Array<Record<string, unknown>>;
+}
+
 export interface RuntimeDashboardCapability {
 	capability: string;
 	label: string;
+	classification?: string;
+	classificationLabel?: string;
+	required?: boolean;
+	availability?: string;
+	availabilityLabel?: string;
+	reason?: string | null;
+	futureHardware?: Record<string, unknown> | null;
 	status: string;
 	statusLabel: string;
 	videoPipeline: boolean;
@@ -369,6 +412,8 @@ export interface RuntimeDashboard {
 	title: string;
 	generatedAt: string;
 	overallRuntimeScore: RuntimeOverallScore;
+	scoreModel?: RuntimeScoreModel;
+	platformHealth?: RuntimePlatformHealth;
 	platformScore: RuntimePlatformScore;
 	summary: RuntimeDashboardSummary;
 	capabilityStatuses: RuntimeDashboardCapability[];

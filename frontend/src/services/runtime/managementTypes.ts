@@ -27,9 +27,23 @@ export interface RuntimeManagedEngine {
 	autoProvisionSupported?: boolean;
 }
 
+export type CapabilityClassification =
+	| "core"
+	| "optional"
+	| "premium"
+	| "experimental"
+	| "deprecated";
+
 export interface RuntimeManagedCapability {
 	capability: string;
 	label: string;
+	classification?: CapabilityClassification;
+	classificationLabel?: string;
+	required?: boolean;
+	enabledByDefault?: boolean;
+	hardwareDependent?: boolean;
+	installable?: boolean;
+	recommended?: boolean;
 	videoPipeline: boolean;
 	selectionMode: CapabilitySelectionMode;
 	selectionModeLabel: string;

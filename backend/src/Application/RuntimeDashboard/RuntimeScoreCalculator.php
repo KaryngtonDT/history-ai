@@ -6,6 +6,7 @@ namespace App\Application\RuntimeDashboard;
 
 use App\Domain\RuntimeDashboard\RuntimeScore;
 use App\Domain\RuntimeDashboard\RuntimeScoreBreakdown;
+use App\Domain\RuntimeDashboard\RuntimeScoreModel;
 
 final class RuntimeScoreCalculator
 {
@@ -67,6 +68,46 @@ final class RuntimeScoreCalculator
             grade: $this->gradeFor($final),
             summary: $this->summaryFor($final),
             breakdown: $breakdown,
+        );
+    }
+
+    /**
+     * @param array{
+     *   runtimeHealth: float,
+     *   compatibleInstalled: float,
+     *   engineTests: float,
+     *   benchmarks: float,
+     *   documentation: float,
+     *   hardwareCompatibility: float,
+     *   provisioning: float,
+     *   predictionAccuracy?: float
+     * } $inputs
+     * @param array<string, mixed> $platformHealth
+     */
+    public function calculateScoreModel(array $inputs, array $platformHealth): RuntimeScoreModel
+    {
+        $coreHealth = is_array($platformHealth['coreHealth'] ?? null) ? $platformHealth['coreHealth'] : [];
+        $extensions = is_array($platformHealth['extensionCoverage'] ?? null) ? $platformHealth['extensionCoverage'] : [];
+        $premium = is_array($platformHealth['premiumAvailability'] ?? null) ? $platformHealth['premiumAvailability'] : [];
+
+        $coreTotal = max(1, (int) ($coreHealth['totalCount'] ?? 1));
+        $coreScore = round(((int) ($coreHealth['readyCount'] ?? 0) / $coreTotal) * 100, 1);
+
+        $extTotal = max(1, (int) ($extensions['totalCount'] ?? 1));
+        $extensionScore = round(((int) ($extensions['readyCount'] ?? 0) / $extTotal) * 100, 1);
+
+        $premiumTotal = max(1, (int) ($premium['totalCount'] ?? 1));
+        $premiumScore = round(((int) ($premium['availableCount'] ?? 0) / $premiumTotal) * 100, 1);
+
+        return new RuntimeScoreModel(
+            coreScore: $coreScore,
+            extensionScore: $extensionScore,
+            premiumScore: $premiumScore,
+            recommendationScore: round(max(0.0, min(100.0, $inputs['runtimeHealth'] ?? 0.0)), 1),
+            hardwareCompatibilityScore: round(max(0.0, min(100.0, $inputs['hardwareCompatibility'] ?? 0.0)), 1),
+            installationCoverage: round(max(0.0, min(100.0, $inputs['compatibleInstalled'] ?? 0.0)), 1),
+            benchmarkCoverage: round(max(0.0, min(100.0, $inputs['benchmarks'] ?? 0.0)), 1),
+            predictionAccuracy: round(max(0.0, min(100.0, $inputs['predictionAccuracy'] ?? 85.0)), 1),
         );
     }
 

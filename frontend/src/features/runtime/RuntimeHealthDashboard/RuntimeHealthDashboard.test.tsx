@@ -22,6 +22,16 @@ const mockDashboard = {
 			},
 		],
 	},
+	scoreModel: {
+		coreScore: 100,
+		extensionScore: 25,
+		premiumScore: 0,
+		recommendationScore: 96,
+		hardwareCompatibilityScore: 85,
+		installationCoverage: 80,
+		benchmarkCoverage: 100,
+		predictionAccuracy: 85,
+	},
 	platformScore: {
 		score: 98,
 		grade: "Excellent",
@@ -32,6 +42,8 @@ const mockDashboard = {
 	},
 	summary: {
 		overallHealth: 96,
+		coreHealthPercent: 100,
+		coreStatus: "ready",
 		hardwareProfile: "low_end_local",
 		hardwareProfileLabel: "Low-End Local",
 		runtimeStatus: "HEALTHY",
@@ -137,7 +149,7 @@ describe("RuntimeHealthDashboard", () => {
 		render(<RuntimeHealthDashboard />);
 
 		await waitFor(() => {
-			expect(screen.getByText("Overall Runtime Health")).toBeInTheDocument();
+			expect(screen.getByText("Runtime Core")).toBeInTheDocument();
 		});
 
 		expect(screen.getAllByText("96 / 100").length).toBeGreaterThan(0);

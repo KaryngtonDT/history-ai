@@ -191,7 +191,7 @@ health:
 	@echo ""
 
 runtime-validate:
-	curl -sf -X POST http://localhost:8000/api/runtime/pipeline/validate | python -m json.tool
+	python scripts/runtime_validate.py
 
 runtime-benchmark:
 	curl -sf -X POST http://localhost:8000/api/runtime/benchmark/full | python -m json.tool

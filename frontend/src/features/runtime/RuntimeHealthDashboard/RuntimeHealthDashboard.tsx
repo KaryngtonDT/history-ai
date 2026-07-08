@@ -110,18 +110,72 @@ export function RuntimeHealthDashboard() {
 		);
 	}
 
-	const { summary, overallRuntimeScore, platformScore } = dashboard;
+	const { summary, overallRuntimeScore, platformScore, scoreModel } = dashboard;
+	const counters = summary.counters;
 
 	return (
 		<div className={styles.root}>
 			<div className={styles.hero}>
 				<Card className={styles.scoreCard}>
-					<h2 className={styles.sectionTitle}>Overall Runtime Health</h2>
+					<h2 className={styles.sectionTitle}>Runtime Core</h2>
 					<div className={styles.scoreValue}>
-						{Math.round(summary.overallHealth)} / 100
+						{Math.round(summary.coreHealthPercent ?? summary.overallHealth)}%
 					</div>
-					<div className={styles.scoreGrade}>{overallRuntimeScore.grade}</div>
+					<div className={styles.scoreGrade}>
+						{summary.coreStatus === "ready" ? "READY" : "NEEDS ATTENTION"}
+					</div>
 					<p className={styles.meta}>{overallRuntimeScore.summary}</p>
+					{counters && (
+						<ul className={styles.breakdownList}>
+							<li className={styles.breakdownItem}>
+								<span>Core</span>
+								<span>
+									{counters.core?.ready ?? 0} / {counters.core?.total ?? 0}{" "}
+									Ready
+								</span>
+							</li>
+							<li className={styles.breakdownItem}>
+								<span>Optional</span>
+								<span>
+									{counters.optional?.installed ?? 0} /{" "}
+									{counters.optional?.total ?? 0} Installed
+								</span>
+							</li>
+							<li className={styles.breakdownItem}>
+								<span>Premium</span>
+								<span>
+									{counters.premium?.available ?? 0} /{" "}
+									{counters.premium?.total ?? 0} Available
+								</span>
+							</li>
+						</ul>
+					)}
+				</Card>
+
+				<Card className={styles.scoreCard}>
+					<h2 className={styles.sectionTitle}>Score Model</h2>
+					{scoreModel ? (
+						<ul className={styles.breakdownList}>
+							<li className={styles.breakdownItem}>
+								<span>Core Score</span>
+								<span>{scoreModel.coreScore}%</span>
+							</li>
+							<li className={styles.breakdownItem}>
+								<span>Extension Score</span>
+								<span>{scoreModel.extensionScore}%</span>
+							</li>
+							<li className={styles.breakdownItem}>
+								<span>Premium Score</span>
+								<span>{scoreModel.premiumScore}%</span>
+							</li>
+							<li className={styles.breakdownItem}>
+								<span>Benchmark Coverage</span>
+								<span>{scoreModel.benchmarkCoverage}%</span>
+							</li>
+						</ul>
+					) : (
+						<p className={styles.meta}>Score model unavailable.</p>
+					)}
 				</Card>
 
 				<Card className={styles.scoreCard}>
@@ -204,10 +258,21 @@ export function RuntimeHealthDashboard() {
 							>
 								<div className={styles.capabilityHeader}>
 									<strong>{capability.label}</strong>
-									<Badge variant={capabilityVariant(capability.status)}>
-										{capabilityIcon(capability.status)} {capability.statusLabel}
-									</Badge>
+									<div className={styles.badges}>
+										{capability.classificationLabel && (
+											<Badge variant="neutral">
+												{capability.classificationLabel}
+											</Badge>
+										)}
+										<Badge variant={capabilityVariant(capability.status)}>
+											{capabilityIcon(capability.status)}{" "}
+											{capability.statusLabel}
+										</Badge>
+									</div>
 								</div>
+								{capability.reason && (
+									<p className={styles.meta}>Reason: {capability.reason}</p>
+								)}
 								{score && (
 									<p className={styles.meta}>
 										Capability score: {score.score}%
