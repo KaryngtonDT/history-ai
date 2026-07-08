@@ -497,6 +497,28 @@ final class ProcessVideoHandlerTest extends TestCase
         $scheduler = $this->createStub(PipelineSchedulerInterface::class);
         $scheduler->method('schedule')->willReturn($this->sampleSchedule());
 
+        $historyStore = new InMemoryExecutionHistoryStore();
+        $recordHandler = new RecordExecutionHistoryHandler(
+            new InMemoryExecutionHistoryRepository($historyStore),
+            $historyStore,
+            new PipelineConfigurationJsonMapper(),
+            new ExecutionOptimizationSnapshotMapper(),
+            new QualityReportJsonMapper(),
+        );
+        $executionHistoryRecorder = new ExecutionHistoryRecorder(
+            $recordHandler,
+            $this->createStub(RuntimePipelineConfigurationContextInterface::class),
+            $this->createStub(RuntimeExecutionOptimizationContextInterface::class),
+            $this->createStub(PipelineConfigurationResolverInterface::class),
+            $this->createStub(FinalVideoRepositoryInterface::class),
+        );
+        $telemetryRecorder = new PipelineTelemetryRecorder(
+            new CollectPipelineMetricsHandler(new InMemoryPipelineTelemetryRepository()),
+            $this->createStub(\App\Domain\Workspace\ProjectRepositoryInterface::class),
+            $this->createStub(RuntimePipelineConfigurationContextInterface::class),
+            $this->runtimeScheduleContext,
+        );
+
         $handler = new ProcessVideoHandler(
             $this->videoRepository,
             $this->aiProviderResolver,
@@ -522,9 +544,9 @@ final class ProcessVideoHandlerTest extends TestCase
             $this->runtimeScheduleContext,
             $this->qualityAssessmentRunner,
             new BatchJobProgressUpdater($this->createStub(BatchJobRepositoryInterface::class)),
-            $this->createStub(ExecutionHistoryRecorder::class),
+            $executionHistoryRecorder,
             new ExecutionReplayContext(),
-            $this->createStub(PipelineTelemetryRecorder::class),
+            $telemetryRecorder,
             $pipelineOrchestrator,
             $progressService,
         );
