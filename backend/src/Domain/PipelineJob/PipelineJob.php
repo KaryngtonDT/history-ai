@@ -174,6 +174,16 @@ final class PipelineJob
         );
     }
 
+    public function withDurationEstimate(int $seconds): self
+    {
+        $normalized = max(1, $seconds);
+
+        return $this->with(
+            estimatedDurationSeconds: $normalized,
+            estimatedRemainingSeconds: $normalized,
+        );
+    }
+
     public function updateProgress(
         int $progressPercent,
         ?string $currentStep = null,

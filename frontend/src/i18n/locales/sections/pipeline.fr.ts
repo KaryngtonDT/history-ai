@@ -541,6 +541,10 @@ export const pipelineFr: PipelineMessages = {
 			submittingChoice: "Envoi en cours…",
 			choiceFailed:
 				"Impossible d'appliquer votre choix de transcription. Réessayez.",
+			startedAt: "Démarré à {{time}}",
+			notStarted: "Pas encore démarré",
+			estimatedDuration: "Durée estimée : ~{{minutes}} min",
+			remainingMinutes: "~{{minutes}} min restantes (estimé)",
 		},
 		create: {
 			videoEyebrow: "Créer",

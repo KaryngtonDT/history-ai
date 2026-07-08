@@ -539,6 +539,10 @@ export const pipelineDe: PipelineMessages = {
 			submittingChoice: "Wird gesendet…",
 			choiceFailed:
 				"Transkriptwahl konnte nicht angewendet werden. Bitte erneut versuchen.",
+			startedAt: "Gestartet um {{time}}",
+			notStarted: "Noch nicht gestartet",
+			estimatedDuration: "Geschätzte Dauer: ~{{minutes}} Min.",
+			remainingMinutes: "~{{minutes}} Min. verbleibend (geschätzt)",
 		},
 		create: {
 			videoEyebrow: "Erstellen",

@@ -100,4 +100,35 @@ describe("PipelineProgressPanel", () => {
 			expect(loadSpy.mock.calls.length).toBeGreaterThan(1);
 		});
 	});
+
+	it("shows start time and duration estimate for running jobs", async () => {
+		vi.spyOn(pipelineJobService, "loadStatus").mockResolvedValue(
+			pipelineStatus({
+				activeJobs: [
+					{
+						jobId: "job-translation",
+						sourceId: SOURCE_ID,
+						stage: "translation",
+						status: "running",
+						progressPercent: 25,
+						startedAt: "2026-06-26T14:30:00.000Z",
+						estimatedDurationSeconds: 600,
+						estimatedRemainingSeconds: 300,
+					},
+				],
+				requiresUserAction: false,
+				message: "Translation in progress",
+			}),
+		);
+
+		renderWithProviders(<PipelineProgressPanel sourceId={SOURCE_ID} />);
+
+		await waitFor(() => {
+			expect(screen.getByText(/Started at/i)).toBeInTheDocument();
+			expect(screen.getByText(/Estimated duration: ~10 min/i)).toBeInTheDocument();
+			expect(
+				screen.getByText(/~5 min remaining \(estimated\)/i),
+			).toBeInTheDocument();
+		});
+	});
 });

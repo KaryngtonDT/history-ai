@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Application\Pipeline\Orchestration;
 
 use App\Application\Pipeline\Estimation\HardwareAwareEstimateResolver;
 use App\Application\Pipeline\Estimation\MediaDurationResolver;
+use App\Application\Pipeline\Estimation\PipelineStageDurationEstimator;
 use App\Application\Pipeline\Estimation\TranscriptionDurationEstimator;
 use App\Application\Pipeline\Orchestration\PipelineDependencyResolver;
 use App\Application\Pipeline\Orchestration\PipelineInvalidationService;
@@ -156,6 +157,8 @@ final class PipelineOrchestratorTest extends TestCase
         self::assertNotNull($started);
         self::assertSame(PipelineStageType::Translation, $started->stage());
         self::assertSame(PipelineJobStatus::Running, $started->status());
+        self::assertNotNull($started->estimatedDurationSeconds());
+        self::assertNotNull($started->startedAt());
     }
 
     private function createOrchestrator(
@@ -172,10 +175,13 @@ final class PipelineOrchestratorTest extends TestCase
         );
 
         $videoRepository = $this->createStub(VideoRepositoryInterface::class);
-        $durationEstimator = new TranscriptionDurationEstimator(
+        $stageDurationEstimator = new PipelineStageDurationEstimator(
+            new TranscriptionDurationEstimator(
+                new MediaDurationResolver($videoRepository),
+                new HardwareAwareEstimateResolver(false),
+                'large-v3',
+            ),
             new MediaDurationResolver($videoRepository),
-            new HardwareAwareEstimateResolver(false),
-            'large-v3',
         );
 
         return new PipelineOrchestrator(
@@ -184,7 +190,7 @@ final class PipelineOrchestratorTest extends TestCase
             $invalidationService,
             $notificationService,
             new PipelineProgressService($repository),
-            $durationEstimator,
+            $stageDurationEstimator,
             $queue ?? $this->createStub(VideoProcessingQueueInterface::class),
             $videoRepository,
         );

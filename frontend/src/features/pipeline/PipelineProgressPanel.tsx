@@ -3,6 +3,9 @@ import { createPortal } from "react-dom";
 import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
 import type { PipelineJob, PipelineSourceStatus } from "@/services/pipeline/jobTypes";
 import { useTranslation } from "@/i18n/useTranslation";
+import {
+	buildPipelineStageTimingLines,
+} from "./pipelineJobDisplayUtils";
 import styles from "./PipelineComponents.module.css";
 import {
 	isPipelineWaitingForTranscriptChoice,
@@ -14,16 +17,6 @@ import {
 	StageStatusBadge,
 	StaleArtifactWarning,
 } from "./PipelineComponents";
-
-function formatRemaining(seconds?: number | null): string | null {
-	if (seconds == null || seconds <= 0) {
-		return null;
-	}
-
-	const minutes = Math.ceil(seconds / 60);
-
-	return `${minutes} min remaining (estimated)`;
-}
 
 function PipelineStageCard({
 	job,
@@ -38,8 +31,17 @@ function PipelineStageCard({
 	onRestart?: (job: PipelineJob) => void;
 	continueLabel?: string;
 }) {
-	const { t } = useTranslation();
-	const remaining = formatRemaining(job.estimatedRemainingSeconds);
+	const { t, locale } = useTranslation();
+	const timingLines = buildPipelineStageTimingLines(
+		job,
+		{
+			startedAt: t("pipeline.progress.startedAt"),
+			notStarted: t("pipeline.progress.notStarted"),
+			estimatedDuration: t("pipeline.progress.estimatedDuration"),
+			remainingMinutes: t("pipeline.progress.remainingMinutes"),
+		},
+		locale,
+	);
 
 	return (
 		<div className={styles.stageCard}>
@@ -50,7 +52,11 @@ function PipelineStageCard({
 				progressPercent={job.progressPercent}
 				label={job.currentStep ?? undefined}
 			/>
-			{remaining ? <p className={styles.safeMessage}>{remaining}</p> : null}
+			{timingLines.map((line) => (
+				<p key={line} className={styles.safeMessage}>
+					{line}
+				</p>
+			))}
 			{job.failureReason ? (
 				<StageNotification title="Stage failed" message={job.failureReason} />
 			) : null}

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Pipeline\Orchestration;
 
-use App\Application\Pipeline\Estimation\TranscriptionDurationEstimator;
+use App\Application\Pipeline\Estimation\PipelineStageDurationEstimator;
 use App\Application\Video\Ports\VideoProcessingQueueInterface;
 use App\Domain\Orchestrator\ProcessingMode;
 use App\Domain\Pipeline\PipelineStageType;
@@ -26,7 +26,7 @@ final class PipelineOrchestrator
         private readonly PipelineInvalidationService $invalidationService,
         private readonly PipelineNotificationService $notificationService,
         private readonly PipelineProgressService $progressService,
-        private readonly TranscriptionDurationEstimator $durationEstimator,
+        private readonly PipelineStageDurationEstimator $stageDurationEstimator,
         private readonly VideoProcessingQueueInterface $videoProcessingQueue,
         private readonly VideoRepositoryInterface $videoRepository,
     ) {
@@ -53,9 +53,12 @@ final class PipelineOrchestrator
             $this->jobRepository->save($cancelled);
         }
 
-        $estimate = PipelineStageType::SpeechToText === $stage && null !== $videoId
-            ? $this->durationEstimator->estimateForVideo(new VideoId($videoId))
-            : ['minSeconds' => null, 'maxSeconds' => null];
+        $estimate = null !== ($videoId ?? $sourceId)
+            ? $this->stageDurationEstimator->estimateForStage(
+                new VideoId($videoId ?? $sourceId),
+                $stage,
+            )
+            : ['maxSeconds' => null];
 
         $job = PipelineJob::createQueued(
             PipelineJobId::generate(),
@@ -87,6 +90,13 @@ final class PipelineOrchestrator
 
         if (PipelineJobStatus::Running === $job->status()) {
             return $job;
+        }
+
+        $videoId = new VideoId($job->videoId() ?? $job->sourceId());
+
+        if (null === $job->estimatedDurationSeconds()) {
+            $estimate = $this->stageDurationEstimator->estimateForStage($videoId, $job->stage());
+            $job = $job->withDurationEstimate($estimate['maxSeconds']);
         }
 
         $started = $job->start('processing');

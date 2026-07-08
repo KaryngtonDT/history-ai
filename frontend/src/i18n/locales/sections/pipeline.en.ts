@@ -526,6 +526,10 @@ export const pipelineEn = {
 				"Transcript saved. Continue to translation when you are ready.",
 			submittingChoice: "Submitting…",
 			choiceFailed: "Could not apply your transcript choice. Please try again.",
+			startedAt: "Started at {{time}}",
+			notStarted: "Not started yet",
+			estimatedDuration: "Estimated duration: ~{{minutes}} min",
+			remainingMinutes: "~{{minutes}} min remaining (estimated)",
 		},
 		create: {
 			videoEyebrow: "Create",
