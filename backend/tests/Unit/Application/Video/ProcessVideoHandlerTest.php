@@ -92,7 +92,6 @@ use App\Domain\VideoIntelligence\VisualCharacteristics;
 use App\Domain\VideoIntelligence\VideoIntelligenceFactoryInterface;
 use App\Domain\VideoRender\FinalVideoRepositoryInterface;
 use App\Domain\Pipeline\PipelineConfigurationResolverInterface;
-use App\Domain\PipelineJob\PipelineJobRepositoryInterface;
 use App\Domain\PipelineJob\PipelineNotificationRepositoryInterface;
 use App\Domain\Scheduler\ExecutionSchedule;
 use App\Domain\Scheduler\ExecutionScheduleId;
