@@ -558,11 +558,16 @@ final class ProcessVideoHandlerTest extends TestCase
             ->willReturn($queued);
 
         $this->aiProviderResolver->expects(self::never())->method('resolveSpeechToText');
+        $this->speechToTextProvider->expects(self::never())->method('transcribe');
+        $this->transcriptRepository->expects(self::never())->method('save');
+        $this->artifactRepository->expects(self::never())->method('save');
 
         $this->videoTranslationGenerator
             ->expects(self::once())
             ->method('generate')
             ->with($videoId, self::anything());
+
+        $this->videoAudioGenerator->expects(self::never())->method('generate');
 
         $this->videoRepository
             ->expects(self::exactly(2))
