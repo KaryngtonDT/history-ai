@@ -95,6 +95,42 @@ export class RuntimeService {
 	getSelection() {
 		return this.repository.getSelection();
 	}
+
+	getEngineManagement() {
+		return this.repository.getEngineManagement();
+	}
+
+	updateSelection(payload: import("./managementTypes").RuntimeSelectionUpdate) {
+		return this.repository.updateSelection(payload);
+	}
+
+	installEngine(engineId: string) {
+		return this.repository.installEngine(engineId);
+	}
+
+	updateEngine(engineId: string) {
+		return this.repository.updateEngine(engineId);
+	}
+
+	repairEngine(engineId: string) {
+		return this.repository.repairEngine(engineId);
+	}
+
+	removeEngine(engineId: string) {
+		return this.repository.removeEngine(engineId);
+	}
+
+	validateEngine(engineId: string) {
+		return this.repository.validateEngine(engineId);
+	}
+
+	listExecutions() {
+		return this.repository.listExecutions();
+	}
+
+	getRecommendationProfiles() {
+		return this.repository.getRecommendationProfiles();
+	}
 }
 
 export const runtimeService = new RuntimeService(createRuntimeRepository());

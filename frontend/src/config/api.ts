@@ -300,6 +300,31 @@ export const RUNTIME_CAPABILITY_MATURITY_PATH =
 export const RUNTIME_DASHBOARD_PATH = "/api/runtime/dashboard";
 export const RUNTIME_ANALYTICS_ENGINES_PATH = "/api/runtime/analytics/engines";
 export const RUNTIME_EXECUTIONS_PATH = "/api/runtime/executions";
+export const RUNTIME_ENGINE_MANAGEMENT_PATH = "/api/runtime/engines/management";
+export const RUNTIME_DOCTOR_PATH = "/api/runtime/doctor";
+export const RUNTIME_NOTIFICATIONS_PATH = "/api/runtime/notifications";
+export const RUNTIME_RECOMMENDATION_PROFILES_PATH =
+	"/api/runtime/recommendations/profiles";
+
+export function runtimeEngineInstallPath(engineId: string): string {
+	return `${RUNTIME_PATH}/engines/${engineId}/install`;
+}
+
+export function runtimeEngineUpdatePath(engineId: string): string {
+	return `${RUNTIME_PATH}/engines/${engineId}/update`;
+}
+
+export function runtimeEngineRepairPath(engineId: string): string {
+	return `${RUNTIME_PATH}/engines/${engineId}/repair`;
+}
+
+export function runtimeEngineValidatePath(engineId: string): string {
+	return `${RUNTIME_PATH}/engines/${engineId}/validate`;
+}
+
+export function runtimeEngineRemovePath(engineId: string): string {
+	return `${RUNTIME_PATH}/engines/${engineId}`;
+}
 
 export function runtimeEngineTestPath(engineId: string): string {
 	return `${RUNTIME_PATH}/engines/${engineId}/test`;

@@ -146,4 +146,59 @@ interface RuntimePlatformInterface
      * @return array<string, mixed>
      */
     public function capabilitySelectionView(string $capability): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function engineManagement(): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function installEngine(string $engineId): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function updateEngine(string $engineId): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function repairEngine(string $engineId): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function removeEngine(string $engineId): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function validateEngine(string $engineId): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function benchmarkEngine(string $engineId): array;
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function engineMetadata(string $engineId): ?array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function recommendationProfiles(): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function doctorReport(): array;
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function notifications(?int $limit = 20): array;
 }

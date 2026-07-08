@@ -18,6 +18,8 @@ export function RuntimeSettingsPage() {
 				secondaryActions={<ExplainThisButton featureId="ai-engines" />}
 			/>
 			<p>
+				<Link to="/settings/runtime/engines">AI Engine Manager</Link>
+				{" · "}
 				<Link to="/settings/runtime/analytics">
 					{t("settings.runtime.analytics.open")}
 				</Link>

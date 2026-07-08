@@ -7,10 +7,10 @@ namespace App\Infrastructure\Runtime\Kernel;
 use App\Application\Hardware\HardwareReportBuilder;
 use App\Application\Runtime\PipelineStageCapabilityMapper;
 use App\Application\Runtime\RuntimeResolverInterface;
+use App\Domain\Engine\CapabilitySelectionMode;
 use App\Domain\Engine\Engine;
 use App\Domain\Engine\EngineCatalogCapability;
 use App\Domain\Engine\EngineRepositoryInterface;
-use App\Domain\Engine\SelectionMode;
 use App\Domain\Hardware\HardwareRepositoryInterface;
 use App\Domain\Runtime\EngineExecutionPlan;
 use App\Domain\Runtime\ResolvedEngine;
@@ -22,6 +22,7 @@ use App\Domain\Runtime\RuntimeRepositoryInterface;
 use App\Infrastructure\Runtime\Catalog\EngineCatalogDefinitions;
 use App\Infrastructure\Runtime\Compatibility\RuntimeCompatibilityService;
 use App\Infrastructure\Runtime\Intelligence\RecommendationEngine;
+use App\Infrastructure\Runtime\Intelligence\RuntimeResolverIntelligence;
 
 final class RuntimeResolver implements RuntimeResolverInterface
 {
@@ -33,6 +34,7 @@ final class RuntimeResolver implements RuntimeResolverInterface
         private readonly HardwareReportBuilder $hardwareReportBuilder,
         private readonly RuntimeCompatibilityService $compatibilityService,
         private readonly EngineAdapterRegistry $adapterRegistry,
+        private readonly RuntimeResolverIntelligence $resolverIntelligence,
     ) {
     }
 
@@ -95,8 +97,9 @@ final class RuntimeResolver implements RuntimeResolverInterface
 
         [$engineId, $reason, $confidence] = $this->pickEngineId(
             $capKey,
-            $config->selectionMode,
+            $config->capabilityMode($capKey),
             $config->manualSelections[$capKey] ?? null,
+            $config->lockedSelections[$capKey] ?? null,
             $context->preferredEngineId,
             $hardwareRecommendedId,
             $profileRecommendedId,
@@ -111,7 +114,10 @@ final class RuntimeResolver implements RuntimeResolverInterface
         $blocked = null !== $compat && 'ready' !== ($compat->status ?? '') && !$engine?->isReady();
         $executable = $engine?->isReady() ?? false;
 
-        if ($blocked && null !== $fallbackEngine && $fallbackEngine->isReady()) {
+        $capabilityMode = $config->capabilityMode($capKey);
+
+        if ($blocked && null !== $fallbackEngine && $fallbackEngine->isReady()
+            && CapabilitySelectionMode::Locked !== $capabilityMode) {
             $engineId = $fallbackEngine->id;
             $engine = $fallbackEngine;
             $reason = RuntimeResolveReason::Fallback;
@@ -128,6 +134,8 @@ final class RuntimeResolver implements RuntimeResolverInterface
             )
             : null;
 
+        $intelligence = $this->resolverIntelligence->enrich($capability, $engineId, $context, $reason);
+
         return new ResolvedEngine(
             engineId: $engineId,
             displayName: $engine?->displayName ?? $default?->displayName ?? $engineId,
@@ -141,6 +149,7 @@ final class RuntimeResolver implements RuntimeResolverInterface
             provider: $compat?->provider->value ?? 'docker',
             executionProfile: $config->profile->value,
             fallback: $fallbackPlan,
+            intelligence: $intelligence,
         );
     }
 
@@ -167,6 +176,7 @@ final class RuntimeResolver implements RuntimeResolverInterface
             'capability' => $capability->value,
             'label' => $capability->label(),
             'videoPipeline' => $capability->isVideoPipeline(),
+            'selectionMode' => $this->runtimeRepository->getConfiguration()->capabilityMode($capability->value)->value,
             'referenceEngineId' => $default?->id,
             'referenceDisplayName' => $default?->displayName,
             'recommendedEngineId' => $recommendedId,
@@ -264,15 +274,22 @@ final class RuntimeResolver implements RuntimeResolverInterface
      */
     private function pickEngineId(
         string $capKey,
-        SelectionMode $selectionMode,
+        CapabilitySelectionMode $selectionMode,
         ?string $manualSelection,
+        ?string $lockedSelection,
         ?string $plannerPreferred,
         ?string $hardwareRecommended,
         ?string $profileRecommended,
         ?string $opsConfiguredId,
         string $defaultId,
     ): array {
-        if (SelectionMode::Manual === $selectionMode && is_string($manualSelection) && '' !== $manualSelection) {
+        if (CapabilitySelectionMode::Locked === $selectionMode
+            && is_string($lockedSelection) && '' !== $lockedSelection) {
+            return [$lockedSelection, RuntimeResolveReason::LockedSelection, 1.0];
+        }
+
+        if (CapabilitySelectionMode::Manual === $selectionMode
+            && is_string($manualSelection) && '' !== $manualSelection) {
             return [$manualSelection, RuntimeResolveReason::UserSelection, 1.0];
         }
 

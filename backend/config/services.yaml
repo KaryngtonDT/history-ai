@@ -865,6 +865,14 @@ services:
     App\Application\Runtime\RuntimeSelectionSynchronizerInterface:
         alias: App\Infrastructure\Runtime\Kernel\RuntimeSelectionSynchronizer
 
+    App\Infrastructure\Runtime\Lifecycle\RuntimeModelManager:
+        arguments:
+            $modelsRoot: '%models.root%'
+
+    App\Infrastructure\Runtime\Lifecycle\RuntimeNotificationService:
+        arguments:
+            $store: '@app.storage.runtime'
+
     App\Infrastructure\AI\AIProviderResolver:
         arguments:
             $runtimeKernelUnified: '%env(bool:default:runtime.kernel_unified_default:RUNTIME_KERNEL_UNIFIED)%'

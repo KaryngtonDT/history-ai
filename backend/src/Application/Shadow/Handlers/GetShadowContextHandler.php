@@ -7,6 +7,7 @@ namespace App\Application\Shadow\Handlers;
 use App\Application\EngineAnalytics\EngineAnalyticsContextBuilder;
 use App\Application\Shadow\DTO\WatchContextResult;
 use App\Application\Shadow\Queries\GetShadowContextQuery;
+use App\Application\Shadow\RuntimeShadowContextBuilder;
 use App\Application\Shadow\ShadowContextFactory;
 use App\Domain\Shadow\Exception\InvalidShadowSessionException;
 use App\Domain\Video\Exception\InvalidVideoIdException;
@@ -17,6 +18,7 @@ final class GetShadowContextHandler
     public function __construct(
         private readonly ShadowContextFactory $shadowContextFactory,
         private readonly EngineAnalyticsContextBuilder $engineAnalyticsContextBuilder,
+        private readonly RuntimeShadowContextBuilder $runtimeShadowContextBuilder,
     ) {
     }
 
@@ -38,6 +40,7 @@ final class GetShadowContextHandler
         return WatchContextResult::fromWatchContext(
             $context,
             $this->engineAnalyticsContextBuilder->buildForStage(),
+            $this->runtimeShadowContextBuilder->build(),
         );
     }
 }

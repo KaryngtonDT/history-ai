@@ -21,6 +21,7 @@ final readonly class ResolvedEngine
         public ?string $provider = null,
         public ?string $executionProfile = null,
         public ?RuntimeFallbackPlan $fallback = null,
+        public ?ResolvedEngineIntelligence $intelligence = null,
     ) {
     }
 
@@ -44,6 +45,7 @@ final readonly class ResolvedEngine
             'provider' => $this->provider,
             'executionProfile' => $this->executionProfile,
             'fallback' => $this->fallback?->toArray(),
+            'intelligence' => $this->intelligence?->toArray(),
         ];
     }
 }

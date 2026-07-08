@@ -35,11 +35,15 @@ final readonly class WatchContextResult
         public array $recentInteractions,
         public array $conversationMemory,
         public ?array $engineAnalytics = null,
+        public ?array $runtimeContext = null,
     ) {
     }
 
-    public static function fromWatchContext(WatchContext $context, ?array $engineAnalytics = null): self
-    {
+    public static function fromWatchContext(
+        WatchContext $context,
+        ?array $engineAnalytics = null,
+        ?array $runtimeContext = null,
+    ): self {
         return new self(
             videoId: $context->videoId,
             currentTimeSeconds: $context->currentTimeSeconds,
@@ -57,6 +61,7 @@ final readonly class WatchContextResult
             recentInteractions: $context->recentInteractions,
             conversationMemory: $context->conversationMemory,
             engineAnalytics: $engineAnalytics,
+            runtimeContext: $runtimeContext,
         );
     }
 }

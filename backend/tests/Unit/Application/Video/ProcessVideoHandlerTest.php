@@ -587,8 +587,12 @@ final class ProcessVideoHandlerTest extends TestCase
         );
         $progressService = new PipelineProgressService($pipelineJobRepository);
         $runtimePlatform = $this->createStub(RuntimePlatformInterface::class);
-        $runtimePlatform->method('hardwareProfile')->willReturn(['profile' => ['type' => 'low_end_local']]);
         $historyRepository = new InMemoryEngineExecutionHistoryRepository();
+        $hardwareRepository = $this->createStub(\App\Domain\Hardware\HardwareRepositoryInterface::class);
+        $hardwareRepository->method('detect')->willReturn(
+            (new \App\Application\Hardware\HardwareReportBuilder(new \App\Application\Hardware\HardwareProfileClassifier()))
+                ->build(new \App\Domain\Hardware\HardwareCapability()),
+        );
         $fallbackEstimator = new PipelineStageDurationEstimator(
             new TranscriptionDurationEstimator(
                 new MediaDurationResolver($this->videoRepository),
@@ -598,7 +602,7 @@ final class ProcessVideoHandlerTest extends TestCase
             new MediaDurationResolver($this->videoRepository),
         );
 
-        $durationPredictionEngine = new DurationPredictionEngine($historyRepository, $fallbackEstimator, $runtimePlatform);
+        $durationPredictionEngine = new DurationPredictionEngine($historyRepository, $fallbackEstimator, $hardwareRepository);
 
         return new PipelineOrchestrator(
             $pipelineJobRepository,

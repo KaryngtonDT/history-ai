@@ -1,5 +1,9 @@
 import type { RuntimeEngineAnalytics } from "./analyticsTypes";
 import type {
+	RuntimeEngineManagement,
+	RuntimeSelectionUpdate,
+} from "./managementTypes";
+import type {
 	RuntimeCapabilityMaturityOverview,
 	RuntimeCapabilitySelectionView,
 	RuntimeCatalog,
@@ -42,4 +46,15 @@ export interface RuntimeRepository {
 		capability: string,
 	): Promise<RuntimeCapabilitySelectionView>;
 	getSelection(): Promise<Record<string, unknown>>;
+	getEngineManagement(): Promise<RuntimeEngineManagement>;
+	updateSelection(
+		payload: RuntimeSelectionUpdate,
+	): Promise<Record<string, unknown>>;
+	installEngine(engineId: string): Promise<Record<string, unknown>>;
+	updateEngine(engineId: string): Promise<Record<string, unknown>>;
+	repairEngine(engineId: string): Promise<Record<string, unknown>>;
+	removeEngine(engineId: string): Promise<void>;
+	validateEngine(engineId: string): Promise<Record<string, unknown>>;
+	listExecutions(): Promise<Array<Record<string, unknown>>>;
+	getRecommendationProfiles(): Promise<Record<string, unknown>>;
 }

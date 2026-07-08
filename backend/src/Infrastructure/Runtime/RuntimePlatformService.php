@@ -14,12 +14,17 @@ use App\Domain\Runtime\RuntimeRepositoryInterface;
 use App\Domain\Runtime\RuntimeStatus;
 use App\Infrastructure\Runtime\Benchmark\BenchmarkRunner;
 use App\Infrastructure\Runtime\Compatibility\RuntimeCompatibilityService;
-use App\Infrastructure\Runtime\Provisioning\IntelligentEngineProvisioner;
+use App\Infrastructure\Runtime\Intelligence\RuntimeRecommendationProfilesService;
+use App\Infrastructure\Runtime\Lifecycle\RuntimeEngineLifecycleService;
+use App\Infrastructure\Runtime\Lifecycle\RuntimeNotificationService;
+use App\Infrastructure\Runtime\Management\RuntimeDoctorReportService;
+use App\Infrastructure\Runtime\Management\RuntimeEngineManagementAssembler;
 use App\Infrastructure\Runtime\Discovery\EngineDiscovery;
 use App\Infrastructure\Runtime\Health\HealthMonitor;
 use App\Infrastructure\Runtime\Intelligence\AutoSelectionEngine;
 use App\Infrastructure\Runtime\Intelligence\RecommendationEngine;
 use App\Infrastructure\Runtime\Provisioning\EngineProvisioner;
+use App\Infrastructure\Runtime\Provisioning\IntelligentEngineProvisioner;
 use App\Infrastructure\Runtime\Readiness\ReadinessEngine;
 use App\Infrastructure\Runtime\Catalog\CapabilityMaturityRegistry;
 use App\Infrastructure\Runtime\Catalog\EngineCatalogDefinitions;
@@ -40,6 +45,11 @@ final class RuntimePlatformService implements RuntimePlatformInterface
         private readonly SystemHardwareRepository $hardwareRepository,
         private readonly IntelligentEngineProvisioner $intelligentEngineProvisioner,
         private readonly RuntimeResolverInterface $runtimeResolver,
+        private readonly RuntimeEngineManagementAssembler $engineManagementAssembler,
+        private readonly RuntimeEngineLifecycleService $engineLifecycleService,
+        private readonly RuntimeRecommendationProfilesService $recommendationProfilesService,
+        private readonly RuntimeDoctorReportService $doctorReportService,
+        private readonly RuntimeNotificationService $notificationService,
     ) {
     }
 
@@ -202,20 +212,40 @@ final class RuntimePlatformService implements RuntimePlatformInterface
     {
         $config = $this->runtimeRepository->getConfiguration();
         $mode = SelectionMode::tryFrom((string) ($payload['selectionMode'] ?? '')) ?? $config->selectionMode;
-        $manual = [];
+        $manual = $this->extractStringMap($payload['manualSelections'] ?? []);
+        $capabilityModes = $this->extractStringMap($payload['capabilityModes'] ?? []);
+        $locked = $this->extractStringMap($payload['lockedSelections'] ?? []);
 
-        if (isset($payload['manualSelections']) && is_array($payload['manualSelections'])) {
-            foreach ($payload['manualSelections'] as $capability => $engineId) {
-                if (is_string($capability) && is_string($engineId)) {
-                    $manual[$capability] = $engineId;
-                }
-            }
-        }
+        $updated = $config
+            ->withSelectionMode($mode)
+            ->withManualSelections([] !== $manual ? array_merge($config->manualSelections, $manual) : $config->manualSelections)
+            ->withCapabilityModes([] !== $capabilityModes ? array_merge($config->capabilityModes, $capabilityModes) : $config->capabilityModes)
+            ->withLockedSelections([] !== $locked ? array_merge($config->lockedSelections, $locked) : $config->lockedSelections);
 
-        $updated = $config->withSelectionMode($mode)->withManualSelections($manual);
         $this->runtimeRepository->saveConfiguration($updated);
 
         return $updated->toArray();
+    }
+
+    /**
+     * @param mixed $input
+     *
+     * @return array<string, string>
+     */
+    private function extractStringMap(mixed $input): array
+    {
+        if (!is_array($input)) {
+            return [];
+        }
+
+        $map = [];
+        foreach ($input as $key => $value) {
+            if (is_string($key) && is_string($value)) {
+                $map[$key] = $value;
+            }
+        }
+
+        return $map;
     }
 
     public function report(string $pipelineId): ?array
@@ -324,5 +354,63 @@ final class RuntimePlatformService implements RuntimePlatformInterface
         $catalogCapability = EngineCatalogCapability::from($capability);
 
         return $this->runtimeResolver->capabilitySelectionView($catalogCapability);
+    }
+
+    public function engineManagement(): array
+    {
+        return $this->engineManagementAssembler->assemble();
+    }
+
+    public function installEngine(string $engineId): array
+    {
+        return $this->engineLifecycleService->install($engineId);
+    }
+
+    public function updateEngine(string $engineId): array
+    {
+        return $this->engineLifecycleService->update($engineId);
+    }
+
+    public function repairEngine(string $engineId): array
+    {
+        return $this->engineLifecycleService->repair($engineId);
+    }
+
+    public function removeEngine(string $engineId): array
+    {
+        return $this->engineLifecycleService->remove($engineId);
+    }
+
+    public function validateEngine(string $engineId): array
+    {
+        return $this->engineLifecycleService->validate($engineId);
+    }
+
+    public function benchmarkEngine(string $engineId): array
+    {
+        return $this->engineLifecycleService->benchmark($engineId);
+    }
+
+    public function engineMetadata(string $engineId): ?array
+    {
+        return $this->engineLifecycleService->metadata($engineId);
+    }
+
+    public function recommendationProfiles(): array
+    {
+        return $this->recommendationProfilesService->profiles();
+    }
+
+    public function doctorReport(): array
+    {
+        return $this->doctorReportService->report();
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function notifications(?int $limit = 20): array
+    {
+        return $this->notificationService->list($limit);
     }
 }

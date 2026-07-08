@@ -63,6 +63,14 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 				description: "Choose AI engines per processing stage.",
 			},
 			{
+				id: "runtime-engines",
+				label: "Engine Manager",
+				to: "/settings/runtime/engines",
+				sprint: 72,
+				description:
+					"Install, benchmark, and select AI engines per capability.",
+			},
+			{
 				id: "runtime-settings",
 				label: "Runtime Center",
 				to: "/settings/runtime",

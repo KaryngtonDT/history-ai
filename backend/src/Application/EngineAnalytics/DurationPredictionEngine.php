@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Application\EngineAnalytics;
 
 use App\Application\Pipeline\Estimation\PipelineStageDurationEstimator;
-use App\Application\Runtime\RuntimePlatformInterface;
+use App\Domain\Hardware\HardwareRepositoryInterface;
 use App\Domain\EngineAnalytics\EngineExecutionHistoryRepositoryInterface;
 use App\Domain\EngineAnalytics\EngineExecutionStatus;
 use App\Domain\Pipeline\PipelineStageType;
@@ -23,7 +23,7 @@ final class DurationPredictionEngine
     public function __construct(
         private readonly EngineExecutionHistoryRepositoryInterface $historyRepository,
         private readonly PipelineStageDurationEstimator $fallbackEstimator,
-        private readonly RuntimePlatformInterface $runtimePlatform,
+        private readonly HardwareRepositoryInterface $hardwareRepository,
         private readonly int $minSamples = self::MIN_SAMPLES,
     ) {
     }
@@ -121,11 +121,7 @@ final class DurationPredictionEngine
 
     private function resolveHardwareProfile(): string
     {
-        $profile = $this->runtimePlatform->hardwareProfile();
-
-        return is_string($profile['profile']['type'] ?? null)
-            ? $profile['profile']['type']
-            : 'unknown';
+        return $this->hardwareRepository->detect()->profile->type->value;
     }
 
     private function defaultEngineForStage(PipelineStageType $stage): string

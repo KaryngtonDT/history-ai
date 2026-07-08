@@ -22,6 +22,11 @@ use App\Application\Pipeline\Orchestration\PipelineProgressService;
 use App\Application\Video\Ports\VideoProcessingQueueInterface;
 use App\Domain\Pipeline\PipelineStageType;
 use App\Domain\PipelineJob\PipelineJob;
+use App\Domain\Hardware\HardwareCapability;
+use App\Domain\Hardware\HardwareDetectionReport;
+use App\Domain\Hardware\HardwareProfile;
+use App\Domain\Hardware\HardwareProfileType;
+use App\Domain\Hardware\HardwareRepositoryInterface;
 use App\Domain\PipelineJob\PipelineJobId;
 use App\Domain\PipelineJob\PipelineJobRepositoryInterface;
 use App\Domain\PipelineJob\PipelineJobStatus;
@@ -162,10 +167,11 @@ final class PipelineOrchestratorTest extends TestCase
             ),
             new MediaDurationResolver($videoRepository),
         );
+        $hardwareRepository = $this->createHardwareRepository();
         $durationPredictionEngine = new DurationPredictionEngine(
             $historyRepository,
             $fallbackEstimator,
-            $runtimePlatform,
+            $hardwareRepository,
         );
         $executionRecorder = new EngineExecutionRecorder(
             $historyRepository,
@@ -188,6 +194,20 @@ final class PipelineOrchestratorTest extends TestCase
             $queue ?? $this->createStub(VideoProcessingQueueInterface::class),
             $videoRepository,
         );
+    }
+
+    private function createHardwareRepository(): HardwareRepositoryInterface
+    {
+        $capabilities = new HardwareCapability();
+        $report = new HardwareDetectionReport(
+            new HardwareProfile(HardwareProfileType::LowEndLocal, $capabilities, 'Low end local'),
+            $capabilities,
+            new \DateTimeImmutable(),
+        );
+        $hardware = $this->createStub(HardwareRepositoryInterface::class);
+        $hardware->method('detect')->willReturn($report);
+
+        return $hardware;
     }
 }
 

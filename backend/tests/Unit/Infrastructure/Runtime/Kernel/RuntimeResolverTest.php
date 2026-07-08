@@ -29,6 +29,7 @@ use App\Infrastructure\Runtime\Intelligence\RecommendationEngine;
 use App\Infrastructure\Storage\JsonFileStore;
 use App\Application\Hardware\HardwareReportBuilder;
 use App\Infrastructure\Runtime\Kernel\EngineAdapterRegistry;
+use App\Infrastructure\Runtime\Intelligence\RuntimeResolverIntelligence;
 use App\Infrastructure\Runtime\Kernel\RuntimeResolver;
 use App\Infrastructure\Runtime\Readiness\EngineStatusFinalizer;
 use App\Infrastructure\Runtime\Readiness\ReadinessEngine;
@@ -121,6 +122,11 @@ final class RuntimeResolverTest extends TestCase
             new HardwareReportBuilder(new \App\Application\Hardware\HardwareProfileClassifier()),
             $compatibilityService,
             new EngineAdapterRegistry(),
+            new RuntimeResolverIntelligence(
+                $this->createStub(\App\Domain\EngineAnalytics\EngineExecutionHistoryRepositoryInterface::class),
+                $hardwareRepository,
+                $engineRepository,
+            ),
         );
 
         $plan = $resolver->resolveCapability(

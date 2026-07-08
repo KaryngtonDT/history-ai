@@ -9,7 +9,13 @@ use App\Application\Pipeline\Estimation\HardwareAwareEstimateResolver;
 use App\Application\Pipeline\Estimation\MediaDurationResolver;
 use App\Application\Pipeline\Estimation\PipelineStageDurationEstimator;
 use App\Application\Pipeline\Estimation\TranscriptionDurationEstimator;
-use App\Application\Runtime\RuntimePlatformInterface;
+use App\Application\Hardware\HardwareProfileClassifier;
+use App\Application\Hardware\HardwareReportBuilder;
+use App\Domain\Hardware\HardwareCapability;
+use App\Domain\Hardware\HardwareDetectionReport;
+use App\Domain\Hardware\HardwareProfile;
+use App\Domain\Hardware\HardwareProfileType;
+use App\Domain\Hardware\HardwareRepositoryInterface;
 use App\Domain\EngineAnalytics\EngineExecutionHistory;
 use App\Domain\EngineAnalytics\EngineExecutionStatus;
 use App\Domain\Pipeline\PipelineStageType;
@@ -25,9 +31,8 @@ final class DurationPredictionEngineTest extends TestCase
     {
         $videoId = new VideoId('550e8400-e29b-41d4-a716-446655440099');
         $repository = new InMemoryEngineExecutionHistoryRepository();
-        $runtime = $this->createStub(RuntimePlatformInterface::class);
-        $runtime->method('hardwareProfile')->willReturn(['profile' => ['type' => 'low_end_local']]);
-        $engine = $this->createEngine($repository, $runtime);
+        $hardware = $this->createHardwareRepository();
+        $engine = $this->createEngine($repository, $hardware);
 
         foreach ([300, 360, 420] as $seconds) {
             $repository->record($this->sampleExecution($seconds));
@@ -44,9 +49,8 @@ final class DurationPredictionEngineTest extends TestCase
     {
         $videoId = new VideoId('550e8400-e29b-41d4-a716-446655440099');
         $repository = new InMemoryEngineExecutionHistoryRepository();
-        $runtime = $this->createStub(RuntimePlatformInterface::class);
-        $runtime->method('hardwareProfile')->willReturn(['profile' => ['type' => 'low_end_local']]);
-        $engine = $this->createEngine($repository, $runtime);
+        $hardware = $this->createHardwareRepository();
+        $engine = $this->createEngine($repository, $hardware);
 
         $estimate = $engine->estimateForStage($videoId, PipelineStageType::Translation, 'ollama');
 
@@ -56,7 +60,7 @@ final class DurationPredictionEngineTest extends TestCase
 
     private function createEngine(
         InMemoryEngineExecutionHistoryRepository $repository,
-        RuntimePlatformInterface $runtime,
+        HardwareRepositoryInterface $hardwareRepository,
     ): DurationPredictionEngine {
         $videoRepository = $this->createStub(VideoRepositoryInterface::class);
         $fallback = new PipelineStageDurationEstimator(
@@ -68,7 +72,21 @@ final class DurationPredictionEngineTest extends TestCase
             new MediaDurationResolver($videoRepository),
         );
 
-        return new DurationPredictionEngine($repository, $fallback, $runtime);
+        return new DurationPredictionEngine($repository, $fallback, $hardwareRepository);
+    }
+
+    private function createHardwareRepository(): HardwareRepositoryInterface
+    {
+        $capabilities = new HardwareCapability();
+        $report = new HardwareDetectionReport(
+            new HardwareProfile(HardwareProfileType::LowEndLocal, $capabilities, 'Low end local'),
+            $capabilities,
+            new \DateTimeImmutable(),
+        );
+        $hardware = $this->createStub(HardwareRepositoryInterface::class);
+        $hardware->method('detect')->willReturn($report);
+
+        return $hardware;
     }
 
     private function sampleExecution(int $seconds): EngineExecutionHistory

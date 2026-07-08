@@ -27,30 +27,30 @@ check_endpoint "Ready  (/ready)" "${API_BASE}/ready" || FAIL=1
 check_endpoint "Live   (/live)" "${API_BASE}/live" || FAIL=1
 
 echo ""
-echo "Runtime readiness:"
-if curl -sf "${API_BASE}/api/runtime/readiness" >/dev/null; then
-  echo "  Runtime API  OK"
-  READY_COUNT="$(curl -sf "${API_BASE}/api/runtime/readiness" | python -c "import sys,json; d=json.load(sys.stdin); print(d.get('readyCount',0))" 2>/dev/null || echo "?")"
-  TOTAL_COUNT="$(curl -sf "${API_BASE}/api/runtime/readiness" | python -c "import sys,json; d=json.load(sys.stdin); print(d.get('totalCount',0))" 2>/dev/null || echo "?")"
-  echo "  Engines ready  ${READY_COUNT}/${TOTAL_COUNT}"
-else
-  echo "  Runtime API  FAIL"
+echo "Runtime doctor (SSOT):"
+DOCTOR="$(curl -sf "${API_BASE}/api/runtime/doctor" 2>/dev/null || echo "")"
+if [ -z "${DOCTOR}" ]; then
+  echo "  Runtime doctor API  FAIL"
   FAIL=1
+else
+  echo "  Runtime doctor API  OK"
+  READY_COUNT="$(echo "${DOCTOR}" | python -c "import sys,json; d=json.load(sys.stdin); print(d.get('readyCount',0))" 2>/dev/null || echo "?")"
+  TOTAL_COUNT="$(echo "${DOCTOR}" | python -c "import sys,json; d=json.load(sys.stdin); print(d.get('totalCount',0))" 2>/dev/null || echo "?")"
+  BLOCKED_COUNT="$(echo "${DOCTOR}" | python -c "import sys,json; d=json.load(sys.stdin); print(len(d.get('blocked',[])))" 2>/dev/null || echo "?")"
+  MISSING_COUNT="$(echo "${DOCTOR}" | python -c "import sys,json; d=json.load(sys.stdin); print(len(d.get('missing',[])))" 2>/dev/null || echo "?")"
+  echo "  Engines ready     ${READY_COUNT}/${TOTAL_COUNT}"
+  echo "  Blocked           ${BLOCKED_COUNT}"
+  echo "  Missing           ${MISSING_COUNT}"
+  echo ""
+  echo "Capabilities:"
+  echo "${DOCTOR}" | python -c "
+import sys, json
+data = json.load(sys.stdin)
+for cap in data.get('capabilities', []):
+    status = 'READY' if cap.get('executable') else 'BLOCKED'
+    print(f\"  {cap.get('capability','?'):16}  {status} ({cap.get('currentEngineId','?')})\")
+" 2>/dev/null || FAIL=1
 fi
-
-echo ""
-echo "Runtime kernel (video pipeline):"
-for capability in speech_to_text translation text_to_speech voice_clone lip_sync video_render; do
-  VIEW="$(curl -sf "${API_BASE}/api/runtime/capabilities/${capability}/selection-view" 2>/dev/null || echo "")"
-  if [ -z "${VIEW}" ]; then
-    echo "  ${capability}  FAIL"
-    FAIL=1
-    continue
-  fi
-  ENGINE="$(echo "${VIEW}" | python -c "import sys,json; d=json.load(sys.stdin); print(d.get('currentEngineId','?'))" 2>/dev/null || echo "?")"
-  STATUS="$(echo "${VIEW}" | python -c "import sys,json; d=json.load(sys.stdin); r=d.get('resolvedEngine',{}); print('READY' if r.get('executable') else 'BLOCKED')" 2>/dev/null || echo "?")"
-  echo "  ${capability}  ${STATUS} (${ENGINE})"
-done
 
 echo ""
 echo "Production Readiness:"

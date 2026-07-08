@@ -244,4 +244,79 @@ final class RuntimeController extends AbstractController
     {
         return $this->json($this->platform->capabilitySelectionView($capability));
     }
+
+    #[OA\Get(operationId: 'getRuntimeEngineManagement', tags: ['Runtime'])]
+    #[Route('/engines/management', name: 'api_runtime_engine_management', methods: ['GET'])]
+    public function engineManagement(): JsonResponse
+    {
+        return $this->json($this->platform->engineManagement());
+    }
+
+    #[OA\Post(operationId: 'installRuntimeEngine', tags: ['Runtime'])]
+    #[Route('/engines/{id}/install', name: 'api_runtime_engine_install', methods: ['POST'])]
+    public function installEngine(string $id): JsonResponse
+    {
+        return $this->json($this->platform->installEngine($id));
+    }
+
+    #[OA\Post(operationId: 'updateRuntimeEngine', tags: ['Runtime'])]
+    #[Route('/engines/{id}/update', name: 'api_runtime_engine_update', methods: ['POST'])]
+    public function updateEngine(string $id): JsonResponse
+    {
+        return $this->json($this->platform->updateEngine($id));
+    }
+
+    #[OA\Post(operationId: 'repairRuntimeEngine', tags: ['Runtime'])]
+    #[Route('/engines/{id}/repair', name: 'api_runtime_engine_repair', methods: ['POST'])]
+    public function repairEngine(string $id): JsonResponse
+    {
+        return $this->json($this->platform->repairEngine($id));
+    }
+
+    #[OA\Delete(operationId: 'removeRuntimeEngine', tags: ['Runtime'])]
+    #[Route('/engines/{id}', name: 'api_runtime_engine_remove', methods: ['DELETE'])]
+    public function removeEngine(string $id): JsonResponse
+    {
+        return $this->json($this->platform->removeEngine($id));
+    }
+
+    #[OA\Post(operationId: 'validateRuntimeEngine', tags: ['Runtime'])]
+    #[Route('/engines/{id}/validate', name: 'api_runtime_engine_validate', methods: ['POST'])]
+    public function validateEngine(string $id): JsonResponse
+    {
+        return $this->json($this->platform->validateEngine($id));
+    }
+
+    #[OA\Get(operationId: 'getRuntimeEngineMetadata', tags: ['Runtime'])]
+    #[Route('/engines/{id}/metadata', name: 'api_runtime_engine_metadata', methods: ['GET'])]
+    public function engineMetadata(string $id): JsonResponse
+    {
+        $metadata = $this->platform->engineMetadata($id);
+        if (null === $metadata) {
+            return $this->json(['error' => 'Engine not found'], 404);
+        }
+
+        return $this->json($metadata);
+    }
+
+    #[OA\Get(operationId: 'getRuntimeRecommendationProfiles', tags: ['Runtime'])]
+    #[Route('/recommendations/profiles', name: 'api_runtime_recommendation_profiles', methods: ['GET'])]
+    public function recommendationProfiles(): JsonResponse
+    {
+        return $this->json($this->platform->recommendationProfiles());
+    }
+
+    #[OA\Get(operationId: 'getRuntimeDoctorReport', tags: ['Runtime'])]
+    #[Route('/doctor', name: 'api_runtime_doctor', methods: ['GET'])]
+    public function doctorReport(): JsonResponse
+    {
+        return $this->json($this->platform->doctorReport());
+    }
+
+    #[OA\Get(operationId: 'listRuntimeNotifications', tags: ['Runtime'])]
+    #[Route('/notifications', name: 'api_runtime_notifications', methods: ['GET'])]
+    public function notifications(): JsonResponse
+    {
+        return $this->json(['notifications' => $this->platform->notifications()]);
+    }
 }

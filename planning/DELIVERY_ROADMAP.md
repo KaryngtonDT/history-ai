@@ -16,7 +16,7 @@ See [WORKFLOW.md](WORKFLOW.md) for roles, cycle, and quality gates.
 
 **Shadow** = product — AI companion that accompanies the user everywhere they learn.
 
-Current chapter: **Platform Sprint 70.4** (AI Runtime Platform), then **Phase III — Shadow Everywhere** resumes with Sprint 71.
+Current chapter: **Platform Sprint 72** (AI Engine Management Platform) complete; **Phase III — Shadow Everywhere** continues with Shadow Sprint 72 (Ambient Shadow).
 
 ---
 
@@ -81,8 +81,9 @@ Mobile API, web settings (Mobile, Connections, Server), Flutter Connection Manag
 | **70.9** | **Engine performance analytics & adaptive estimation** ([TASK-0070.9](Platform/Sprint-70.9/TASK-0070.9.md)) |
 | **71** | **Capability platform** — 33 engines, 10 capabilities ([TASK-0071](Platform/Sprint-71/TASK-0071.md)) |
 | **71.1** | **Runtime Kernel unification** — Resolver, Pipeline/Doctor convergence ([TASK-0071.1](Platform/Sprint-71.1/TASK-0071.1.md)) |
+| **72** | **AI Engine Management Platform** — lifecycle, Provision Center, Auto/Manual/Locked, resolver intelligence ([TASK-0072](Platform/Sprint-72/TASK-0072.md)) |
 | 71 (Shadow) | IDE Companion ([TASK-0071](Shadow/Sprint-71/TASK-0071.md)) |
-| 72 | Ambient Shadow |
+| 72 (Shadow) | Ambient Shadow |
 
 Detail: [docs/shadow/ROADMAP.md](../docs/shadow/ROADMAP.md)
 

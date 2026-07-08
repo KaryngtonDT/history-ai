@@ -23,6 +23,7 @@ Every platform sprint must align with [LUMEN_VISION_2030.md](../../docs/vision/L
 | **70.9** | [TASK-0070.9](Sprint-70.9/TASK-0070.9.md) | Engine performance analytics & adaptive duration estimation | **Complete** |
 | **71** | [TASK-0071](Sprint-71/TASK-0071.md) | Capability platform & engine tiers (33 engines, 10 capabilities) | **Complete** |
 | **71.1** | [TASK-0071.1](Sprint-71.1/TASK-0071.1.md) | **Runtime Kernel unification** (Resolver, Pipeline/Doctor convergence) | **Complete** |
+| **72** | [TASK-0072](Sprint-72/TASK-0072.md) | **AI Engine Management Platform** (lifecycle, Provision Center, selection modes, intelligence) | **Complete** |
 
 **Note:** Platform Sprint **70.5** was merged into **70.4** (Runtime + Registry + Benchmark + Orchestrator = one system).
 

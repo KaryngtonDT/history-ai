@@ -5,7 +5,9 @@ import {
 	RUNTIME_CATALOG_PATH,
 	RUNTIME_COMPATIBILITY_PATH,
 	RUNTIME_DASHBOARD_PATH,
+	RUNTIME_ENGINE_MANAGEMENT_PATH,
 	RUNTIME_ENGINES_PATH,
+	RUNTIME_EXECUTIONS_PATH,
 	RUNTIME_HARDWARE_PATH,
 	RUNTIME_HEALTH_PATH,
 	RUNTIME_PATH,
@@ -15,15 +17,25 @@ import {
 	RUNTIME_PROVISION_PATH,
 	RUNTIME_PROVISION_PLAN_PATH,
 	RUNTIME_READINESS_PATH,
+	RUNTIME_RECOMMENDATION_PROFILES_PATH,
 	RUNTIME_RECOMMENDATIONS_PATH,
 	RUNTIME_SELECTION_PATH,
 	runtimeCapabilitySelectionViewPath,
 	runtimeEngineCompatibilityPath,
+	runtimeEngineInstallPath,
 	runtimeEngineProvisionPath,
+	runtimeEngineRemovePath,
+	runtimeEngineRepairPath,
 	runtimeEngineTestPath,
+	runtimeEngineUpdatePath,
+	runtimeEngineValidatePath,
 } from "@/config/api";
 import type { HttpClient } from "@/services/http/HttpClient";
 import type { RuntimeEngineAnalytics } from "./analyticsTypes";
+import type {
+	RuntimeEngineManagement,
+	RuntimeSelectionUpdate,
+} from "./managementTypes";
 import type { RuntimeRepository } from "./RuntimeRepository";
 import type {
 	RuntimeCapabilityMaturityOverview,
@@ -180,5 +192,66 @@ export class HttpRuntimeRepository implements RuntimeRepository {
 
 	getSelection(): Promise<Record<string, unknown>> {
 		return this.httpClient.get<Record<string, unknown>>(RUNTIME_SELECTION_PATH);
+	}
+
+	getEngineManagement(): Promise<RuntimeEngineManagement> {
+		return this.httpClient.get<RuntimeEngineManagement>(
+			RUNTIME_ENGINE_MANAGEMENT_PATH,
+		);
+	}
+
+	updateSelection(
+		payload: RuntimeSelectionUpdate,
+	): Promise<Record<string, unknown>> {
+		return this.httpClient.put<Record<string, unknown>>(
+			RUNTIME_SELECTION_PATH,
+			payload,
+		);
+	}
+
+	installEngine(engineId: string): Promise<Record<string, unknown>> {
+		return this.httpClient.post<Record<string, unknown>>(
+			runtimeEngineInstallPath(engineId),
+			{},
+		);
+	}
+
+	updateEngine(engineId: string): Promise<Record<string, unknown>> {
+		return this.httpClient.post<Record<string, unknown>>(
+			runtimeEngineUpdatePath(engineId),
+			{},
+		);
+	}
+
+	repairEngine(engineId: string): Promise<Record<string, unknown>> {
+		return this.httpClient.post<Record<string, unknown>>(
+			runtimeEngineRepairPath(engineId),
+			{},
+		);
+	}
+
+	removeEngine(engineId: string): Promise<void> {
+		return this.httpClient.delete(runtimeEngineRemovePath(engineId));
+	}
+
+	validateEngine(engineId: string): Promise<Record<string, unknown>> {
+		return this.httpClient.post<Record<string, unknown>>(
+			runtimeEngineValidatePath(engineId),
+			{},
+		);
+	}
+
+	listExecutions(): Promise<Array<Record<string, unknown>>> {
+		return this.httpClient
+			.get<{ executions: Array<Record<string, unknown>> }>(
+				RUNTIME_EXECUTIONS_PATH,
+			)
+			.then((response) => response.executions ?? []);
+	}
+
+	getRecommendationProfiles(): Promise<Record<string, unknown>> {
+		return this.httpClient.get<Record<string, unknown>>(
+			RUNTIME_RECOMMENDATION_PROFILES_PATH,
+		);
 	}
 }

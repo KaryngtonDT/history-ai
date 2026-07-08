@@ -16,6 +16,7 @@ use App\Application\Runtime\RuntimePlatformInterface;
 use App\Domain\Video\VideoRepositoryInterface;
 use App\Tests\Unit\Application\EngineAnalytics\InMemoryEngineExecutionHistoryRepository;
 use App\Application\Shadow\Handlers\GetShadowContextHandler;
+use App\Application\Shadow\RuntimeShadowContextBuilder;
 use App\Application\Shadow\Queries\GetShadowContextQuery;
 use App\Application\Shadow\ShadowContextFactory;
 use App\Domain\Shadow\Exception\InvalidShadowSessionException;
@@ -77,6 +78,7 @@ final class GetShadowContextHandlerTest extends TestCase
         $handler = new GetShadowContextHandler(
             $factory,
             $analyticsContextBuilder,
+            $this->createRuntimeShadowContextBuilder(),
         );
         $result = $handler(new GetShadowContextQuery($videoId->value, 2.5, 'fr'));
 
@@ -103,6 +105,7 @@ final class GetShadowContextHandlerTest extends TestCase
         $handler = new GetShadowContextHandler(
             $factory,
             $this->createEngineAnalyticsContextBuilder(),
+            $this->createRuntimeShadowContextBuilder(),
         );
 
         $this->expectException(InvalidShadowSessionException::class);
@@ -112,8 +115,12 @@ final class GetShadowContextHandlerTest extends TestCase
     private function createEngineAnalyticsContextBuilder(): EngineAnalyticsContextBuilder
     {
         $historyRepository = new InMemoryEngineExecutionHistoryRepository();
-        $runtime = $this->createStub(RuntimePlatformInterface::class);
         $videoRepository = $this->createStub(VideoRepositoryInterface::class);
+        $hardware = $this->createStub(\App\Domain\Hardware\HardwareRepositoryInterface::class);
+        $hardware->method('detect')->willReturn(
+            (new \App\Application\Hardware\HardwareReportBuilder(new \App\Application\Hardware\HardwareProfileClassifier()))
+                ->build(new \App\Domain\Hardware\HardwareCapability()),
+        );
         $predictionEngine = new DurationPredictionEngine(
             $historyRepository,
             new PipelineStageDurationEstimator(
@@ -124,13 +131,26 @@ final class GetShadowContextHandlerTest extends TestCase
                 ),
                 new MediaDurationResolver($videoRepository),
             ),
-            $runtime,
+            $hardware,
         );
+
+        $runtime = $this->createStub(RuntimePlatformInterface::class);
 
         return new EngineAnalyticsContextBuilder(
             new EngineStatisticsAggregator($historyRepository, $predictionEngine),
             new PipelineJobAnalyticsEnricher($historyRepository, $runtime),
             $historyRepository,
         );
+    }
+
+    private function createRuntimeShadowContextBuilder(): RuntimeShadowContextBuilder
+    {
+        $runtime = $this->createStub(RuntimePlatformInterface::class);
+        $runtime->method('engineManagement')->willReturn(['capabilities' => []]);
+        $runtime->method('recommendationProfiles')->willReturn(['profiles' => []]);
+        $runtime->method('doctorReport')->willReturn(['readyCount' => 0, 'totalCount' => 0, 'blocked' => [], 'missing' => []]);
+        $runtime->method('selection')->willReturn(['resolved' => []]);
+
+        return new RuntimeShadowContextBuilder($runtime);
     }
 }

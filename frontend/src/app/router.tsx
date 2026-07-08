@@ -15,6 +15,7 @@ import { LibraryPage } from "@/pages/Library/LibraryPage";
 import { PipelineSettingsPage } from "@/pages/PipelineSettings/PipelineSettingsPage";
 import { ProcessingPage } from "@/pages/Processing/ProcessingPage";
 import { RuntimeAnalyticsPage } from "@/pages/RuntimeAnalytics/RuntimeAnalyticsPage";
+import { RuntimeEnginesPage } from "@/pages/RuntimeEngines/RuntimeEnginesPage";
 import { RuntimeSettingsPage } from "@/pages/RuntimeSettings/RuntimeSettingsPage";
 import { ServerSettingsPage } from "@/pages/ServerSettings/ServerSettingsPage";
 import { SettingsPage } from "@/pages/Settings/SettingsPage";
@@ -75,6 +76,10 @@ export function AppRouter() {
 				<Route path="/settings/ai" element={<AIEngineSettingsPage />} />
 				<Route path="/settings/pipeline" element={<PipelineSettingsPage />} />
 				<Route path="/settings/runtime" element={<RuntimeSettingsPage />} />
+				<Route
+					path="/settings/runtime/engines"
+					element={<RuntimeEnginesPage />}
+				/>
 				<Route
 					path="/settings/runtime/analytics"
 					element={<RuntimeAnalyticsPage />}

@@ -13,6 +13,9 @@ enum RuntimeResolveReason: string
     case OpsBootstrap = 'ops_bootstrap';
     case Fallback = 'fallback';
     case ProfileRecommended = 'profile_recommended';
+    case LockedSelection = 'locked_selection';
+    case AnalyticsRecommended = 'analytics_recommended';
+    case LearningRecommended = 'learning_recommended';
 
     public function label(): string
     {
@@ -24,6 +27,9 @@ enum RuntimeResolveReason: string
             self::OpsBootstrap => 'Ops bootstrap',
             self::Fallback => 'Fallback engine',
             self::ProfileRecommended => 'Profile recommended',
+            self::LockedSelection => 'Locked selection',
+            self::AnalyticsRecommended => 'Analytics recommended',
+            self::LearningRecommended => 'Learning recommended',
         };
     }
 }
