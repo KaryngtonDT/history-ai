@@ -451,7 +451,7 @@ final class ProcessVideoHandlerTest extends TestCase
             $videoId->value,
         )->start('processing');
 
-        $pipelineJobRepository = $this->createMock(PipelineJobRepositoryInterface::class);
+        $pipelineJobRepository = $this->createStub(PipelineJobRepositoryInterface::class);
         $pipelineJobRepository->method('findById')->willReturn($translationJob);
         $pipelineJobRepository->method('save')->willReturnCallback(
             static function (PipelineJob $job) use (&$translationJob): void {
