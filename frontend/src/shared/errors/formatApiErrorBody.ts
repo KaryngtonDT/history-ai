@@ -25,11 +25,17 @@ export function formatApiErrorBody(body: unknown): string {
 		parts.push(`failure: ${record.failureMessage.trim()}`);
 	}
 
-	if (typeof record.failedStage === "string" && record.failedStage.trim() !== "") {
+	if (
+		typeof record.failedStage === "string" &&
+		record.failedStage.trim() !== ""
+	) {
 		parts.push(`stage: ${record.failedStage.trim()}`);
 	}
 
-	if (typeof record.videoStatus === "string" && record.videoStatus.trim() !== "") {
+	if (
+		typeof record.videoStatus === "string" &&
+		record.videoStatus.trim() !== ""
+	) {
 		parts.push(`videoStatus: ${record.videoStatus.trim()}`);
 	}
 

@@ -9,7 +9,10 @@ export type PipelineJobStatus =
 	| "waiting_user_confirmation"
 	| "waiting_user_choice";
 
-export type TranscriptUserChoice = "youtube_transcript" | "local_engine" | "none";
+export type TranscriptUserChoice =
+	| "youtube_transcript"
+	| "local_engine"
+	| "none";
 
 export interface PipelineJob {
 	jobId: string;

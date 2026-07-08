@@ -1,4 +1,7 @@
-import type { TranscriptLoadResult, TranscriptRepository } from "./TranscriptRepository";
+import type {
+	TranscriptLoadResult,
+	TranscriptRepository,
+} from "./TranscriptRepository";
 import { createTranscriptRepository } from "./TranscriptRepositoryFactory";
 import type { VideoTranscript } from "./types";
 

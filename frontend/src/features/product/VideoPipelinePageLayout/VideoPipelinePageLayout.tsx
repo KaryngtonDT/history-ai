@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 import { useParams } from "react-router";
 import { ArtifactJourney } from "@/features/artifacts";
 import { ExplainThisButton } from "@/features/help";
-import { PipelineProgressPanel } from "@/features/pipeline";
 import type { FeatureHelpId } from "@/features/help/content/features";
 import { getFeatureHelp } from "@/features/help/content/features";
+import { PipelineProgressPanel } from "@/features/pipeline";
 import { useTranslation } from "@/i18n/useTranslation";
 import { PageIntroduction } from "../PageIntroduction";
 import {

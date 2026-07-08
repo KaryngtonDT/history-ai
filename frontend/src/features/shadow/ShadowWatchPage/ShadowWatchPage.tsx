@@ -2,20 +2,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { API_BASE_URL, videoStreamPath } from "@/config/api";
-import { KnowledgeDiffPanel } from "@/features/shadowBrain/KnowledgeDiffPanel";
-import { ExecutiveWatchBar } from "@/features/shadowExecutive/ExecutiveWatchBar";
-import { useTranslation } from "@/i18n/useTranslation";
-import { resolveVideoRenderStreamUrl } from "@/services/render/types";
-import { videoRenderService } from "@/services/render/VideoRenderService";
-import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
-import {
-	computeNonNegativeElapsedSeconds,
-	isPipelineWaitingForTranscriptChoice,
-} from "@/features/pipeline/pipelineChoiceUtils";
 import {
 	PipelineProgressPanel,
 	PipelineTranscriptChoicePanel,
 } from "@/features/pipeline";
+import {
+	computeNonNegativeElapsedSeconds,
+	isPipelineWaitingForTranscriptChoice,
+} from "@/features/pipeline/pipelineChoiceUtils";
+import { KnowledgeDiffPanel } from "@/features/shadowBrain/KnowledgeDiffPanel";
+import { ExecutiveWatchBar } from "@/features/shadowExecutive/ExecutiveWatchBar";
+import { useTranslation } from "@/i18n/useTranslation";
+import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
+import { resolveVideoRenderStreamUrl } from "@/services/render/types";
+import { videoRenderService } from "@/services/render/VideoRenderService";
 import { shadowService } from "@/services/shadow/ShadowService";
 import type {
 	SessionLearningState,
@@ -100,7 +100,8 @@ export function ShadowWatchPage() {
 
 	const [loading, setLoading] = useState(true);
 	const [bootstrapAttempt, setBootstrapAttempt] = useState(0);
-	const [awaitingTranscriptChoice, setAwaitingTranscriptChoice] = useState(false);
+	const [awaitingTranscriptChoice, setAwaitingTranscriptChoice] =
+		useState(false);
 	const [loadingSubtitle, setLoadingSubtitle] = useState("");
 	const [bootstrapChecks, setBootstrapChecks] = useState<BootstrapCheckItem[]>(
 		[],
@@ -168,6 +169,7 @@ export function ShadowWatchPage() {
 		};
 
 		async function bootstrap() {
+			const retryAttempt = bootstrapAttempt;
 			let pausedForUserChoice = false;
 			setLoading(true);
 			setAwaitingTranscriptChoice(false);
@@ -199,6 +201,9 @@ export function ShadowWatchPage() {
 			];
 			setBootstrapChecks(initialChecks);
 			pushLog(t("pipeline.shadow.bootstrapLogStart", { videoId }));
+			if (retryAttempt > 0) {
+				pushLog(`Bootstrap retry #${retryAttempt}`);
+			}
 
 			try {
 				pushLog(t("pipeline.shadow.bootstrapLogFetchTranscript"));
@@ -235,9 +240,7 @@ export function ShadowWatchPage() {
 							API_BASE_URL,
 						);
 
-						if (
-							isNetworkUnavailableDetail(transcriptUnavailableDetail)
-						) {
+						if (isNetworkUnavailableDetail(transcriptUnavailableDetail)) {
 							const failureMessage = formatBackendUnreachableMessage(
 								t,
 								API_BASE_URL,
@@ -379,10 +382,7 @@ export function ShadowWatchPage() {
 								if (backgroundSttActive && activeStt) {
 									const estimateMs =
 										(activeStt.estimatedDurationSeconds ?? 7200) * 1000;
-									deadline = Math.max(
-										deadline,
-										Date.now() + estimateMs,
-									);
+									deadline = Math.max(deadline, Date.now() + estimateMs);
 									pushLog(
 										t("pipeline.shadow.bootstrapBackgroundTranscription", {
 											progress: activeStt.progressPercent,
@@ -465,7 +465,10 @@ export function ShadowWatchPage() {
 
 						if (Date.now() >= deadline && backgroundSttActive) {
 							deadline = Date.now() + TRANSCRIPT_BACKGROUND_EXTENSION_MS;
-							pushLog(t("pipeline.shadow.bootstrapBackgroundStillRunning"), "warn");
+							pushLog(
+								t("pipeline.shadow.bootstrapBackgroundStillRunning"),
+								"warn",
+							);
 						}
 
 						pollAttempt += 1;
@@ -943,7 +946,11 @@ export function ShadowWatchPage() {
 							}}
 						/>
 						{awaitingTranscriptChoice ? (
-							<PipelineProgressPanel sourceId={videoId} pollMs={8000} hideChoiceDialog />
+							<PipelineProgressPanel
+								sourceId={videoId}
+								pollMs={8000}
+								hideChoiceDialog
+							/>
 						) : null}
 					</>
 				) : null}

@@ -386,7 +386,8 @@ export const pipelineFr: PipelineMessages = {
 			bootstrapLogTranscriptReady:
 				"Transcription prête ({{segments}} segments)",
 			bootstrapLogTranscriptMissing: "Transcription introuvable pour l'instant",
-			bootstrapLogTranscriptUnavailableDetail: "Détail API transcript : {{detail}}",
+			bootstrapLogTranscriptUnavailableDetail:
+				"Détail API transcript : {{detail}}",
 			bootstrapLogBackendHint:
 				"Backend inaccessible à {{apiUrl}} — vérifiez Docker (`make doctor`) et que le port 8000 répond.",
 			bootstrapBackendUnreachable:

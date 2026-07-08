@@ -1,4 +1,5 @@
 import {
+	API_BASE_URL,
 	pipelineJobEventsPath,
 	pipelineJobStageCancelPath,
 	pipelineJobStageChoicePath,
@@ -6,7 +7,6 @@ import {
 	pipelineJobStageStartPath,
 	pipelineJobsPath,
 } from "@/config/api";
-import { API_BASE_URL } from "@/config/api";
 import { HttpClient } from "@/services/http/HttpClient";
 import type {
 	PipelineJob,

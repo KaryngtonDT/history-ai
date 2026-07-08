@@ -58,7 +58,9 @@ export class HttpTranscriptRepository implements TranscriptRepository {
 	}
 }
 
-function buildNetworkUnavailableDetail(error: NetworkError): Record<string, unknown> {
+function buildNetworkUnavailableDetail(
+	error: NetworkError,
+): Record<string, unknown> {
 	const cause =
 		error.cause instanceof Error
 			? error.cause.message.trim()

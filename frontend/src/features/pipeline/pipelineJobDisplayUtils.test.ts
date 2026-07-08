@@ -25,7 +25,10 @@ function job(partial: Partial<PipelineJob> = {}): PipelineJob {
 
 describe("pipelineJobDisplayUtils", () => {
 	it("formats startedAt with locale", () => {
-		const formatted = formatPipelineStartedAt("2026-06-26T14:30:00.000Z", "en-US");
+		const formatted = formatPipelineStartedAt(
+			"2026-06-26T14:30:00.000Z",
+			"en-US",
+		);
 
 		expect(formatted).toBeTruthy();
 		expect(formatted).toMatch(/6\/26\/26|26\/06\/26|2026/);

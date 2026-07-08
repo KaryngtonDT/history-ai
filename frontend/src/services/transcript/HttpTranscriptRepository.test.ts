@@ -73,7 +73,9 @@ describe("HttpTranscriptRepository", () => {
 	it("returns network unavailable detail when fetch fails", async () => {
 		const get = vi
 			.fn()
-			.mockRejectedValue(new NetworkError("GET failed", new TypeError("Failed to fetch")));
+			.mockRejectedValue(
+				new NetworkError("GET failed", new TypeError("Failed to fetch")),
+			);
 		const httpClient = { get, post: vi.fn() } as unknown as HttpClient;
 		const repository = new HttpTranscriptRepository(httpClient);
 

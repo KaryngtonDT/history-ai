@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
 import type { PipelineSourceStatus } from "@/services/pipeline/jobTypes";
+import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
 import {
 	isPipelineWaitingForTranscriptChoice,
 	resolveJobsWaitingUserChoice,
@@ -52,9 +52,7 @@ export function usePipelineChoiceState(sourceId: string | null, pollMs = 5000) {
 		return () => window.clearInterval(timer);
 	}, [pollMs, refresh, sourceId, status]);
 
-	const waitingChoiceJobs = status
-		? resolveJobsWaitingUserChoice(status)
-		: [];
+	const waitingChoiceJobs = status ? resolveJobsWaitingUserChoice(status) : [];
 
 	return {
 		status,

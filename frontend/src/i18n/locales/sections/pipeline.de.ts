@@ -526,8 +526,7 @@ export const pipelineDe: PipelineMessages = {
 			continue: "Weiter",
 			cancel: "Abbrechen",
 			restart: "Stufe neu starten",
-			restartConfirm:
-				"Neustart invalidiert nachfolgende Stufen. Fortfahren?",
+			restartConfirm: "Neustart invalidiert nachfolgende Stufen. Fortfahren?",
 			youtubeChoiceTitle: "Originales YouTube-Transkript gefunden",
 			youtubeChoiceDescription:
 				"YouTube-Transkript oder lokale Transkription wählen.",

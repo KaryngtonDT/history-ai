@@ -1,8 +1,8 @@
 import { appendActivityLog } from "@/features/activity/activityLogStore";
 import type { VideoJobStatus } from "@/services/video/types";
 import { ApiError } from "@/shared/errors/ApiError";
-import { NetworkError } from "@/shared/errors/NetworkError";
 import { formatApiErrorBody } from "@/shared/errors/formatApiErrorBody";
+import { NetworkError } from "@/shared/errors/NetworkError";
 import type {
 	BootstrapCheckItem,
 	BootstrapLogEntry,
@@ -62,10 +62,7 @@ type BootstrapTranslator = (
 ) => string;
 
 export function logVideoPipelineDiagnostics(
-	pushLog: (
-		message: string,
-		level?: BootstrapLogEntry["level"],
-	) => void,
+	pushLog: (message: string, level?: BootstrapLogEntry["level"]) => void,
 	t: BootstrapTranslator,
 	jobStatus: VideoJobStatus,
 ): void {
@@ -116,7 +113,8 @@ export function formatPipelineFailureSummary(
 ): string {
 	if (jobStatus.failureMessage) {
 		return t("pipeline.shadow.bootstrapPipelineFailedDetail", {
-			stage: jobStatus.failedStage ?? t("pipeline.shadow.bootstrapUnknownStage"),
+			stage:
+				jobStatus.failedStage ?? t("pipeline.shadow.bootstrapUnknownStage"),
 			message: jobStatus.failureMessage,
 		});
 	}
@@ -146,10 +144,7 @@ export function formatBackendUnreachableMessage(
 }
 
 export function logTranscriptUnavailableDiagnostics(
-	pushLog: (
-		message: string,
-		level?: BootstrapLogEntry["level"],
-	) => void,
+	pushLog: (message: string, level?: BootstrapLogEntry["level"]) => void,
 	t: BootstrapTranslator,
 	body: unknown,
 	apiBaseUrl: string,

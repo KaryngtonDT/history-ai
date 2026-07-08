@@ -1,4 +1,7 @@
-import type { PipelineJob, PipelineSourceStatus } from "@/services/pipeline/jobTypes";
+import type {
+	PipelineJob,
+	PipelineSourceStatus,
+} from "@/services/pipeline/jobTypes";
 
 export function isJobWaitingForTranscriptChoice(job: PipelineJob): boolean {
 	if (job.status === "waiting_user_choice") {

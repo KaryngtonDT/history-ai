@@ -1,9 +1,9 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TranscriptPanel } from "@/features/transcript/TranscriptPanel/TranscriptPanel";
+import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
 import { transcriptService } from "@/services/transcript/TranscriptService";
 import { renderWithProviders } from "@/test/render";
 

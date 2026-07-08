@@ -47,11 +47,7 @@ export class HttpClient {
 			const causeDetail =
 				error instanceof Error ? error.message.trim() : String(error);
 			const networkSuffix = causeDetail ? `: ${causeDetail}` : "";
-			appendActivityLog(
-				`GET ${path} failed${networkSuffix}`,
-				"error",
-				"http",
-			);
+			appendActivityLog(`GET ${path} failed${networkSuffix}`, "error", "http");
 			throw new NetworkError(`GET ${path} failed`, error);
 		}
 	}

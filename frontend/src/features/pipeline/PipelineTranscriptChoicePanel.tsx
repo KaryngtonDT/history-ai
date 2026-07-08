@@ -1,10 +1,10 @@
 import { useState } from "react";
+import { useTranslation } from "@/i18n/useTranslation";
 import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
+import { ApiError } from "@/shared/errors/ApiError";
+import { formatApiErrorBody } from "@/shared/errors/formatApiErrorBody";
 import { TranscriptSourceChoiceDialog } from "./PipelineProgressPanel";
 import { usePipelineChoiceState } from "./usePipelineChoiceState";
-import { useTranslation } from "@/i18n/useTranslation";
-import { formatApiErrorBody } from "@/shared/errors/formatApiErrorBody";
-import { ApiError } from "@/shared/errors/ApiError";
 
 export function PipelineTranscriptChoicePanel({
 	sourceId,
@@ -18,7 +18,9 @@ export function PipelineTranscriptChoicePanel({
 	const [submitting, setSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const submitChoice = async (choice: "youtube_transcript" | "local_engine") => {
+	const submitChoice = async (
+		choice: "youtube_transcript" | "local_engine",
+	) => {
 		setSubmitting(true);
 		setError(null);
 

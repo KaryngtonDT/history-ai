@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { PipelineJob, PipelineSourceStatus } from "@/services/pipeline/jobTypes";
+import type {
+	PipelineJob,
+	PipelineSourceStatus,
+} from "@/services/pipeline/jobTypes";
 import {
 	computeNonNegativeElapsedSeconds,
 	formatJobElapsedSeconds,
@@ -8,7 +11,9 @@ import {
 	resolveJobsWaitingUserChoice,
 } from "./pipelineChoiceUtils";
 
-function job(partial: Partial<PipelineJob> & Pick<PipelineJob, "jobId">): PipelineJob {
+function job(
+	partial: Partial<PipelineJob> & Pick<PipelineJob, "jobId">,
+): PipelineJob {
 	return {
 		sourceId: "video-1",
 		stage: "speech_to_text",
@@ -67,9 +72,11 @@ describe("pipelineChoiceUtils", () => {
 		);
 
 		expect(resolved).toHaveLength(2);
-		expect(isPipelineWaitingForTranscriptChoice(status({ activeJobs: [queuedChoiceJob] }))).toBe(
-			true,
-		);
+		expect(
+			isPipelineWaitingForTranscriptChoice(
+				status({ activeJobs: [queuedChoiceJob] }),
+			),
+		).toBe(true);
 	});
 
 	it("never returns negative elapsed seconds", () => {

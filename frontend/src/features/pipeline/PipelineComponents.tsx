@@ -40,7 +40,11 @@ export function StageNotification({
 	);
 }
 
-export function StaleArtifactWarning({ artifactIds }: { artifactIds: string[] }) {
+export function StaleArtifactWarning({
+	artifactIds,
+}: {
+	artifactIds: string[];
+}) {
 	if (artifactIds.length === 0) {
 		return null;
 	}

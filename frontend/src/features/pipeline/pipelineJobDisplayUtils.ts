@@ -20,7 +20,9 @@ export function formatPipelineStartedAt(
 	}).format(new Date(parsed));
 }
 
-export function estimateMinutesFromSeconds(seconds?: number | null): number | null {
+export function estimateMinutesFromSeconds(
+	seconds?: number | null,
+): number | null {
 	if (seconds == null || seconds <= 0) {
 		return null;
 	}
@@ -49,7 +51,9 @@ export function buildPipelineStageTimingLines(
 		lines.push(labels.notStarted);
 	}
 
-	const durationMinutes = estimateMinutesFromSeconds(job.estimatedDurationSeconds);
+	const durationMinutes = estimateMinutesFromSeconds(
+		job.estimatedDurationSeconds,
+	);
 
 	if (durationMinutes != null) {
 		lines.push(
@@ -57,7 +61,9 @@ export function buildPipelineStageTimingLines(
 		);
 	}
 
-	const remainingMinutes = estimateMinutesFromSeconds(job.estimatedRemainingSeconds);
+	const remainingMinutes = estimateMinutesFromSeconds(
+		job.estimatedRemainingSeconds,
+	);
 
 	if (
 		remainingMinutes != null &&

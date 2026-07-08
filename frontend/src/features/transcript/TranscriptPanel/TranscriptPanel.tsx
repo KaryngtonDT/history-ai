@@ -21,8 +21,11 @@ export function TranscriptPanel() {
 	const [transcript, setTranscript] = useState<VideoTranscript | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [activeIndex, setActiveIndex] = useState(0);
-	const { isWaitingForChoice, loading: pipelineLoading, status: pipelineStatus } =
-		usePipelineChoiceState(videoId || null);
+	const {
+		isWaitingForChoice,
+		loading: pipelineLoading,
+		status: pipelineStatus,
+	} = usePipelineChoiceState(videoId || null);
 
 	useEffect(() => {
 		let cancelled = false;

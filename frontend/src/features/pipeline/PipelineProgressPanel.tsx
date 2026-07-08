@@ -1,22 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
-import type { PipelineJob, PipelineSourceStatus } from "@/services/pipeline/jobTypes";
 import { useTranslation } from "@/i18n/useTranslation";
-import {
-	buildPipelineStageTimingLines,
-} from "./pipelineJobDisplayUtils";
-import styles from "./PipelineComponents.module.css";
-import {
-	isPipelineWaitingForTranscriptChoice,
-	resolveJobsWaitingUserChoice,
-} from "./pipelineChoiceUtils";
+import type {
+	PipelineJob,
+	PipelineSourceStatus,
+} from "@/services/pipeline/jobTypes";
+import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
 import {
 	StageNotification,
 	StageProgressBar,
 	StageStatusBadge,
 	StaleArtifactWarning,
 } from "./PipelineComponents";
+import styles from "./PipelineComponents.module.css";
+import {
+	isPipelineWaitingForTranscriptChoice,
+	resolveJobsWaitingUserChoice,
+} from "./pipelineChoiceUtils";
+import { buildPipelineStageTimingLines } from "./pipelineJobDisplayUtils";
 
 function PipelineStageCard({
 	job,
@@ -46,7 +47,8 @@ function PipelineStageCard({
 	return (
 		<div className={styles.stageCard}>
 			<div className={styles.stageTitle}>
-				{job.stage.replaceAll("_", " ")} <StageStatusBadge status={job.status} />
+				{job.stage.replaceAll("_", " ")}{" "}
+				<StageStatusBadge status={job.status} />
 			</div>
 			<StageProgressBar
 				progressPercent={job.progressPercent}
@@ -113,9 +115,16 @@ export function TranscriptSourceChoiceDialog({
 	}
 
 	const dialog = (
-		<div className={styles.dialogBackdrop} role="dialog" aria-modal="true" aria-labelledby="transcript-choice-title">
+		<div
+			className={styles.dialogBackdrop}
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="transcript-choice-title"
+		>
 			<div className={styles.dialog}>
-				<h3 id="transcript-choice-title">{t("pipeline.progress.youtubeChoiceTitle")}</h3>
+				<h3 id="transcript-choice-title">
+					{t("pipeline.progress.youtubeChoiceTitle")}
+				</h3>
 				<p>{t("pipeline.progress.youtubeChoiceDescription")}</p>
 				{error ? <p className={styles.choiceError}>{error}</p> : null}
 				<div className={styles.dialogActions}>
@@ -238,7 +247,11 @@ export function PipelineProgressPanel({
 
 	const handleLocalChoice = async () => {
 		try {
-			await pipelineJobService.submitChoice(sourceId, "speech_to_text", "local_engine");
+			await pipelineJobService.submitChoice(
+				sourceId,
+				"speech_to_text",
+				"local_engine",
+			);
 			await refresh();
 		} catch {
 			setError(t("pipeline.progress.choiceFailed"));
@@ -249,10 +262,17 @@ export function PipelineProgressPanel({
 		<div className={styles.root} data-testid="pipeline-progress-panel">
 			<div className={styles.header}>
 				<h3>{t("pipeline.progress.title")}</h3>
-				<p className={styles.safeMessage}>{t("pipeline.progress.refreshSafe")}</p>
-				{status?.message ? <StageNotification title="Pipeline" message={status.message} /> : null}
+				<p className={styles.safeMessage}>
+					{t("pipeline.progress.refreshSafe")}
+				</p>
+				{status?.message ? (
+					<StageNotification title="Pipeline" message={status.message} />
+				) : null}
 				{choiceNotice ? (
-					<StageNotification title={t("pipeline.progress.title")} message={choiceNotice} />
+					<StageNotification
+						title={t("pipeline.progress.title")}
+						message={choiceNotice}
+					/>
 				) : null}
 				{error ? <StageNotification title="Error" message={error} /> : null}
 			</div>

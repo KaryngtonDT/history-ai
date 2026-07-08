@@ -45,6 +45,16 @@
 	font-size: 0.9375rem;
 }
 
+.checkSymbol {
+	width: 1.25rem;
+	flex-shrink: 0;
+	font-weight: 700;
+}
+
+.checkLabel {
+	display: block;
+}
+
 .checkItem[data-status="active"] .checkLabel {
 	font-weight: 600;
 }
@@ -59,16 +69,6 @@
 
 .checkItem[data-status="error"] .checkSymbol {
 	color: var(--color-danger, #dc2626);
-}
-
-.checkSymbol {
-	width: 1.25rem;
-	flex-shrink: 0;
-	font-weight: 700;
-}
-
-.checkLabel {
-	display: block;
 }
 
 .checkDetail {

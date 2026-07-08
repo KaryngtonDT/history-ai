@@ -1,5 +1,7 @@
-import type { TranscriptRepository } from "./TranscriptRepository";
-import type { TranscriptLoadResult } from "./TranscriptRepository";
+import type {
+	TranscriptLoadResult,
+	TranscriptRepository,
+} from "./TranscriptRepository";
 import type { VideoTranscript } from "./types";
 
 export class MockTranscriptRepository implements TranscriptRepository {

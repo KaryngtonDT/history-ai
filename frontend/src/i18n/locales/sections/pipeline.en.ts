@@ -374,7 +374,8 @@ export const pipelineEn = {
 			bootstrapLogFetchTranscript: "GET /api/videos/{id}/transcript",
 			bootstrapLogTranscriptReady: "Transcript ready ({{segments}} segments)",
 			bootstrapLogTranscriptMissing: "Transcript not found yet",
-			bootstrapLogTranscriptUnavailableDetail: "Transcript API detail: {{detail}}",
+			bootstrapLogTranscriptUnavailableDetail:
+				"Transcript API detail: {{detail}}",
 			bootstrapLogBackendHint:
 				"Backend unreachable at {{apiUrl}} — check Docker (`make doctor`) and port 8000.",
 			bootstrapBackendUnreachable:
@@ -383,8 +384,7 @@ export const pipelineEn = {
 			bootstrapLogFailureMessage: "Pipeline cause: {{message}}",
 			bootstrapLogPreviousFailureMessage:
 				"Previous pipeline error (last run): {{message}}",
-			bootstrapLogProcessingDuration:
-				"Last processing duration: {{seconds}} s",
+			bootstrapLogProcessingDuration: "Last processing duration: {{seconds}} s",
 			bootstrapLogFetchRenders: "GET /api/videos/{id}/render",
 			bootstrapLogRendersLoaded: "Found {{count}} render(s)",
 			bootstrapLogFetchRenderStream:
