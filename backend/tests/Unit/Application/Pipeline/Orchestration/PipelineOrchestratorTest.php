@@ -110,34 +110,40 @@ final class PipelineOrchestratorTest extends TestCase
         /** @var array<string, PipelineJob> $jobs */
         $jobs = [$sttJob->jobId()->value => $sttJob];
 
-        $repository = $this->createStub(PipelineJobRepositoryInterface::class);
-        $repository->method('findById')->willReturnCallback(
-            static fn (PipelineJobId $jobId): ?PipelineJob => $jobs[$jobId->value] ?? null,
-        );
-        $repository->method('save')->willReturnCallback(
-            static function (PipelineJob $job) use (&$jobs): void {
-                $jobs[$job->jobId()->value] = $job;
-            },
-        );
-        $repository->method('findActiveBySourceAndStage')->willReturnCallback(
-            static function (string $source, PipelineStageType $stage) use (&$jobs): ?PipelineJob {
-                foreach ($jobs as $job) {
-                    if ($job->sourceId() !== $source) {
-                        continue;
+        $repository = $this->createMock(PipelineJobRepositoryInterface::class);
+        $repository->expects(self::any())
+            ->method('findById')
+            ->willReturnCallback(
+                static fn (PipelineJobId $jobId): ?PipelineJob => $jobs[$jobId->value] ?? null,
+            );
+        $repository->expects(self::any())
+            ->method('save')
+            ->willReturnCallback(
+                static function (PipelineJob $job) use (&$jobs): void {
+                    $jobs[$job->jobId()->value] = $job;
+                },
+            );
+        $repository->expects(self::any())
+            ->method('findActiveBySourceAndStage')
+            ->willReturnCallback(
+                static function (string $source, PipelineStageType $stage) use (&$jobs): ?PipelineJob {
+                    foreach ($jobs as $job) {
+                        if ($job->sourceId() !== $source) {
+                            continue;
+                        }
+
+                        if ($job->stage() !== $stage) {
+                            continue;
+                        }
+
+                        if ($job->status()->isActive() || $job->status()->isWaitingForUser()) {
+                            return $job;
+                        }
                     }
 
-                    if ($job->stage() !== $stage) {
-                        continue;
-                    }
-
-                    if ($job->status()->isActive() || $job->status()->isWaitingForUser()) {
-                        return $job;
-                    }
-                }
-
-                return null;
-            },
-        );
+                    return null;
+                },
+            );
 
         $queue = $this->createMock(VideoProcessingQueueInterface::class);
         $queue->expects(self::once())
