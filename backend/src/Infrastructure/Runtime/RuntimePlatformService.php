@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Infrastructure\Runtime;
 
 use App\Application\Runtime\RuntimePlatformInterface;
+use App\Application\Runtime\RuntimeResolverInterface;
+use App\Domain\Engine\EngineCatalogCapability;
 use App\Domain\Engine\EngineProfileName;
 use App\Domain\Engine\SelectionMode;
-use App\Domain\Runtime\RuntimeConfiguration;
+use App\Domain\Runtime\RuntimeResolveRequest;
 use App\Domain\Runtime\RuntimeRepositoryInterface;
 use App\Domain\Runtime\RuntimeStatus;
 use App\Infrastructure\Runtime\Benchmark\BenchmarkRunner;
@@ -37,6 +39,7 @@ final class RuntimePlatformService implements RuntimePlatformInterface
         private readonly RuntimeCompatibilityService $compatibilityService,
         private readonly SystemHardwareRepository $hardwareRepository,
         private readonly IntelligentEngineProvisioner $intelligentEngineProvisioner,
+        private readonly RuntimeResolverInterface $runtimeResolver,
     ) {
     }
 
@@ -296,5 +299,30 @@ final class RuntimePlatformService implements RuntimePlatformInterface
             'totalEngines' => count(EngineCatalogDefinitions::all()),
             'at' => (new \DateTimeImmutable())->format(DATE_ATOM),
         ];
+    }
+
+    public function resolve(array $payload): array
+    {
+        $request = RuntimeResolveRequest::fromArray($payload);
+        $plan = $this->runtimeResolver->resolve($request);
+
+        return $plan->toArray();
+    }
+
+    public function selection(): array
+    {
+        return $this->runtimeResolver->selection();
+    }
+
+    public function capabilities(): array
+    {
+        return $this->runtimeResolver->capabilities();
+    }
+
+    public function capabilitySelectionView(string $capability): array
+    {
+        $catalogCapability = EngineCatalogCapability::from($capability);
+
+        return $this->runtimeResolver->capabilitySelectionView($catalogCapability);
     }
 }

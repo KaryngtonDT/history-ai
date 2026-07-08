@@ -2,88 +2,37 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { PipelineBuilder } from "./PipelineBuilder";
 
-vi.mock("@/services/ai/AIEngineService", () => ({
-	aiEngineService: {
-		listEngines: vi.fn().mockResolvedValue([
-			{
-				engineId: "speech-to-text",
-				capability: "speech_to_text",
-				enabled: true,
-				providers: [
-					{
-						providerId: "faster_whisper",
-						displayName: "FasterWhisper",
-						capability: "speech_to_text",
-						enabled: true,
-					},
-				],
-			},
-			{
-				engineId: "translation",
-				capability: "translation",
-				enabled: true,
-				providers: [
-					{
-						providerId: "ollama",
-						displayName: "Ollama",
-						capability: "translation",
-						enabled: true,
-					},
-				],
-			},
-			{
-				engineId: "text-to-speech",
-				capability: "text_to_speech",
-				enabled: true,
-				providers: [
-					{
-						providerId: "f5_tts",
-						displayName: "F5-TTS",
-						capability: "text_to_speech",
-						enabled: true,
-					},
-				],
-			},
-			{
-				engineId: "voice-clone",
-				capability: "voice_clone",
-				enabled: true,
-				providers: [
-					{
-						providerId: "openvoice",
-						displayName: "OpenVoice V2",
-						capability: "voice_clone",
-						enabled: true,
-					},
-				],
-			},
-			{
-				engineId: "lip-sync",
-				capability: "lip_sync",
-				enabled: true,
-				providers: [
-					{
-						providerId: "latentsync",
-						displayName: "LatentSync",
-						capability: "lip_sync",
-						enabled: true,
-					},
-				],
-			},
-			{
-				engineId: "video-render",
-				capability: "video_render",
-				enabled: true,
-				providers: [
-					{
-						providerId: "ffmpeg",
-						displayName: "FFmpeg",
-						capability: "video_render",
-						enabled: true,
-					},
-				],
-			},
-		]),
+function selectionView(capability: string, adapterKey: string) {
+	return {
+		capability,
+		label: capability,
+		recommendedDisplayName: adapterKey,
+		currentDisplayName: adapterKey,
+		currentEngineId: adapterKey,
+		installedEngineIds: [adapterKey],
+		adapterKey,
+		executable: true,
+		blocked: false,
+	};
+}
+
+vi.mock("@/services/runtime/RuntimeService", () => ({
+	runtimeService: {
+		getCapabilitySelectionView: vi
+			.fn()
+			.mockImplementation((capability: string) => {
+				const map: Record<string, string> = {
+					speech_to_text: "faster_whisper",
+					translation: "ollama",
+					text_to_speech: "f5_tts",
+					voice_clone: "openvoice",
+					lip_sync: "latentsync",
+					video_render: "ffmpeg",
+				};
+				return Promise.resolve(
+					selectionView(capability, map[capability] ?? capability),
+				);
+			}),
 	},
 }));
 

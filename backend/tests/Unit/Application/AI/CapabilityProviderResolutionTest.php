@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Application\AI;
 
 use App\Domain\AI\AIEngineCapability;
+use App\Application\Runtime\RuntimeResolverInterface;
 use App\Domain\Pipeline\PipelineConfigurationResolverInterface;
 use App\Infrastructure\AI\AIEngineRegistryFactory;
 use App\Infrastructure\AI\AIProviderResolver;
+use App\Infrastructure\Runtime\Kernel\EngineExecutionAdapter;
 use App\Infrastructure\AI\Exception\InvalidAIEngineConfigurationException;
 use App\Infrastructure\Speech\DeterministicSpeechToTextProvider;
 use App\Infrastructure\Speech\FasterWhisperOutputParser;
@@ -121,6 +123,8 @@ final class CapabilityProviderResolutionTest extends TestCase
                 new MockVideoRenderProvider(),
             ),
             $pipelineConfigurationResolver,
+            new EngineExecutionAdapter($this->createStub(RuntimeResolverInterface::class)),
+            false,
         );
     }
 

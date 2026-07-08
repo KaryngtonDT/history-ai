@@ -13,12 +13,14 @@ use App\Domain\Pipeline\PipelineConfigurationId;
 use App\Domain\Pipeline\PipelineConfigurationRepositoryInterface;
 use App\Domain\Pipeline\PipelineStage;
 use App\Domain\Pipeline\PipelineStageType;
+use App\Application\Runtime\RuntimeSelectionSynchronizerInterface;
 
 final class SavePipelineConfigurationHandler
 {
     public function __construct(
         private readonly PipelineConfigurationRepositoryInterface $pipelineConfigurationRepository,
         private readonly PipelineConfigurationValidator $pipelineConfigurationValidator,
+        private readonly RuntimeSelectionSynchronizerInterface $runtimeSelectionSynchronizer,
     ) {
     }
 
@@ -57,6 +59,7 @@ final class SavePipelineConfigurationHandler
         );
 
         $this->pipelineConfigurationRepository->save($configuration);
+        $this->runtimeSelectionSynchronizer->syncFromPipelineConfiguration($configuration);
 
         return PipelineConfigurationResult::fromConfiguration($configuration);
     }

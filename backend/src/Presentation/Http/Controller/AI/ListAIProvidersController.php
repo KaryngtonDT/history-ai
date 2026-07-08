@@ -29,6 +29,10 @@ final class ListAIProvidersController extends AbstractController
     #[Route('/api/ai/providers', name: 'api_ai_providers_list', methods: ['GET'])]
     public function __invoke(ListAIProvidersHandler $handler): JsonResponse
     {
-        return $this->json(AIProvidersResponse::fromSummaries($handler())->toArray());
+        $payload = AIProvidersResponse::fromSummaries($handler())->toArray();
+        $payload['deprecated'] = true;
+        $payload['migration'] = 'Use GET /api/runtime/capabilities/{capability}/selection-view and POST /api/runtime/resolve';
+
+        return $this->json($payload);
     }
 }

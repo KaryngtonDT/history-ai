@@ -213,4 +213,35 @@ final class RuntimeController extends AbstractController
     {
         return $this->json($this->platform->capabilityMaturity());
     }
+
+    #[OA\Post(operationId: 'resolveRuntimeEngine', tags: ['Runtime'])]
+    #[Route('/resolve', name: 'api_runtime_resolve', methods: ['POST'])]
+    public function resolve(Request $request): JsonResponse
+    {
+        /** @var array<string, mixed> $payload */
+        $payload = json_decode($request->getContent(), true) ?: [];
+
+        return $this->json($this->platform->resolve($payload));
+    }
+
+    #[OA\Get(operationId: 'getRuntimeSelection', tags: ['Runtime'])]
+    #[Route('/selection', name: 'api_runtime_selection_get', methods: ['GET'])]
+    public function selection(): JsonResponse
+    {
+        return $this->json($this->platform->selection());
+    }
+
+    #[OA\Get(operationId: 'listRuntimeCapabilities', tags: ['Runtime'])]
+    #[Route('/capabilities', name: 'api_runtime_capabilities', methods: ['GET'])]
+    public function capabilities(): JsonResponse
+    {
+        return $this->json(['capabilities' => $this->platform->capabilities()]);
+    }
+
+    #[OA\Get(operationId: 'getRuntimeCapabilitySelectionView', tags: ['Runtime'])]
+    #[Route('/capabilities/{capability}/selection-view', name: 'api_runtime_capability_selection_view', methods: ['GET'])]
+    public function capabilitySelectionView(string $capability): JsonResponse
+    {
+        return $this->json($this->platform->capabilitySelectionView($capability));
+    }
 }

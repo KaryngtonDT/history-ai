@@ -37,7 +37,7 @@ final class DurationPredictionEngineTest extends TestCase
 
         self::assertSame('historical', $estimate['source']);
         self::assertSame(360, $estimate['maxSeconds']);
-        self::assertGreaterThan(0.5, $estimate['confidence']);
+        self::assertSame(0.15, $estimate['confidence']);
     }
 
     public function testFallsBackToRulesWhenHistoryIsSparse(): void

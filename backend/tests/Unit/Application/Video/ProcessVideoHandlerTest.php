@@ -524,7 +524,7 @@ final class ProcessVideoHandlerTest extends TestCase
         );
 
         $this->videoRepository
-            ->expects(self::once())
+            ->expects(self::exactly(2))
             ->method('findById')
             ->with($videoId)
             ->willReturn($queued);

@@ -9,6 +9,7 @@ use App\Application\Pipeline\Handlers\SavePipelineConfigurationHandler;
 use App\Application\Pipeline\PipelineConfigurationValidator;
 use App\Domain\AI\AIProviderResolverInterface;
 use App\Domain\Pipeline\PipelineConfigurationRepositoryInterface;
+use App\Application\Runtime\RuntimeSelectionSynchronizerInterface;
 use App\Infrastructure\AI\AIEngineRegistryFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -32,6 +33,7 @@ final class SavePipelineConfigurationHandlerTest extends TestCase
         $this->handler = new SavePipelineConfigurationHandler(
             $this->repository,
             new PipelineConfigurationValidator($this->aiProviderResolver),
+            $this->createStub(RuntimeSelectionSynchronizerInterface::class),
         );
     }
 

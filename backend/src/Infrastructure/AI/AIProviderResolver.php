@@ -22,6 +22,7 @@ use App\Infrastructure\AI\Exception\InvalidAIEngineConfigurationException;
 use App\Domain\VideoRender\VideoRenderProvider;
 use App\Domain\VideoRender\VideoRenderProviderInterface;
 use App\Domain\Pipeline\PipelineStageType;
+use App\Infrastructure\Runtime\Kernel\EngineExecutionAdapter;
 use App\Infrastructure\VideoRender\VideoRenderProviderFactory;
 use App\Infrastructure\Speech\SpeechToTextProviderFactory;
 use App\Infrastructure\Translation\TranslationProviderFactory;
@@ -41,6 +42,8 @@ final class AIProviderResolver implements AIProviderResolverInterface
         private readonly LipSyncProviderFactory $lipSyncProviderFactory,
         private readonly VideoRenderProviderFactory $videoRenderProviderFactory,
         private readonly \App\Domain\Pipeline\PipelineConfigurationResolverInterface $pipelineConfigurationResolver,
+        private readonly EngineExecutionAdapter $executionAdapter,
+        private readonly bool $runtimeKernelUnified = false,
     ) {
     }
 
@@ -220,6 +223,10 @@ final class AIProviderResolver implements AIProviderResolverInterface
         PipelineStageType $stageType,
         AIEngineCapability $capability,
     ): string {
+        if ($this->runtimeKernelUnified) {
+            return $this->executionAdapter->legacyProviderIdForStage($stageType);
+        }
+
         $pipelineConfiguration = $this->pipelineConfigurationResolver->resolve();
 
         if (null !== $pipelineConfiguration) {

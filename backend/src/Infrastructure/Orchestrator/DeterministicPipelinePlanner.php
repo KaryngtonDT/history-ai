@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Orchestrator;
 
+use App\Application\Runtime\PipelineStageCapabilityMapper;
+use App\Application\Runtime\RuntimeResolverInterface;
 use App\Domain\AI\AIEngineCapability;
 use App\Domain\AI\AIEngineRegistry;
 use App\Domain\Orchestrator\PipelinePlannerInterface;
@@ -23,6 +25,8 @@ use App\Domain\VideoIntelligence\BackgroundMusic;
 use App\Domain\VideoIntelligence\LipVisibility;
 use App\Domain\VideoIntelligence\LightingCondition;
 use App\Domain\VideoIntelligence\VideoIntelligence;
+use App\Domain\Runtime\RuntimeResolveContext;
+use App\Infrastructure\Runtime\Kernel\EngineAdapterRegistry;
 
 final class DeterministicPipelinePlanner implements PipelinePlannerInterface
 {
@@ -34,6 +38,8 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
 
     public function __construct(
         private readonly AIEngineRegistry $registry,
+        private readonly RuntimeResolverInterface $runtimeResolver,
+        private readonly EngineAdapterRegistry $adapterRegistry,
     ) {
     }
 
@@ -181,6 +187,20 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
         ProcessingStrategy $strategy,
         array $preferences,
     ): string {
+        $catalogCapability = $this->mapCapability($capability);
+
+        foreach ($preferences as $preferredId) {
+            $engineId = $this->adapterRegistry->engineIdForLegacyProvider($preferredId);
+            $plan = $this->runtimeResolver->resolveCapability(
+                $catalogCapability,
+                new RuntimeResolveContext(preferredEngineId: $engineId),
+            );
+
+            if ($plan->resolvedEngine->executable) {
+                return $plan->resolvedEngine->adapterKey;
+            }
+        }
+
         $enabledIds = array_map(
             static fn ($provider) => $provider->providerId(),
             $this->registry->enabledProviders($capability),
@@ -436,6 +456,18 @@ final class DeterministicPipelinePlanner implements PipelinePlannerInterface
             ProcessingStrategy::Balanced => max($intelligence->estimatedVramGb(), 8.0),
             ProcessingStrategy::Speed => min($intelligence->estimatedVramGb(), 6.0),
             ProcessingStrategy::LowMemory => min($intelligence->estimatedVramGb(), 4.0),
+        };
+    }
+
+    private function mapCapability(AIEngineCapability $capability): \App\Domain\Engine\EngineCatalogCapability
+    {
+        return match ($capability) {
+            AIEngineCapability::SpeechToText => \App\Domain\Engine\EngineCatalogCapability::SpeechToText,
+            AIEngineCapability::Translation => \App\Domain\Engine\EngineCatalogCapability::Translation,
+            AIEngineCapability::TextToSpeech => \App\Domain\Engine\EngineCatalogCapability::TextToSpeech,
+            AIEngineCapability::VoiceClone => \App\Domain\Engine\EngineCatalogCapability::VoiceClone,
+            AIEngineCapability::LipSync => \App\Domain\Engine\EngineCatalogCapability::LipSync,
+            AIEngineCapability::VideoRender => \App\Domain\Engine\EngineCatalogCapability::VideoRender,
         };
     }
 }

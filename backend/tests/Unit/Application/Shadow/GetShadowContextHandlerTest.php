@@ -4,6 +4,17 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Shadow;
 
+use App\Application\EngineAnalytics\DurationPredictionEngine;
+use App\Application\EngineAnalytics\EngineAnalyticsContextBuilder;
+use App\Application\EngineAnalytics\EngineStatisticsAggregator;
+use App\Application\EngineAnalytics\PipelineJobAnalyticsEnricher;
+use App\Application\Pipeline\Estimation\HardwareAwareEstimateResolver;
+use App\Application\Pipeline\Estimation\MediaDurationResolver;
+use App\Application\Pipeline\Estimation\PipelineStageDurationEstimator;
+use App\Application\Pipeline\Estimation\TranscriptionDurationEstimator;
+use App\Application\Runtime\RuntimePlatformInterface;
+use App\Domain\Video\VideoRepositoryInterface;
+use App\Tests\Unit\Application\EngineAnalytics\InMemoryEngineExecutionHistoryRepository;
 use App\Application\Shadow\Handlers\GetShadowContextHandler;
 use App\Application\Shadow\Queries\GetShadowContextQuery;
 use App\Application\Shadow\ShadowContextFactory;
@@ -61,7 +72,12 @@ final class GetShadowContextHandlerTest extends TestCase
             $conversationContext,
         );
 
-        $handler = new GetShadowContextHandler($factory);
+        $analyticsContextBuilder = $this->createEngineAnalyticsContextBuilder();
+
+        $handler = new GetShadowContextHandler(
+            $factory,
+            $analyticsContextBuilder,
+        );
         $result = $handler(new GetShadowContextQuery($videoId->value, 2.5, 'fr'));
 
         self::assertSame($videoId->value, $result->videoId);
@@ -84,9 +100,37 @@ final class GetShadowContextHandlerTest extends TestCase
             $conversationContext,
         );
 
-        $handler = new GetShadowContextHandler($factory);
+        $handler = new GetShadowContextHandler(
+            $factory,
+            $this->createEngineAnalyticsContextBuilder(),
+        );
 
         $this->expectException(InvalidShadowSessionException::class);
         $handler(new GetShadowContextQuery('not-a-uuid', 1.0, 'fr'));
+    }
+
+    private function createEngineAnalyticsContextBuilder(): EngineAnalyticsContextBuilder
+    {
+        $historyRepository = new InMemoryEngineExecutionHistoryRepository();
+        $runtime = $this->createStub(RuntimePlatformInterface::class);
+        $videoRepository = $this->createStub(VideoRepositoryInterface::class);
+        $predictionEngine = new DurationPredictionEngine(
+            $historyRepository,
+            new PipelineStageDurationEstimator(
+                new TranscriptionDurationEstimator(
+                    new MediaDurationResolver($videoRepository),
+                    new HardwareAwareEstimateResolver(false),
+                    'large-v3',
+                ),
+                new MediaDurationResolver($videoRepository),
+            ),
+            $runtime,
+        );
+
+        return new EngineAnalyticsContextBuilder(
+            new EngineStatisticsAggregator($historyRepository, $predictionEngine),
+            new PipelineJobAnalyticsEnricher($historyRepository, $runtime),
+            $historyRepository,
+        );
     }
 }

@@ -124,4 +124,26 @@ interface RuntimePlatformInterface
      * @return array<string, mixed>
      */
     public function capabilityMaturity(): array;
+
+    /**
+     * @param array<string, mixed> $payload
+     *
+     * @return array<string, mixed>
+     */
+    public function resolve(array $payload): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function selection(): array;
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function capabilities(): array;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function capabilitySelectionView(string $capability): array;
 }

@@ -18,9 +18,11 @@ use App\Domain\Speech\TranscriptSegmentCollection;
 use App\Domain\Translation\TranslationLanguage;
 use App\Domain\Translation\TranslationRepositoryInterface;
 use App\Domain\Video\VideoId;
+use App\Application\Runtime\RuntimeResolverInterface;
 use App\Domain\Pipeline\PipelineConfigurationResolverInterface;
 use App\Infrastructure\AI\AIEngineRegistryFactory;
 use App\Infrastructure\AI\AIProviderResolver;
+use App\Infrastructure\Runtime\Kernel\EngineExecutionAdapter;
 use App\Infrastructure\Speech\DeterministicSpeechToTextProvider;
 use App\Infrastructure\Speech\FasterWhisperOutputParser;
 use App\Infrastructure\Speech\FasterWhisperProcessRunnerInterface;
@@ -141,6 +143,8 @@ final class VideoTranslationGeneratorTest extends TestCase
                 new MockVideoRenderProvider(),
             ),
             $pipelineConfigurationResolver,
+            new EngineExecutionAdapter($this->createStub(RuntimeResolverInterface::class)),
+            false,
         );
 
         $this->generator = new VideoTranslationGenerator(

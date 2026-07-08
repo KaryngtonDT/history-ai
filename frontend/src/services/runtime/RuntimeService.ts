@@ -87,6 +87,14 @@ export class RuntimeService {
 	listEngineAnalytics() {
 		return this.repository.listEngineAnalytics();
 	}
+
+	getCapabilitySelectionView(capability: string) {
+		return this.repository.getCapabilitySelectionView(capability);
+	}
+
+	getSelection() {
+		return this.repository.getSelection();
+	}
 }
 
 export const runtimeService = new RuntimeService(createRuntimeRepository());

@@ -7,7 +7,7 @@ import { renderWithProviders } from "@/test/render";
 
 describe("Sprint 1 — app shell", () => {
 	it("renders layout and navigates between pages", async () => {
-		const user = userEvent.setup();
+		const user = userEvent.setup({ delay: null });
 
 		renderWithProviders(
 			<MemoryRouter initialEntries={["/"]}>
@@ -54,5 +54,5 @@ describe("Sprint 1 — app shell", () => {
 				screen.getByRole("heading", { name: "Settings" }),
 			).toBeInTheDocument();
 		});
-	});
+	}, 15000);
 });

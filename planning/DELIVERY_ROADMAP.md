@@ -79,8 +79,9 @@ Mobile API, web settings (Mobile, Connections, Server), Flutter Connection Manag
 | ------ | ---- |
 | **70.8** | **Background pipeline orchestration** ([TASK-0070.8](Platform/Sprint-70.8/TASK-0070.8.md)) |
 | **70.9** | **Engine performance analytics & adaptive estimation** ([TASK-0070.9](Platform/Sprint-70.9/TASK-0070.9.md)) |
-| **70.4** | **AI Runtime Platform** (Platform — see [Platform/README.md](Platform/README.md)) |
-| 71 | IDE Companion |
+| **71** | **Capability platform** — 33 engines, 10 capabilities ([TASK-0071](Platform/Sprint-71/TASK-0071.md)) |
+| **71.1** | **Runtime Kernel unification** — Resolver, Pipeline/Doctor convergence ([TASK-0071.1](Platform/Sprint-71.1/TASK-0071.1.md)) |
+| 71 (Shadow) | IDE Companion ([TASK-0071](Shadow/Sprint-71/TASK-0071.md)) |
 | 72 | Ambient Shadow |
 
 Detail: [docs/shadow/ROADMAP.md](../docs/shadow/ROADMAP.md)

@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Infrastructure\Orchestrator;
 
+use App\Application\Runtime\RuntimeResolverInterface;
+use App\Domain\Engine\EngineCatalogCapability;
 use App\Domain\Orchestrator\ProcessingStrategy;
 use App\Domain\Pipeline\PipelineStageType;
+use App\Domain\Runtime\EngineExecutionPlan;
+use App\Domain\Runtime\ResolvedEngine;
+use App\Domain\Runtime\RuntimeResolveContext;
+use App\Domain\Runtime\RuntimeResolveReason;
 use App\Domain\Review\LipSyncStrengthPreference;
 use App\Domain\Review\RenderingPresetPreference;
 use App\Domain\Review\TranslationStylePreference;
@@ -14,6 +20,7 @@ use App\Domain\Review\VoiceStabilityPreference;
 use App\Domain\VideoIntelligence\VideoAnalyzerInput;
 use App\Infrastructure\AI\AIEngineRegistryFactory;
 use App\Infrastructure\Orchestrator\DeterministicPipelinePlanner;
+use App\Infrastructure\Runtime\Kernel\EngineAdapterRegistry;
 use App\Infrastructure\VideoIntelligence\AudioAnalyzer;
 use App\Infrastructure\VideoIntelligence\CompositeVideoAnalyzer;
 use App\Infrastructure\VideoIntelligence\SpeechAnalyzer;
@@ -28,8 +35,34 @@ final class DeterministicPipelinePlannerPreferenceTest extends TestCase
 
     protected function setUp(): void
     {
+        $adapterRegistry = new EngineAdapterRegistry();
+        $runtimeResolver = $this->createStub(RuntimeResolverInterface::class);
+        $runtimeResolver->method('resolveCapability')->willReturnCallback(
+            static function (EngineCatalogCapability $capability, RuntimeResolveContext $context) use ($adapterRegistry): EngineExecutionPlan {
+                $engineId = $context->preferredEngineId ?? 'faster_whisper_large_v3';
+                $adapterKey = $adapterRegistry->adapterKeyForEngine($engineId);
+
+                return new EngineExecutionPlan(
+                    resolvedEngine: new ResolvedEngine(
+                        engineId: $engineId,
+                        displayName: $engineId,
+                        capability: $capability,
+                        adapterKey: $adapterKey,
+                        reason: RuntimeResolveReason::PlannerContext,
+                        confidence: 1.0,
+                        executable: true,
+                        blocked: false,
+                    ),
+                    planId: 'test-plan',
+                    adapterKey: $adapterKey,
+                );
+            },
+        );
+
         $this->planner = new DeterministicPipelinePlanner(
             (new AIEngineRegistryFactory())->create(),
+            $runtimeResolver,
+            $adapterRegistry,
         );
         $this->analyzer = new CompositeVideoAnalyzer(
             new AudioAnalyzer(),

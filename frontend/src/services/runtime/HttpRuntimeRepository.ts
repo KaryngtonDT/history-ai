@@ -16,6 +16,8 @@ import {
 	RUNTIME_PROVISION_PLAN_PATH,
 	RUNTIME_READINESS_PATH,
 	RUNTIME_RECOMMENDATIONS_PATH,
+	RUNTIME_SELECTION_PATH,
+	runtimeCapabilitySelectionViewPath,
 	runtimeEngineCompatibilityPath,
 	runtimeEngineProvisionPath,
 	runtimeEngineTestPath,
@@ -25,6 +27,7 @@ import type { RuntimeEngineAnalytics } from "./analyticsTypes";
 import type { RuntimeRepository } from "./RuntimeRepository";
 import type {
 	RuntimeCapabilityMaturityOverview,
+	RuntimeCapabilitySelectionView,
 	RuntimeCatalog,
 	RuntimeCompatibilitySummary,
 	RuntimeDashboard,
@@ -165,5 +168,17 @@ export class HttpRuntimeRepository implements RuntimeRepository {
 				RUNTIME_ANALYTICS_ENGINES_PATH,
 			)
 			.then((response) => response.engines);
+	}
+
+	getCapabilitySelectionView(
+		capability: string,
+	): Promise<RuntimeCapabilitySelectionView> {
+		return this.httpClient.get<RuntimeCapabilitySelectionView>(
+			runtimeCapabilitySelectionViewPath(capability),
+		);
+	}
+
+	getSelection(): Promise<Record<string, unknown>> {
+		return this.httpClient.get<Record<string, unknown>>(RUNTIME_SELECTION_PATH);
 	}
 }

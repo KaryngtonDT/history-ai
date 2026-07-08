@@ -281,6 +281,12 @@ export const RUNTIME_BENCHMARK_FULL_PATH = "/api/runtime/benchmark/full";
 export const RUNTIME_PIPELINE_VALIDATE_PATH = "/api/runtime/pipeline/validate";
 export const RUNTIME_PROFILE_PATH = "/api/runtime/profile";
 export const RUNTIME_SELECTION_PATH = "/api/runtime/selection";
+export const RUNTIME_RESOLVE_PATH = "/api/runtime/resolve";
+export const RUNTIME_CAPABILITIES_PATH = "/api/runtime/capabilities";
+
+export function runtimeCapabilitySelectionViewPath(capability: string): string {
+	return `${RUNTIME_CAPABILITIES_PATH}/${capability}/selection-view`;
+}
 
 export const RUNTIME_PROVISION_PATH = "/api/runtime/provision";
 export const RUNTIME_PROVISION_COMPATIBLE_PATH =

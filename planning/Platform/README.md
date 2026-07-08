@@ -19,10 +19,14 @@ Every platform sprint must align with [LUMEN_VISION_2030.md](../../docs/vision/L
 | **70.4** | [TASK-0070.4](Sprint-70.4/TASK-0070.4.md) | AI Runtime, Engine Intelligence & Benchmark Platform | **Complete** |
 | **70.6** | [TASK-0070.6](Sprint-70.6/TASK-0070.6.md) | Runtime completion & dashboard | **Complete** |
 | **70.7** | [TASK-0070.7](Sprint-70.7/TASK-0070.7.md) | Runtime provisioning intelligence | **Complete** |
-| **70.8** | [TASK-0070.8](Sprint-70.8/TASK-0070.8.md) | Background pipeline orchestration & progress UX | **In progress** |
-| **70.9** | [TASK-0070.9](Sprint-70.9/TASK-0070.9.md) | Engine performance analytics & adaptive duration estimation | **Planned** |
+| **70.8** | [TASK-0070.8](Sprint-70.8/TASK-0070.8.md) | Background pipeline orchestration & progress UX | **Complete** |
+| **70.9** | [TASK-0070.9](Sprint-70.9/TASK-0070.9.md) | Engine performance analytics & adaptive duration estimation | **Complete** |
+| **71** | [TASK-0071](Sprint-71/TASK-0071.md) | Capability platform & engine tiers (33 engines, 10 capabilities) | **Complete** |
+| **71.1** | [TASK-0071.1](Sprint-71.1/TASK-0071.1.md) | **Runtime Kernel unification** (Resolver, Pipeline/Doctor convergence) | **Complete** |
 
 **Note:** Platform Sprint **70.5** was merged into **70.4** (Runtime + Registry + Benchmark + Orchestrator = one system).
+
+**Note:** Shadow Sprint **71** (IDE Companion) is separate — see `planning/Shadow/Sprint-71/`.
 
 ---
 

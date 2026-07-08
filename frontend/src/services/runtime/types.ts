@@ -382,3 +382,22 @@ export interface RuntimeDashboard {
 	shadowCommentary: RuntimeDashboardShadowCommentary;
 	maturity: RuntimeCapabilityMaturityOverview;
 }
+
+export interface RuntimeCapabilitySelectionView {
+	capability: string;
+	label: string;
+	videoPipeline?: boolean;
+	referenceEngineId?: string | null;
+	referenceDisplayName?: string | null;
+	recommendedEngineId?: string | null;
+	recommendedDisplayName?: string | null;
+	currentEngineId?: string | null;
+	currentDisplayName?: string | null;
+	installedEngineIds?: string[];
+	adapterKey?: string | null;
+	blockedReason?: string | null;
+	blocked?: boolean;
+	executable?: boolean;
+	health?: string | null;
+	resolvedEngine?: Record<string, unknown>;
+}

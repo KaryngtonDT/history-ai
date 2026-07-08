@@ -50,6 +50,8 @@ use App\Infrastructure\VoiceClone\VoiceCloneMapper;
 use App\Infrastructure\VoiceClone\VoiceCloneProcessingContext;
 use App\Infrastructure\VoiceClone\VoiceCloneProviderFactory;
 use App\Domain\Pipeline\PipelineConfigurationResolverInterface;
+use App\Application\Runtime\RuntimeResolverInterface;
+use App\Infrastructure\Runtime\Kernel\EngineExecutionAdapter;
 use PHPUnit\Framework\TestCase;
 
 final class AIProviderResolverTest extends TestCase
@@ -90,6 +92,8 @@ final class AIProviderResolverTest extends TestCase
             $this->createLipSyncProviderFactory(),
             $this->createVideoRenderProviderFactory(),
             $this->pipelineConfigurationResolver,
+            new EngineExecutionAdapter($this->createStub(RuntimeResolverInterface::class)),
+            false,
         );
     }
 

@@ -16,3 +16,20 @@
 	background: var(--color-surface);
 	color: var(--color-text);
 }
+
+.labelRow {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.meta {
+	margin: 0.25rem 0 0.75rem;
+	padding-left: 1rem;
+	font-size: 0.85rem;
+	color: var(--color-text-muted, #666);
+}
+
+.blocked {
+	color: var(--color-danger, #b42318);
+}
