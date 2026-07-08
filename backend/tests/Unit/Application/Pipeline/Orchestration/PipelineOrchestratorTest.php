@@ -148,7 +148,7 @@ final class PipelineOrchestratorTest extends TestCase
                 null,
                 null,
                 PipelineStageType::Translation,
-                self::isType('string'),
+                self::isString(),
             );
 
         $orchestrator = $this->createOrchestrator($repository, $queue);
