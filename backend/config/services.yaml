@@ -192,6 +192,9 @@ services:
     App\Domain\PipelineJob\PipelineNotificationRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\PipelineJob\DoctrinePipelineNotificationRepository
 
+    App\Domain\EngineAnalytics\EngineExecutionHistoryRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\EngineAnalytics\DoctrineEngineExecutionHistoryRepository
+
     App\Application\Pipeline\Estimation\HardwareAwareEstimateResolver:
         arguments:
             $hasGpu: false

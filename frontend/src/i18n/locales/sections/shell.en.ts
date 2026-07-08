@@ -284,6 +284,24 @@ export const shellEn = {
 			title: "AI Runtime",
 			description:
 				"Discover, verify, benchmark, and validate installed AI engines.",
+			analytics: {
+				title: "Engine Performance Analytics",
+				description:
+					"Compare real execution history, estimation accuracy, and relative speed per engine.",
+				whatCanIDo:
+					"Review which engines are fastest on your hardware profile based on completed pipeline jobs.",
+				open: "Open engine performance analytics →",
+				back: "← Back to runtime console",
+				loadFailed: "Could not load engine analytics.",
+				empty: "No engine execution history recorded yet.",
+				executions: "Executions",
+				average: "Average",
+				fastest: "Fastest",
+				slowest: "Slowest",
+				averageError: "Avg. estimation error",
+				successRate: "Success rate",
+				relativeSpeed: "Relative speed",
+			},
 		},
 		aiEngines: {
 			title: "AI Engines",

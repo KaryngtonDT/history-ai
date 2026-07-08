@@ -83,6 +83,10 @@ export class RuntimeService {
 	getEngineCompatibility(engineId: string) {
 		return this.repository.getEngineCompatibility(engineId);
 	}
+
+	listEngineAnalytics() {
+		return this.repository.listEngineAnalytics();
+	}
 }
 
 export const runtimeService = new RuntimeService(createRuntimeRepository());

@@ -17,7 +17,7 @@ final class Version20260630120000 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->addSql(<<<'SQL'
-            CREATE TABLE video_transcript (
+            CREATE TABLE IF NOT EXISTS video_transcript (
                 video_id UUID NOT NULL,
                 transcript_id UUID NOT NULL,
                 payload TEXT NOT NULL,
@@ -29,6 +29,6 @@ final class Version20260630120000 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('DROP TABLE video_transcript');
+        $this->addSql('DROP TABLE IF EXISTS video_transcript');
     }
 }

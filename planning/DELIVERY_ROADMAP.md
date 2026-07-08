@@ -77,6 +77,8 @@ Mobile API, web settings (Mobile, Connections, Server), Flutter Connection Manag
 
 | Sprint | Name |
 | ------ | ---- |
+| **70.8** | **Background pipeline orchestration** ([TASK-0070.8](Platform/Sprint-70.8/TASK-0070.8.md)) |
+| **70.9** | **Engine performance analytics & adaptive estimation** ([TASK-0070.9](Platform/Sprint-70.9/TASK-0070.9.md)) |
 | **70.4** | **AI Runtime Platform** (Platform — see [Platform/README.md](Platform/README.md)) |
 | 71 | IDE Companion |
 | 72 | Ambient Shadow |

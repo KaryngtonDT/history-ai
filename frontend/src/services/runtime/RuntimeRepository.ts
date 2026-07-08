@@ -1,3 +1,4 @@
+import type { RuntimeEngineAnalytics } from "./analyticsTypes";
 import type {
 	RuntimeCapabilityMaturityOverview,
 	RuntimeCatalog,
@@ -35,4 +36,5 @@ export interface RuntimeRepository {
 	getCapabilityMaturity(): Promise<RuntimeCapabilityMaturityOverview>;
 	getDashboard(): Promise<RuntimeDashboard>;
 	getEngineCompatibility(engineId: string): Promise<RuntimeEngineCompatibility>;
+	listEngineAnalytics(): Promise<RuntimeEngineAnalytics[]>;
 }

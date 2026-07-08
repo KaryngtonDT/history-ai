@@ -34,6 +34,7 @@ final readonly class WatchContextResponse
         public ?string $currentSpeaker,
         public array $recentInteractions,
         public array $conversationMemory,
+        public ?array $engineAnalytics = null,
     ) {
     }
 
@@ -55,6 +56,7 @@ final readonly class WatchContextResponse
             currentSpeaker: $result->currentSpeaker,
             recentInteractions: $result->recentInteractions,
             conversationMemory: $result->conversationMemory,
+            engineAnalytics: $result->engineAnalytics,
         );
     }
 
@@ -79,6 +81,7 @@ final readonly class WatchContextResponse
             'currentSpeaker' => $this->currentSpeaker,
             'recentInteractions' => $this->recentInteractions,
             'conversationMemory' => $this->conversationMemory,
+            'engineAnalytics' => $this->engineAnalytics,
         ];
     }
 

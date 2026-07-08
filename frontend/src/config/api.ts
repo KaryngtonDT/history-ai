@@ -292,6 +292,8 @@ export const RUNTIME_COMPATIBILITY_PATH = "/api/runtime/compatibility";
 export const RUNTIME_CAPABILITY_MATURITY_PATH =
 	"/api/runtime/capabilities/maturity";
 export const RUNTIME_DASHBOARD_PATH = "/api/runtime/dashboard";
+export const RUNTIME_ANALYTICS_ENGINES_PATH = "/api/runtime/analytics/engines";
+export const RUNTIME_EXECUTIONS_PATH = "/api/runtime/executions";
 
 export function runtimeEngineTestPath(engineId: string): string {
 	return `${RUNTIME_PATH}/engines/${engineId}/test`;

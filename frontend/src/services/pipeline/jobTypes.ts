@@ -29,7 +29,14 @@ export interface PipelineJob {
 	completedAt?: string | null;
 	estimatedDurationSeconds?: number | null;
 	estimatedRemainingSeconds?: number | null;
+	estimatedCompletionAt?: string | null;
 	elapsedSeconds?: number | null;
+	actualDurationSeconds?: number | null;
+	estimationAccuracyPercent?: number | null;
+	predictionConfidence?: number | null;
+	estimationSource?: string | null;
+	engineId?: string | null;
+	hardwareProfile?: string | null;
 	failureReason?: string | null;
 	cancellationReason?: string | null;
 	transcriptSource?: string | null;

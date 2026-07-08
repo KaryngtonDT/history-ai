@@ -291,6 +291,24 @@ export const shellDe: ShellMessages = {
 			title: "KI-Runtime",
 			description:
 				"Installierte KI-Engines entdecken, prüfen, benchmarken und validieren.",
+			analytics: {
+				title: "Engine-Leistungsanalyse",
+				description:
+					"Vergleichen Sie echte Ausführungshistorie, Schätzgenauigkeit und relative Geschwindigkeit pro Engine.",
+				whatCanIDo:
+					"Prüfen Sie, welche Engines auf Ihrem Hardwareprofil am schnellsten sind – basierend auf abgeschlossenen Pipeline-Jobs.",
+				open: "Engine-Leistungsanalyse öffnen →",
+				back: "← Zurück zur Runtime-Konsole",
+				loadFailed: "Engine-Analytik konnte nicht geladen werden.",
+				empty: "Noch keine Engine-Ausführungshistorie erfasst.",
+				executions: "Ausführungen",
+				average: "Durchschnitt",
+				fastest: "Schnellste",
+				slowest: "Langsamste",
+				averageError: "Ø Schätzfehler",
+				successRate: "Erfolgsrate",
+				relativeSpeed: "Relative Geschwindigkeit",
+			},
 		},
 		aiEngines: {
 			title: "KI-Engines",

@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Pipeline\Orchestration;
 
+use App\Application\EngineAnalytics\DurationPredictionEngine;
+use App\Application\EngineAnalytics\EngineExecutionRecorder;
+use App\Application\EngineAnalytics\EngineStatisticsAggregator;
+use App\Application\EngineAnalytics\PipelineJobAnalyticsEnricher;
 use App\Application\Pipeline\Estimation\HardwareAwareEstimateResolver;
 use App\Application\Pipeline\Estimation\MediaDurationResolver;
 use App\Application\Pipeline\Estimation\PipelineStageDurationEstimator;
 use App\Application\Pipeline\Estimation\TranscriptionDurationEstimator;
+use App\Application\Runtime\RuntimePlatformInterface;
+use App\Tests\Unit\Application\EngineAnalytics\InMemoryEngineExecutionHistoryRepository;
 use App\Application\Pipeline\Orchestration\PipelineDependencyResolver;
 use App\Application\Pipeline\Orchestration\PipelineInvalidationService;
 use App\Application\Pipeline\Orchestration\PipelineNotificationService;
@@ -145,7 +151,10 @@ final class PipelineOrchestratorTest extends TestCase
         );
 
         $videoRepository = $this->createStub(VideoRepositoryInterface::class);
-        $stageDurationEstimator = new PipelineStageDurationEstimator(
+        $runtimePlatform = $this->createStub(RuntimePlatformInterface::class);
+        $runtimePlatform->method('hardwareProfile')->willReturn(['profile' => ['type' => 'low_end_local']]);
+        $historyRepository = new InMemoryEngineExecutionHistoryRepository();
+        $fallbackEstimator = new PipelineStageDurationEstimator(
             new TranscriptionDurationEstimator(
                 new MediaDurationResolver($videoRepository),
                 new HardwareAwareEstimateResolver(false),
@@ -153,6 +162,18 @@ final class PipelineOrchestratorTest extends TestCase
             ),
             new MediaDurationResolver($videoRepository),
         );
+        $durationPredictionEngine = new DurationPredictionEngine(
+            $historyRepository,
+            $fallbackEstimator,
+            $runtimePlatform,
+        );
+        $executionRecorder = new EngineExecutionRecorder(
+            $historyRepository,
+            $runtimePlatform,
+            new MediaDurationResolver($videoRepository),
+        );
+        $statisticsAggregator = new EngineStatisticsAggregator($historyRepository, $durationPredictionEngine);
+        $jobAnalyticsEnricher = new PipelineJobAnalyticsEnricher($historyRepository, $runtimePlatform);
 
         return new PipelineOrchestrator(
             $repository,
@@ -160,7 +181,10 @@ final class PipelineOrchestratorTest extends TestCase
             $invalidationService,
             $notificationService,
             new PipelineProgressService($repository),
-            $stageDurationEstimator,
+            $durationPredictionEngine,
+            $executionRecorder,
+            $statisticsAggregator,
+            $jobAnalyticsEnricher,
             $queue ?? $this->createStub(VideoProcessingQueueInterface::class),
             $videoRepository,
         );

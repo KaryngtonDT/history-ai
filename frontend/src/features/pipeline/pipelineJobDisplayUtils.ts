@@ -1,14 +1,14 @@
 import type { PipelineJob } from "@/services/pipeline/jobTypes";
 
-export function formatPipelineStartedAt(
-	startedAt: string | null | undefined,
+export function formatPipelineDateTime(
+	value: string | null | undefined,
 	locale: string,
 ): string | null {
-	if (!startedAt) {
+	if (!value) {
 		return null;
 	}
 
-	const parsed = Date.parse(startedAt);
+	const parsed = Date.parse(value);
 
 	if (Number.isNaN(parsed)) {
 		return null;
@@ -30,11 +30,27 @@ export function estimateMinutesFromSeconds(
 	return Math.ceil(seconds / 60);
 }
 
+export function formatAccuracyPercent(value?: number | null): string | null {
+	if (value == null) {
+		return null;
+	}
+
+	return `${Math.round(value)}%`;
+}
+
 export type PipelineTimingLabels = {
 	startedAt: string;
 	notStarted: string;
 	estimatedDuration: string;
+	estimatedCompletion: string;
+	actualCompletion: string;
+	actualDuration: string;
+	estimationAccuracy: string;
+	elapsedTime: string;
 	remainingMinutes: string;
+	engine: string;
+	hardwareProfile: string;
+	currentStep: string;
 };
 
 export function buildPipelineStageTimingLines(
@@ -43,7 +59,7 @@ export function buildPipelineStageTimingLines(
 	locale: string,
 ): string[] {
 	const lines: string[] = [];
-	const startedLabel = formatPipelineStartedAt(job.startedAt, locale);
+	const startedLabel = formatPipelineDateTime(job.startedAt, locale);
 
 	if (startedLabel) {
 		lines.push(labels.startedAt.replace("{{time}}", startedLabel));
@@ -61,17 +77,84 @@ export function buildPipelineStageTimingLines(
 		);
 	}
 
-	const remainingMinutes = estimateMinutesFromSeconds(
-		job.estimatedRemainingSeconds,
+	const estimatedCompletion = formatPipelineDateTime(
+		job.estimatedCompletionAt,
+		locale,
 	);
 
-	if (
-		remainingMinutes != null &&
-		(job.status === "running" || job.status === "queued")
-	) {
+	if (estimatedCompletion) {
 		lines.push(
-			labels.remainingMinutes.replace("{{minutes}}", String(remainingMinutes)),
+			labels.estimatedCompletion.replace("{{time}}", estimatedCompletion),
 		);
+	}
+
+	if (job.status === "running" || job.status === "queued") {
+		const elapsedMinutes = estimateMinutesFromSeconds(job.elapsedSeconds);
+
+		if (elapsedMinutes != null) {
+			lines.push(
+				labels.elapsedTime.replace("{{minutes}}", String(elapsedMinutes)),
+			);
+		}
+
+		const remainingMinutes = estimateMinutesFromSeconds(
+			job.estimatedRemainingSeconds,
+		);
+
+		if (remainingMinutes != null) {
+			lines.push(
+				labels.remainingMinutes.replace(
+					"{{minutes}}",
+					String(remainingMinutes),
+				),
+			);
+		}
+	}
+
+	if (
+		job.status === "completed" ||
+		job.status === "waiting_user_confirmation" ||
+		job.status === "failed" ||
+		job.status === "cancelled"
+	) {
+		const actualCompletion = formatPipelineDateTime(job.completedAt, locale);
+
+		if (actualCompletion) {
+			lines.push(labels.actualCompletion.replace("{{time}}", actualCompletion));
+		}
+
+		const actualMinutes = estimateMinutesFromSeconds(job.actualDurationSeconds);
+
+		if (actualMinutes != null) {
+			lines.push(
+				labels.actualDuration.replace("{{minutes}}", String(actualMinutes)),
+			);
+		}
+
+		const accuracy = formatAccuracyPercent(job.estimationAccuracyPercent);
+
+		if (accuracy) {
+			lines.push(labels.estimationAccuracy.replace("{{percent}}", accuracy));
+		}
+	}
+
+	if (job.engineId || job.currentEngine || job.provider) {
+		lines.push(
+			labels.engine.replace(
+				"{{engine}}",
+				job.engineId ?? job.currentEngine ?? job.provider ?? "unknown",
+			),
+		);
+	}
+
+	if (job.hardwareProfile) {
+		lines.push(
+			labels.hardwareProfile.replace("{{profile}}", job.hardwareProfile),
+		);
+	}
+
+	if (job.currentStep && job.status === "running") {
+		lines.push(labels.currentStep.replace("{{step}}", job.currentStep));
 	}
 
 	return lines;

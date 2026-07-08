@@ -1,4 +1,5 @@
 import {
+	RUNTIME_ANALYTICS_ENGINES_PATH,
 	RUNTIME_BENCHMARK_FULL_PATH,
 	RUNTIME_CAPABILITY_MATURITY_PATH,
 	RUNTIME_CATALOG_PATH,
@@ -20,6 +21,7 @@ import {
 	runtimeEngineTestPath,
 } from "@/config/api";
 import type { HttpClient } from "@/services/http/HttpClient";
+import type { RuntimeEngineAnalytics } from "./analyticsTypes";
 import type { RuntimeRepository } from "./RuntimeRepository";
 import type {
 	RuntimeCapabilityMaturityOverview,
@@ -155,5 +157,13 @@ export class HttpRuntimeRepository implements RuntimeRepository {
 		return this.httpClient.get<RuntimeEngineCompatibility>(
 			runtimeEngineCompatibilityPath(engineId),
 		);
+	}
+
+	listEngineAnalytics(): Promise<RuntimeEngineAnalytics[]> {
+		return this.httpClient
+			.get<{ engines: RuntimeEngineAnalytics[] }>(
+				RUNTIME_ANALYTICS_ENGINES_PATH,
+			)
+			.then((response) => response.engines);
 	}
 }

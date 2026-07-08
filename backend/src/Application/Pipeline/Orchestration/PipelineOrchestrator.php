@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Application\Pipeline\Orchestration;
 
-use App\Application\Pipeline\Estimation\PipelineStageDurationEstimator;
+use App\Application\EngineAnalytics\DurationPredictionEngine;
+use App\Application\EngineAnalytics\EngineExecutionRecorder;
+use App\Application\EngineAnalytics\EngineStatisticsAggregator;
+use App\Application\EngineAnalytics\PipelineJobAnalyticsEnricher;
 use App\Application\Video\Ports\VideoProcessingQueueInterface;
 use App\Domain\Orchestrator\ProcessingMode;
 use App\Domain\Pipeline\PipelineStageType;
@@ -26,7 +29,10 @@ final class PipelineOrchestrator
         private readonly PipelineInvalidationService $invalidationService,
         private readonly PipelineNotificationService $notificationService,
         private readonly PipelineProgressService $progressService,
-        private readonly PipelineStageDurationEstimator $stageDurationEstimator,
+        private readonly DurationPredictionEngine $durationPredictionEngine,
+        private readonly EngineExecutionRecorder $executionRecorder,
+        private readonly EngineStatisticsAggregator $statisticsAggregator,
+        private readonly PipelineJobAnalyticsEnricher $jobAnalyticsEnricher,
         private readonly VideoProcessingQueueInterface $videoProcessingQueue,
         private readonly VideoRepositoryInterface $videoRepository,
     ) {
@@ -54,11 +60,12 @@ final class PipelineOrchestrator
         }
 
         $estimate = null !== ($videoId ?? $sourceId)
-            ? $this->stageDurationEstimator->estimateForStage(
+            ? $this->durationPredictionEngine->estimateForStage(
                 new VideoId($videoId ?? $sourceId),
                 $stage,
+                $currentEngine,
             )
-            : ['maxSeconds' => null];
+            : ['maxSeconds' => null, 'confidence' => null];
 
         $job = PipelineJob::createQueued(
             PipelineJobId::generate(),
@@ -95,7 +102,7 @@ final class PipelineOrchestrator
         $videoId = new VideoId($job->videoId() ?? $job->sourceId());
 
         if (null === $job->estimatedDurationSeconds()) {
-            $estimate = $this->stageDurationEstimator->estimateForStage($videoId, $job->stage());
+            $estimate = $this->durationPredictionEngine->estimateForStage($videoId, $job->stage(), $job->currentEngine());
             $job = $job->withDurationEstimate($estimate['maxSeconds']);
         }
 
@@ -135,6 +142,7 @@ final class PipelineOrchestrator
         $completed = $job->complete($resultArtifactId);
         $this->jobRepository->save($completed);
         $this->notificationService->notifyStageCompleted($completed);
+        $this->recordExecution($completed);
 
         return $completed;
     }
@@ -145,6 +153,7 @@ final class PipelineOrchestrator
         $failed = $job->fail($reason);
         $this->jobRepository->save($failed);
         $this->notificationService->notifyStageFailed($failed);
+        $this->recordExecution($failed);
 
         return $failed;
     }
@@ -281,7 +290,16 @@ final class PipelineOrchestrator
      */
     public function serializeJob(PipelineJob $job): array
     {
-        return [
+        $videoId = $job->videoId() ?? $job->sourceId();
+        $estimate = null !== $videoId
+            ? $this->durationPredictionEngine->estimateForStage(
+                new VideoId($videoId),
+                $job->stage(),
+                $job->currentEngine(),
+            )
+            : ['confidence' => null];
+
+        return $this->jobAnalyticsEnricher->enrich($job, [
             'jobId' => $job->jobId()->value,
             'sourceId' => $job->sourceId(),
             'videoId' => $job->videoId(),
@@ -303,7 +321,16 @@ final class PipelineOrchestrator
             'userChoiceRequired' => $job->userChoiceRequired(),
             'userChoiceOptions' => $job->userChoiceOptions(),
             'staleArtifactIds' => $job->staleArtifactIds(),
-        ];
+            'predictionConfidence' => $estimate['confidence'] ?? null,
+            'estimationSource' => $estimate['source'] ?? null,
+        ]);
+    }
+
+    private function recordExecution(PipelineJob $job): void
+    {
+        if (null !== $this->executionRecorder->recordTerminalJob($job)) {
+            $this->statisticsAggregator->refreshAfterExecution();
+        }
     }
 
     private function isWaitingForTranscriptChoice(PipelineJob $job): bool

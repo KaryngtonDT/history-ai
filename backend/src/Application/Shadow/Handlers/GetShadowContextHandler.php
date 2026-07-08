@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Shadow\Handlers;
 
+use App\Application\EngineAnalytics\EngineAnalyticsContextBuilder;
 use App\Application\Shadow\DTO\WatchContextResult;
 use App\Application\Shadow\Queries\GetShadowContextQuery;
 use App\Application\Shadow\ShadowContextFactory;
@@ -15,6 +16,7 @@ final class GetShadowContextHandler
 {
     public function __construct(
         private readonly ShadowContextFactory $shadowContextFactory,
+        private readonly EngineAnalyticsContextBuilder $engineAnalyticsContextBuilder,
     ) {
     }
 
@@ -33,6 +35,9 @@ final class GetShadowContextHandler
             $query->conversationId,
         );
 
-        return WatchContextResult::fromWatchContext($context);
+        return WatchContextResult::fromWatchContext(
+            $context,
+            $this->engineAnalyticsContextBuilder->buildForStage(),
+        );
     }
 }

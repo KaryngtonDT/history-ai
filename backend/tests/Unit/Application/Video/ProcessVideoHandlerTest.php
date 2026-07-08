@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Video;
 
+use App\Application\EngineAnalytics\DurationPredictionEngine;
+use App\Application\EngineAnalytics\EngineExecutionRecorder;
+use App\Application\EngineAnalytics\EngineStatisticsAggregator;
+use App\Application\EngineAnalytics\PipelineJobAnalyticsEnricher;
 use App\Application\Pipeline\Estimation\HardwareAwareEstimateResolver;
 use App\Application\Pipeline\Estimation\MediaDurationResolver;
 use App\Application\Pipeline\Estimation\PipelineStageDurationEstimator;
@@ -21,7 +25,9 @@ use App\Domain\PipelineJob\PipelineJobId;
 use App\Domain\PipelineJob\PipelineJobRepositoryInterface;
 use App\Domain\PipelineJob\PipelineJobStatus;
 use App\Domain\PipelineJob\PipelineSourceType;
+use App\Application\Runtime\RuntimePlatformInterface;
 use App\Application\Video\Ports\VideoProcessingQueueInterface;
+use App\Tests\Unit\Application\EngineAnalytics\InMemoryEngineExecutionHistoryRepository;
 use App\Domain\AI\AIProviderResolverInterface;
 use App\Domain\Artifact\ArtifactRepositoryInterface;
 use App\Domain\Artifact\ArtifactType;
@@ -211,24 +217,7 @@ final class ProcessVideoHandlerTest extends TestCase
             $notificationService,
         );
         $progressService = new PipelineProgressService($pipelineJobRepository);
-        $stageDurationEstimator = new PipelineStageDurationEstimator(
-            new TranscriptionDurationEstimator(
-                new MediaDurationResolver($this->videoRepository),
-                new HardwareAwareEstimateResolver(false),
-                'large-v3',
-            ),
-            new MediaDurationResolver($this->videoRepository),
-        );
-        $pipelineOrchestrator = new PipelineOrchestrator(
-            $pipelineJobRepository,
-            $dependencyResolver,
-            $invalidationService,
-            $notificationService,
-            $progressService,
-            $stageDurationEstimator,
-            $this->createStub(VideoProcessingQueueInterface::class),
-            $this->videoRepository,
-        );
+        $pipelineOrchestrator = $this->createPipelineOrchestrator($pipelineJobRepository);
 
         $this->handler = new ProcessVideoHandler(
             $this->videoRepository,
@@ -469,24 +458,7 @@ final class ProcessVideoHandlerTest extends TestCase
             $notificationService,
         );
         $progressService = new PipelineProgressService($pipelineJobRepository);
-        $stageDurationEstimator = new PipelineStageDurationEstimator(
-            new TranscriptionDurationEstimator(
-                new MediaDurationResolver($this->videoRepository),
-                new HardwareAwareEstimateResolver(false),
-                'large-v3',
-            ),
-            new MediaDurationResolver($this->videoRepository),
-        );
-        $pipelineOrchestrator = new PipelineOrchestrator(
-            $pipelineJobRepository,
-            $dependencyResolver,
-            $invalidationService,
-            $notificationService,
-            $progressService,
-            $stageDurationEstimator,
-            $this->createStub(VideoProcessingQueueInterface::class),
-            $this->videoRepository,
-        );
+        $pipelineOrchestrator = $this->createPipelineOrchestrator($pipelineJobRepository);
 
         $intelligenceFactory = $this->createStub(VideoIntelligenceFactoryInterface::class);
         $intelligenceFactory->method('fromVideoJob')->willReturn($this->sampleIntelligence());
@@ -598,6 +570,48 @@ final class ProcessVideoHandlerTest extends TestCase
         self::assertSame(
             PipelineJobStatus::WaitingUserConfirmation,
             $translationJob->status(),
+        );
+    }
+
+    private function createPipelineOrchestrator(
+        PipelineJobRepositoryInterface $pipelineJobRepository,
+    ): PipelineOrchestrator {
+        $dependencyResolver = new PipelineDependencyResolver();
+        $notificationService = new PipelineNotificationService(
+            $this->createStub(PipelineNotificationRepositoryInterface::class),
+        );
+        $invalidationService = new PipelineInvalidationService(
+            $pipelineJobRepository,
+            $dependencyResolver,
+            $notificationService,
+        );
+        $progressService = new PipelineProgressService($pipelineJobRepository);
+        $runtimePlatform = $this->createStub(RuntimePlatformInterface::class);
+        $runtimePlatform->method('hardwareProfile')->willReturn(['profile' => ['type' => 'low_end_local']]);
+        $historyRepository = new InMemoryEngineExecutionHistoryRepository();
+        $fallbackEstimator = new PipelineStageDurationEstimator(
+            new TranscriptionDurationEstimator(
+                new MediaDurationResolver($this->videoRepository),
+                new HardwareAwareEstimateResolver(false),
+                'large-v3',
+            ),
+            new MediaDurationResolver($this->videoRepository),
+        );
+
+        $durationPredictionEngine = new DurationPredictionEngine($historyRepository, $fallbackEstimator, $runtimePlatform);
+
+        return new PipelineOrchestrator(
+            $pipelineJobRepository,
+            $dependencyResolver,
+            $invalidationService,
+            $notificationService,
+            $progressService,
+            $durationPredictionEngine,
+            new EngineExecutionRecorder($historyRepository, $runtimePlatform, new MediaDurationResolver($this->videoRepository)),
+            new EngineStatisticsAggregator($historyRepository, $durationPredictionEngine),
+            new PipelineJobAnalyticsEnricher($historyRepository, $runtimePlatform),
+            $this->createStub(VideoProcessingQueueInterface::class),
+            $this->videoRepository,
         );
     }
 }

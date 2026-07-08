@@ -296,6 +296,25 @@ export const shellFr: ShellMessages = {
 			title: "Runtime IA",
 			description:
 				"Découvrir, vérifier, benchmarker et valider les moteurs IA installés.",
+			analytics: {
+				title: "Analytique de performance des moteurs",
+				description:
+					"Comparer l'historique d'exécution réel, la précision des estimations et la vitesse relative par moteur.",
+				whatCanIDo:
+					"Examinez quels moteurs sont les plus rapides sur votre profil matériel selon les jobs de pipeline terminés.",
+				open: "Ouvrir l'analytique de performance des moteurs →",
+				back: "← Retour à la console runtime",
+				loadFailed: "Impossible de charger l'analytique des moteurs.",
+				empty:
+					"Aucun historique d'exécution de moteur enregistré pour l'instant.",
+				executions: "Exécutions",
+				average: "Moyenne",
+				fastest: "Plus rapide",
+				slowest: "Plus lent",
+				averageError: "Erreur d'estimation moy.",
+				successRate: "Taux de réussite",
+				relativeSpeed: "Vitesse relative",
+			},
 		},
 		aiEngines: {
 			title: "Moteurs IA",
