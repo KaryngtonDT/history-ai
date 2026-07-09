@@ -121,6 +121,10 @@ when@test:
             class: App\Infrastructure\YouTube\NullYouTubeCaptionFetcher
             public: true
 
+        App\Infrastructure\AI\AIProviderResolver:
+            arguments:
+                $runtimeKernelUnified: false
+
         App\Domain\Source\SourceRepositoryInterface:
             alias: App\Infrastructure\Persistence\Doctrine\Source\DoctrineSourceRepository
             public: true
