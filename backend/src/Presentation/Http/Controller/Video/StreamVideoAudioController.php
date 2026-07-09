@@ -23,12 +23,27 @@ final class StreamVideoAudioController extends AbstractController
             return $this->json(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
         }
 
-        $response = new BinaryFileResponse($path);
+        $response = new BinaryFileResponse(
+            $path,
+            Response::HTTP_OK,
+            ['Content-Type' => $this->resolveAudioMimeType($path)],
+        );
         $response->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_INLINE,
             basename($path),
         );
 
         return $response;
+    }
+
+    private function resolveAudioMimeType(string $path): string
+    {
+        return match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
+            'mp3' => 'audio/mpeg',
+            'ogg' => 'audio/ogg',
+            'flac' => 'audio/flac',
+            'aac' => 'audio/aac',
+            default => 'audio/wav',
+        };
     }
 }

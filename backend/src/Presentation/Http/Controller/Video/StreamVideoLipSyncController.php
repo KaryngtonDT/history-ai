@@ -23,12 +23,26 @@ final class StreamVideoLipSyncController extends AbstractController
             return $this->json(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
         }
 
-        $response = new BinaryFileResponse($path);
+        $response = new BinaryFileResponse(
+            $path,
+            Response::HTTP_OK,
+            ['Content-Type' => $this->resolveVideoMimeType($path)],
+        );
         $response->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_INLINE,
             basename($path),
         );
 
         return $response;
+    }
+
+    private function resolveVideoMimeType(string $path): string
+    {
+        return match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
+            'webm' => 'video/webm',
+            'mkv' => 'video/x-matroska',
+            'mov' => 'video/quicktime',
+            default => 'video/mp4',
+        };
     }
 }
