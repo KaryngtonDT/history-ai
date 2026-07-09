@@ -21,7 +21,7 @@ type PipelineSourceContextValue = {
 	status: PipelineSourceStatus | null;
 	loading: boolean;
 	error: string | null;
-	refresh: () => Promise<void>;
+	refresh: () => Promise<PipelineSourceStatus | null>;
 	refreshToken: number;
 };
 
@@ -34,7 +34,7 @@ const EMPTY_PIPELINE_SOURCE_CONTEXT: PipelineSourceContextValue = {
 	status: null,
 	loading: false,
 	error: null,
-	refresh: async () => {},
+	refresh: async () => null,
 	refreshToken: 0,
 };
 
@@ -50,11 +50,11 @@ export function PipelineSourceProvider({
 	const [error, setError] = useState<string | null>(null);
 	const [refreshToken, setRefreshToken] = useState(0);
 
-	const refresh = useCallback(async () => {
+	const refresh = useCallback(async (): Promise<PipelineSourceStatus | null> => {
 		if (!sourceId) {
 			setStatus(null);
 			setLoading(false);
-			return;
+			return null;
 		}
 
 		try {
@@ -62,8 +62,12 @@ export function PipelineSourceProvider({
 			setStatus(next);
 			setError(null);
 			setRefreshToken((current) => current + 1);
+
+			return next;
 		} catch {
 			setError("Failed to load pipeline status.");
+
+			return null;
 		} finally {
 			setLoading(false);
 		}

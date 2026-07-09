@@ -230,8 +230,10 @@ export function PipelineProgressPanel({
 
 	const refresh = useCallback(async () => {
 		if (usesSharedContext) {
-			await pipelineContext.refresh();
-			onStatusChange?.(pipelineContext.status);
+			const next = await pipelineContext.refresh();
+			if (next) {
+				onStatusChange?.(next);
+			}
 			return;
 		}
 
