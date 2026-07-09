@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Pipeline\Orchestration;
 
+use App\Domain\Pipeline\PipelineStageType;
 use App\Domain\PipelineJob\PipelineJob;
 use App\Domain\PipelineJob\PipelineJobId;
 use App\Domain\PipelineJob\PipelineJobRepositoryInterface;
@@ -56,7 +57,7 @@ final class PipelineProgressService
         return $updated;
     }
 
-    public function heartbeat(PipelineJobId $jobId): PipelineJob
+    public function heartbeat(PipelineJobId $jobId, ?PipelineStageType $stage = null): PipelineJob
     {
         $job = $this->jobRepository->findById($jobId);
 
@@ -64,14 +65,19 @@ final class PipelineProgressService
             throw new \RuntimeException('Pipeline job not found.');
         }
 
+        $stage ??= $job->stage();
         $elapsed = null !== $job->startedAt()
             ? max(0, time() - $job->startedAt()->getTimestamp())
             : 0;
-        $checkpoint = PipelineSttCheckpointRegistry::resolve($job->currentStep());
+        $checkpoint = PipelineStageCheckpointRegistry::resolve($stage, $job->currentStep());
         $estimated = $job->estimatedDurationSeconds();
         $progress = $job->progressPercent();
 
-        if ('transcribing' === $checkpoint['checkpoint'] && null !== $estimated && $estimated > 0) {
+        if (
+            PipelineStageCheckpointRegistry::isProcessingCheckpoint($checkpoint['checkpoint'])
+            && null !== $estimated
+            && $estimated > 0
+        ) {
             $ratio = min(1.0, $elapsed / $estimated);
             $progress = (int) round(
                 $checkpoint['minPercent'] + (($checkpoint['maxPercent'] - $checkpoint['minPercent']) * $ratio),

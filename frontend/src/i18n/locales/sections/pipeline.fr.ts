@@ -147,6 +147,8 @@ export const pipelineFr: PipelineMessages = {
 			engine: "Moteur de traduction",
 			generating: "Génération...",
 			generateCta: "Générer la traduction",
+			executionLocked:
+				"Exécution du pipeline en cours. Utilisez le panneau de progression pour suivre ou annuler.",
 			sourceLabel: "Source",
 			translationLabel: "Traduction",
 			sourceDuration: "{{count}} segments · durée source {{duration}}",
@@ -166,6 +168,8 @@ export const pipelineFr: PipelineMessages = {
 			voice: "Voix",
 			generating: "Génération...",
 			generateCta: "Générer l'audio",
+			executionLocked:
+				"Exécution du pipeline en cours. Utilisez le panneau de progression pour suivre ou annuler.",
 			preview: "Aperçu audio",
 			voiceLabel: "Voix :",
 			pause: "Pause",
@@ -193,6 +197,8 @@ export const pipelineFr: PipelineMessages = {
 			failed: "La génération du clonage de voix a échoué.",
 			generating: "Génération...",
 			generateCta: "Générer l'audio cloné",
+			executionLocked:
+				"Exécution du pipeline en cours. Utilisez le panneau de progression pour suivre ou annuler.",
 			preview: "Aperçu",
 			compareMode: "Mode comparaison",
 			originalGeneric: "Original (générique)",
@@ -218,6 +224,8 @@ export const pipelineFr: PipelineMessages = {
 			clonedAudioLanguages: "Langues audio clonées",
 			generating: "Génération...",
 			generateCta: "Générer le lip sync",
+			executionLocked:
+				"Exécution du pipeline en cours. Utilisez le panneau de progression pour suivre ou annuler.",
 			emptyTitle: "Pas encore de vidéo lip sync",
 			emptyDescription:
 				"Générez un lip sync une fois le clonage de voix terminé.",
@@ -247,6 +255,8 @@ export const pipelineFr: PipelineMessages = {
 			quality: "Qualité",
 			rendering: "Rendu...",
 			renderCta: "Rendre la vidéo finale",
+			executionLocked:
+				"Exécution du pipeline en cours. Utilisez le panneau de progression pour suivre ou annuler.",
 			emptyTitle: "Pas encore de vidéo finale",
 			emptyDescription:
 				"Rendez une vidéo avec lip sync pour produire un MP4 téléchargeable.",

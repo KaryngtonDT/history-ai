@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Presentation\Http\Controller\Video;
 
-use App\Application\VideoRender\Commands\GenerateVideoRenderCommand;
-use App\Application\VideoRender\Handlers\GenerateVideoRenderHandler;
+use App\Application\Pipeline\Orchestration\PipelineLegacyStageLauncher;
+use App\Domain\Pipeline\PipelineStageType;
+use App\Domain\PipelineJob\Exception\InvalidPipelineJobException;
 use App\Domain\VideoRender\Exception\InvalidVideoRenderException;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,7 +20,7 @@ final class GenerateVideoRenderController extends AbstractController
     #[OA\Post(
         operationId: 'generateVideoRender',
         summary: 'Generate final rendered video',
-        description: 'Renders a lip-synced preview into a downloadable MP4 using FFmpeg.',
+        description: 'Starts a video render pipeline job for the selected languages.',
         tags: ['Video'],
         parameters: [
             new OA\Parameter(
@@ -36,10 +37,10 @@ final class GenerateVideoRenderController extends AbstractController
         responses: [
             new OA\Response(
                 response: 202,
-                description: 'Final render accepted',
+                description: 'Render pipeline job accepted',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'status', type: 'string', example: 'rendered'),
+                        new OA\Property(property: 'status', type: 'string', example: 'accepted'),
                     ],
                     type: 'object',
                 ),
@@ -52,8 +53,11 @@ final class GenerateVideoRenderController extends AbstractController
         ],
     )]
     #[Route('/api/videos/{videoId}/render', name: 'api_videos_render_generate', methods: ['POST'])]
-    public function __invoke(string $videoId, Request $request, GenerateVideoRenderHandler $handler): JsonResponse
-    {
+    public function __invoke(
+        string $videoId,
+        Request $request,
+        PipelineLegacyStageLauncher $launcher,
+    ): JsonResponse {
         /** @var array<string, mixed>|null $payload */
         $payload = json_decode($request->getContent(), true);
 
@@ -80,17 +84,18 @@ final class GenerateVideoRenderController extends AbstractController
         ));
 
         try {
-            $handler(new GenerateVideoRenderCommand(
-                videoId: $videoId,
-                targetLanguages: $languageCodes,
-                provider: is_string($provider) ? $provider : null,
-                format: is_string($format) ? $format : null,
-                quality: is_string($quality) ? $quality : null,
-            ));
+            $job = $launcher->launch($videoId, PipelineStageType::VideoRender, [
+                'targetLanguages' => $languageCodes,
+                'provider' => is_string($provider) ? $provider : null,
+                'format' => is_string($format) ? $format : null,
+                'quality' => is_string($quality) ? $quality : null,
+            ]);
+        } catch (InvalidPipelineJobException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_CONFLICT);
         } catch (InvalidVideoRenderException) {
             return $this->json(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->json(['status' => 'rendered'], Response::HTTP_ACCEPTED);
+        return $this->json(['status' => 'accepted', 'job' => $job], Response::HTTP_ACCEPTED);
     }
 }

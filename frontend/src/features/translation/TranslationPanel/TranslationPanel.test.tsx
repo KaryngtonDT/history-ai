@@ -2,10 +2,14 @@ import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it, vi } from "vitest";
+import { PipelineSourceProvider } from "@/features/pipeline/PipelineSourceContext";
 import { TranslationPanel } from "@/features/translation/TranslationPanel/TranslationPanel";
+import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
 import { transcriptService } from "@/services/transcript/TranscriptService";
 import { translationService } from "@/services/translation/TranslationService";
 import { renderWithProviders } from "@/test/render";
+
+const VIDEO_ID = "550e8400-e29b-41d4-a716-446655440099";
 
 describe("TranslationPanel", () => {
 	it("renders translations and provider badge", async () => {
@@ -114,5 +118,61 @@ describe("TranslationPanel", () => {
 		);
 
 		expect(generateTranslations).toHaveBeenCalled();
+	});
+
+	it("hides generate button while translation pipeline is running", async () => {
+		vi.spyOn(transcriptService, "getTranscript").mockResolvedValue({
+			videoId: VIDEO_ID,
+			transcriptId: "550e8400-e29b-41d4-a716-446655440010",
+			language: "english",
+			text: "Hello",
+			duration: 2,
+			segmentCount: 1,
+			segments: [{ index: 0, startTime: 0, endTime: 2, text: "Hello" }],
+		});
+		vi.spyOn(translationService, "listTranslations").mockResolvedValue([]);
+		vi.spyOn(pipelineJobService, "loadStatus").mockResolvedValue({
+			sourceId: VIDEO_ID,
+			activeJobs: [
+				{
+					jobId: "job-1",
+					sourceId: VIDEO_ID,
+					stage: "translation",
+					status: "running",
+					progressPercent: 40,
+				},
+			],
+			completedJobs: [],
+			jobsWaitingUserChoice: [],
+			jobsWaitingConfirmation: [],
+			failedJobs: [],
+			cancelledJobs: [],
+			staleArtifacts: [],
+			blockedStages: [],
+			requiresUserAction: false,
+			message: "Translation in progress",
+		});
+
+		renderWithProviders(
+			<MemoryRouter initialEntries={[`/video/${VIDEO_ID}/translations`]}>
+				<PipelineSourceProvider sourceId={VIDEO_ID}>
+					<Routes>
+						<Route
+							path="/video/:videoId/translations"
+							element={<TranslationPanel />}
+						/>
+					</Routes>
+				</PipelineSourceProvider>
+			</MemoryRouter>,
+		);
+
+		await waitFor(() => {
+			expect(
+				screen.queryByRole("button", { name: "Generate Translation" }),
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByText(/Pipeline execution is in progress/i),
+			).toBeInTheDocument();
+		});
 	});
 });

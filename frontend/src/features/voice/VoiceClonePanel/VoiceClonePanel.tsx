@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import { API_BASE_URL } from "@/config/api";
+import { usePipelineStageExecutionLock } from "@/features/pipeline/usePipelineStageExecutionLock";
 import { useTranslation } from "@/i18n/useTranslation";
 import { audioService } from "@/services/audio/AudioService";
 import { translationService } from "@/services/translation/TranslationService";
@@ -30,6 +31,8 @@ import styles from "./VoiceClonePanel.module.css";
 export function VoiceClonePanel() {
 	const { t } = useTranslation();
 	const { videoId = "" } = useParams();
+	const { executionLocked, refreshPipeline } =
+		usePipelineStageExecutionLock("voice_clone");
 	const originalRef = useRef<HTMLAudioElement | null>(null);
 	const clonedRef = useRef<HTMLAudioElement | null>(null);
 	const [translationsAvailable, setTranslationsAvailable] = useState(false);
@@ -128,6 +131,7 @@ export function VoiceClonePanel() {
 				voiceMode,
 			});
 			await loadData();
+			await refreshPipeline();
 		} catch {
 			setError(t("pipeline.voiceClone.failed"));
 		} finally {
@@ -227,6 +231,7 @@ export function VoiceClonePanel() {
 								type="checkbox"
 								checked={selectedTargets.includes(language)}
 								onChange={() => toggleTargetLanguage(language)}
+								disabled={executionLocked}
 							/>
 							{formatTranslationLanguageLabel(language)}
 						</label>
@@ -243,7 +248,7 @@ export function VoiceClonePanel() {
 					onChange={(event) =>
 						setProvider(event.target.value as VoiceCloneProvider)
 					}
-					disabled={voiceMode !== "clone"}
+					disabled={voiceMode !== "clone" || executionLocked}
 				>
 					{VOICE_CLONE_PROVIDERS.map((entry) => (
 						<option key={entry.value} value={entry.value}>
@@ -252,17 +257,25 @@ export function VoiceClonePanel() {
 					))}
 				</select>
 
-				<Button
-					type="button"
-					onClick={handleGenerate}
-					disabled={
-						generating || selectedTargets.length === 0 || voiceMode !== "clone"
-					}
-				>
-					{generating
-						? t("pipeline.voiceClone.generating")
-						: t("pipeline.voiceClone.generateCta")}
-				</Button>
+				{executionLocked ? (
+					<p className={styles.error}>
+						{t("pipeline.voiceClone.executionLocked")}
+					</p>
+				) : (
+					<Button
+						type="button"
+						onClick={handleGenerate}
+						disabled={
+							generating ||
+							selectedTargets.length === 0 ||
+							voiceMode !== "clone"
+						}
+					>
+						{generating
+							? t("pipeline.voiceClone.generating")
+							: t("pipeline.voiceClone.generateCta")}
+					</Button>
+				)}
 
 				{error ? <p className={styles.error}>{error}</p> : null}
 			</Card>

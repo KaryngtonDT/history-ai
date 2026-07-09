@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Presentation\Http\Controller\Video;
 
-use App\Application\VoiceClone\Commands\GenerateVideoVoiceCloneCommand;
-use App\Application\VoiceClone\Handlers\GenerateVideoVoiceCloneHandler;
+use App\Application\Pipeline\Orchestration\PipelineLegacyStageLauncher;
+use App\Domain\Pipeline\PipelineStageType;
+use App\Domain\PipelineJob\Exception\InvalidPipelineJobException;
 use App\Domain\VoiceClone\Exception\InvalidVoiceCloneException;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,7 +20,7 @@ final class GenerateVideoVoiceCloneController extends AbstractController
     #[OA\Post(
         operationId: 'generateVideoVoiceClone',
         summary: 'Generate video voice clone',
-        description: 'Clones the original speaker voice onto translated generic audio using the configured voice clone provider.',
+        description: 'Starts a voice clone pipeline job for the selected languages.',
         tags: ['Video'],
         parameters: [
             new OA\Parameter(
@@ -36,10 +37,10 @@ final class GenerateVideoVoiceCloneController extends AbstractController
         responses: [
             new OA\Response(
                 response: 202,
-                description: 'Voice clone generation accepted',
+                description: 'Voice clone pipeline job accepted',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'status', type: 'string', example: 'generated'),
+                        new OA\Property(property: 'status', type: 'string', example: 'accepted'),
                     ],
                     type: 'object',
                 ),
@@ -52,13 +53,16 @@ final class GenerateVideoVoiceCloneController extends AbstractController
         ],
     )]
     #[Route('/api/videos/{videoId}/voice-clone', name: 'api_videos_voice_clone_generate', methods: ['POST'])]
-    public function __invoke(string $videoId, Request $request, GenerateVideoVoiceCloneHandler $handler): JsonResponse
-    {
+    public function __invoke(
+        string $videoId,
+        Request $request,
+        PipelineLegacyStageLauncher $launcher,
+    ): JsonResponse {
         /** @var array<string, mixed>|null $payload */
         $payload = json_decode($request->getContent(), true);
 
         if (!is_array($payload)) {
-            return $this->json(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
+            $payload = [];
         }
 
         $targetLanguages = $payload['targetLanguages'] ?? [];
@@ -79,16 +83,17 @@ final class GenerateVideoVoiceCloneController extends AbstractController
         ));
 
         try {
-            $handler(new GenerateVideoVoiceCloneCommand(
-                videoId: $videoId,
-                targetLanguages: $languageCodes,
-                provider: is_string($provider) ? $provider : null,
-                voiceMode: is_string($voiceMode) ? $voiceMode : null,
-            ));
+            $job = $launcher->launch($videoId, PipelineStageType::VoiceClone, [
+                'targetLanguages' => $languageCodes,
+                'provider' => is_string($provider) ? $provider : null,
+                'voiceMode' => is_string($voiceMode) ? $voiceMode : null,
+            ]);
+        } catch (InvalidPipelineJobException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_CONFLICT);
         } catch (InvalidVoiceCloneException) {
             return $this->json(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->json(['status' => 'generated'], Response::HTTP_ACCEPTED);
+        return $this->json(['status' => 'accepted', 'job' => $job], Response::HTTP_ACCEPTED);
     }
 }

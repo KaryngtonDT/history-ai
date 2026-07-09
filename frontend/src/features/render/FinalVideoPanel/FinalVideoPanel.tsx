@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { usePipelineStageExecutionLock } from "@/features/pipeline/usePipelineStageExecutionLock";
 import { useTranslation } from "@/i18n/useTranslation";
 import { lipSyncService } from "@/services/lipsync/LipSyncService";
 import type {
@@ -19,6 +20,8 @@ import styles from "./FinalVideoPanel.module.css";
 export function FinalVideoPanel() {
 	const { t } = useTranslation();
 	const { videoId = "" } = useParams();
+	const { executionLocked, refreshPipeline } =
+		usePipelineStageExecutionLock("video_render");
 	const [lipSyncAvailable, setLipSyncAvailable] = useState(false);
 	const [renderEntries, setRenderEntries] = useState<VideoRender[]>([]);
 	const [selectedLanguage, setSelectedLanguage] =
@@ -73,6 +76,7 @@ export function FinalVideoPanel() {
 			});
 			await loadData();
 			setActiveLanguage(selectedLanguage);
+			await refreshPipeline();
 		} catch {
 			setError(t("pipeline.render.failed"));
 		} finally {
@@ -117,6 +121,7 @@ export function FinalVideoPanel() {
 				quality={quality}
 				lipSyncAvailable={lipSyncAvailable}
 				generating={generating}
+				executionLocked={executionLocked}
 				error={error}
 				onLanguageChange={setSelectedLanguage}
 				onProviderChange={setProvider}

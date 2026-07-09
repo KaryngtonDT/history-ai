@@ -325,6 +325,7 @@ final class PipelineOrchestrator
                 'userChoiceRequired' => $job->userChoiceRequired(),
                 'userChoiceOptions' => $job->userChoiceOptions(),
                 'staleArtifactIds' => $job->staleArtifactIds(),
+                'stageMetadata' => $job->stageMetadata(),
                 'predictionConfidence' => $estimate['confidence'] ?? null,
                 'estimationSource' => $estimate['source'] ?? null,
             ]),

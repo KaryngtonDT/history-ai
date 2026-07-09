@@ -1,6 +1,10 @@
 import type { ReactNode } from "react";
 import { useParams } from "react-router";
 import { ArtifactJourney } from "@/features/artifacts";
+import {
+	PipelineProgressPanel,
+	PipelineSourceProvider,
+} from "@/features/pipeline";
 import { useTranslation } from "@/i18n/useTranslation";
 import {
 	AUDIO_PIPELINE_STEPS,
@@ -15,12 +19,12 @@ interface AudioPipelinePageLayoutProps {
 	children: ReactNode;
 }
 
-export function AudioPipelinePageLayout({
+function AudioPipelinePageLayoutInner({
 	stepId,
 	children,
-}: AudioPipelinePageLayoutProps) {
+	audioId,
+}: AudioPipelinePageLayoutProps & { audioId: string }) {
 	const { t } = useTranslation();
-	const { audioId = "" } = useParams();
 	const step = AUDIO_PIPELINE_STEPS.find((entry) => entry.id === stepId);
 	const stepLabel = step
 		? getAudioPipelineStepLabel(t, step.id)
@@ -40,7 +44,31 @@ export function AudioPipelinePageLayout({
 				videoId={audioId || null}
 				title={t("pipeline.layouts.journeyProcessing")}
 			/>
+			<PipelineProgressPanel sourceId={audioId} />
 			<div className={styles.content}>{children}</div>
 		</div>
+	);
+}
+
+export function AudioPipelinePageLayout({
+	stepId,
+	children,
+}: AudioPipelinePageLayoutProps) {
+	const { audioId = "" } = useParams();
+
+	if (!audioId) {
+		return (
+			<AudioPipelinePageLayoutInner stepId={stepId} audioId="">
+				{children}
+			</AudioPipelinePageLayoutInner>
+		);
+	}
+
+	return (
+		<PipelineSourceProvider sourceId={audioId}>
+			<AudioPipelinePageLayoutInner stepId={stepId} audioId={audioId}>
+				{children}
+			</AudioPipelinePageLayoutInner>
+		</PipelineSourceProvider>
 	);
 }

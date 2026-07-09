@@ -250,6 +250,8 @@ final class ProcessVideoHandlerTest extends TestCase
             $telemetryRecorder,
             $pipelineOrchestrator,
             $progressService,
+            $pipelineJobRepository,
+            new \App\Application\Translation\PipelineTranslationMetadataResolver(),
         );
     }
 
@@ -522,6 +524,8 @@ final class ProcessVideoHandlerTest extends TestCase
             $telemetryRecorder,
             $pipelineOrchestrator,
             $progressService,
+            $pipelineJobRepository,
+            new \App\Application\Translation\PipelineTranslationMetadataResolver(),
         );
 
         $this->videoRepository

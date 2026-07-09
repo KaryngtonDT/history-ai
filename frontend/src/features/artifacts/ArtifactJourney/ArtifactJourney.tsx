@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { usePipelineSourceContext } from "@/features/pipeline/PipelineSourceContext";
 import { useTranslation } from "@/i18n/useTranslation";
 import { type ArtifactStatus, buildArtifactJourney } from "../journeyModel";
 import { useVideoPipelineProgress } from "../useVideoPipelineProgress";
@@ -58,12 +59,17 @@ function statusKey(status: ArtifactStatus): string {
 
 export function ArtifactJourney({ videoId, title }: ArtifactJourneyProps) {
 	const { t } = useTranslation();
-	const progress = useVideoPipelineProgress(videoId);
+	const { status: pipelineStatus, refreshToken } = usePipelineSourceContext();
+	const progress = useVideoPipelineProgress(videoId, refreshToken);
 	const resolvedTitle = title ?? t("pipeline.artifactJourney.defaultTitle");
-	const steps = buildArtifactJourney(videoId, t, progress);
+	const steps = buildArtifactJourney(videoId, t, progress, pipelineStatus);
 
 	return (
-		<section className={styles.root} aria-label={resolvedTitle}>
+		<section
+			className={styles.root}
+			aria-label={resolvedTitle}
+			data-refresh-token={refreshToken}
+		>
 			<h2 className={styles.title}>{resolvedTitle}</h2>
 			<p className={styles.subtitle}>
 				{t("pipeline.artifactJourney.subtitle")}

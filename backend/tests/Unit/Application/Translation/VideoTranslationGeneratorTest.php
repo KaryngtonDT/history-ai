@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Application\Translation;
 
 use App\Application\Translation\TranslationJsonMapper;
 use App\Application\Translation\VideoTranslationGenerator;
+use App\Application\Pipeline\Orchestration\PipelineStageProgressReporter;
 use App\Domain\Artifact\ArtifactRepositoryInterface;
 use App\Domain\Artifact\ArtifactType;
 use App\Domain\Content\ContentId;
@@ -183,5 +184,41 @@ final class VideoTranslationGeneratorTest extends TestCase
             ));
 
         $this->generator->generate($videoId, [TranslationLanguage::French]);
+    }
+
+    public function testEmitsProgressCheckpointsDuringGeneration(): void
+    {
+        $videoId = new VideoId('550e8400-e29b-41d4-a716-446655440099');
+        $transcript = Transcript::create(
+            new TranscriptId('550e8400-e29b-41d4-a716-446655440010'),
+            TranscriptLanguage::English,
+            new TranscriptSegmentCollection([
+                TranscriptSegment::create(0, 0.0, 2.0, 'Hello world'),
+            ]),
+        );
+
+        $this->transcriptRepository
+            ->method('findByVideoId')
+            ->with($videoId)
+            ->willReturn($transcript);
+
+        $progress = $this->createMock(PipelineStageProgressReporter::class);
+        $progress
+            ->expects(self::atLeastOnce())
+            ->method('checkpoint')
+            ->with(
+                self::logicalOr('preparing', 'loading', 'processing', 'saving', 'completed'),
+                self::greaterThanOrEqual(5),
+                self::anything(),
+                self::anything(),
+            );
+        $progress->expects(self::atLeastOnce())->method('heartbeat');
+
+        $this->generator->generate(
+            $videoId,
+            [TranslationLanguage::French, TranslationLanguage::German],
+            null,
+            $progress,
+        );
     }
 }

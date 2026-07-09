@@ -110,6 +110,10 @@ class PipelineJobRecord
     #[ORM\Column(name: 'progress_detail', type: Types::JSON, nullable: true)]
     private ?array $progressDetail = null;
 
+    /** @var array<string, mixed>|null */
+    #[ORM\Column(name: 'stage_metadata', type: Types::JSON, nullable: true)]
+    private ?array $stageMetadata = null;
+
     private function __construct()
     {
     }
@@ -154,6 +158,8 @@ class PipelineJobRecord
         $this->userChoiceOptions = $job->userChoiceOptions();
         $detail = $job->progressDetail();
         $this->progressDetail = [] === $detail ? null : $detail;
+        $metadata = $job->stageMetadata();
+        $this->stageMetadata = [] === $metadata ? null : $metadata;
     }
 
     public function toDomain(): PipelineJob
@@ -195,6 +201,7 @@ class PipelineJobRecord
             $this->userChoiceRequired,
             $this->userChoiceOptions,
             $this->progressDetail ?? [],
+            $this->stageMetadata ?? [],
         );
     }
 }

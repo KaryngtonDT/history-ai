@@ -7,6 +7,8 @@ namespace App\Application\Video\Handlers;
 use App\Application\History\ExecutionHistoryRecorder;
 use App\Application\Pipeline\Orchestration\PipelineOrchestrator;
 use App\Application\Pipeline\Orchestration\PipelineProgressService;
+use App\Application\Pipeline\Orchestration\PipelineStageProgressReporter;
+use App\Application\Translation\PipelineTranslationMetadataResolver;
 use App\Application\Quality\VideoQualityAssessmentRunner;
 use App\Application\Telemetry\PipelineTelemetryRecorder;
 use App\Application\Workspace\BatchJobProgressUpdater;
@@ -42,9 +44,11 @@ use App\Domain\Scheduler\PipelineSchedulerInterface;
 use App\Domain\Scheduler\RuntimeExecutionScheduleContextInterface;
 use App\Domain\Scheduler\ScheduledStageStatus;
 use App\Domain\PipelineJob\PipelineJobId;
+use App\Domain\PipelineJob\PipelineJobRepositoryInterface;
 use App\Domain\PipelineJob\TranscriptSource;
 use App\Domain\PipelineJob\TranscriptUserChoice;
 use App\Domain\Speech\TranscriptMetadata;
+use App\Domain\Translation\TranslationProvider;
 use App\Domain\Speech\TranscriptRepositoryInterface;
 use App\Domain\Video\VideoId;
 use App\Domain\Video\VideoJob;
@@ -97,6 +101,8 @@ final class ProcessVideoHandler
         private readonly PipelineTelemetryRecorder $pipelineTelemetryRecorder,
         private readonly PipelineOrchestrator $pipelineOrchestrator,
         private readonly PipelineProgressService $pipelineProgressService,
+        private readonly PipelineJobRepositoryInterface $pipelineJobRepository,
+        private readonly PipelineTranslationMetadataResolver $translationMetadataResolver,
     ) {
     }
 
@@ -374,49 +380,73 @@ final class ProcessVideoHandler
         VideoId $videoId,
         PipelineJobId $pipelineJobId,
     ): void {
-        $this->pipelineProgressService->updateProgress($pipelineJobId, 10, $stage->value.'_started');
+        $job = $this->pipelineJobRepository->findById($pipelineJobId);
+        $reporter = new PipelineStageProgressReporter(
+            $this->pipelineProgressService,
+            $pipelineJobId,
+            $stage,
+        );
+
+        $reporter->checkpoint('preparing', 5, 'preparing');
 
         match ($stage) {
             PipelineStageType::Translation => $this->runScheduledStage(
                 PipelineStageType::Translation,
-                function () use ($videoId, $pipelineJobId): void {
-                    $this->pipelineProgressService->updateProgress($pipelineJobId, 40, 'translating');
+                function () use ($videoId, $pipelineJobId, $job, $reporter): void {
+                    $metadata = $job?->stageMetadata() ?? [];
+                    $languages = $this->translationMetadataResolver->resolveLanguages(
+                        $metadata,
+                        $this->defaultTranslationLanguages,
+                    );
+                    $provider = null;
 
-                    if ([] !== $this->defaultTranslationLanguages->all()) {
-                        $this->videoTranslationGenerator->generate(
-                            $videoId,
-                            $this->defaultTranslationLanguages->all(),
-                        );
+                    if (is_string($metadata['provider'] ?? null) && '' !== trim((string) $metadata['provider'])) {
+                        $provider = TranslationProvider::tryFrom(strtolower(trim((string) $metadata['provider'])));
                     }
+
+                    $this->videoTranslationGenerator->generate(
+                        $videoId,
+                        $languages,
+                        $provider,
+                        $reporter,
+                    );
 
                     $this->pipelineOrchestrator->completeStage($pipelineJobId);
                 },
             ),
             PipelineStageType::TextToSpeech => $this->runScheduledStage(
                 PipelineStageType::TextToSpeech,
-                function () use ($videoId, $pipelineJobId): void {
+                function () use ($videoId, $pipelineJobId, $reporter): void {
+                    $reporter->checkpoint('processing', 20, 'generating_audio');
                     $this->videoAudioGenerator->generate($videoId);
+                    $reporter->checkpoint('completed', 99, 'completed');
                     $this->pipelineOrchestrator->completeStage($pipelineJobId);
                 },
             ),
             PipelineStageType::VoiceClone => $this->runScheduledStage(
                 PipelineStageType::VoiceClone,
-                function () use ($videoId, $pipelineJobId): void {
+                function () use ($videoId, $pipelineJobId, $reporter): void {
+                    $reporter->checkpoint('processing', 20, 'cloning_voice');
                     $this->videoVoiceCloneGenerator->generate($videoId);
+                    $reporter->checkpoint('completed', 99, 'completed');
                     $this->pipelineOrchestrator->completeStage($pipelineJobId);
                 },
             ),
             PipelineStageType::LipSync => $this->runScheduledStage(
                 PipelineStageType::LipSync,
-                function () use ($videoId, $pipelineJobId): void {
+                function () use ($videoId, $pipelineJobId, $reporter): void {
+                    $reporter->checkpoint('processing', 20, 'syncing_lips');
                     $this->videoLipSyncGenerator->generate($videoId);
+                    $reporter->checkpoint('completed', 99, 'completed');
                     $this->pipelineOrchestrator->completeStage($pipelineJobId);
                 },
             ),
             PipelineStageType::VideoRender => $this->runScheduledStage(
                 PipelineStageType::VideoRender,
-                function () use ($videoId, $pipelineJobId): void {
+                function () use ($videoId, $pipelineJobId, $reporter): void {
+                    $reporter->checkpoint('processing', 20, 'rendering_video');
                     $this->videoFinalRenderGenerator->generate($videoId);
+                    $reporter->checkpoint('completed', 99, 'completed');
                     $this->pipelineOrchestrator->completeStage($pipelineJobId);
                 },
             ),

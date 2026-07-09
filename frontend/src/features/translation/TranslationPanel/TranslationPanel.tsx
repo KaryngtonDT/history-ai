@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { usePipelineStageExecutionLock } from "@/features/pipeline/usePipelineStageExecutionLock";
 import { useTranslation } from "@/i18n/useTranslation";
 import { transcriptService } from "@/services/transcript/TranscriptService";
 import type { VideoTranscript } from "@/services/transcript/types";
@@ -26,6 +27,8 @@ export function TranslationPanel() {
 	const { t } = useTranslation();
 	const { videoId = "", audioId = "" } = useParams();
 	const resourceId = videoId || audioId;
+	const { executionLocked, refreshPipeline } =
+		usePipelineStageExecutionLock("translation");
 	const [transcript, setTranscript] = useState<VideoTranscript | null>(null);
 	const [translations, setTranslations] = useState<VideoTranslation[]>([]);
 	const [selectedTargets, setSelectedTargets] = useState<TranslationLanguage[]>(
@@ -88,6 +91,7 @@ export function TranslationPanel() {
 				provider,
 			});
 			await loadData();
+			await refreshPipeline();
 		} catch {
 			setError(t("pipeline.translation.failed"));
 		} finally {
@@ -144,6 +148,7 @@ export function TranslationPanel() {
 								type="checkbox"
 								checked={selectedTargets.includes(language)}
 								onChange={() => toggleTargetLanguage(language)}
+								disabled={executionLocked}
 							/>
 							{formatTranslationLanguageLabel(language)}
 						</label>
@@ -160,6 +165,7 @@ export function TranslationPanel() {
 					onChange={(event) =>
 						setProvider(event.target.value as TranslationProvider)
 					}
+					disabled={executionLocked}
 				>
 					{TRANSLATION_PROVIDERS.map((entry) => (
 						<option key={entry.value} value={entry.value}>
@@ -168,15 +174,21 @@ export function TranslationPanel() {
 					))}
 				</select>
 
-				<Button
-					type="button"
-					onClick={handleGenerate}
-					disabled={generating || selectedTargets.length === 0}
-				>
-					{generating
-						? t("pipeline.translation.generating")
-						: t("pipeline.translation.generateCta")}
-				</Button>
+				{executionLocked ? (
+					<p className={styles.meta}>
+						{t("pipeline.translation.executionLocked")}
+					</p>
+				) : (
+					<Button
+						type="button"
+						onClick={handleGenerate}
+						disabled={generating || selectedTargets.length === 0}
+					>
+						{generating
+							? t("pipeline.translation.generating")
+							: t("pipeline.translation.generateCta")}
+					</Button>
+				)}
 
 				{error ? <p className={styles.error}>{error}</p> : null}
 			</Card>

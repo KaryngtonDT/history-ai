@@ -16,6 +16,7 @@ interface LipSyncSettingsProps {
 	selectedTargets: TranslationLanguage[];
 	provider: LipSyncProvider;
 	generating: boolean;
+	executionLocked?: boolean;
 	error: string | null;
 	onToggleLanguage: (language: TranslationLanguage) => void;
 	onProviderChange: (provider: LipSyncProvider) => void;
@@ -26,6 +27,7 @@ export function LipSyncSettings({
 	selectedTargets,
 	provider,
 	generating,
+	executionLocked = false,
 	error,
 	onToggleLanguage,
 	onProviderChange,
@@ -43,6 +45,7 @@ export function LipSyncSettings({
 				onChange={(event) =>
 					onProviderChange(event.target.value as LipSyncProvider)
 				}
+				disabled={executionLocked}
 			>
 				{LIP_SYNC_PROVIDERS.map((entry) => (
 					<option
@@ -66,21 +69,26 @@ export function LipSyncSettings({
 							type="checkbox"
 							checked={selectedTargets.includes(language)}
 							onChange={() => onToggleLanguage(language)}
+							disabled={executionLocked}
 						/>
 						{formatTranslationLanguageLabel(language)}
 					</label>
 				))}
 			</div>
 
-			<Button
-				type="button"
-				onClick={onGenerate}
-				disabled={generating || selectedTargets.length === 0}
-			>
-				{generating
-					? t("pipeline.lipSync.generating")
-					: t("pipeline.lipSync.generateCta")}
-			</Button>
+			{executionLocked ? (
+				<p className={styles.error}>{t("pipeline.lipSync.executionLocked")}</p>
+			) : (
+				<Button
+					type="button"
+					onClick={onGenerate}
+					disabled={generating || selectedTargets.length === 0}
+				>
+					{generating
+						? t("pipeline.lipSync.generating")
+						: t("pipeline.lipSync.generateCta")}
+				</Button>
+			)}
 
 			{error ? <p className={styles.error}>{error}</p> : null}
 		</Card>

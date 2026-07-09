@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Presentation\Http\Controller\Video;
 
-use App\Application\Translation\Commands\GenerateVideoTranslationsCommand;
-use App\Application\Translation\Handlers\GenerateVideoTranslationsHandler;
-use App\Domain\Translation\Exception\InvalidTranslationException;
+use App\Application\Pipeline\Orchestration\PipelineLegacyStageLauncher;
+use App\Domain\Pipeline\PipelineStageType;
+use App\Domain\PipelineJob\Exception\InvalidPipelineJobException;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,7 +19,7 @@ final class GenerateVideoTranslationsController extends AbstractController
     #[OA\Post(
         operationId: 'generateVideoTranslations',
         summary: 'Generate video translations',
-        description: 'Translates the video transcript into one or more target languages using the configured translation provider. Creates one translation artifact per language.',
+        description: 'Starts a translation pipeline job with the selected languages and provider.',
         tags: ['Video'],
         parameters: [
             new OA\Parameter(
@@ -37,10 +37,10 @@ final class GenerateVideoTranslationsController extends AbstractController
         responses: [
             new OA\Response(
                 response: 202,
-                description: 'Translation generation accepted',
+                description: 'Translation pipeline job accepted',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'status', type: 'string', example: 'generated'),
+                        new OA\Property(property: 'status', type: 'string', example: 'accepted'),
                     ],
                     type: 'object',
                 ),
@@ -53,8 +53,11 @@ final class GenerateVideoTranslationsController extends AbstractController
         ],
     )]
     #[Route('/api/videos/{videoId}/translations', name: 'api_videos_translations_generate', methods: ['POST'])]
-    public function __invoke(string $videoId, Request $request, GenerateVideoTranslationsHandler $handler): JsonResponse
-    {
+    public function __invoke(
+        string $videoId,
+        Request $request,
+        PipelineLegacyStageLauncher $launcher,
+    ): JsonResponse {
         /** @var array<string, mixed>|null $payload */
         $payload = json_decode($request->getContent(), true);
 
@@ -79,15 +82,14 @@ final class GenerateVideoTranslationsController extends AbstractController
         ));
 
         try {
-            $handler(new GenerateVideoTranslationsCommand(
-                videoId: $videoId,
-                targetLanguages: $languageCodes,
-                provider: is_string($provider) ? $provider : null,
-            ));
-        } catch (InvalidTranslationException) {
-            return $this->json(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
+            $job = $launcher->launch($videoId, PipelineStageType::Translation, [
+                'targetLanguages' => $languageCodes,
+                'provider' => is_string($provider) ? $provider : null,
+            ]);
+        } catch (InvalidPipelineJobException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_CONFLICT);
         }
 
-        return $this->json(['status' => 'generated'], Response::HTTP_ACCEPTED);
+        return $this->json(['status' => 'accepted', 'job' => $job], Response::HTTP_ACCEPTED);
     }
 }

@@ -45,6 +45,7 @@ final class PipelineJob
         private bool $userChoiceRequired,
         private array $userChoiceOptions,
         private array $progressDetail = [],
+        private array $stageMetadata = [],
     ) {
     }
 
@@ -94,6 +95,7 @@ final class PipelineJob
             false,
             [],
             [],
+            [],
         );
     }
 
@@ -102,6 +104,7 @@ final class PipelineJob
      * @param list<string> $staleArtifactIds
      * @param list<string> $userChoiceOptions
      * @param array<string, mixed> $progressDetail
+     * @param array<string, mixed> $stageMetadata
      */
     public static function reconstitute(
         PipelineJobId $jobId,
@@ -133,6 +136,7 @@ final class PipelineJob
         bool $userChoiceRequired,
         array $userChoiceOptions,
         array $progressDetail = [],
+        array $stageMetadata = [],
     ): self {
         return new self(
             $jobId,
@@ -164,7 +168,16 @@ final class PipelineJob
             $userChoiceRequired,
             $userChoiceOptions,
             $progressDetail,
+            $stageMetadata,
         );
+    }
+
+    /**
+     * @param array<string, mixed> $metadata
+     */
+    public function withStageMetadata(array $metadata): self
+    {
+        return $this->with(stageMetadata: [...$this->stageMetadata, ...$metadata]);
     }
 
     public function start(?string $currentStep = null): self
@@ -482,6 +495,14 @@ final class PipelineJob
         return $this->progressDetail;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    public function stageMetadata(): array
+    {
+        return $this->stageMetadata;
+    }
+
     private function assertAwaitingTranscriptChoice(string $action): void
     {
         if (PipelineJobStatus::WaitingUserChoice === $this->status) {
@@ -538,6 +559,7 @@ final class PipelineJob
         ?array $userChoiceOptions = null,
         ?array $staleArtifactIds = null,
         ?array $progressDetail = null,
+        ?array $stageMetadata = null,
     ): self {
         return new self(
             $this->jobId,
@@ -569,6 +591,7 @@ final class PipelineJob
             $userChoiceRequired ?? $this->userChoiceRequired,
             $userChoiceOptions ?? $this->userChoiceOptions,
             $progressDetail ?? $this->progressDetail,
+            $stageMetadata ?? $this->stageMetadata,
         );
     }
 }

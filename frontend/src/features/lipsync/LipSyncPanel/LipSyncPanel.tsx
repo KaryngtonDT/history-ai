@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
+import { usePipelineStageExecutionLock } from "@/features/pipeline/usePipelineStageExecutionLock";
 import { useTranslation } from "@/i18n/useTranslation";
 import { lipSyncService } from "@/services/lipsync/LipSyncService";
 import type { LipSyncProvider, VideoLipSync } from "@/services/lipsync/types";
@@ -14,6 +15,8 @@ import styles from "./LipSyncPanel.module.css";
 export function LipSyncPanel() {
 	const { t } = useTranslation();
 	const { videoId = "" } = useParams();
+	const { executionLocked, refreshPipeline } =
+		usePipelineStageExecutionLock("lip_sync");
 	const [voiceCloneAvailable, setVoiceCloneAvailable] = useState(false);
 	const [lipSyncEntries, setLipSyncEntries] = useState<VideoLipSync[]>([]);
 	const [selectedTargets, setSelectedTargets] = useState<TranslationLanguage[]>(
@@ -73,6 +76,7 @@ export function LipSyncPanel() {
 				provider,
 			});
 			await loadData();
+			await refreshPipeline();
 		} catch {
 			setError(t("pipeline.lipSync.failed"));
 		} finally {
@@ -114,6 +118,7 @@ export function LipSyncPanel() {
 				selectedTargets={selectedTargets}
 				provider={provider}
 				generating={generating}
+				executionLocked={executionLocked}
 				error={error}
 				onToggleLanguage={toggleTargetLanguage}
 				onProviderChange={setProvider}

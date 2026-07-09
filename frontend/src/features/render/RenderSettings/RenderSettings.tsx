@@ -23,6 +23,7 @@ interface RenderSettingsProps {
 	quality: VideoRenderQuality;
 	lipSyncAvailable: boolean;
 	generating: boolean;
+	executionLocked?: boolean;
 	error: string | null;
 	onLanguageChange: (language: TranslationLanguage) => void;
 	onProviderChange: (provider: VideoRenderProvider) => void;
@@ -38,6 +39,7 @@ export function RenderSettings({
 	quality,
 	lipSyncAvailable,
 	generating,
+	executionLocked = false,
 	error,
 	onLanguageChange,
 	onProviderChange,
@@ -62,6 +64,7 @@ export function RenderSettings({
 					onChange={(event) =>
 						onLanguageChange(event.target.value as TranslationLanguage)
 					}
+					disabled={executionLocked}
 				>
 					{TARGET_TRANSLATION_LANGUAGES.map((language) => (
 						<option key={language} value={language}>
@@ -89,6 +92,7 @@ export function RenderSettings({
 					onChange={(event) =>
 						onProviderChange(event.target.value as VideoRenderProvider)
 					}
+					disabled={executionLocked}
 				>
 					{VIDEO_RENDER_PROVIDERS.map((entry) => (
 						<option
@@ -113,6 +117,7 @@ export function RenderSettings({
 					onChange={(event) =>
 						onFormatChange(event.target.value as VideoRenderFormat)
 					}
+					disabled={executionLocked}
 				>
 					{VIDEO_RENDER_FORMATS.map((entry) => (
 						<option key={entry} value={entry}>
@@ -133,6 +138,7 @@ export function RenderSettings({
 					onChange={(event) =>
 						onQualityChange(event.target.value as VideoRenderQuality)
 					}
+					disabled={executionLocked}
 				>
 					{VIDEO_RENDER_QUALITIES.map((entry) => (
 						<option key={entry} value={entry}>
@@ -142,15 +148,19 @@ export function RenderSettings({
 				</select>
 			</label>
 
-			<Button
-				type="button"
-				onClick={onGenerate}
-				disabled={generating || !lipSyncAvailable}
-			>
-				{generating
-					? t("pipeline.render.rendering")
-					: t("pipeline.render.renderCta")}
-			</Button>
+			{executionLocked ? (
+				<p className={styles.error}>{t("pipeline.render.executionLocked")}</p>
+			) : (
+				<Button
+					type="button"
+					onClick={onGenerate}
+					disabled={generating || !lipSyncAvailable}
+				>
+					{generating
+						? t("pipeline.render.rendering")
+						: t("pipeline.render.renderCta")}
+				</Button>
+			)}
 
 			{error ? <p className={styles.error}>{error}</p> : null}
 		</Card>

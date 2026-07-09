@@ -32,6 +32,7 @@ const EMPTY_PROGRESS: VideoPipelineProgress = {
 
 export function useVideoPipelineProgress(
 	videoId: string | null,
+	_refreshKey = 0,
 ): VideoPipelineProgress {
 	const [progress, setProgress] = useState<VideoPipelineProgress>({
 		...EMPTY_PROGRESS,

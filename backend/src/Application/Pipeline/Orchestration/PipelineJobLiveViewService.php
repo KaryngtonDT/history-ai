@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Pipeline\Orchestration;
 
+use App\Domain\Pipeline\PipelineStageType;
 use App\Domain\PipelineJob\PipelineJob;
 use App\Domain\PipelineJob\PipelineJobProgressDetail;
 use App\Domain\PipelineJob\PipelineJobStatus;
@@ -47,7 +48,7 @@ final class PipelineJobLiveViewService
         }
 
         $elapsed = $this->liveElapsedSeconds($job, $now);
-        $checkpoint = PipelineSttCheckpointRegistry::resolve($job->currentStep());
+        $checkpoint = PipelineStageCheckpointRegistry::resolve($job->stage(), $job->currentStep());
         $progress = $this->resolveLiveProgress($job, $detail, $elapsed, $checkpoint);
         $remaining = $this->resolveRemainingSeconds($job, $elapsed, $progress);
         $completionAt = null !== $remaining
@@ -112,7 +113,7 @@ final class PipelineJobLiveViewService
         $min = $checkpoint['minPercent'];
         $max = $checkpoint['maxPercent'];
 
-        if ('transcribing' === $checkpoint['checkpoint']) {
+        if (PipelineStageCheckpointRegistry::isProcessingCheckpoint($checkpoint['checkpoint'])) {
             if (
                 null !== $detail?->audioProcessedSeconds
                 && null !== $detail->audioTotalSeconds
@@ -134,7 +135,7 @@ final class PipelineJobLiveViewService
             }
 
             $estimated = $job->estimatedDurationSeconds();
-            if (null !== $estimated && $estimated > 0) {
+            if (null !== $estimated && $estimated > 0 && $elapsed > 0) {
                 $ratio = min(1.0, $elapsed / $estimated);
 
                 return (int) round($min + (($max - $min) * $ratio));
@@ -149,7 +150,7 @@ final class PipelineJobLiveViewService
         $estimated = $job->estimatedDurationSeconds();
 
         if (null !== $estimated && $estimated > 0) {
-            if ($progress > 5 && $progress < 99) {
+            if ($progress >= 5 && $progress < 99) {
                 $projectedTotal = (int) round($elapsed / ($progress / 100));
 
                 return max(0, $projectedTotal - $elapsed);

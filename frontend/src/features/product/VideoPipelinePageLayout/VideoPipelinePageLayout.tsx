@@ -4,7 +4,10 @@ import { ArtifactJourney } from "@/features/artifacts";
 import { ExplainThisButton } from "@/features/help";
 import type { FeatureHelpId } from "@/features/help/content/features";
 import { getFeatureHelp } from "@/features/help/content/features";
-import { PipelineProgressPanel } from "@/features/pipeline";
+import {
+	PipelineProgressPanel,
+	PipelineSourceProvider,
+} from "@/features/pipeline";
 import { useTranslation } from "@/i18n/useTranslation";
 import { PageIntroduction } from "../PageIntroduction";
 import {
@@ -21,13 +24,13 @@ interface VideoPipelinePageLayoutProps {
 	children: ReactNode;
 }
 
-export function VideoPipelinePageLayout({
+function VideoPipelinePageLayoutInner({
 	stepId,
 	featureId,
 	children,
-}: VideoPipelinePageLayoutProps) {
+	videoId,
+}: VideoPipelinePageLayoutProps & { videoId: string }) {
 	const { t } = useTranslation();
-	const { videoId = "" } = useParams();
 	const step = VIDEO_PIPELINE_STEPS.find((entry) => entry.id === stepId);
 	const help = getFeatureHelp(featureId);
 
@@ -50,8 +53,40 @@ export function VideoPipelinePageLayout({
 				videoId={videoId || null}
 				title={t("pipeline.layouts.journeyPipeline")}
 			/>
-			{videoId ? <PipelineProgressPanel sourceId={videoId} /> : null}
+			<PipelineProgressPanel sourceId={videoId} />
 			<div className={styles.content}>{children}</div>
 		</div>
+	);
+}
+
+export function VideoPipelinePageLayout({
+	stepId,
+	featureId,
+	children,
+}: VideoPipelinePageLayoutProps) {
+	const { videoId = "" } = useParams();
+
+	if (!videoId) {
+		return (
+			<VideoPipelinePageLayoutInner
+				stepId={stepId}
+				featureId={featureId}
+				videoId=""
+			>
+				{children}
+			</VideoPipelinePageLayoutInner>
+		);
+	}
+
+	return (
+		<PipelineSourceProvider sourceId={videoId}>
+			<VideoPipelinePageLayoutInner
+				stepId={stepId}
+				featureId={featureId}
+				videoId={videoId}
+			>
+				{children}
+			</VideoPipelinePageLayoutInner>
+		</PipelineSourceProvider>
 	);
 }

@@ -147,6 +147,8 @@ export const pipelineDe: PipelineMessages = {
 			engine: "Übersetzungs-Engine",
 			generating: "Wird generiert...",
 			generateCta: "Übersetzung generieren",
+			executionLocked:
+				"Pipeline-Ausführung läuft. Nutzen Sie das Fortschrittspanel zum Überwachen oder Abbrechen.",
 			sourceLabel: "Quelle",
 			translationLabel: "Übersetzung",
 			sourceDuration: "{{count}} Segmente · Quelldauer {{duration}}",
@@ -165,6 +167,8 @@ export const pipelineDe: PipelineMessages = {
 			voice: "Stimme",
 			generating: "Wird generiert...",
 			generateCta: "Audio generieren",
+			executionLocked:
+				"Pipeline-Ausführung läuft. Nutzen Sie das Fortschrittspanel zum Überwachen oder Abbrechen.",
 			preview: "Audio-Vorschau",
 			voiceLabel: "Stimme:",
 			pause: "Pause",
@@ -192,6 +196,8 @@ export const pipelineDe: PipelineMessages = {
 			failed: "Stimmenklon-Generierung fehlgeschlagen.",
 			generating: "Wird generiert...",
 			generateCta: "Geklontes Audio generieren",
+			executionLocked:
+				"Pipeline-Ausführung läuft. Nutzen Sie das Fortschrittspanel zum Überwachen oder Abbrechen.",
 			preview: "Vorschau",
 			compareMode: "Vergleichsmodus",
 			originalGeneric: "Original (generisch)",
@@ -217,6 +223,8 @@ export const pipelineDe: PipelineMessages = {
 			clonedAudioLanguages: "Geklonte Audiosprachen",
 			generating: "Wird generiert...",
 			generateCta: "Lip-Sync generieren",
+			executionLocked:
+				"Pipeline-Ausführung läuft. Nutzen Sie das Fortschrittspanel zum Überwachen oder Abbrechen.",
 			emptyTitle: "Noch kein Lip-Sync-Video",
 			emptyDescription:
 				"Lip-Sync generieren, sobald Stimmenklonen abgeschlossen ist.",
@@ -246,6 +254,8 @@ export const pipelineDe: PipelineMessages = {
 			quality: "Qualität",
 			rendering: "Rendering...",
 			renderCta: "Finales Video rendern",
+			executionLocked:
+				"Pipeline-Ausführung läuft. Nutzen Sie das Fortschrittspanel zum Überwachen oder Abbrechen.",
 			emptyTitle: "Noch kein finales Video",
 			emptyDescription:
 				"Ein lip-synchronisiertes Video rendern, um ein herunterladbares MP4 zu erzeugen.",

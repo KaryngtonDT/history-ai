@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Translation;
 
+use App\Application\Pipeline\Orchestration\PipelineStageProgressReporter;
 use App\Domain\AI\AIProviderResolverInterface;
 use App\Domain\Artifact\Artifact;
 use App\Domain\Artifact\ArtifactContent;
@@ -36,6 +37,7 @@ class VideoTranslationGenerator
         VideoId $videoId,
         array $targetLanguages,
         ?TranslationProvider $provider = null,
+        ?PipelineStageProgressReporter $progress = null,
     ): void {
         $transcript = $this->transcriptRepository->findByVideoId($videoId);
 
@@ -43,15 +45,45 @@ class VideoTranslationGenerator
             return;
         }
 
-        $translationProvider = $this->aiProviderResolver->resolveTranslation($provider);
+        $languages = array_values(array_filter(
+            $targetLanguages,
+            static fn (TranslationLanguage $language): bool => TranslationLanguage::Unknown !== $language,
+        ));
 
-        foreach ($targetLanguages as $targetLanguage) {
-            if ($targetLanguage === TranslationLanguage::Unknown) {
-                continue;
-            }
+        if ([] === $languages) {
+            return;
+        }
+
+        $progress?->checkpoint('preparing', 5, 'preparing');
+        $progress?->checkpoint('loading', 12, 'loading_model');
+
+        $translationProvider = $this->aiProviderResolver->resolveTranslation($provider);
+        $total = count($languages);
+
+        $progress?->checkpoint('processing', 15, 'translating', [
+            'totalSegments' => $total,
+            'currentSegment' => 0,
+        ]);
+
+        foreach ($languages as $index => $targetLanguage) {
+            $progress?->heartbeat();
+
+            $segment = $index + 1;
+            $ratio = $total > 0 ? $segment / $total : 1.0;
+            $percent = 15 + (int) round(75 * $ratio);
+
+            $progress?->checkpoint('processing', $percent, 'translating', [
+                'currentSegment' => $segment,
+                'totalSegments' => $total,
+            ]);
 
             $translation = $translationProvider->translate($transcript, $targetLanguage);
             $this->translationRepository->save($videoId, $translation);
+
+            $progress?->checkpoint('saving', min(98, $percent + 2), 'saving_translation', [
+                'currentSegment' => $segment,
+                'totalSegments' => $total,
+            ]);
 
             $artifact = Artifact::create(
                 ArtifactId::generate(),
@@ -61,6 +93,10 @@ class VideoTranslationGenerator
                 ArtifactContent::fromString($this->translationJsonMapper->toJson($translation)),
             );
             $this->artifactRepository->save($artifact);
+
+            $progress?->heartbeat();
         }
+
+        $progress?->checkpoint('completed', 99, 'completed');
     }
 }

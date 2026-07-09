@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import { API_BASE_URL } from "@/config/api";
+import { usePipelineStageExecutionLock } from "@/features/pipeline/usePipelineStageExecutionLock";
 import { useTranslation } from "@/i18n/useTranslation";
 import { audioService } from "@/services/audio/AudioService";
 import {
@@ -29,6 +30,8 @@ import styles from "./AudioPlayerPanel.module.css";
 export function AudioPlayerPanel() {
 	const { t } = useTranslation();
 	const { videoId = "" } = useParams();
+	const { executionLocked, refreshPipeline } =
+		usePipelineStageExecutionLock("text_to_speech");
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 	const [translationsAvailable, setTranslationsAvailable] = useState(false);
 	const [audioEntries, setAudioEntries] = useState<VideoAudio[]>([]);
@@ -104,6 +107,7 @@ export function AudioPlayerPanel() {
 				voiceId,
 			});
 			await loadData();
+			await refreshPipeline();
 		} catch {
 			setError(t("pipeline.audioPanel.failed"));
 		} finally {
@@ -169,6 +173,7 @@ export function AudioPlayerPanel() {
 								type="checkbox"
 								checked={selectedTargets.includes(language)}
 								onChange={() => toggleTargetLanguage(language)}
+								disabled={executionLocked}
 							/>
 							{formatTranslationLanguageLabel(language)}
 						</label>
@@ -185,6 +190,7 @@ export function AudioPlayerPanel() {
 					onChange={(event) =>
 						setProvider(event.target.value as TextToSpeechProvider)
 					}
+					disabled={executionLocked}
 				>
 					{TTS_PROVIDERS.map((entry) => (
 						<option key={entry.value} value={entry.value}>
@@ -202,15 +208,21 @@ export function AudioPlayerPanel() {
 					onChange={setVoiceId}
 				/>
 
-				<Button
-					type="button"
-					onClick={handleGenerate}
-					disabled={generating || selectedTargets.length === 0}
-				>
-					{generating
-						? t("pipeline.audioPanel.generating")
-						: t("pipeline.audioPanel.generateCta")}
-				</Button>
+				{executionLocked ? (
+					<p className={styles.error}>
+						{t("pipeline.audioPanel.executionLocked")}
+					</p>
+				) : (
+					<Button
+						type="button"
+						onClick={handleGenerate}
+						disabled={generating || selectedTargets.length === 0}
+					>
+						{generating
+							? t("pipeline.audioPanel.generating")
+							: t("pipeline.audioPanel.generateCta")}
+					</Button>
+				)}
 
 				{error ? <p className={styles.error}>{error}</p> : null}
 			</Card>

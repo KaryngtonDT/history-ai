@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Presentation\Http\Controller\Video;
 
-use App\Application\TTS\Handlers\GenerateVideoAudioHandler;
-use App\Application\TTS\Commands\GenerateVideoAudioCommand;
+use App\Application\Pipeline\Orchestration\PipelineLegacyStageLauncher;
+use App\Domain\Pipeline\PipelineStageType;
+use App\Domain\PipelineJob\Exception\InvalidPipelineJobException;
 use App\Domain\TTS\Exception\InvalidAudioArtifactException;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,7 +20,7 @@ final class GenerateVideoAudioController extends AbstractController
     #[OA\Post(
         operationId: 'generateVideoAudio',
         summary: 'Generate video audio',
-        description: 'Synthesizes translated text into audio files using the configured text-to-speech provider. Creates one audio artifact per target language.',
+        description: 'Starts a text-to-speech pipeline job for the selected languages.',
         tags: ['Video'],
         parameters: [
             new OA\Parameter(
@@ -37,10 +38,10 @@ final class GenerateVideoAudioController extends AbstractController
         responses: [
             new OA\Response(
                 response: 202,
-                description: 'Audio generation accepted',
+                description: 'Audio pipeline job accepted',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'status', type: 'string', example: 'generated'),
+                        new OA\Property(property: 'status', type: 'string', example: 'accepted'),
                     ],
                     type: 'object',
                 ),
@@ -53,13 +54,16 @@ final class GenerateVideoAudioController extends AbstractController
         ],
     )]
     #[Route('/api/videos/{videoId}/audio', name: 'api_videos_audio_generate', methods: ['POST'])]
-    public function __invoke(string $videoId, Request $request, GenerateVideoAudioHandler $handler): JsonResponse
-    {
+    public function __invoke(
+        string $videoId,
+        Request $request,
+        PipelineLegacyStageLauncher $launcher,
+    ): JsonResponse {
         /** @var array<string, mixed>|null $payload */
         $payload = json_decode($request->getContent(), true);
 
         if (!is_array($payload)) {
-            return $this->json(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
+            $payload = [];
         }
 
         $targetLanguages = $payload['targetLanguages'] ?? [];
@@ -80,16 +84,17 @@ final class GenerateVideoAudioController extends AbstractController
         ));
 
         try {
-            $handler(new GenerateVideoAudioCommand(
-                videoId: $videoId,
-                targetLanguages: $languageCodes,
-                provider: is_string($provider) ? $provider : null,
-                voiceId: is_string($voiceId) ? $voiceId : null,
-            ));
+            $job = $launcher->launch($videoId, PipelineStageType::TextToSpeech, [
+                'targetLanguages' => $languageCodes,
+                'provider' => is_string($provider) ? $provider : null,
+                'voiceId' => is_string($voiceId) ? $voiceId : null,
+            ]);
+        } catch (InvalidPipelineJobException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_CONFLICT);
         } catch (InvalidAudioArtifactException) {
             return $this->json(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->json(['status' => 'generated'], Response::HTTP_ACCEPTED);
+        return $this->json(['status' => 'accepted', 'job' => $job], Response::HTTP_ACCEPTED);
     }
 }

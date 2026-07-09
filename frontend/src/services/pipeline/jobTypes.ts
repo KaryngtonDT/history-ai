@@ -79,6 +79,7 @@ export interface PipelineJob {
 	checkpoint?: string | null;
 	checkpointLabel?: string | null;
 	progressDetail?: PipelineJobProgressDetail | null;
+	stageMetadata?: Record<string, unknown> | null;
 }
 
 export interface PipelineSourceStatus {

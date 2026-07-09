@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Presentation\Http\Controller\Video;
 
-use App\Application\LipSync\Commands\GenerateVideoLipSyncCommand;
-use App\Application\LipSync\Handlers\GenerateVideoLipSyncHandler;
+use App\Application\Pipeline\Orchestration\PipelineLegacyStageLauncher;
 use App\Domain\LipSync\Exception\InvalidLipSyncException;
+use App\Domain\Pipeline\PipelineStageType;
+use App\Domain\PipelineJob\Exception\InvalidPipelineJobException;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,7 +20,7 @@ final class GenerateVideoLipSyncController extends AbstractController
     #[OA\Post(
         operationId: 'generateVideoLipSync',
         summary: 'Generate video lip sync',
-        description: 'Synchronizes lip movements with cloned audio using the configured lip sync provider.',
+        description: 'Starts a lip sync pipeline job for the selected languages.',
         tags: ['Video'],
         parameters: [
             new OA\Parameter(
@@ -36,10 +37,10 @@ final class GenerateVideoLipSyncController extends AbstractController
         responses: [
             new OA\Response(
                 response: 202,
-                description: 'Lip sync generation accepted',
+                description: 'Lip sync pipeline job accepted',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'status', type: 'string', example: 'generated'),
+                        new OA\Property(property: 'status', type: 'string', example: 'accepted'),
                     ],
                     type: 'object',
                 ),
@@ -52,8 +53,11 @@ final class GenerateVideoLipSyncController extends AbstractController
         ],
     )]
     #[Route('/api/videos/{videoId}/lip-sync', name: 'api_videos_lip_sync_generate', methods: ['POST'])]
-    public function __invoke(string $videoId, Request $request, GenerateVideoLipSyncHandler $handler): JsonResponse
-    {
+    public function __invoke(
+        string $videoId,
+        Request $request,
+        PipelineLegacyStageLauncher $launcher,
+    ): JsonResponse {
         /** @var array<string, mixed>|null $payload */
         $payload = json_decode($request->getContent(), true);
 
@@ -78,15 +82,16 @@ final class GenerateVideoLipSyncController extends AbstractController
         ));
 
         try {
-            $handler(new GenerateVideoLipSyncCommand(
-                videoId: $videoId,
-                targetLanguages: $languageCodes,
-                provider: is_string($provider) ? $provider : null,
-            ));
+            $job = $launcher->launch($videoId, PipelineStageType::LipSync, [
+                'targetLanguages' => $languageCodes,
+                'provider' => is_string($provider) ? $provider : null,
+            ]);
+        } catch (InvalidPipelineJobException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_CONFLICT);
         } catch (InvalidLipSyncException) {
             return $this->json(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->json(['status' => 'generated'], Response::HTTP_ACCEPTED);
+        return $this->json(['status' => 'accepted', 'job' => $job], Response::HTTP_ACCEPTED);
     }
 }

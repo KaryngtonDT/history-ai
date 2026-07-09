@@ -139,6 +139,8 @@ export const pipelineEn = {
 			engine: "Translation engine",
 			generating: "Generating...",
 			generateCta: "Generate Translation",
+			executionLocked:
+				"Pipeline execution is in progress. Use the progress panel to monitor or cancel.",
 			sourceLabel: "Source",
 			translationLabel: "Translation",
 			sourceDuration: "{{count}} segments · {{duration}} source duration",
@@ -157,6 +159,8 @@ export const pipelineEn = {
 			voice: "Voice",
 			generating: "Generating...",
 			generateCta: "Generate Audio",
+			executionLocked:
+				"Pipeline execution is in progress. Use the progress panel to monitor or cancel.",
 			preview: "Audio Preview",
 			voiceLabel: "Voice:",
 			pause: "Pause",
@@ -183,6 +187,8 @@ export const pipelineEn = {
 			failed: "Voice clone generation failed.",
 			generating: "Generating...",
 			generateCta: "Generate Cloned Audio",
+			executionLocked:
+				"Pipeline execution is in progress. Use the progress panel to monitor or cancel.",
 			preview: "Preview",
 			compareMode: "Compare mode",
 			originalGeneric: "Original (generic)",
@@ -208,6 +214,8 @@ export const pipelineEn = {
 			clonedAudioLanguages: "Cloned audio languages",
 			generating: "Generating...",
 			generateCta: "Generate Lip Sync",
+			executionLocked:
+				"Pipeline execution is in progress. Use the progress panel to monitor or cancel.",
 			emptyTitle: "No lip-synced video yet",
 			emptyDescription: "Generate lip sync after voice cloning is complete.",
 			preview: "Preview",
@@ -236,6 +244,8 @@ export const pipelineEn = {
 			quality: "Quality",
 			rendering: "Rendering...",
 			renderCta: "Render Final Video",
+			executionLocked:
+				"Pipeline execution is in progress. Use the progress panel to monitor or cancel.",
 			emptyTitle: "No final video yet",
 			emptyDescription:
 				"Render a lip-synced video to produce a downloadable MP4.",

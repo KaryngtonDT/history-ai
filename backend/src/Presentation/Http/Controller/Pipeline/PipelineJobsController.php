@@ -77,6 +77,7 @@ final class PipelineJobsController extends AbstractController
             $sourceId,
             $stage,
             (bool) ($payload['forceRestart'] ?? false),
+            is_array($payload['metadata'] ?? null) ? $payload['metadata'] : (is_array($payload['stageMetadata'] ?? null) ? $payload['stageMetadata'] : []),
         ), Response::HTTP_ACCEPTED);
     }
 

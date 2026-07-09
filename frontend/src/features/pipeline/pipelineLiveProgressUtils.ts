@@ -60,7 +60,7 @@ export function computeLiveRemainingSeconds(
 		return job.estimatedRemainingSeconds ?? null;
 	}
 
-	if (progressPercent > 5 && progressPercent < 99) {
+	if (progressPercent >= 5 && progressPercent < 99) {
 		const projectedTotal = Math.round(elapsedSeconds / (progressPercent / 100));
 
 		return Math.max(0, projectedTotal - elapsedSeconds);

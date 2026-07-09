@@ -13,6 +13,7 @@ import {
 	StaleArtifactWarning,
 } from "./PipelineComponents";
 import styles from "./PipelineComponents.module.css";
+import { usePipelineSourceContext } from "./PipelineSourceContext";
 import {
 	isPipelineWaitingForTranscriptChoice,
 	resolveJobsWaitingUserChoice,
@@ -218,26 +219,41 @@ export function PipelineProgressPanel({
 	hideChoiceDialog?: boolean;
 }) {
 	const { t } = useTranslation();
-	const [status, setStatus] = useState<PipelineSourceStatus | null>(null);
+	const pipelineContext = usePipelineSourceContext();
+	const usesSharedContext = pipelineContext.sourceId === sourceId;
+	const [localStatus, setLocalStatus] = useState<PipelineSourceStatus | null>(
+		null,
+	);
 	const [error, setError] = useState<string | null>(null);
 	const [choiceNotice, setChoiceNotice] = useState<string | null>(null);
+	const status = usesSharedContext ? pipelineContext.status : localStatus;
 
 	const refresh = useCallback(async () => {
+		if (usesSharedContext) {
+			await pipelineContext.refresh();
+			onStatusChange?.(pipelineContext.status);
+			return;
+		}
+
 		try {
 			const next = attachClockToStatus(
 				await pipelineJobService.loadStatus(sourceId),
 			);
-			setStatus(next);
+			setLocalStatus(next);
 			setError(null);
 			onStatusChange?.(next);
 		} catch {
 			setError(t("pipeline.progress.loadFailed"));
 		}
-	}, [onStatusChange, sourceId, t]);
+	}, [onStatusChange, pipelineContext, sourceId, t, usesSharedContext]);
 
 	useEffect(() => {
+		if (usesSharedContext) {
+			return;
+		}
+
 		void refresh();
-	}, [refresh]);
+	}, [refresh, usesSharedContext]);
 
 	const effectivePollMs = useMemo(() => {
 		if (pollMs != null) {
@@ -255,7 +271,7 @@ export function PipelineProgressPanel({
 	}, [pollMs, status]);
 
 	useEffect(() => {
-		if (isPipelineWaitingForTranscriptChoice(status)) {
+		if (usesSharedContext || isPipelineWaitingForTranscriptChoice(status)) {
 			return;
 		}
 
@@ -264,7 +280,7 @@ export function PipelineProgressPanel({
 		}, effectivePollMs);
 
 		return () => window.clearInterval(timer);
-	}, [effectivePollMs, refresh, status]);
+	}, [effectivePollMs, refresh, status, usesSharedContext]);
 
 	const handleContinue = async (job: PipelineJob) => {
 		await pipelineJobService.continueStage(sourceId, job.stage);
