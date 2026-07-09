@@ -14,7 +14,10 @@ export type TranscriptUserChoice =
 	| "local_engine"
 	| "none";
 
-export type PipelineWorkerStatus = "active" | "waiting_for_update" | "completed";
+export type PipelineWorkerStatus =
+	| "active"
+	| "waiting_for_update"
+	| "completed";
 
 export interface PipelineJobProgressDetail {
 	checkpoint?: string | null;

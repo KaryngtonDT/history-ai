@@ -79,8 +79,10 @@ final class PipelineJobLiveViewService
         $payload['workerId'] = $detail?->workerId ?? 'symfony-worker';
         $payload['dockerContainer'] = $detail?->dockerContainer ?? (gethostname() ?: null);
 
-        if (null !== $payload['hardwareProfile']) {
-            $payload['hardwareProfileCode'] = strtoupper(str_replace(' ', '_', (string) $payload['hardwareProfile']));
+        $hardwareProfile = $payload['hardwareProfile'] ?? null;
+
+        if (null !== $hardwareProfile) {
+            $payload['hardwareProfileCode'] = strtoupper(str_replace(' ', '_', (string) $hardwareProfile));
         }
 
         return $payload;

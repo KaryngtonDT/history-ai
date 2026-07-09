@@ -2,7 +2,10 @@ import { act, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { PipelineProgressPanel } from "@/features/pipeline/PipelineProgressPanel";
-import { LIVE_PIPELINE_POLL_MS, LIVE_PIPELINE_TICK_MS } from "@/features/pipeline/pipelineLiveProgressUtils";
+import {
+	LIVE_PIPELINE_POLL_MS,
+	LIVE_PIPELINE_TICK_MS,
+} from "@/features/pipeline/pipelineLiveProgressUtils";
 import type { PipelineSourceStatus } from "@/services/pipeline/jobTypes";
 import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
 import { renderWithProviders } from "@/test/render";

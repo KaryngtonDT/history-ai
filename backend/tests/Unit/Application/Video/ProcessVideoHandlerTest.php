@@ -15,6 +15,7 @@ use App\Application\Pipeline\Estimation\TranscriptionDurationEstimator;
 use App\Application\Pipeline\Orchestration\PipelineDependencyResolver;
 use App\Application\Pipeline\Orchestration\PipelineInvalidationService;
 use App\Application\Pipeline\Orchestration\PipelineNotificationService;
+use App\Application\Pipeline\Orchestration\PipelineJobLiveViewService;
 use App\Application\Pipeline\Orchestration\PipelineOrchestrator;
 use App\Application\Pipeline\Orchestration\PipelineProgressService;
 use App\Application\Video\Handlers\ProcessVideoHandler;
@@ -610,6 +611,7 @@ final class ProcessVideoHandlerTest extends TestCase
             $invalidationService,
             $notificationService,
             $progressService,
+            new PipelineJobLiveViewService(),
             $durationPredictionEngine,
             new EngineExecutionRecorder($historyRepository, $runtimePlatform, new MediaDurationResolver($this->videoRepository)),
             new EngineStatisticsAggregator($historyRepository, $durationPredictionEngine),

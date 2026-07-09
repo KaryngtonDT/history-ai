@@ -1,9 +1,9 @@
-import type { PipelineJob } from "@/services/pipeline/jobTypes";
 import {
 	formatDurationClock,
 	formatProcessingSpeedRatio,
 	resolveHardwareProfileDisplay,
 } from "@/features/pipeline/pipelineLiveProgressUtils";
+import type { PipelineJob } from "@/services/pipeline/jobTypes";
 
 export function formatPipelineDateTime(
 	value: string | null | undefined,
@@ -165,9 +165,7 @@ export function buildPipelineStageTimingLines(
 		const actualDuration = formatDurationClock(job.actualDurationSeconds);
 
 		if (actualDuration) {
-			lines.push(
-				labels.actualDuration.replace("{{time}}", actualDuration),
-			);
+			lines.push(labels.actualDuration.replace("{{time}}", actualDuration));
 		}
 
 		const accuracy = formatAccuracyPercent(job.estimationAccuracyPercent);
@@ -203,9 +201,7 @@ export function buildPipelineStageTimingLines(
 	const hardwareProfile = resolveHardwareProfileDisplay(job);
 
 	if (hardwareProfile) {
-		lines.push(
-			labels.hardwareProfile.replace("{{profile}}", hardwareProfile),
-		);
+		lines.push(labels.hardwareProfile.replace("{{profile}}", hardwareProfile));
 	}
 
 	const stepLabel = job.checkpointLabel ?? job.currentStep;
@@ -231,6 +227,8 @@ export function buildPipelineStageTimingLines(
 	return lines;
 }
 
-export function resolvePipelineProgressLabel(job: PipelineJob): string | undefined {
+export function resolvePipelineProgressLabel(
+	job: PipelineJob,
+): string | undefined {
 	return job.checkpointLabel ?? job.currentStep ?? undefined;
 }

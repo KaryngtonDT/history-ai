@@ -31,8 +31,6 @@ use App\Application\Hardware\HardwareReportBuilder;
 use App\Infrastructure\Runtime\Kernel\EngineAdapterRegistry;
 use App\Infrastructure\Runtime\Intelligence\RuntimeResolverIntelligence;
 use App\Infrastructure\Runtime\Kernel\RuntimeResolver;
-use App\Infrastructure\Runtime\Readiness\EngineStatusFinalizer;
-use App\Infrastructure\Runtime\Readiness\ReadinessEngine;
 use PHPUnit\Framework\TestCase;
 
 final class RuntimeResolverTest extends TestCase
@@ -69,13 +67,7 @@ final class RuntimeResolverTest extends TestCase
             'ffmpeg',
         );
 
-        $recommendationEngine = new RecommendationEngine(
-            new ReadinessEngine(
-                $engineDiscovery,
-                new EngineStatusFinalizer(),
-            ),
-            $engineRepository,
-        );
+        $recommendationEngine = new RecommendationEngine($engineRepository);
 
         $hardwareReport = (new HardwareReportBuilder(new \App\Application\Hardware\HardwareProfileClassifier()))
             ->build(new HardwareCapability());

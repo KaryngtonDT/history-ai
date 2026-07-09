@@ -20,10 +20,7 @@ export function usePipelineLiveJob(
 		}, LIVE_PIPELINE_TICK_MS);
 
 		return () => window.clearInterval(timer);
-	}, [job.isLive, job.liveFrozen, job.jobId]);
+	}, [job.isLive, job.liveFrozen]);
 
-	return useMemo(
-		() => applyLiveProgressTick(job, nowMs),
-		[job, nowMs],
-	);
+	return useMemo(() => applyLiveProgressTick(job, nowMs), [job, nowMs]);
 }

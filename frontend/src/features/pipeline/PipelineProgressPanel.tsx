@@ -74,7 +74,10 @@ function PipelineStageCard({
 	);
 
 	return (
-		<div className={styles.stageCard} data-testid={`pipeline-stage-${job.stage}`}>
+		<div
+			className={styles.stageCard}
+			data-testid={`pipeline-stage-${job.stage}`}
+		>
 			<div className={styles.stageTitle}>
 				{job.stage.replaceAll("_", " ")}{" "}
 				<StageStatusBadge status={job.status} />
@@ -185,9 +188,12 @@ export function TranscriptSourceChoiceDialog({
 	return createPortal(dialog, document.body);
 }
 
-function attachClockToStatus(status: PipelineSourceStatus): PipelineSourceStatus {
+function attachClockToStatus(
+	status: PipelineSourceStatus,
+): PipelineSourceStatus {
 	const receivedAtMs = Date.now();
-	const mapJob = (job: PipelineJob) => attachPipelineJobClock(job, receivedAtMs);
+	const mapJob = (job: PipelineJob) =>
+		attachPipelineJobClock(job, receivedAtMs);
 
 	return {
 		...status,

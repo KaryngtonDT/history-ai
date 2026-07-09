@@ -66,7 +66,10 @@ export function computeLiveRemainingSeconds(
 		return Math.max(0, projectedTotal - elapsedSeconds);
 	}
 
-	if (job.estimatedDurationSeconds != null && job.estimatedDurationSeconds > 0) {
+	if (
+		job.estimatedDurationSeconds != null &&
+		job.estimatedDurationSeconds > 0
+	) {
 		return Math.max(0, job.estimatedDurationSeconds - elapsedSeconds);
 	}
 
@@ -147,7 +150,9 @@ export function formatDurationClock(seconds?: number | null): string | null {
 	return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
 
-export function formatProcessingSpeedRatio(ratio?: number | null): string | null {
+export function formatProcessingSpeedRatio(
+	ratio?: number | null,
+): string | null {
 	if (ratio == null || ratio <= 0) {
 		return null;
 	}
