@@ -21,13 +21,36 @@ final class PipelineProgressService
         ?string $currentStep = null,
         ?int $estimatedRemainingSeconds = null,
     ): PipelineJob {
+        return $this->updateProgressDetailed(
+            $jobId,
+            $progressPercent,
+            $currentStep,
+            $estimatedRemainingSeconds,
+        );
+    }
+
+    /**
+     * @param array<string, mixed>|null $progressDetail
+     */
+    public function updateProgressDetailed(
+        PipelineJobId $jobId,
+        int $progressPercent,
+        ?string $currentStep = null,
+        ?int $estimatedRemainingSeconds = null,
+        ?array $progressDetail = null,
+    ): PipelineJob {
         $job = $this->jobRepository->findById($jobId);
 
         if (null === $job) {
             throw new \RuntimeException('Pipeline job not found.');
         }
 
-        $updated = $job->updateProgress($progressPercent, $currentStep, $estimatedRemainingSeconds);
+        $updated = $job->updateProgress(
+            $progressPercent,
+            $currentStep,
+            $estimatedRemainingSeconds,
+            $progressDetail,
+        );
         $this->jobRepository->save($updated);
 
         return $updated;
@@ -44,12 +67,20 @@ final class PipelineProgressService
         $elapsed = null !== $job->startedAt()
             ? max(0, time() - $job->startedAt()->getTimestamp())
             : 0;
-        $remaining = $job->estimatedDurationSeconds() !== null
-            ? max(0, $job->estimatedDurationSeconds() - $elapsed)
-            : null;
-        $progress = $job->estimatedDurationSeconds() !== null && $job->estimatedDurationSeconds() > 0
-            ? min(95, (int) round(($elapsed / $job->estimatedDurationSeconds()) * 100))
-            : $job->progressPercent();
+        $checkpoint = PipelineSttCheckpointRegistry::resolve($job->currentStep());
+        $estimated = $job->estimatedDurationSeconds();
+        $progress = $job->progressPercent();
+
+        if ('transcribing' === $checkpoint['checkpoint'] && null !== $estimated && $estimated > 0) {
+            $ratio = min(1.0, $elapsed / $estimated);
+            $progress = (int) round(
+                $checkpoint['minPercent'] + (($checkpoint['maxPercent'] - $checkpoint['minPercent']) * $ratio),
+            );
+        }
+
+        $remaining = null !== $estimated && $estimated > 0
+            ? max(0, $estimated - $elapsed)
+            : $job->estimatedRemainingSeconds();
 
         return $this->updateProgress($jobId, $progress, $job->currentStep(), $remaining);
     }

@@ -29,6 +29,7 @@ final class PipelineOrchestrator
         private readonly PipelineInvalidationService $invalidationService,
         private readonly PipelineNotificationService $notificationService,
         private readonly PipelineProgressService $progressService,
+        private readonly PipelineJobLiveViewService $liveViewService,
         private readonly DurationPredictionEngine $durationPredictionEngine,
         private readonly EngineExecutionRecorder $executionRecorder,
         private readonly EngineStatisticsAggregator $statisticsAggregator,
@@ -268,6 +269,7 @@ final class PipelineOrchestrator
 
         return [
             'sourceId' => $sourceId,
+            'serverNow' => (new \DateTimeImmutable())->format(DATE_ATOM),
             'activeJobs' => $activeJobs,
             'completedJobs' => $completedJobs,
             'jobsWaitingUserChoice' => $jobsWaitingUserChoice,
@@ -299,31 +301,34 @@ final class PipelineOrchestrator
             )
             : ['confidence' => null];
 
-        return $this->jobAnalyticsEnricher->enrich($job, [
-            'jobId' => $job->jobId()->value,
-            'sourceId' => $job->sourceId(),
-            'videoId' => $job->videoId(),
-            'stage' => $job->stage()->value,
-            'status' => $job->status()->value,
-            'progressPercent' => $job->progressPercent(),
-            'currentStep' => $job->currentStep(),
-            'currentEngine' => $job->currentEngine(),
-            'provider' => $job->provider(),
-            'startedAt' => $job->startedAt()?->format(DATE_ATOM),
-            'updatedAt' => $job->updatedAt()->format(DATE_ATOM),
-            'completedAt' => $job->completedAt()?->format(DATE_ATOM),
-            'estimatedDurationSeconds' => $job->estimatedDurationSeconds(),
-            'estimatedRemainingSeconds' => $job->estimatedRemainingSeconds(),
-            'elapsedSeconds' => $job->elapsedSeconds(),
-            'failureReason' => $job->failureReason(),
-            'cancellationReason' => $job->cancellationReason(),
-            'transcriptSource' => $job->transcriptSource()?->value,
-            'userChoiceRequired' => $job->userChoiceRequired(),
-            'userChoiceOptions' => $job->userChoiceOptions(),
-            'staleArtifactIds' => $job->staleArtifactIds(),
-            'predictionConfidence' => $estimate['confidence'] ?? null,
-            'estimationSource' => $estimate['source'] ?? null,
-        ]);
+        return $this->liveViewService->enrich(
+            $job,
+            $this->jobAnalyticsEnricher->enrich($job, [
+                'jobId' => $job->jobId()->value,
+                'sourceId' => $job->sourceId(),
+                'videoId' => $job->videoId(),
+                'stage' => $job->stage()->value,
+                'status' => $job->status()->value,
+                'progressPercent' => $job->progressPercent(),
+                'currentStep' => $job->currentStep(),
+                'currentEngine' => $job->currentEngine(),
+                'provider' => $job->provider(),
+                'startedAt' => $job->startedAt()?->format(DATE_ATOM),
+                'updatedAt' => $job->updatedAt()->format(DATE_ATOM),
+                'completedAt' => $job->completedAt()?->format(DATE_ATOM),
+                'estimatedDurationSeconds' => $job->estimatedDurationSeconds(),
+                'estimatedRemainingSeconds' => $job->estimatedRemainingSeconds(),
+                'elapsedSeconds' => $job->elapsedSeconds(),
+                'failureReason' => $job->failureReason(),
+                'cancellationReason' => $job->cancellationReason(),
+                'transcriptSource' => $job->transcriptSource()?->value,
+                'userChoiceRequired' => $job->userChoiceRequired(),
+                'userChoiceOptions' => $job->userChoiceOptions(),
+                'staleArtifactIds' => $job->staleArtifactIds(),
+                'predictionConfidence' => $estimate['confidence'] ?? null,
+                'estimationSource' => $estimate['source'] ?? null,
+            ]),
+        );
     }
 
     private function recordExecution(PipelineJob $job): void

@@ -139,8 +139,37 @@ final class ProcessVideoHandler
 
             if ($runFullPipeline || PipelineStageType::SpeechToText === $targetStage) {
                 $this->runScheduledStage(PipelineStageType::SpeechToText, function () use ($processing, $videoId, $pipelineJobId): void {
+                    $runtimeContext = $this->pipelineRuntimeContext();
+
                     if (null !== $pipelineJobId) {
-                        $this->pipelineProgressService->updateProgress($pipelineJobId, 5, 'extracting_audio');
+                        $this->pipelineProgressService->updateProgressDetailed(
+                            $pipelineJobId,
+                            2,
+                            'preparing',
+                            null,
+                            ['checkpoint' => 'preparing', ...$runtimeContext],
+                        );
+                        $this->pipelineProgressService->updateProgressDetailed(
+                            $pipelineJobId,
+                            10,
+                            'extracting_audio',
+                            null,
+                            ['checkpoint' => 'extracting_audio', ...$runtimeContext],
+                        );
+                        $this->pipelineProgressService->updateProgressDetailed(
+                            $pipelineJobId,
+                            15,
+                            'loading_model',
+                            null,
+                            ['checkpoint' => 'loading_model', ...$runtimeContext],
+                        );
+                        $this->pipelineProgressService->updateProgressDetailed(
+                            $pipelineJobId,
+                            20,
+                            'transcribing',
+                            null,
+                            ['checkpoint' => 'transcribing', ...$runtimeContext],
+                        );
                     }
 
                     $transcript = $this->aiProviderResolver
@@ -148,7 +177,13 @@ final class ProcessVideoHandler
                         ->transcribe($processing);
 
                     if (null !== $pipelineJobId) {
-                        $this->pipelineProgressService->updateProgress($pipelineJobId, 90, 'saving_transcript');
+                        $this->pipelineProgressService->updateProgressDetailed(
+                            $pipelineJobId,
+                            98,
+                            'saving_transcript',
+                            0,
+                            ['checkpoint' => 'saving_transcript', ...$runtimeContext],
+                        );
                     }
 
                     $this->transcriptRepository->save($videoId, $transcript, new TranscriptMetadata(
@@ -390,5 +425,21 @@ final class ProcessVideoHandler
                 $stage->value,
             )),
         };
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function pipelineRuntimeContext(): array
+    {
+        $container = getenv('HOSTNAME') ?: gethostname() ?: 'backend';
+
+        return [
+            'workerId' => 'symfony-worker',
+            'dockerContainer' => is_string($container) ? $container : 'backend',
+            'engineVersion' => is_string(getenv('STT_FASTER_WHISPER_MODEL') ?: null)
+                ? (string) getenv('STT_FASTER_WHISPER_MODEL')
+                : 'large-v3',
+        ];
     }
 }

@@ -14,6 +14,20 @@ export type TranscriptUserChoice =
 	| "local_engine"
 	| "none";
 
+export type PipelineWorkerStatus = "active" | "waiting_for_update" | "completed";
+
+export interface PipelineJobProgressDetail {
+	checkpoint?: string | null;
+	currentSegment?: number | null;
+	totalSegments?: number | null;
+	audioProcessedSeconds?: number | null;
+	audioTotalSeconds?: number | null;
+	processingSpeedRatio?: number | null;
+	engineVersion?: string | null;
+	workerId?: string | null;
+	dockerContainer?: string | null;
+}
+
 export interface PipelineJob {
 	jobId: string;
 	sourceId: string;
@@ -37,12 +51,31 @@ export interface PipelineJob {
 	estimationSource?: string | null;
 	engineId?: string | null;
 	hardwareProfile?: string | null;
+	hardwareProfileCode?: string | null;
+	hardwareProfileLabel?: string | null;
 	failureReason?: string | null;
 	cancellationReason?: string | null;
 	transcriptSource?: string | null;
 	userChoiceRequired?: boolean;
 	userChoiceOptions?: string[];
 	staleArtifactIds?: string[];
+	serverNow?: string | null;
+	isLive?: boolean;
+	liveFrozen?: boolean;
+	workerStatus?: PipelineWorkerStatus | null;
+	workerStale?: boolean;
+	secondsSinceUpdate?: number | null;
+	processingSpeedRatio?: number | null;
+	currentSegment?: number | null;
+	totalSegments?: number | null;
+	audioProcessedSeconds?: number | null;
+	audioTotalSeconds?: number | null;
+	engineVersion?: string | null;
+	workerId?: string | null;
+	dockerContainer?: string | null;
+	checkpoint?: string | null;
+	checkpointLabel?: string | null;
+	progressDetail?: PipelineJobProgressDetail | null;
 }
 
 export interface PipelineSourceStatus {

@@ -44,6 +44,7 @@ final class PipelineJob
         private ?TranscriptSource $transcriptSource,
         private bool $userChoiceRequired,
         private array $userChoiceOptions,
+        private array $progressDetail = [],
     ) {
     }
 
@@ -92,6 +93,7 @@ final class PipelineJob
             null,
             false,
             [],
+            [],
         );
     }
 
@@ -99,6 +101,7 @@ final class PipelineJob
      * @param list<string> $invalidatesStages
      * @param list<string> $staleArtifactIds
      * @param list<string> $userChoiceOptions
+     * @param array<string, mixed> $progressDetail
      */
     public static function reconstitute(
         PipelineJobId $jobId,
@@ -129,6 +132,7 @@ final class PipelineJob
         ?TranscriptSource $transcriptSource,
         bool $userChoiceRequired,
         array $userChoiceOptions,
+        array $progressDetail = [],
     ): self {
         return new self(
             $jobId,
@@ -159,6 +163,7 @@ final class PipelineJob
             $transcriptSource,
             $userChoiceRequired,
             $userChoiceOptions,
+            $progressDetail,
         );
     }
 
@@ -188,6 +193,7 @@ final class PipelineJob
         int $progressPercent,
         ?string $currentStep = null,
         ?int $estimatedRemainingSeconds = null,
+        ?array $progressDetail = null,
     ): self {
         if (!in_array($this->status, [PipelineJobStatus::Running, PipelineJobStatus::Queued], true)) {
             throw new InvalidPipelineJobException(sprintf(
@@ -198,11 +204,16 @@ final class PipelineJob
 
         $elapsed = $this->computeElapsedSeconds();
 
+        $mergedDetail = null !== $progressDetail
+            ? [...$this->progressDetail, ...$progressDetail]
+            : $this->progressDetail;
+
         return $this->with(
             progressPercent: max(0, min(99, $progressPercent)),
             currentStep: $currentStep ?? $this->currentStep,
             estimatedRemainingSeconds: $estimatedRemainingSeconds ?? $this->estimatedRemainingSeconds,
             elapsedSeconds: $elapsed,
+            progressDetail: $mergedDetail,
         );
     }
 
@@ -465,6 +476,12 @@ final class PipelineJob
         return $this->userChoiceOptions;
     }
 
+    /** @return array<string, mixed> */
+    public function progressDetail(): array
+    {
+        return $this->progressDetail;
+    }
+
     private function assertAwaitingTranscriptChoice(string $action): void
     {
         if (PipelineJobStatus::WaitingUserChoice === $this->status) {
@@ -520,6 +537,7 @@ final class PipelineJob
         ?bool $userChoiceRequired = null,
         ?array $userChoiceOptions = null,
         ?array $staleArtifactIds = null,
+        ?array $progressDetail = null,
     ): self {
         return new self(
             $this->jobId,
@@ -550,6 +568,7 @@ final class PipelineJob
             $transcriptSource ?? $this->transcriptSource,
             $userChoiceRequired ?? $this->userChoiceRequired,
             $userChoiceOptions ?? $this->userChoiceOptions,
+            $progressDetail ?? $this->progressDetail,
         );
     }
 }

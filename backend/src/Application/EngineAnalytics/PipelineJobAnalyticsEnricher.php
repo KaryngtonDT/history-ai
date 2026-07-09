@@ -32,7 +32,20 @@ final class PipelineJobAnalyticsEnricher
         $engineId = $execution?->engineId()
             ?? $job->currentEngine()
             ?? $job->provider();
-        $hardwareProfile = $execution?->hardwareProfile() ?? $this->resolveHardwareProfile();
+        $hardware = $this->runtimePlatform->hardware();
+        $profileType = is_string($hardware['profile']['type'] ?? null)
+            ? (string) $hardware['profile']['type']
+            : 'unknown';
+        $gpuVendor = is_string($hardware['capabilities']['gpuVendor'] ?? null)
+            ? strtolower((string) $hardware['capabilities']['gpuVendor'])
+            : null;
+
+        $payload['hardwareProfile'] = $execution?->hardwareProfile()
+            ?? $this->resolveHardwareProfileCode($profileType, $gpuVendor);
+        $payload['hardwareProfileLabel'] = is_string($hardware['profile']['label'] ?? null)
+            ? (string) $hardware['profile']['label']
+            : $profileType;
+
         $estimationAccuracyPercent = $execution?->estimationAccuracyPercent();
         $actualDurationSeconds = $execution?->actualDurationSeconds()
             ?? $this->resolveActualDuration($job);
@@ -51,12 +64,30 @@ final class PipelineJobAnalyticsEnricher
         }
 
         $payload['engineId'] = $engineId;
-        $payload['hardwareProfile'] = $hardwareProfile;
         $payload['estimatedCompletionAt'] = $estimatedCompletionAt?->format(DATE_ATOM);
         $payload['actualDurationSeconds'] = $actualDurationSeconds;
         $payload['estimationAccuracyPercent'] = $estimationAccuracyPercent;
 
         return $payload;
+    }
+
+    private function resolveHardwareProfileCode(string $profileType, ?string $gpuVendor): string
+    {
+        if (null !== $gpuVendor) {
+            if (str_contains($gpuVendor, 'nvidia')) {
+                return 'NVIDIA';
+            }
+
+            if (str_contains($gpuVendor, 'amd') || str_contains($gpuVendor, 'advanced micro')) {
+                return 'AMD';
+            }
+        }
+
+        return match ($profileType) {
+            'cpu_only', 'low_end_local' => 'CPU_ONLY',
+            'mid_range_nvidia', 'high_end_nvidia', 'enterprise_gpu' => 'NVIDIA',
+            default => strtoupper(str_replace(' ', '_', $profileType)),
+        };
     }
 
     private function resolveActualDuration(PipelineJob $job): ?int
@@ -79,8 +110,8 @@ final class PipelineJobAnalyticsEnricher
     {
         $profile = $this->runtimePlatform->hardwareProfile();
 
-        return is_string($profile['profile']['type'] ?? null)
-            ? $profile['profile']['type']
+        return is_string($profile['type'] ?? null)
+            ? $profile['type']
             : 'unknown';
     }
 

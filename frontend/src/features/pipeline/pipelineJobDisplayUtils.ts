@@ -1,4 +1,9 @@
 import type { PipelineJob } from "@/services/pipeline/jobTypes";
+import {
+	formatDurationClock,
+	formatProcessingSpeedRatio,
+	resolveHardwareProfileDisplay,
+} from "@/features/pipeline/pipelineLiveProgressUtils";
 
 export function formatPipelineDateTime(
 	value: string | null | undefined,
@@ -47,10 +52,20 @@ export type PipelineTimingLabels = {
 	actualDuration: string;
 	estimationAccuracy: string;
 	elapsedTime: string;
-	remainingMinutes: string;
+	remainingTime: string;
 	engine: string;
+	engineVersion: string;
+	provider: string;
 	hardwareProfile: string;
 	currentStep: string;
+	checkpoint: string;
+	processingSpeed: string;
+	currentSegment: string;
+	audioProcessed: string;
+	worker: string;
+	dockerContainer: string;
+	waitingForWorker: string;
+	averageSpeed: string;
 };
 
 export function buildPipelineStageTimingLines(
@@ -77,37 +92,61 @@ export function buildPipelineStageTimingLines(
 		);
 	}
 
-	const estimatedCompletion = formatPipelineDateTime(
-		job.estimatedCompletionAt,
-		locale,
-	);
-
-	if (estimatedCompletion) {
-		lines.push(
-			labels.estimatedCompletion.replace("{{time}}", estimatedCompletion),
-		);
-	}
-
 	if (job.status === "running" || job.status === "queued") {
-		const elapsedMinutes = estimateMinutesFromSeconds(job.elapsedSeconds);
+		const elapsedClock = formatDurationClock(job.elapsedSeconds);
 
-		if (elapsedMinutes != null) {
+		if (elapsedClock) {
+			lines.push(labels.elapsedTime.replace("{{time}}", elapsedClock));
+		}
+
+		const remainingClock = formatDurationClock(job.estimatedRemainingSeconds);
+
+		if (remainingClock) {
+			lines.push(labels.remainingTime.replace("{{time}}", remainingClock));
+		}
+
+		const estimatedCompletion = formatPipelineDateTime(
+			job.estimatedCompletionAt,
+			locale,
+		);
+
+		if (estimatedCompletion) {
 			lines.push(
-				labels.elapsedTime.replace("{{minutes}}", String(elapsedMinutes)),
+				labels.estimatedCompletion.replace("{{time}}", estimatedCompletion),
 			);
 		}
 
-		const remainingMinutes = estimateMinutesFromSeconds(
-			job.estimatedRemainingSeconds,
-		);
+		const speed = formatProcessingSpeedRatio(job.processingSpeedRatio);
 
-		if (remainingMinutes != null) {
+		if (speed) {
+			lines.push(labels.processingSpeed.replace("{{speed}}", speed));
+		}
+
+		if (
+			job.currentSegment != null &&
+			job.totalSegments != null &&
+			job.totalSegments > 0
+		) {
 			lines.push(
-				labels.remainingMinutes.replace(
-					"{{minutes}}",
-					String(remainingMinutes),
-				),
+				labels.currentSegment
+					.replace("{{current}}", String(job.currentSegment))
+					.replace("{{total}}", String(job.totalSegments)),
 			);
+		}
+
+		const audioProcessed = formatDurationClock(job.audioProcessedSeconds);
+		const audioTotal = formatDurationClock(job.audioTotalSeconds);
+
+		if (audioProcessed && audioTotal) {
+			lines.push(
+				labels.audioProcessed
+					.replace("{{processed}}", audioProcessed)
+					.replace("{{total}}", audioTotal),
+			);
+		}
+
+		if (job.workerStatus === "waiting_for_update" || job.workerStale) {
+			lines.push(labels.waitingForWorker);
 		}
 	}
 
@@ -123,11 +162,11 @@ export function buildPipelineStageTimingLines(
 			lines.push(labels.actualCompletion.replace("{{time}}", actualCompletion));
 		}
 
-		const actualMinutes = estimateMinutesFromSeconds(job.actualDurationSeconds);
+		const actualDuration = formatDurationClock(job.actualDurationSeconds);
 
-		if (actualMinutes != null) {
+		if (actualDuration) {
 			lines.push(
-				labels.actualDuration.replace("{{minutes}}", String(actualMinutes)),
+				labels.actualDuration.replace("{{time}}", actualDuration),
 			);
 		}
 
@@ -136,26 +175,62 @@ export function buildPipelineStageTimingLines(
 		if (accuracy) {
 			lines.push(labels.estimationAccuracy.replace("{{percent}}", accuracy));
 		}
+
+		const averageSpeed = formatProcessingSpeedRatio(job.processingSpeedRatio);
+
+		if (averageSpeed) {
+			lines.push(labels.averageSpeed.replace("{{speed}}", averageSpeed));
+		}
 	}
 
-	if (job.engineId || job.currentEngine || job.provider) {
+	if (job.engineId || job.currentEngine) {
 		lines.push(
 			labels.engine.replace(
 				"{{engine}}",
-				job.engineId ?? job.currentEngine ?? job.provider ?? "unknown",
+				job.engineId ?? job.currentEngine ?? "unknown",
 			),
 		);
 	}
 
-	if (job.hardwareProfile) {
+	if (job.engineVersion) {
+		lines.push(labels.engineVersion.replace("{{version}}", job.engineVersion));
+	}
+
+	if (job.provider) {
+		lines.push(labels.provider.replace("{{provider}}", job.provider));
+	}
+
+	const hardwareProfile = resolveHardwareProfileDisplay(job);
+
+	if (hardwareProfile) {
 		lines.push(
-			labels.hardwareProfile.replace("{{profile}}", job.hardwareProfile),
+			labels.hardwareProfile.replace("{{profile}}", hardwareProfile),
 		);
 	}
 
-	if (job.currentStep && job.status === "running") {
-		lines.push(labels.currentStep.replace("{{step}}", job.currentStep));
+	const stepLabel = job.checkpointLabel ?? job.currentStep;
+
+	if (stepLabel && (job.status === "running" || job.status === "queued")) {
+		lines.push(labels.currentStep.replace("{{step}}", stepLabel));
+	}
+
+	if (job.checkpoint && job.status === "running") {
+		lines.push(labels.checkpoint.replace("{{checkpoint}}", job.checkpoint));
+	}
+
+	if (job.workerId) {
+		lines.push(labels.worker.replace("{{worker}}", job.workerId));
+	}
+
+	if (job.dockerContainer) {
+		lines.push(
+			labels.dockerContainer.replace("{{container}}", job.dockerContainer),
+		);
 	}
 
 	return lines;
+}
+
+export function resolvePipelineProgressLabel(job: PipelineJob): string | undefined {
+	return job.checkpointLabel ?? job.currentStep ?? undefined;
 }

@@ -17,6 +17,7 @@ use App\Tests\Unit\Application\EngineAnalytics\InMemoryEngineExecutionHistoryRep
 use App\Application\Pipeline\Orchestration\PipelineDependencyResolver;
 use App\Application\Pipeline\Orchestration\PipelineInvalidationService;
 use App\Application\Pipeline\Orchestration\PipelineNotificationService;
+use App\Application\Pipeline\Orchestration\PipelineJobLiveViewService;
 use App\Application\Pipeline\Orchestration\PipelineOrchestrator;
 use App\Application\Pipeline\Orchestration\PipelineProgressService;
 use App\Application\Video\Ports\VideoProcessingQueueInterface;
@@ -187,6 +188,7 @@ final class PipelineOrchestratorTest extends TestCase
             $invalidationService,
             $notificationService,
             new PipelineProgressService($repository),
+            new PipelineJobLiveViewService(),
             $durationPredictionEngine,
             $executionRecorder,
             $statisticsAggregator,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "@/i18n/useTranslation";
 import type {
@@ -17,7 +17,17 @@ import {
 	isPipelineWaitingForTranscriptChoice,
 	resolveJobsWaitingUserChoice,
 } from "./pipelineChoiceUtils";
-import { buildPipelineStageTimingLines } from "./pipelineJobDisplayUtils";
+import {
+	buildPipelineStageTimingLines,
+	resolvePipelineProgressLabel,
+} from "./pipelineJobDisplayUtils";
+import {
+	attachPipelineJobClock,
+	hasRunningPipelineJobs,
+	IDLE_PIPELINE_POLL_MS,
+	LIVE_PIPELINE_POLL_MS,
+} from "./pipelineLiveProgressUtils";
+import { usePipelineLiveJob } from "./usePipelineLiveJob";
 
 function PipelineStageCard({
 	job,
@@ -33,8 +43,9 @@ function PipelineStageCard({
 	continueLabel?: string;
 }) {
 	const { t, locale } = useTranslation();
+	const liveJob = usePipelineLiveJob(job);
 	const timingLines = buildPipelineStageTimingLines(
-		job,
+		liveJob,
 		{
 			startedAt: t("pipeline.progress.startedAt"),
 			notStarted: t("pipeline.progress.notStarted"),
@@ -44,23 +55,33 @@ function PipelineStageCard({
 			actualDuration: t("pipeline.progress.actualDuration"),
 			estimationAccuracy: t("pipeline.progress.estimationAccuracy"),
 			elapsedTime: t("pipeline.progress.elapsedTime"),
-			remainingMinutes: t("pipeline.progress.remainingMinutes"),
+			remainingTime: t("pipeline.progress.remainingTime"),
 			engine: t("pipeline.progress.engine"),
+			engineVersion: t("pipeline.progress.engineVersion"),
+			provider: t("pipeline.progress.provider"),
 			hardwareProfile: t("pipeline.progress.hardwareProfile"),
 			currentStep: t("pipeline.progress.currentStep"),
+			checkpoint: t("pipeline.progress.checkpoint"),
+			processingSpeed: t("pipeline.progress.processingSpeed"),
+			currentSegment: t("pipeline.progress.currentSegment"),
+			audioProcessed: t("pipeline.progress.audioProcessed"),
+			worker: t("pipeline.progress.worker"),
+			dockerContainer: t("pipeline.progress.dockerContainer"),
+			waitingForWorker: t("pipeline.progress.waitingForWorker"),
+			averageSpeed: t("pipeline.progress.averageSpeed"),
 		},
 		locale,
 	);
 
 	return (
-		<div className={styles.stageCard}>
+		<div className={styles.stageCard} data-testid={`pipeline-stage-${job.stage}`}>
 			<div className={styles.stageTitle}>
 				{job.stage.replaceAll("_", " ")}{" "}
 				<StageStatusBadge status={job.status} />
 			</div>
 			<StageProgressBar
-				progressPercent={job.progressPercent}
-				label={job.currentStep ?? undefined}
+				progressPercent={liveJob.progressPercent}
+				label={resolvePipelineProgressLabel(liveJob)}
 			/>
 			{timingLines.map((line) => (
 				<p key={line} className={styles.safeMessage}>
@@ -164,9 +185,24 @@ export function TranscriptSourceChoiceDialog({
 	return createPortal(dialog, document.body);
 }
 
+function attachClockToStatus(status: PipelineSourceStatus): PipelineSourceStatus {
+	const receivedAtMs = Date.now();
+	const mapJob = (job: PipelineJob) => attachPipelineJobClock(job, receivedAtMs);
+
+	return {
+		...status,
+		activeJobs: status.activeJobs.map(mapJob),
+		completedJobs: status.completedJobs.map(mapJob),
+		jobsWaitingUserChoice: status.jobsWaitingUserChoice.map(mapJob),
+		jobsWaitingConfirmation: status.jobsWaitingConfirmation.map(mapJob),
+		failedJobs: status.failedJobs.map(mapJob),
+		cancelledJobs: status.cancelledJobs.map(mapJob),
+	};
+}
+
 export function PipelineProgressPanel({
 	sourceId,
-	pollMs = 5000,
+	pollMs,
 	onStatusChange,
 	hideChoiceDialog = false,
 }: {
@@ -182,7 +218,9 @@ export function PipelineProgressPanel({
 
 	const refresh = useCallback(async () => {
 		try {
-			const next = await pipelineJobService.loadStatus(sourceId);
+			const next = attachClockToStatus(
+				await pipelineJobService.loadStatus(sourceId),
+			);
 			setStatus(next);
 			setError(null);
 			onStatusChange?.(next);
@@ -195,6 +233,21 @@ export function PipelineProgressPanel({
 		void refresh();
 	}, [refresh]);
 
+	const effectivePollMs = useMemo(() => {
+		if (pollMs != null) {
+			return pollMs;
+		}
+
+		const jobs = [
+			...(status?.activeJobs ?? []),
+			...(status?.jobsWaitingConfirmation ?? []),
+		];
+
+		return hasRunningPipelineJobs(jobs)
+			? LIVE_PIPELINE_POLL_MS
+			: IDLE_PIPELINE_POLL_MS;
+	}, [pollMs, status]);
+
 	useEffect(() => {
 		if (isPipelineWaitingForTranscriptChoice(status)) {
 			return;
@@ -202,10 +255,10 @@ export function PipelineProgressPanel({
 
 		const timer = window.setInterval(() => {
 			void refresh();
-		}, pollMs);
+		}, effectivePollMs);
 
 		return () => window.clearInterval(timer);
-	}, [pollMs, refresh, status]);
+	}, [effectivePollMs, refresh, status]);
 
 	const handleContinue = async (job: PipelineJob) => {
 		await pipelineJobService.continueStage(sourceId, job.stage);
