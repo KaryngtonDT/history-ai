@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Translation;
 
+use App\Application\Pipeline\Orchestration\PipelineProgressService;
+use App\Application\Pipeline\Orchestration\PipelineStageProgressReporter;
 use App\Application\Translation\TranslationJsonMapper;
 use App\Application\Translation\VideoTranslationGenerator;
-use App\Application\Pipeline\Orchestration\PipelineStageProgressReporter;
+use App\Domain\Pipeline\PipelineStageType;
+use App\Domain\PipelineJob\PipelineJobId;
 use App\Domain\Artifact\ArtifactRepositoryInterface;
 use App\Domain\Artifact\ArtifactType;
 use App\Domain\Content\ContentId;
@@ -198,21 +201,27 @@ final class VideoTranslationGeneratorTest extends TestCase
         );
 
         $this->transcriptRepository
+            ->expects(self::once())
             ->method('findByVideoId')
             ->with($videoId)
             ->willReturn($transcript);
 
-        $progress = $this->createMock(PipelineStageProgressReporter::class);
-        $progress
+        $this->translationRepository->expects(self::exactly(2))->method('save');
+        $this->artifactRepository->expects(self::exactly(2))->method('save');
+
+        $progressService = $this->createMock(PipelineProgressService::class);
+        $progressService
             ->expects(self::atLeastOnce())
-            ->method('checkpoint')
-            ->with(
-                self::logicalOr('preparing', 'loading', 'processing', 'saving', 'completed'),
-                self::greaterThanOrEqual(5),
-                self::anything(),
-                self::anything(),
-            );
-        $progress->expects(self::atLeastOnce())->method('heartbeat');
+            ->method('updateProgressDetailed');
+        $progressService
+            ->expects(self::atLeastOnce())
+            ->method('heartbeat');
+
+        $progress = new PipelineStageProgressReporter(
+            $progressService,
+            PipelineJobId::generate(),
+            PipelineStageType::Translation,
+        );
 
         $this->generator->generate(
             $videoId,

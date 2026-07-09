@@ -50,28 +50,29 @@ export function PipelineSourceProvider({
 	const [error, setError] = useState<string | null>(null);
 	const [refreshToken, setRefreshToken] = useState(0);
 
-	const refresh = useCallback(async (): Promise<PipelineSourceStatus | null> => {
-		if (!sourceId) {
-			setStatus(null);
-			setLoading(false);
-			return null;
-		}
+	const refresh =
+		useCallback(async (): Promise<PipelineSourceStatus | null> => {
+			if (!sourceId) {
+				setStatus(null);
+				setLoading(false);
+				return null;
+			}
 
-		try {
-			const next = await pipelineJobService.loadStatus(sourceId);
-			setStatus(next);
-			setError(null);
-			setRefreshToken((current) => current + 1);
+			try {
+				const next = await pipelineJobService.loadStatus(sourceId);
+				setStatus(next);
+				setError(null);
+				setRefreshToken((current) => current + 1);
 
-			return next;
-		} catch {
-			setError("Failed to load pipeline status.");
+				return next;
+			} catch {
+				setError("Failed to load pipeline status.");
 
-			return null;
-		} finally {
-			setLoading(false);
-		}
-	}, [sourceId]);
+				return null;
+			} finally {
+				setLoading(false);
+			}
+		}, [sourceId]);
 
 	useEffect(() => {
 		setLoading(Boolean(sourceId));
