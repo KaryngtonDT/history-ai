@@ -42,4 +42,9 @@ final class PipelineStageProgressReporter
     {
         $this->progressService->heartbeat($this->jobId, $this->stage);
     }
+
+    public function jobId(): PipelineJobId
+    {
+        return $this->jobId;
+    }
 }

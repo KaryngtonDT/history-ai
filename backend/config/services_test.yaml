@@ -122,6 +122,7 @@ when@test:
             public: true
 
         App\Infrastructure\AI\AIProviderResolver:
+            autowire: true
             arguments:
                 $runtimeKernelUnified: false
 

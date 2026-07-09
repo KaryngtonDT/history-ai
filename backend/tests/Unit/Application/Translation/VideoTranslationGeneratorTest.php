@@ -6,6 +6,8 @@ namespace App\Tests\Unit\Application\Translation;
 
 use App\Application\Pipeline\Orchestration\PipelineProgressService;
 use App\Application\Pipeline\Orchestration\PipelineStageProgressReporter;
+use App\Domain\PipelineJob\PipelineJob;
+use App\Domain\PipelineJob\PipelineSourceType;
 use App\Application\Translation\TranslationJsonMapper;
 use App\Application\Translation\VideoTranslationGenerator;
 use App\Domain\Pipeline\PipelineStageType;
@@ -209,13 +211,22 @@ final class VideoTranslationGeneratorTest extends TestCase
         $this->translationRepository->expects(self::exactly(2))->method('save');
         $this->artifactRepository->expects(self::exactly(2))->method('save');
 
+        $dummyJob = PipelineJob::createQueued(
+            PipelineJobId::generate(),
+            'source-test',
+            PipelineSourceType::Video,
+            PipelineStageType::Translation,
+        );
+
         $progressService = $this->createMock(PipelineProgressService::class);
         $progressService
             ->expects(self::atLeastOnce())
-            ->method('updateProgressDetailed');
+            ->method('updateProgressDetailed')
+            ->willReturn($dummyJob);
         $progressService
             ->expects(self::atLeastOnce())
-            ->method('heartbeat');
+            ->method('heartbeat')
+            ->willReturn($dummyJob);
 
         $progress = new PipelineStageProgressReporter(
             $progressService,

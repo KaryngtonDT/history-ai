@@ -32,7 +32,7 @@ const EMPTY_PROGRESS: VideoPipelineProgress = {
 
 export function useVideoPipelineProgress(
 	videoId: string | null,
-	_refreshKey = 0,
+	refreshKey = 0,
 ): VideoPipelineProgress {
 	const [progress, setProgress] = useState<VideoPipelineProgress>({
 		...EMPTY_PROGRESS,
@@ -40,6 +40,8 @@ export function useVideoPipelineProgress(
 	});
 
 	useEffect(() => {
+		void refreshKey;
+
 		if (!videoId) {
 			setProgress(EMPTY_PROGRESS);
 			return;
@@ -103,7 +105,7 @@ export function useVideoPipelineProgress(
 		return () => {
 			cancelled = true;
 		};
-	}, [videoId]);
+	}, [videoId, refreshKey]);
 
 	return progress;
 }

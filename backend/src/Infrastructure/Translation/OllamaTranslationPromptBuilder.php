@@ -32,9 +32,11 @@ final class OllamaTranslationPromptBuilder
      */
     public function mapResponseToSegments(Transcript $transcript, string $responseJson): array
     {
+        $clean = $this->extractJson($responseJson);
+
         try {
             /** @var mixed $decoded */
-            $decoded = json_decode($responseJson, true, 512, JSON_THROW_ON_ERROR);
+            $decoded = json_decode($clean, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $exception) {
             throw new OllamaTranslationException('Ollama translation response is not valid JSON.', 0, $exception);
         }
@@ -63,15 +65,14 @@ final class OllamaTranslationPromptBuilder
 
         $mapped = [];
 
-        foreach ($transcript->segments()->all() as $segment) {
-            $translatedText = $translatedByIndex[$segment->index()] ?? null;
+        // Build a sequential fallback: if model reindexed from 0, remap by position
+        $translatedSequential = array_values($translatedByIndex);
+        $allSegments = $transcript->segments()->all();
 
-            if (null === $translatedText) {
-                throw new OllamaTranslationException(sprintf(
-                    'Ollama translation response is missing segment index %d.',
-                    $segment->index(),
-                ));
-            }
+        foreach ($allSegments as $position => $segment) {
+            $translatedText = $translatedByIndex[$segment->index()]
+                ?? $translatedSequential[$position]
+                ?? $segment->text(); // fallback: keep source text if translation missing
 
             $mapped[] = [
                 'index' => $segment->index(),
@@ -81,5 +82,26 @@ final class OllamaTranslationPromptBuilder
         }
 
         return $mapped;
+    }
+
+    private function extractJson(string $text): string
+    {
+        // Strip <think>...</think> blocks (used by reasoning models like DeepSeek, Qwen3)
+        $text = preg_replace('/<think>.*?<\/think>/s', '', $text) ?? $text;
+
+        // Extract JSON from markdown code block ```json ... ``` or ``` ... ```
+        if (preg_match('/```(?:json)?\s*(\{.*?\})\s*```/s', $text, $matches)) {
+            return trim($matches[1]);
+        }
+
+        // Find the first { ... } JSON object in the text
+        $start = strpos($text, '{');
+        $end = strrpos($text, '}');
+
+        if (false !== $start && false !== $end && $end > $start) {
+            return substr($text, $start, $end - $start + 1);
+        }
+
+        return trim($text);
     }
 }

@@ -9,7 +9,7 @@ use App\Domain\PipelineJob\PipelineJob;
 use App\Domain\PipelineJob\PipelineJobId;
 use App\Domain\PipelineJob\PipelineJobRepositoryInterface;
 
-final class PipelineProgressService
+class PipelineProgressService
 {
     public function __construct(
         private readonly PipelineJobRepositoryInterface $jobRepository,

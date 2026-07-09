@@ -97,7 +97,14 @@ final readonly class VideoJob
 
     public function startProcessing(): self
     {
-        $this->assertStatus(VideoStatus::Queued, 'start processing');
+        $allowed = [VideoStatus::Queued, VideoStatus::Completed, VideoStatus::Failed];
+
+        if (!in_array($this->status, $allowed, true)) {
+            throw new InvalidVideoJobException(sprintf(
+                'Cannot start processing a video job in status "%s".',
+                $this->status->value,
+            ));
+        }
 
         return $this->withStatus(VideoStatus::Processing)->withoutFailureDetails();
     }

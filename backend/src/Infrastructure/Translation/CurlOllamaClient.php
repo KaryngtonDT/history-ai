@@ -29,7 +29,7 @@ final class CurlOllamaClient implements OllamaClientInterface
             CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
             CURLOPT_POSTFIELDS => $body,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 120,
+            CURLOPT_TIMEOUT => 900,
         ]);
 
         $responseBody = curl_exec($handle);

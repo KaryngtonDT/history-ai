@@ -35,6 +35,8 @@ final class OllamaTranslationProvider implements TranslationProviderInterface
             'model' => $this->model,
             'prompt' => $prompt,
             'stream' => false,
+            'format' => 'json',
+            'think' => false,
         ]);
 
         $responseText = $response['response'] ?? null;

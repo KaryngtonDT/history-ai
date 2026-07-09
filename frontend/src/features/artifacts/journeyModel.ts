@@ -1,5 +1,6 @@
 import {
 	findPipelineJobForStage,
+	inferArtifactDependencyMet,
 	mapPipelineJobToArtifactStatus,
 	PIPELINE_STAGE_BY_STEP,
 } from "@/features/pipeline/pipelineJobStateUtils";
@@ -41,12 +42,17 @@ function resolveStepStatusFromPipeline(
 ): ArtifactStatus {
 	const stage = PIPELINE_STAGE_BY_STEP[stepId];
 	const job = findPipelineJobForStage(pipelineStatus, stage);
+	const resolvedDependency = inferArtifactDependencyMet(
+		pipelineStatus,
+		stepId,
+		dependencyMet,
+	);
 
 	if (job) {
-		return mapPipelineJobToArtifactStatus(job, dependencyMet);
+		return mapPipelineJobToArtifactStatus(job, resolvedDependency);
 	}
 
-	if (!dependencyMet) {
+	if (!resolvedDependency) {
 		return "locked";
 	}
 

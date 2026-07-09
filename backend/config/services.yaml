@@ -26,27 +26,27 @@ parameters:
     translation.provider_default: 'ollama'
     translation.languages_default: 'fr,de'
     ollama.base_url_default: 'http://ollama:11434'
-    ollama.model_default: 'gemma3:4b'
+    ollama.model_default: 'qwen3:4b'
     tts.provider_default: 'f5'
-    tts.f5.binary_default: 'f5-tts'
+    tts.f5.binary_default: '/opt/lumen/placeholders/f5-tts'
     tts.f5.model_default: 'F5-TTS'
     tts.f5.base_path_default: '/models/f5'
     tts.output_dir: '%storage.root%/artifacts/audio'
     tts.generate_audio_default: false
     voice_clone.provider_default: 'openvoice'
-    voice_clone.openvoice.binary_default: 'openvoice'
+    voice_clone.openvoice.binary_default: '/opt/lumen/placeholders/openvoice'
     voice_clone.openvoice.model_default: 'openvoice_v2'
     voice_clone.openvoice.base_path_default: '/models/openvoice'
     voice_clone.output_dir: '%storage.root%/artifacts/voiceclone'
     voice_clone.generate_default: false
     lip_sync.provider_default: 'latentsync'
-    lip_sync.latentsync.binary_default: 'latentsync'
+    lip_sync.latentsync.binary_default: '/opt/lumen/placeholders/latentsync'
     lip_sync.latentsync.model_default: 'latentsync'
     lip_sync.latentsync.base_path_default: '/models/latentsync'
     lip_sync.output_dir: '%storage.root%/artifacts/lipsync'
     lip_sync.generate_default: false
     video_render.provider_default: 'ffmpeg'
-    runtime.kernel_unified_default: 'true'
+    runtime.kernel_unified_default: 'false'
     video_render.ffmpeg.binary_default: 'ffmpeg'
     video_render.format_default: 'mp4'
     video_render.quality_default: 'standard'
@@ -63,6 +63,8 @@ services:
 
     App\Presentation\:
         resource: '../src/Presentation/'
+        exclude:
+            - '../src/Presentation/OpenApi/Schema/'
 
     App\Application\:
         resource: '../src/Application/'
@@ -696,7 +698,7 @@ services:
 
     App\Infrastructure\Translation\OllamaTranslationProvider:
         arguments:
-            $model: '%env(default:ollama.model_default:OLLAMA_MODEL)%'
+            $model: '%ollama.model_default%'
 
     App\Domain\Translation\TranslationProviderResolverInterface:
         alias: App\Infrastructure\Translation\TranslationProviderFactory
@@ -819,7 +821,7 @@ services:
     App\Infrastructure\Runtime\Discovery\EngineReadinessAssessor:
         arguments:
             $sttConfiguredModel: '%env(default:stt.faster_whisper.model_default:STT_FASTER_WHISPER_MODEL)%'
-            $ollamaConfiguredModel: '%env(default:ollama.model_default:OLLAMA_MODEL)%'
+            $ollamaConfiguredModel: '%ollama.model_default%'
             $sttProvider: '%env(default:stt.provider_default:STT_PROVIDER)%'
             $translationProvider: '%env(default:translation.provider_default:TRANSLATION_PROVIDER)%'
             $ttsProvider: '%env(default:tts.provider_default:TTS_PROVIDER)%'

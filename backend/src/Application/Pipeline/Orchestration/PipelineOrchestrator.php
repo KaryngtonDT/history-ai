@@ -140,6 +140,13 @@ final class PipelineOrchestrator
     public function completeStage(PipelineJobId $jobId, ?string $resultArtifactId = null): PipelineJob
     {
         $job = $this->requireJob($jobId);
+        $job = $this->progressService->updateProgressDetailed(
+            $jobId,
+            99,
+            'completed',
+            0,
+            ['checkpoint' => 'completed'],
+        );
         $completed = $job->complete($resultArtifactId);
         $this->jobRepository->save($completed);
         $this->notificationService->notifyStageCompleted($completed);

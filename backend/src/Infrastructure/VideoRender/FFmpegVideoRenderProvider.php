@@ -54,10 +54,14 @@ final class FFmpegVideoRenderProvider implements VideoRenderProviderInterface
             $outputPath,
         ];
 
-        $output = $this->processRunner->run($command);
+        $this->processRunner->run($command);
+
+        $fileSizeBytes = file_exists($outputPath) ? (int) filesize($outputPath) : 0;
+        $duration = max(1.0, $lipSync->video()->duration());
+        $syntheticOutput = json_encode(['duration' => $duration, 'fileSizeBytes' => $fileSizeBytes], \JSON_THROW_ON_ERROR);
 
         return $this->videoRenderMapper->toArtifact(
-            $output,
+            $syntheticOutput,
             $lipSync,
             VideoRenderProvider::FFmpeg,
             $format,

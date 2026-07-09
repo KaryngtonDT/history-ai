@@ -88,27 +88,75 @@ export function mapPipelineJobToArtifactStatus(
 	job: PipelineJob | null,
 	dependencyMet: boolean,
 ): import("@/features/artifacts/journeyModel").ArtifactStatus {
-	if (!dependencyMet) {
-		return "locked";
+	if (!job) {
+		return dependencyMet ? "open" : "locked";
 	}
 
 	const uiState = resolvePipelineStageUiState(job);
+	const isActive = ["queued", "running", "waiting_user_confirmation"].includes(
+		uiState,
+	);
+
+	if (!dependencyMet && !isActive) {
+		return "locked";
+	}
 
 	switch (uiState) {
 		case "completed":
+		case "waiting_user_confirmation":
 			return "completed";
 		case "running":
 		case "queued":
 			return "in_progress";
 		case "failed":
 			return "failed";
-		case "waiting_user_confirmation":
-			return "open";
 		case "cancelled":
 			return "open";
 		default:
-			return "open";
+			return dependencyMet ? "open" : "locked";
 	}
+}
+
+const PIPELINE_STEP_ORDER: VideoPipelineStepId[] = [
+	"transcript",
+	"translations",
+	"audio",
+	"voice-clone",
+	"lip-sync",
+	"render",
+];
+
+export function inferArtifactDependencyMet(
+	pipelineStatus: PipelineSourceStatus | null | undefined,
+	stepId: VideoPipelineStepId,
+	artifactPresent: boolean,
+): boolean {
+	if (artifactPresent) {
+		return true;
+	}
+
+	if (!pipelineStatus) {
+		return false;
+	}
+
+	const stepIndex = PIPELINE_STEP_ORDER.indexOf(stepId);
+
+	if (stepIndex <= 0) {
+		return true;
+	}
+
+	for (let index = stepIndex; index < PIPELINE_STEP_ORDER.length; index += 1) {
+		const stage = PIPELINE_STAGE_BY_STEP[PIPELINE_STEP_ORDER[index]];
+		const job = findPipelineJobForStage(pipelineStatus, stage);
+
+		if (!job || job.status === "cancelled") {
+			continue;
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 export function collectAllPipelineJobs(

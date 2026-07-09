@@ -59,4 +59,34 @@ describe("pipelineJobStateUtils", () => {
 			),
 		).toBe("in_progress");
 	});
+
+	it("shows in_progress when translation runs even if artifact dependency cache is stale", () => {
+		expect(
+			mapPipelineJobToArtifactStatus(
+				{
+					jobId: "job-1",
+					sourceId: "source-1",
+					stage: "translation",
+					status: "running",
+					progressPercent: 31,
+				},
+				false,
+			),
+		).toBe("in_progress");
+	});
+
+	it("treats waiting confirmation as completed in the journey", () => {
+		expect(
+			mapPipelineJobToArtifactStatus(
+				{
+					jobId: "job-1",
+					sourceId: "source-1",
+					stage: "translation",
+					status: "waiting_user_confirmation",
+					progressPercent: 100,
+				},
+				true,
+			),
+		).toBe("completed");
+	});
 });
