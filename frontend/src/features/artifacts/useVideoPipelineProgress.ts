@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { audioService } from "@/services/audio/AudioService";
 import { lipSyncService } from "@/services/lipsync/LipSyncService";
 import { videoRenderService } from "@/services/render/VideoRenderService";
@@ -38,12 +38,14 @@ export function useVideoPipelineProgress(
 		...EMPTY_PROGRESS,
 		loading: Boolean(videoId),
 	});
+	const hasDataRef = useRef(false);
 
 	useEffect(() => {
 		void refreshKey;
 
 		if (!videoId) {
 			setProgress(EMPTY_PROGRESS);
+			hasDataRef.current = false; // eslint-disable-line react-hooks/exhaustive-deps
 			return;
 		}
 
@@ -51,7 +53,10 @@ export function useVideoPipelineProgress(
 
 		async function load() {
 			const id = videoId as string;
-			setProgress((current) => ({ ...current, loading: true }));
+			// Only show loading spinner on initial load, not on background refreshes
+			if (!hasDataRef.current) {
+				setProgress((current) => ({ ...current, loading: true }));
+			}
 
 			const [
 				statusResult,
@@ -75,6 +80,7 @@ export function useVideoPipelineProgress(
 				return;
 			}
 
+			hasDataRef.current = true;
 			setProgress({
 				loading: false,
 				videoStatus:
