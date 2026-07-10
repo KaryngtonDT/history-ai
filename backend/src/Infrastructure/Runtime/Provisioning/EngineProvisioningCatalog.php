@@ -203,17 +203,15 @@ final class EngineProvisioningCatalog
             // OCR
             new EngineProvisionSpec(
                 'paddleocr',
-                false,
-                blockedReason: 'PaddleOCR requires manual pip install and model download.',
-                installCommand: 'pip install paddlepaddle paddleocr',
+                true,
+                installCommand: 'pip3 install --break-system-packages paddlepaddle paddleocr',
                 modelPath: '/models/paddleocr',
                 documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#ocr',
             ),
             new EngineProvisionSpec(
                 'easyocr',
-                false,
-                blockedReason: 'EasyOCR requires manual pip install and language packs.',
-                installCommand: 'pip install easyocr',
+                true,
+                installCommand: 'pip3 install --break-system-packages easyocr',
                 modelPath: '/models/easyocr',
                 documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#ocr',
             ),
@@ -255,10 +253,9 @@ final class EngineProvisioningCatalog
             ),
             new EngineProvisionSpec(
                 'nomic_embed',
-                false,
-                blockedReason: 'Nomic Embed requires manual model download.',
-                installCommand: 'pip install sentence-transformers',
-                modelPath: '/models/nomic-embed',
+                true,
+                installCommand: 'docker compose exec ollama ollama pull nomic-embed-text',
+                modelDownloadHint: 'nomic-embed-text via Ollama',
                 documentationPath: 'docs/architecture/CAPABILITY_PLATFORM_VISION.md#embeddings',
             ),
             new EngineProvisionSpec(

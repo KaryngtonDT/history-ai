@@ -53,6 +53,9 @@ final class EngineProvisioner
             'wav2lip' => $this->provisionWav2Lip($output),
             'whisper_cpp' => $this->provisionWhisperCpp($output),
             'piper' => $this->provisionPiper($output),
+            'nomic_embed' => $this->provisionOllamaModel('nomic-embed-text', $output),
+            'paddleocr' => $this->provisionPipPackage('paddlepaddle paddleocr', $output),
+            'easyocr' => $this->provisionPipPackage('easyocr', $output),
             'ffmpeg', 'ffmpeg_nvenc', 'ffmpeg_av1' => $this->verifyFfmpeg($output),
             default => false,
         };
@@ -213,6 +216,21 @@ final class EngineProvisioner
             'bash /opt/lumen/install-gpu-engines.sh --engine '.escapeshellarg($engine).' 2>&1',
         );
         $process->setTimeout(7200);
+        $process->run();
+        $output[] = trim($process->getOutput().$process->getErrorOutput());
+
+        return $process->isSuccessful();
+    }
+
+    /**
+     * @param list<string> $output
+     */
+    private function provisionPipPackage(string $packages, array &$output): bool
+    {
+        $process = Process::fromShellCommandline(
+            'pip3 install --break-system-packages '.escapeshellarg($packages).' 2>&1',
+        );
+        $process->setTimeout(600);
         $process->run();
         $output[] = trim($process->getOutput().$process->getErrorOutput());
 
