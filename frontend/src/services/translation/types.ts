@@ -57,7 +57,7 @@ export const TRANSLATION_PROVIDERS: Array<{
 	label: string;
 }> = [
 	{ value: "qwen", label: "Qwen 3 (Ollama)" },
-	{ value: "mock", label: "Mock (local dev)" },
+	{ value: "deepseek", label: "DeepSeek R1 (Ollama)" },
 ];
 
 const TRANSLATION_LANGUAGES = new Set<TranslationLanguage>([
@@ -86,7 +86,7 @@ export function mapTranslationLanguage(value: string): TranslationLanguage {
 export function mapTranslationProvider(value: string): TranslationProvider {
 	return TRANSLATION_PROVIDER_VALUES.has(value as TranslationProvider)
 		? (value as TranslationProvider)
-		: "mock";
+		: "qwen";
 }
 
 export function formatTranslationLanguageLabel(

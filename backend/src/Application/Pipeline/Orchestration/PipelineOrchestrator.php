@@ -246,21 +246,30 @@ final class PipelineOrchestrator
         $failedJobs = [];
         $cancelledJobs = [];
         $staleArtifacts = [];
+        $seenStages = [];
 
         foreach ($jobs as $job) {
+            $stageKey = $job->stage()->value;
             $payload = $this->serializeJob($job);
 
             if ($this->isWaitingForTranscriptChoice($job)) {
-                $jobsWaitingUserChoice[] = $payload;
+                if (!isset($seenStages[$stageKey])) {
+                    $seenStages[$stageKey] = true;
+                    $jobsWaitingUserChoice[] = $payload;
+                }
             } else {
-                match ($job->status()) {
-                    PipelineJobStatus::Queued, PipelineJobStatus::Running => $activeJobs[] = $payload,
-                    PipelineJobStatus::Completed => $completedJobs[] = $payload,
-                    PipelineJobStatus::WaitingUserChoice => $jobsWaitingUserChoice[] = $payload,
-                    PipelineJobStatus::WaitingUserConfirmation => $jobsWaitingConfirmation[] = $payload,
-                    PipelineJobStatus::Failed => $failedJobs[] = $payload,
-                    PipelineJobStatus::Cancelled => $cancelledJobs[] = $payload,
-                };
+                $status = $job->status();
+                if (!isset($seenStages[$stageKey])) {
+                    $seenStages[$stageKey] = true;
+                    match ($status) {
+                        PipelineJobStatus::Queued, PipelineJobStatus::Running => $activeJobs[] = $payload,
+                        PipelineJobStatus::Completed => $completedJobs[] = $payload,
+                        PipelineJobStatus::WaitingUserChoice => $jobsWaitingUserChoice[] = $payload,
+                        PipelineJobStatus::WaitingUserConfirmation => $jobsWaitingConfirmation[] = $payload,
+                        PipelineJobStatus::Failed => $failedJobs[] = $payload,
+                        PipelineJobStatus::Cancelled => $cancelledJobs[] = $payload,
+                    };
+                }
             }
 
             $staleArtifacts = [...$staleArtifacts, ...$job->staleArtifactIds()];
