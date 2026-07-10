@@ -119,11 +119,40 @@ install-gpu-engines:
 
 ENGINE ?= all
 provision:
-	@if [ "$(ENGINE)" = "all" ]; then bash scripts/provision-engines.sh; \
-	elif [ "$(ENGINE)" = "latentsync" ]; then $(BACKEND_EXEC) bash /opt/lumen/install-latentsync.sh; \
-	elif [ "$(ENGINE)" = "openvoice" ]; then $(BACKEND_EXEC) bash /opt/lumen/install-gpu-engines.sh --engine openvoice; \
-	elif [ "$(ENGINE)" = "f5-tts" ] || [ "$(ENGINE)" = "f5" ]; then $(BACKEND_EXEC) bash /opt/lumen/install-gpu-engines.sh --engine f5; \
-	else echo "Unknown ENGINE=$(ENGINE). Use: latentsync, openvoice, f5-tts, or all"; exit 1; fi
+	@if [ -z "$(ENGINE)" ]; then \
+		echo "Usage: make provision ENGINE=<engine_id>"; \
+		echo ""; \
+		echo "Examples:"; \
+		echo "  make provision ENGINE=easyocr"; \
+		echo "  make provision ENGINE=paddleocr"; \
+		echo "  make provision ENGINE=bge_m3"; \
+		echo "  make provision ENGINE=smolvlm"; \
+		echo "  make provision ENGINE=kokoro"; \
+		echo "  make provision ENGINE=nomic_embed"; \
+		echo "  make provision ENGINE=latentsync"; \
+		echo "  make provision ENGINE=ollama_gemma3"; \
+		echo ""; \
+		echo "List all engines: make provision-list"; \
+		exit 1; \
+	fi
+	@echo "==> Provisioning engine: $(ENGINE)"
+	@$(BACKEND_EXEC) curl -sf --max-time 7200 -X POST \
+		"http://localhost/api/runtime/engines/$(ENGINE)/provision" \
+		| python3 -m json.tool 2>/dev/null || true
+	@echo ""
+	@echo "==> Status after provisioning:"
+	@$(BACKEND_EXEC) curl -sf "http://localhost/api/runtime/engines/$(ENGINE)/compatibility" \
+		| python3 -m json.tool 2>/dev/null || true
+
+provision-list:
+	@echo "==> All engines and their current status:"
+	@$(BACKEND_EXEC) curl -sf "http://localhost/api/runtime/engines" \
+		| python3 -c "\
+import json, sys; \
+data = json.load(sys.stdin); \
+engines = data if isinstance(data, list) else data.get('engines', []); \
+[print(f'  {e.get(\"status\",\"?\"):10}  {e[\"id\"]}') for e in sorted(engines, key=lambda x: x.get('status',''))]" \
+		2>/dev/null || true
 
 prod-restart:
 	$(COMPOSE_PROD) restart
