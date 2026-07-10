@@ -56,6 +56,13 @@ final class EngineProvisioner
             'nomic_embed' => $this->provisionOllamaModel('nomic-embed-text', $output),
             'paddleocr' => $this->provisionPipPackage('paddlepaddle paddleocr', $output),
             'easyocr' => $this->provisionPipPackage('easyocr', $output),
+            'kokoro' => $this->provisionHuggingFaceEngine('"kokoro-onnx>=0.4" soundfile', 'hexgrad/Kokoro-82M', 'kokoro', $output),
+            'smolvlm' => $this->provisionHuggingFaceEngine('transformers accelerate pillow', 'HuggingFaceTB/SmolVLM-256M-Instruct', 'smolvlm', $output),
+            'bge_m3' => $this->provisionHuggingFaceEngine('FlagEmbedding', 'BAAI/bge-m3', 'bge-m3', $output),
+            'jina_embeddings' => $this->provisionHuggingFaceEngine('sentence-transformers', 'jinaai/jina-embeddings-v2-base-en', 'jina-embeddings', $output),
+            'e5_large' => $this->provisionHuggingFaceEngine('sentence-transformers', 'intfloat/e5-large-v2', 'e5-large', $output),
+            'bge_reranker' => $this->provisionHuggingFaceEngine('FlagEmbedding', 'BAAI/bge-reranker-base', 'bge-reranker', $output),
+            'jina_reranker' => $this->provisionHuggingFaceEngine('sentence-transformers', 'cross-encoder/ms-marco-MiniLM-L-6-v2', 'jina-reranker', $output),
             'ffmpeg', 'ffmpeg_nvenc', 'ffmpeg_av1' => $this->verifyFfmpeg($output),
             default => false,
         };
@@ -235,6 +242,35 @@ final class EngineProvisioner
         $output[] = trim($process->getOutput().$process->getErrorOutput());
 
         return $process->isSuccessful();
+    }
+
+    /**
+     * @param list<string> $output
+     */
+    private function provisionHuggingFaceEngine(string $packages, string $modelRepo, string $modelPath, array &$output): bool
+    {
+        $pip = Process::fromShellCommandline(
+            'pip3 install --break-system-packages '.escapeshellarg($packages).' 2>&1',
+        );
+        $pip->setTimeout(600);
+        $pip->run();
+        $output[] = trim($pip->getOutput().$pip->getErrorOutput());
+        if (!$pip->isSuccessful()) {
+            return false;
+        }
+
+        $dest = rtrim($this->modelsRoot, '/').'/'.$modelPath;
+        $downloadCmd = sprintf(
+            'python3 -c "from huggingface_hub import snapshot_download; snapshot_download(%s, local_dir=%s, ignore_patterns=[\'*.msgpack\',\'flax_model*\',\'tf_model*\'])" 2>&1',
+            escapeshellarg($modelRepo),
+            escapeshellarg($dest),
+        );
+        $download = Process::fromShellCommandline($downloadCmd);
+        $download->setTimeout(3600);
+        $download->run();
+        $output[] = trim($download->getOutput().$download->getErrorOutput());
+
+        return $download->isSuccessful();
     }
 
     /**

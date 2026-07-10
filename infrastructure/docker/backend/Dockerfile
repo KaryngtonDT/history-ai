@@ -67,6 +67,13 @@ COPY infrastructure/docker/backend/bin/faster-whisper \
      infrastructure/docker/backend/bin/piper \
      infrastructure/docker/backend/bin/liveportrait \
      infrastructure/docker/backend/bin/musetalk \
+     infrastructure/docker/backend/bin/kokoro \
+     infrastructure/docker/backend/bin/smolvlm \
+     infrastructure/docker/backend/bin/bge-m3 \
+     infrastructure/docker/backend/bin/jina-embeddings \
+     infrastructure/docker/backend/bin/e5-embed \
+     infrastructure/docker/backend/bin/bge-reranker \
+     infrastructure/docker/backend/bin/jina-reranker \
      /usr/local/bin/
 COPY infrastructure/docker/backend/placeholders/f5-tts \
      infrastructure/docker/backend/placeholders/openvoice \
@@ -94,6 +101,13 @@ RUN chmod +x /usr/local/bin/faster-whisper \
              /usr/local/bin/piper \
              /usr/local/bin/liveportrait \
              /usr/local/bin/musetalk \
+             /usr/local/bin/kokoro \
+             /usr/local/bin/smolvlm \
+             /usr/local/bin/bge-m3 \
+             /usr/local/bin/jina-embeddings \
+             /usr/local/bin/e5-embed \
+             /usr/local/bin/bge-reranker \
+             /usr/local/bin/jina-reranker \
              /opt/lumen/placeholders/f5-tts \
              /opt/lumen/placeholders/openvoice \
              /opt/lumen/placeholders/latentsync \
@@ -119,6 +133,13 @@ RUN chmod +x /usr/local/bin/faster-whisper \
              /usr/local/bin/piper \
              /usr/local/bin/liveportrait \
              /usr/local/bin/musetalk \
+             /usr/local/bin/kokoro \
+             /usr/local/bin/smolvlm \
+             /usr/local/bin/bge-m3 \
+             /usr/local/bin/jina-embeddings \
+             /usr/local/bin/e5-embed \
+             /usr/local/bin/bge-reranker \
+             /usr/local/bin/jina-reranker \
              /opt/lumen/placeholders/f5-tts \
              /opt/lumen/placeholders/openvoice \
              /opt/lumen/placeholders/latentsync \

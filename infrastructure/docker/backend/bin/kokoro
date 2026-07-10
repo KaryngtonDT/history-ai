@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""Lumen Kokoro TTS wrapper (kokoro-onnx, CPU-compatible)."""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+
+
+def main() -> int:
+    if "--version" in sys.argv or "-version" in sys.argv:
+        try:
+            import kokoro  # type: ignore[import]
+            print(f"kokoro {getattr(kokoro, '__version__', 'installed')}")
+        except ImportError:
+            print("kokoro (not installed — run: make provision ENGINE=kokoro)")
+        return 0
+
+    parser = argparse.ArgumentParser(description="Lumen Kokoro TTS synthesis")
+    parser.add_argument("--text", required=True)
+    parser.add_argument("--voice", default="af_heart")
+    parser.add_argument("--speed", type=float, default=1.0)
+    parser.add_argument("--lang", default="a")
+    parser.add_argument("--base-path", default="/models/kokoro")
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+
+    try:
+        from kokoro import KPipeline  # type: ignore[import]
+    except ImportError:
+        print("kokoro-onnx not installed. Run: make provision ENGINE=kokoro", file=sys.stderr)
+        return 1
+
+    if not os.path.isdir(args.base_path) or not any(
+        f for f in os.listdir(args.base_path) if not f.startswith(".")
+    ):
+        print(f"Kokoro models not found at {args.base_path}. Run: make provision ENGINE=kokoro", file=sys.stderr)
+        return 1
+
+    try:
+        import soundfile as sf  # type: ignore[import]
+        import numpy as np  # type: ignore[import]
+
+        pipeline = KPipeline(lang_code=args.lang, repo_id=args.base_path)
+        samples = []
+        sample_rate = 24000
+        for _, _, audio in pipeline(args.text, voice=args.voice, speed=args.speed):
+            if audio is not None:
+                samples.append(audio)
+
+        if not samples:
+            print("Kokoro produced no audio output", file=sys.stderr)
+            return 1
+
+        combined = np.concatenate(samples) if len(samples) > 1 else samples[0]
+        os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
+        sf.write(args.output, combined, sample_rate)
+
+        result = {
+            "output": args.output,
+            "voice": args.voice,
+            "duration": len(combined) / sample_rate,
+            "sample_rate": sample_rate,
+        }
+        print(json.dumps(result))
+        return 0
+    except Exception as exc:  # noqa: BLE001
+        print(str(exc), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

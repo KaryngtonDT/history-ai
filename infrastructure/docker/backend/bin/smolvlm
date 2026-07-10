@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""Lumen SmolVLM vision wrapper (HuggingFace Transformers, CPU-compatible)."""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+
+
+def main() -> int:
+    if "--version" in sys.argv or "-version" in sys.argv:
+        try:
+            import transformers  # type: ignore[import]
+            print(f"smolvlm (transformers {transformers.__version__})")
+        except ImportError:
+            print("smolvlm (not installed — run: make provision ENGINE=smolvlm)")
+        return 0
+
+    parser = argparse.ArgumentParser(description="Lumen SmolVLM image analysis")
+    parser.add_argument("--image", required=True)
+    parser.add_argument("--prompt", default="Describe this image in detail.")
+    parser.add_argument("--base-path", default="/models/smolvlm")
+    parser.add_argument("--max-tokens", type=int, default=256)
+    args = parser.parse_args()
+
+    try:
+        from transformers import AutoProcessor, AutoModelForVision2Seq  # type: ignore[import]
+        from PIL import Image  # type: ignore[import]
+        import torch  # type: ignore[import]
+    except ImportError as exc:
+        print(f"SmolVLM dependencies not installed: {exc}. Run: make provision ENGINE=smolvlm", file=sys.stderr)
+        return 1
+
+    if not os.path.isdir(args.base_path) or not any(
+        f for f in os.listdir(args.base_path) if not f.startswith(".")
+    ):
+        print(f"SmolVLM model not found at {args.base_path}. Run: make provision ENGINE=smolvlm", file=sys.stderr)
+        return 1
+
+    if not os.path.isfile(args.image):
+        print(f"Image not found: {args.image}", file=sys.stderr)
+        return 1
+
+    try:
+        processor = AutoProcessor.from_pretrained(args.base_path)
+        model = AutoModelForVision2Seq.from_pretrained(args.base_path, torch_dtype=torch.float32)
+        model.eval()
+
+        image = Image.open(args.image).convert("RGB")
+        messages = [{"role": "user", "content": [{"type": "image"}, {"type": "text", "text": args.prompt}]}]
+        prompt_text = processor.apply_chat_template(messages, add_generation_prompt=True)
+        inputs = processor(text=prompt_text, images=[image], return_tensors="pt")
+
+        with torch.no_grad():
+            output_ids = model.generate(**inputs, max_new_tokens=args.max_tokens)
+
+        generated = processor.batch_decode(output_ids, skip_special_tokens=True)[0]
+        description = generated.split("Assistant:")[-1].strip() if "Assistant:" in generated else generated.strip()
+
+        result = {"description": description, "model": "smolvlm"}
+        print(json.dumps(result, ensure_ascii=False))
+        return 0
+    except Exception as exc:  # noqa: BLE001
+        print(str(exc), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

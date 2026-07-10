@@ -23,7 +23,7 @@ final class EngineRequirementMatrix
             // Translation
             new HardwareRequirement('ollama_gemma3', cpuFallbackSupported: true, minimumRamGb: 4.0),
             new HardwareRequirement('ollama_qwen3', cpuFallbackSupported: true, minimumRamGb: 4.0),
-            new HardwareRequirement('ollama_deepseek_r1_distill', cpuFallbackSupported: true, minimumRamGb: 6.0),
+            new HardwareRequirement('ollama_deepseek_r1_distill', cpuFallbackSupported: true, minimumRamGb: 2.0),
 
             // TTS
             new HardwareRequirement('f5_tts', cudaRecommended: true, cpuFallbackSupported: true, minimumRamGb: 6.0),
@@ -102,7 +102,7 @@ final class EngineRequirementMatrix
             new HardwareRequirement('bge_m3', cpuFallbackSupported: true, minimumRamGb: 4.0),
             new HardwareRequirement('nomic_embed', cpuFallbackSupported: true, minimumRamGb: 2.0),
             new HardwareRequirement('jina_embeddings', cpuFallbackSupported: true, minimumRamGb: 4.0),
-            new HardwareRequirement('e5_large', cpuFallbackSupported: true, minimumRamGb: 6.0),
+            new HardwareRequirement('e5_large', cpuFallbackSupported: true, minimumRamGb: 2.0),
 
             // Reranking
             new HardwareRequirement('bge_reranker', cpuFallbackSupported: true, minimumRamGb: 4.0),

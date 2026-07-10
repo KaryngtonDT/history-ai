@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+"""Lumen Jina Embeddings wrapper (sentence-transformers, CPU-compatible)."""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+
+
+def main() -> int:
+    if "--version" in sys.argv or "-version" in sys.argv:
+        try:
+            import sentence_transformers  # type: ignore[import]
+            print(f"jina-embeddings (sentence-transformers {sentence_transformers.__version__})")
+        except ImportError:
+            print("jina-embeddings (not installed — run: make provision ENGINE=jina_embeddings)")
+        return 0
+
+    parser = argparse.ArgumentParser(description="Lumen Jina Embeddings")
+    parser.add_argument("--texts", nargs="+", required=True)
+    parser.add_argument("--base-path", default="/models/jina-embeddings")
+    args = parser.parse_args()
+
+    try:
+        from sentence_transformers import SentenceTransformer  # type: ignore[import]
+    except ImportError:
+        print("sentence-transformers not installed. Run: make provision ENGINE=jina_embeddings", file=sys.stderr)
+        return 1
+
+    if not os.path.isdir(args.base_path) or not any(
+        f for f in os.listdir(args.base_path) if not f.startswith(".")
+    ):
+        print(f"Jina Embeddings model not found at {args.base_path}. Run: make provision ENGINE=jina_embeddings", file=sys.stderr)
+        return 1
+
+    try:
+        model = SentenceTransformer(args.base_path, trust_remote_code=True)
+        embeddings = model.encode(args.texts, normalize_embeddings=True).tolist()
+        result = {"embeddings": embeddings, "model": "jina-embeddings", "dim": len(embeddings[0]) if embeddings else 0}
+        print(json.dumps(result))
+        return 0
+    except Exception as exc:  # noqa: BLE001
+        print(str(exc), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

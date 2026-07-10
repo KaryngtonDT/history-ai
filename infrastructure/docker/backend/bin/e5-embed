@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+"""Lumen E5-Large embeddings wrapper (sentence-transformers, CPU-compatible)."""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+
+
+def _average_pool(last_hidden_states, attention_mask):
+    import torch  # type: ignore[import]
+    last_hidden = last_hidden_states.masked_fill(~attention_mask[..., None].bool(), 0.0)
+    return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
+
+
+def main() -> int:
+    if "--version" in sys.argv or "-version" in sys.argv:
+        try:
+            import sentence_transformers  # type: ignore[import]
+            print(f"e5-embed (sentence-transformers {sentence_transformers.__version__})")
+        except ImportError:
+            print("e5-embed (not installed — run: make provision ENGINE=e5_large)")
+        return 0
+
+    parser = argparse.ArgumentParser(description="Lumen E5-Large text embeddings")
+    parser.add_argument("--texts", nargs="+", required=True)
+    parser.add_argument("--base-path", default="/models/e5-large")
+    parser.add_argument("--prefix", default="query: ", help="E5 task prefix (query: or passage:)")
+    args = parser.parse_args()
+
+    try:
+        from sentence_transformers import SentenceTransformer  # type: ignore[import]
+    except ImportError:
+        print("sentence-transformers not installed. Run: make provision ENGINE=e5_large", file=sys.stderr)
+        return 1
+
+    if not os.path.isdir(args.base_path) or not any(
+        f for f in os.listdir(args.base_path) if not f.startswith(".")
+    ):
+        print(f"E5-Large model not found at {args.base_path}. Run: make provision ENGINE=e5_large", file=sys.stderr)
+        return 1
+
+    try:
+        model = SentenceTransformer(args.base_path)
+        prefixed = [args.prefix + t for t in args.texts]
+        embeddings = model.encode(prefixed, normalize_embeddings=True).tolist()
+        result = {"embeddings": embeddings, "model": "e5-large", "dim": len(embeddings[0]) if embeddings else 0}
+        print(json.dumps(result))
+        return 0
+    except Exception as exc:  # noqa: BLE001
+        print(str(exc), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

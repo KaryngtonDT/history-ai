@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+"""Lumen BGE Reranker wrapper (FlagEmbedding, CPU-compatible)."""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+
+
+def main() -> int:
+    if "--version" in sys.argv or "-version" in sys.argv:
+        try:
+            import FlagEmbedding  # type: ignore[import]
+            print(f"bge-reranker (FlagEmbedding {getattr(FlagEmbedding, '__version__', 'installed')})")
+        except ImportError:
+            print("bge-reranker (not installed — run: make provision ENGINE=bge_reranker)")
+        return 0
+
+    parser = argparse.ArgumentParser(description="Lumen BGE Reranker")
+    parser.add_argument("--query", required=True)
+    parser.add_argument("--docs", nargs="+", required=True)
+    parser.add_argument("--base-path", default="/models/bge-reranker")
+    args = parser.parse_args()
+
+    try:
+        from FlagEmbedding import FlagReranker  # type: ignore[import]
+    except ImportError:
+        print("FlagEmbedding not installed. Run: make provision ENGINE=bge_reranker", file=sys.stderr)
+        return 1
+
+    if not os.path.isdir(args.base_path) or not any(
+        f for f in os.listdir(args.base_path) if not f.startswith(".")
+    ):
+        print(f"BGE Reranker model not found at {args.base_path}. Run: make provision ENGINE=bge_reranker", file=sys.stderr)
+        return 1
+
+    try:
+        reranker = FlagReranker(args.base_path, use_fp16=False)
+        pairs = [[args.query, doc] for doc in args.docs]
+        scores = reranker.compute_score(pairs, normalize=True)
+        if not isinstance(scores, list):
+            scores = [scores]
+        ranked = sorted(
+            [{"doc": doc, "score": float(s)} for doc, s in zip(args.docs, scores)],
+            key=lambda x: x["score"],
+            reverse=True,
+        )
+        result = {"ranked": ranked, "model": "bge-reranker"}
+        print(json.dumps(result))
+        return 0
+    except Exception as exc:  # noqa: BLE001
+        print(str(exc), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
