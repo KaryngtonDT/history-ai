@@ -72,10 +72,10 @@ echo ""
 PLAN_JSON=$(backend_get "api/runtime/provision/plan")
 ENGINES_JSON=$(backend_get "api/runtime/engines")
 
-# Extract engine IDs to provision from plan (grep-based, no python3)
+# Extract only toProvision engine IDs (excludes skipped/hardware-blocked entries)
 ENGINES_TO_PROVISION=$(echo "$PLAN_JSON" \
-  | grep -o '"engineId":"[^"]*"' \
-  | sed 's/"engineId":"//;s/"//' || true)
+  | parse_json "import json,sys; plan=json.load(sys.stdin); [print(e['engineId']) for e in plan.get('toProvision',[])]" \
+  2>/dev/null || true)
 
 # Extract ready engine IDs — parse inside container where python3 is available
 READY_ENGINES=$(echo "$ENGINES_JSON" \
@@ -137,12 +137,10 @@ fi
 echo ""
 echo "[5/5] Final verification..."
 
-FINAL_PLAN=$(backend_get "api/runtime/completion/plan")
+FINAL_PLAN=$(backend_get "api/runtime/provision/plan")
 REMAINING=$(echo "$FINAL_PLAN" \
-  | grep -o '"completionCount":[0-9]*' \
-  | grep -o '[0-9]*' \
-  | head -1 || true)
-REMAINING="${REMAINING:-unknown}"
+  | parse_json "import json,sys; plan=json.load(sys.stdin); print(len(plan.get('toProvision',[])))" \
+  2>/dev/null || echo "unknown")
 
 # Summary table — parsed inside the container
 FINAL_ENGINES_JSON=$(backend_get "api/runtime/engines")
@@ -167,9 +165,8 @@ if [ "$REMAINING" != "0" ] && [ "$REMAINING" != "unknown" ]; then
   echo ""
   echo "  Still missing:"
   echo "$FINAL_PLAN" \
-    | grep -o '"engineId":"[^"]*"' \
-    | sed 's/"engineId":"//;s/"//' \
-    | sed 's/^/    [!!] /' || true
+    | parse_json "import json,sys; plan=json.load(sys.stdin); [print('    [!!] '+e['engineId']) for e in plan.get('toProvision',[])]" \
+    2>/dev/null || true
   echo ""
   echo "ERROR: ${REMAINING} engine(s) could not be provisioned."
   exit 1
