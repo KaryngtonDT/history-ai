@@ -111,24 +111,26 @@ final class RuntimeCompletionPlanner
                     continue;
                 }
 
-                if ($engineId !== $recommendedId) {
-                    continue;
-                }
-
                 $spec = EngineProvisioningCatalog::find($engineId);
                 if (null === $spec || !$spec->autoProvisionSupported) {
                     continue;
                 }
 
+                $isRecommended = $engineId === $recommendedId;
                 $toProvision[] = [
                     'engineId' => $engineId,
                     'capability' => $capKey,
                     'displayName' => (string) ($entry['displayName'] ?? $engineId),
-                    'reason' => sprintf(
-                        'Recommended for %s — compatible, not READY.',
-                        $dashboard['summary']['hardwareProfile'] ?? 'profile',
-                    ),
-                    'recommended' => true,
+                    'reason' => $isRecommended
+                        ? sprintf(
+                            'Recommended for %s — compatible, not READY.',
+                            $dashboard['summary']['hardwareProfile'] ?? 'profile',
+                        )
+                        : sprintf(
+                            'Compatible with %s — installing all available engines.',
+                            $dashboard['summary']['hardwareProfile'] ?? 'profile',
+                        ),
+                    'recommended' => $isRecommended,
                 ];
                 $plannedIds[$engineId] = true;
             }
