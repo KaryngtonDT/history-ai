@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Runtime\Kernel;
 
+use App\Application\EngineAnalytics\EngineStatisticsAggregator;
 use App\Application\Hardware\HardwareReportBuilder;
 use App\Application\Runtime\PipelineStageCapabilityMapper;
 use App\Application\Runtime\RuntimeResolverInterface;
@@ -35,6 +36,7 @@ final class RuntimeResolver implements RuntimeResolverInterface
         private readonly RuntimeCompatibilityService $compatibilityService,
         private readonly EngineAdapterRegistry $adapterRegistry,
         private readonly RuntimeResolverIntelligence $resolverIntelligence,
+        private readonly EngineStatisticsAggregator $statisticsAggregator,
     ) {
     }
 
@@ -94,6 +96,8 @@ final class RuntimeResolver implements RuntimeResolverInterface
         }
 
         $configuredEngine = $this->findConfiguredEngine($engines);
+        $readyEngines = array_values(array_filter($engines, static fn (Engine $e): bool => $e->isReady()));
+        $analyticsRecommendedId = $this->pickFastestByAnalytics($readyEngines);
 
         [$engineId, $reason, $confidence] = $this->pickEngineId(
             $capKey,
@@ -101,6 +105,7 @@ final class RuntimeResolver implements RuntimeResolverInterface
             $config->manualSelections[$capKey] ?? null,
             $config->lockedSelections[$capKey] ?? null,
             $context->preferredEngineId,
+            $analyticsRecommendedId,
             $hardwareRecommendedId,
             $profileRecommendedId,
             $configuredEngine?->id,
@@ -270,6 +275,38 @@ final class RuntimeResolver implements RuntimeResolverInterface
     }
 
     /**
+     * @param list<Engine> $readyEngines
+     */
+    private function pickFastestByAnalytics(array $readyEngines): ?string
+    {
+        if ([] === $readyEngines) {
+            return null;
+        }
+
+        $stats = $this->statisticsAggregator->aggregateEngines();
+        if ([] === $stats) {
+            return null;
+        }
+
+        $medians = [];
+        foreach ($stats as $entry) {
+            $medians[(string) ($entry['engineId'] ?? '')] = (int) ($entry['medianDurationSeconds'] ?? PHP_INT_MAX);
+        }
+
+        $best = null;
+        $bestMs = PHP_INT_MAX;
+        foreach ($readyEngines as $engine) {
+            $ms = $medians[$engine->id] ?? PHP_INT_MAX;
+            if ($ms < $bestMs) {
+                $bestMs = $ms;
+                $best = $engine;
+            }
+        }
+
+        return PHP_INT_MAX !== $bestMs ? $best?->id : null;
+    }
+
+    /**
      * @return array{0: string, 1: RuntimeResolveReason, 2: float}
      */
     private function pickEngineId(
@@ -278,6 +315,7 @@ final class RuntimeResolver implements RuntimeResolverInterface
         ?string $manualSelection,
         ?string $lockedSelection,
         ?string $plannerPreferred,
+        ?string $analyticsRecommended,
         ?string $hardwareRecommended,
         ?string $profileRecommended,
         ?string $opsConfiguredId,
@@ -295,6 +333,10 @@ final class RuntimeResolver implements RuntimeResolverInterface
 
         if (is_string($plannerPreferred) && '' !== $plannerPreferred) {
             return [$plannerPreferred, RuntimeResolveReason::PlannerContext, 0.95];
+        }
+
+        if (is_string($analyticsRecommended) && '' !== $analyticsRecommended) {
+            return [$analyticsRecommended, RuntimeResolveReason::AnalyticsRecommended, 0.92];
         }
 
         if (is_string($hardwareRecommended) && '' !== $hardwareRecommended) {

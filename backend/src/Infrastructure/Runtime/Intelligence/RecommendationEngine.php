@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Runtime\Intelligence;
 
+use App\Application\EngineAnalytics\EngineStatisticsAggregator;
 use App\Domain\Engine\EngineProfileName;
 use App\Domain\Engine\EngineRepositoryInterface;
 use App\Domain\Runtime\RuntimeCapability;
@@ -15,6 +16,7 @@ final class RecommendationEngine
 {
     public function __construct(
         private readonly EngineRepositoryInterface $engineRepository,
+        private readonly EngineStatisticsAggregator $statisticsAggregator,
     ) {
     }
 
@@ -98,9 +100,16 @@ final class RecommendationEngine
             return null;
         }
 
-        return match ($profile) {
-            EngineProfileName::Fast => $engines[0],
-            default => $engines[0],
-        };
+        $stats = $this->statisticsAggregator->aggregateEngines();
+        $medians = [];
+        foreach ($stats as $entry) {
+            $medians[(string) ($entry['engineId'] ?? '')] = (int) ($entry['medianDurationSeconds'] ?? PHP_INT_MAX);
+        }
+
+        usort($engines, static function (\App\Domain\Engine\Engine $a, \App\Domain\Engine\Engine $b) use ($medians): int {
+            return ($medians[$a->id] ?? PHP_INT_MAX) <=> ($medians[$b->id] ?? PHP_INT_MAX);
+        });
+
+        return $engines[0];
     }
 }
