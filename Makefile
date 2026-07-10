@@ -8,6 +8,7 @@ COMPOSE ?= docker compose
 COMPOSE_DEV := $(COMPOSE)
 COMPOSE_PROD := $(COMPOSE) -f docker-compose.prod-like.yml
 BACKEND_EXEC := $(COMPOSE_PROD) exec backend
+BACKEND_EXEC_T := $(COMPOSE_PROD) exec -T backend
 FRONTEND_EXEC := $(COMPOSE_PROD) exec frontend
 WORKER_EXEC := $(COMPOSE_PROD) exec worker
 
@@ -136,23 +137,14 @@ provision:
 		exit 1; \
 	fi
 	@echo "==> Provisioning engine: $(ENGINE)"
-	@$(BACKEND_EXEC) curl -sf --max-time 7200 -X POST \
-		"http://localhost/api/runtime/engines/$(ENGINE)/provision" \
-		| python3 -m json.tool 2>/dev/null || true
+	@$(BACKEND_EXEC_T) sh -c 'curl -sf --max-time 7200 -X POST "http://localhost/api/runtime/engines/$(ENGINE)/provision" | python3 -m json.tool' 2>/dev/null || true
 	@echo ""
 	@echo "==> Status after provisioning:"
-	@$(BACKEND_EXEC) curl -sf "http://localhost/api/runtime/engines/$(ENGINE)/compatibility" \
-		| python3 -m json.tool 2>/dev/null || true
+	@$(BACKEND_EXEC_T) sh -c 'curl -sf "http://localhost/api/runtime/engines/$(ENGINE)/compatibility" | python3 -m json.tool' 2>/dev/null || true
 
 provision-list:
 	@echo "==> All engines and their current status:"
-	@$(BACKEND_EXEC) curl -sf "http://localhost/api/runtime/engines" \
-		| python3 -c "\
-import json, sys; \
-data = json.load(sys.stdin); \
-engines = data if isinstance(data, list) else data.get('engines', []); \
-[print(f'  {e.get(\"status\",\"?\"):10}  {e[\"id\"]}') for e in sorted(engines, key=lambda x: x.get('status',''))]" \
-		2>/dev/null || true
+	@$(BACKEND_EXEC_T) sh -c 'curl -sf "http://localhost/api/runtime/engines" | python3 -c "import json,sys; data=json.load(sys.stdin); engines=data if isinstance(data,list) else data.get(\"engines\",[]); [print(\"  {:<12} {}\".format(e.get(\"status\",\"?\"),e[\"id\"])) for e in sorted(engines,key=lambda x:x.get(\"status\",\"\"))]"' 2>/dev/null || true
 
 prod-restart:
 	$(COMPOSE_PROD) restart
