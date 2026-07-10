@@ -235,7 +235,7 @@ final class EngineProvisioner
     private function provisionPipPackage(string $packages, array &$output): bool
     {
         $process = Process::fromShellCommandline(
-            'pip3 install --break-system-packages '.escapeshellarg($packages).' 2>&1',
+            'pip3 install --break-system-packages '.$packages.' 2>&1',
         );
         $process->setTimeout(3600);
         $process->run();
@@ -250,7 +250,7 @@ final class EngineProvisioner
     private function provisionHuggingFaceEngine(string $packages, string $modelRepo, string $modelPath, array &$output): bool
     {
         $pip = Process::fromShellCommandline(
-            'pip3 install --break-system-packages '.escapeshellarg($packages).' 2>&1',
+            'pip3 install --break-system-packages '.$packages.' 2>&1',
         );
         $pip->setTimeout(3600);
         $pip->run();
