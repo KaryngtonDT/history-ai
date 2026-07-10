@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Full engine provisioning with strict verification.
-# Installs ALL compatible engines and exits non-zero if any remain unprovisioned.
+# Provisions engines ONE BY ONE via docker exec (bypasses nginx timeout entirely).
+# Shows real-time status: already ready, in progress, done, failed.
 # Called by prod-reset and prod-redeploy — no || true allowed here.
 set -euo pipefail
 
@@ -11,113 +12,177 @@ COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.prod-like.yml}"
 COMPOSE=(docker compose -f "${COMPOSE_FILE}")
 BACKEND_URL="${BACKEND_URL:-http://localhost:8000}"
 BACKEND_CONTAINER="${BACKEND_CONTAINER:-history-ai-prod-like-backend-1}"
-HEALTH_TIMEOUT=120  # seconds to wait for backend after rebuild
-PROVISION_TIMEOUT=3600  # 1 hour max per provisioning call
+HEALTH_TIMEOUT=120
 
-echo "========================================================="
-echo "   LUMEN — FULL ENGINE PROVISIONING & VERIFICATION"
-echo "========================================================="
+# Colors / symbols
+GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; CYAN='\033[0;36m'; NC='\033[0m'
+OK="[OK]"; SKIP="[--]"; FAIL="[!!]"; WAIT="[..]"
 
-# Ensure nginx inside the container uses a 1h read timeout for provisioning.
-# The image may have been built with the old 600s default; reload without rebuild.
-patch_nginx_timeout() {
-  local container="$1"
-  if docker inspect "$container" >/dev/null 2>&1; then
-    docker exec "$container" sed -i \
-      's/fastcgi_read_timeout [0-9]*s/fastcgi_read_timeout 3600s/g;s/fastcgi_send_timeout [0-9]*s/fastcgi_send_timeout 3600s/g' \
-      /etc/nginx/conf.d/default.conf 2>/dev/null \
-    && docker exec "$container" nginx -s reload 2>/dev/null \
-    && echo "  nginx timeout patched to 3600s and reloaded." \
-    || echo "  (nginx patch skipped — container not found or nginx not running)"
-  fi
+# Call a GET endpoint inside the container (no nginx timeout risk for reads)
+backend_get() {
+  "${COMPOSE[@]}" exec -T backend curl -sf --max-time 30 "http://localhost/$1" 2>/dev/null
 }
 
+# Provision a single engine inside the container (completely bypasses nginx)
+provision_engine_exec() {
+  local engine_id="$1"
+  "${COMPOSE[@]}" exec -T backend \
+    curl -sf --max-time 7200 -X POST "http://localhost/api/runtime/engines/${engine_id}/provision" \
+    2>/dev/null
+}
+
+echo "========================================================="
+echo "   LUMEN — ENGINE PROVISIONING & VERIFICATION"
+echo "========================================================="
+
 # ------------------------------------------------------------------
 echo ""
-echo "[1/6] Ensuring stack is running..."
+echo "[1/5] Ensuring stack is running..."
 "${COMPOSE[@]}" up -d postgres redis ollama backend >/dev/null 2>&1
-# ------------------------------------------------------------------
 
 echo ""
-echo "[2/6] Waiting for backend to become healthy (max ${HEALTH_TIMEOUT}s)..."
+echo "[2/5] Waiting for backend (max ${HEALTH_TIMEOUT}s)..."
 elapsed=0
 until curl -sf --max-time 5 "${BACKEND_URL}/health" >/dev/null 2>&1; do
   if [ "$elapsed" -ge "$HEALTH_TIMEOUT" ]; then
-    echo "ERROR: Backend not reachable at ${BACKEND_URL} after ${HEALTH_TIMEOUT}s."
+    echo "ERROR: Backend not reachable after ${HEALTH_TIMEOUT}s."
     exit 1
   fi
   printf "  ...waiting (%ds)\r" "$elapsed"
   sleep 3
   elapsed=$((elapsed + 3))
 done
-echo "  Backend healthy.                     "
-patch_nginx_timeout "${BACKEND_CONTAINER}"
+echo "  Backend healthy."
 
 # ------------------------------------------------------------------
 echo ""
-echo "[3/6] Refreshing hardware capability report..."
-curl -sf --max-time 30 "${BACKEND_URL}/api/runtime/hardware" >/dev/null
-echo "  Hardware report refreshed."
+echo "[3/5] Refreshing hardware profile..."
+backend_get "api/runtime/hardware" >/dev/null
+echo "  Done."
 
 # ------------------------------------------------------------------
 echo ""
-echo "[4/6] Showing provisioning plan..."
-curl -sf --max-time 30 "${BACKEND_URL}/api/runtime/provision/plan" \
-  | python3 -m json.tool 2>/dev/null || true
-
-# ------------------------------------------------------------------
-echo ""
-echo "[5/6] Provisioning all compatible engines..."
-echo "  (taking all the time needed — timeout: ${PROVISION_TIMEOUT}s)"
+echo "[4/5] Provisioning engines one by one..."
 echo ""
 
-PROVISION_RESULT=$(curl -s --max-time "${PROVISION_TIMEOUT}" \
-  -X POST "${BACKEND_URL}/api/runtime/provision/compatible")
+# Fetch current engine states
+ENGINES_JSON=$(backend_get "api/runtime/engines")
+PLAN_JSON=$(backend_get "api/runtime/provision/plan")
 
-if [ -z "$PROVISION_RESULT" ]; then
-  echo "ERROR: No response from provision/compatible endpoint."
-  exit 1
+# Extract engines to provision from the plan
+ENGINES_TO_PROVISION=$(echo "$PLAN_JSON" \
+  | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+plan = data.get('compatibleEngineCompletionPlan', [])
+for e in plan:
+    print(e['engineId'])
+" 2>/dev/null || echo "")
+
+# Extract already-ready engines
+READY_ENGINES=$(echo "$ENGINES_JSON" \
+  | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+engines = data if isinstance(data, list) else data.get('engines', [])
+for e in engines:
+    if e.get('status') == 'ready':
+        print(e['id'])
+" 2>/dev/null || echo "")
+
+# Show already-ready engines
+echo "  Already READY:"
+if [ -z "$READY_ENGINES" ]; then
+  echo "    (none)"
+else
+  echo "$READY_ENGINES" | while read -r eid; do
+    printf "    ${GREEN}${OK}${NC} %s\n" "$eid"
+  done
 fi
 
-echo "$PROVISION_RESULT" | python3 -m json.tool 2>/dev/null || echo "$PROVISION_RESULT"
+# Count engines to provision
+PLAN_COUNT=$(echo "$ENGINES_TO_PROVISION" | grep -c '\S' || echo "0")
 
-PROVISION_OK=$(echo "$PROVISION_RESULT" \
-  | grep -o '"ok":true' | head -1 || echo "")
+echo ""
+if [ "$PLAN_COUNT" -eq 0 ]; then
+  echo "  Nothing to provision — all compatible engines already READY."
+else
+  echo "  To provision ($PLAN_COUNT engines):"
+  echo "$ENGINES_TO_PROVISION" | while read -r eid; do
+    printf "    ${CYAN}${WAIT}${NC} %s\n" "$eid"
+  done
+  echo ""
 
-if [ -z "$PROVISION_OK" ]; then
-  echo ""
-  echo "  WARN: Intelligent provisioner reported ok=false."
-  echo "  Running completion pass to install any remaining engines..."
-  echo ""
-  COMPLETION_RESULT=$(curl -s --max-time "${PROVISION_TIMEOUT}" \
-    -X POST "${BACKEND_URL}/api/runtime/completion/execute")
-  echo "$COMPLETION_RESULT" | python3 -m json.tool 2>/dev/null || echo "$COMPLETION_RESULT"
+  FAILED_ENGINES=""
+  DONE_ENGINES=""
+
+  while IFS= read -r ENGINE_ID; do
+    [ -z "$ENGINE_ID" ] && continue
+
+    printf "  ${YELLOW}${WAIT}${NC} %-30s installing..." "$ENGINE_ID"
+
+    RESULT=$(provision_engine_exec "$ENGINE_ID" 2>/dev/null || echo '{"ok":false}')
+    ENGINE_OK=$(echo "$RESULT" | grep -o '"ok":true' | head -1 || echo "")
+
+    if [ -n "$ENGINE_OK" ]; then
+      printf "\r  ${GREEN}${OK}${NC} %-30s done\n" "$ENGINE_ID"
+      DONE_ENGINES="${DONE_ENGINES} ${ENGINE_ID}"
+    else
+      # Check if it became ready despite non-ok response
+      STATUS_JSON=$(backend_get "api/runtime/engines/${ENGINE_ID}/compatibility" 2>/dev/null || echo '{}')
+      IS_READY=$(echo "$STATUS_JSON" | grep -o '"status":"ready"' | head -1 || echo "")
+      if [ -n "$IS_READY" ]; then
+        printf "\r  ${GREEN}${OK}${NC} %-30s ready\n" "$ENGINE_ID"
+        DONE_ENGINES="${DONE_ENGINES} ${ENGINE_ID}"
+      else
+        printf "\r  ${RED}${FAIL}${NC} %-30s FAILED\n" "$ENGINE_ID"
+        FAILED_ENGINES="${FAILED_ENGINES} ${ENGINE_ID}"
+      fi
+    fi
+  done <<< "$ENGINES_TO_PROVISION"
 fi
 
 # ------------------------------------------------------------------
 echo ""
-echo "[6/6] Verifying — checking remaining completion plan..."
-PLAN_JSON=$(curl -sf --max-time 30 "${BACKEND_URL}/api/runtime/completion/plan")
+echo "[5/5] Final verification..."
+FINAL_PLAN=$(backend_get "api/runtime/completion/plan")
 
-REMAINING=$(echo "$PLAN_JSON" \
+REMAINING=$(echo "$FINAL_PLAN" \
   | grep -o '"completionCount":[0-9]*' \
   | grep -o '[0-9]*' \
   | head -1 || echo "")
-
 REMAINING="${REMAINING:-unknown}"
-echo "  Engines still pending provisioning: ${REMAINING}"
+
+# Recount ready engines
+FINAL_READY=$(backend_get "api/runtime/engines" \
+  | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+engines = data if isinstance(data, list) else data.get('engines', [])
+ready = [e['id'] for e in engines if e.get('status') == 'ready']
+print(f'  Ready engines   : {len(ready)}')
+for e in ready:
+    print(f'    {e}')
+blocked = [e['id'] for e in engines if e.get('status') not in ('ready',)]
+print(f'  Not ready       : {len(blocked)}')
+for e in blocked:
+    print(f'    {e}  ({e.get(\"status\",\"?\")})')
+" 2>/dev/null || echo "  (could not parse engine list)")
+
+echo "$FINAL_READY"
+echo ""
+echo "  Engines still pending: ${REMAINING}"
 
 if [ "$REMAINING" != "0" ] && [ "$REMAINING" != "unknown" ]; then
   echo ""
-  echo "  Pending engines:"
-  echo "$PLAN_JSON" \
+  echo "  Still missing:"
+  echo "$FINAL_PLAN" \
     | grep -o '"engineId":"[^"]*"' \
-    | grep -o '"[^"]*"$' \
+    | grep -o '[^"]*"$' \
     | tr -d '"' \
-    | sed 's/^/    - /' || true
+    | sed "s/^/    ${FAIL} /" || true
   echo ""
   echo "ERROR: ${REMAINING} engine(s) could not be provisioned."
-  echo "Run 'make doctor' or check docs/reports/Engine-Provisioning-Final.md"
   exit 1
 fi
 
