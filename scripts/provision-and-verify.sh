@@ -10,12 +10,27 @@ cd "${ROOT}"
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.prod-like.yml}"
 COMPOSE=(docker compose -f "${COMPOSE_FILE}")
 BACKEND_URL="${BACKEND_URL:-http://localhost:8000}"
+BACKEND_CONTAINER="${BACKEND_CONTAINER:-history-ai-prod-like-backend-1}"
 HEALTH_TIMEOUT=120  # seconds to wait for backend after rebuild
 PROVISION_TIMEOUT=3600  # 1 hour max per provisioning call
 
 echo "========================================================="
 echo "   LUMEN — FULL ENGINE PROVISIONING & VERIFICATION"
 echo "========================================================="
+
+# Ensure nginx inside the container uses a 1h read timeout for provisioning.
+# The image may have been built with the old 600s default; reload without rebuild.
+patch_nginx_timeout() {
+  local container="$1"
+  if docker inspect "$container" >/dev/null 2>&1; then
+    docker exec "$container" sed -i \
+      's/fastcgi_read_timeout [0-9]*s/fastcgi_read_timeout 3600s/g;s/fastcgi_send_timeout [0-9]*s/fastcgi_send_timeout 3600s/g' \
+      /etc/nginx/conf.d/default.conf 2>/dev/null \
+    && docker exec "$container" nginx -s reload 2>/dev/null \
+    && echo "  nginx timeout patched to 3600s and reloaded." \
+    || echo "  (nginx patch skipped — container not found or nginx not running)"
+  fi
+}
 
 # ------------------------------------------------------------------
 echo ""
@@ -36,6 +51,7 @@ until curl -sf --max-time 5 "${BACKEND_URL}/health" >/dev/null 2>&1; do
   elapsed=$((elapsed + 3))
 done
 echo "  Backend healthy.                     "
+patch_nginx_timeout "${BACKEND_CONTAINER}"
 
 # ------------------------------------------------------------------
 echo ""
