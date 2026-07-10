@@ -89,7 +89,9 @@ services:
       MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN:-redis://redis:6379/messages}
       STT_PROVIDER: ${STT_PROVIDER:-faster_whisper}
       STT_FASTER_WHISPER_MODEL: ${STT_FASTER_WHISPER_MODEL:-large-v3}
-      HF_HOME: /models/whisper
+      HF_HOME: /models/hf-cache
+      PIP_TARGET: /models/pip-packages
+      PYTHONPATH: /models/pip-packages
       TRANSLATION_PROVIDER: ${TRANSLATION_PROVIDER:-ollama}
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-gemma3:4b}
