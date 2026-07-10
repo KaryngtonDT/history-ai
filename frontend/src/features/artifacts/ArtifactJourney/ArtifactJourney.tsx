@@ -78,8 +78,7 @@ export function ArtifactJourney({ videoId, title }: ArtifactJourneyProps) {
 				<div className={styles.loading}>
 					<Spinner label={t("pipeline.artifactJourney.loadingProgress")} />
 				</div>
-			) : null}
-			{!videoId ? (
+			) : !videoId ? (
 				<EmptyState
 					title={t("pipeline.artifactJourney.noVideoTitle")}
 					description={t("pipeline.artifactJourney.noVideoDescription")}
@@ -90,7 +89,7 @@ export function ArtifactJourney({ videoId, title }: ArtifactJourneyProps) {
 					}
 				/>
 			) : null}
-			<div className={styles.track}>
+			<div className={videoId && progress.loading ? styles.trackInvisible : styles.track}>
 				{steps.map((step, index) => (
 					<div key={step.id} style={{ display: "contents" }}>
 						<article className={styles.card}>
