@@ -19,17 +19,17 @@ OK="[OK]"; FAIL="[!!]"; WAIT="[..]"
 
 # Call a GET endpoint from inside the container
 backend_get() {
-  "${COMPOSE[@]}" exec -T backend curl -sf --max-time 30 "http://localhost/${1}" 2>/dev/null
+  "${COMPOSE[@]}" exec -T backend curl -sf --max-time 30 "http://localhost/${1}" 2>/dev/null < /dev/null
 }
 
 # Provision one engine from inside the container (bypasses nginx)
 provision_engine_exec() {
   "${COMPOSE[@]}" exec -T backend \
     curl -sf --max-time 7200 -X POST "http://localhost/api/runtime/engines/${1}/provision" \
-    2>/dev/null
+    2>/dev/null < /dev/null
 }
 
-# Parse JSON inside the container (no python3 needed on host)
+# Parse JSON inside the container (stdin piped from caller)
 parse_json() {
   "${COMPOSE[@]}" exec -T backend python3 -c "$1"
 }
