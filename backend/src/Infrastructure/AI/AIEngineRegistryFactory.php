@@ -47,7 +47,7 @@ final class AIEngineRegistryFactory
                         'Ollama',
                         AIEngineCapability::Translation,
                     ),
-                    AIEngineProvider::create('mock', 'Mock (Dev)', AIEngineCapability::Translation),
+                    AIEngineProvider::create('mock', 'Mock (Dev)', AIEngineCapability::Translation, false),
                 ],
             ),
             AIEngine::create(
