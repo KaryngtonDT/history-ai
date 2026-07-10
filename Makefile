@@ -132,6 +132,40 @@ prod-fresh:
 	@read -r confirm && [ "$$confirm" = "DELETE EVERYTHING" ] || (echo "Aborted." && exit 1)
 	$(COMPOSE_PROD) down -v
 
+prod-redeploy:
+	@echo "--- Rebuilding and starting containers ---"
+	$(MAKE) prod-rebuild
+	@echo "--- Running migrations ---"
+	$(MAKE) migrate
+	@echo "--- Doctor check ---"
+	$(MAKE) doctor || true
+	@echo "--- Validating runtime ---"
+	$(MAKE) runtime-validate || true
+	$(MAKE) runtime-benchmark || true
+	@echo "--- Running tests ---"
+	$(MAKE) test
+	$(MAKE) runtime-completion-execute || true
+	cd frontend && npm run check && npm test
+	@echo "=== prod-redeploy complete ==="
+
+prod-reset: prod-fresh
+	@echo "--- Rebuilding and starting containers ---"
+	$(MAKE) prod-rebuild
+	@echo "--- Running migrations ---"
+	$(MAKE) migrate
+	@echo "--- Provisioning compatible engines ---"
+	$(MAKE) provision-compatible
+	@echo "--- Doctor check ---"
+	$(MAKE) doctor || true
+	@echo "--- Validating runtime ---"
+	$(MAKE) runtime-validate || true
+	$(MAKE) runtime-benchmark || true
+	@echo "--- Running tests ---"
+	$(MAKE) test
+	$(MAKE) runtime-completion-execute || true
+	cd frontend && npm run check && npm test
+	@echo "=== prod-reset complete ==="
+
 prod-backend:
 	$(COMPOSE_PROD) up -d --build backend
 
@@ -200,7 +234,7 @@ runtime-completion:
 	curl -sf http://localhost:8000/api/runtime/completion/plan | python -m json.tool
 
 runtime-completion-execute:
-	curl -sf -X POST http://localhost:8000/api/runtime/completion/execute | python -m json.tool
+	curl -s -X POST http://localhost:8000/api/runtime/completion/execute | python -m json.tool
 
 doctor:
 	bash scripts/doctor.sh
