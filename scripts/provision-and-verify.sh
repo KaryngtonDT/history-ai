@@ -11,23 +11,20 @@ cd "${ROOT}"
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.prod-like.yml}"
 COMPOSE=(docker compose -f "${COMPOSE_FILE}")
 BACKEND_URL="${BACKEND_URL:-http://localhost:8000}"
-BACKEND_CONTAINER="${BACKEND_CONTAINER:-history-ai-prod-like-backend-1}"
 HEALTH_TIMEOUT=120
 
-# Colors / symbols
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; CYAN='\033[0;36m'; NC='\033[0m'
-OK="[OK]"; SKIP="[--]"; FAIL="[!!]"; WAIT="[..]"
+OK="[OK]"; FAIL="[!!]"; WAIT="[..]"
 
-# Call a GET endpoint inside the container (no nginx timeout risk for reads)
+# Call a GET endpoint from inside the container (no nginx external timeout risk)
 backend_get() {
-  "${COMPOSE[@]}" exec -T backend curl -sf --max-time 30 "http://localhost/$1" 2>/dev/null
+  "${COMPOSE[@]}" exec -T backend curl -sf --max-time 30 "http://localhost/${1}" 2>/dev/null
 }
 
-# Provision a single engine inside the container (completely bypasses nginx)
+# Provision one engine from inside the container (completely bypasses nginx)
 provision_engine_exec() {
-  local engine_id="$1"
   "${COMPOSE[@]}" exec -T backend \
-    curl -sf --max-time 7200 -X POST "http://localhost/api/runtime/engines/${engine_id}/provision" \
+    curl -sf --max-time 7200 -X POST "http://localhost/api/runtime/engines/${1}/provision" \
     2>/dev/null
 }
 
@@ -40,6 +37,7 @@ echo ""
 echo "[1/5] Ensuring stack is running..."
 "${COMPOSE[@]}" up -d postgres redis ollama backend >/dev/null 2>&1
 
+# ------------------------------------------------------------------
 echo ""
 echo "[2/5] Waiting for backend (max ${HEALTH_TIMEOUT}s)..."
 elapsed=0
@@ -65,78 +63,71 @@ echo ""
 echo "[4/5] Provisioning engines one by one..."
 echo ""
 
-# Fetch current engine states
 ENGINES_JSON=$(backend_get "api/runtime/engines")
 PLAN_JSON=$(backend_get "api/runtime/provision/plan")
 
-# Extract engines to provision from the plan
-ENGINES_TO_PROVISION=$(echo "$PLAN_JSON" \
-  | python3 -c "
+# Extract engines to provision (use single-quoted heredoc to avoid bash expansion issues)
+ENGINES_TO_PROVISION=$(echo "$PLAN_JSON" | python3 - << 'PYEOF'
 import json, sys
 data = json.load(sys.stdin)
-plan = data.get('compatibleEngineCompletionPlan', [])
-for e in plan:
+for e in data.get('compatibleEngineCompletionPlan', []):
     print(e['engineId'])
-" 2>/dev/null || echo "")
+PYEOF
+) || ENGINES_TO_PROVISION=""
 
 # Extract already-ready engines
-READY_ENGINES=$(echo "$ENGINES_JSON" \
-  | python3 -c "
+READY_ENGINES=$(echo "$ENGINES_JSON" | python3 - << 'PYEOF'
 import json, sys
 data = json.load(sys.stdin)
 engines = data if isinstance(data, list) else data.get('engines', [])
 for e in engines:
     if e.get('status') == 'ready':
         print(e['id'])
-" 2>/dev/null || echo "")
+PYEOF
+) || READY_ENGINES=""
 
 # Show already-ready engines
 echo "  Already READY:"
 if [ -z "$READY_ENGINES" ]; then
   echo "    (none)"
 else
-  echo "$READY_ENGINES" | while read -r eid; do
+  while IFS= read -r eid; do
+    [ -z "$eid" ] && continue
     printf "    ${GREEN}${OK}${NC} %s\n" "$eid"
-  done
+  done <<< "$READY_ENGINES"
 fi
 
-# Count engines to provision
-PLAN_COUNT=$(echo "$ENGINES_TO_PROVISION" | grep -c '\S' || echo "0")
+PLAN_COUNT=$(echo "$ENGINES_TO_PROVISION" | grep -c '[^[:space:]]' || true)
 
 echo ""
-if [ "$PLAN_COUNT" -eq 0 ]; then
+if [ "${PLAN_COUNT:-0}" -eq 0 ]; then
   echo "  Nothing to provision — all compatible engines already READY."
 else
-  echo "  To provision ($PLAN_COUNT engines):"
-  echo "$ENGINES_TO_PROVISION" | while read -r eid; do
+  echo "  To provision (${PLAN_COUNT} engine(s)):"
+  while IFS= read -r eid; do
+    [ -z "$eid" ] && continue
     printf "    ${CYAN}${WAIT}${NC} %s\n" "$eid"
-  done
+  done <<< "$ENGINES_TO_PROVISION"
   echo ""
-
-  FAILED_ENGINES=""
-  DONE_ENGINES=""
 
   while IFS= read -r ENGINE_ID; do
     [ -z "$ENGINE_ID" ] && continue
 
-    printf "  ${YELLOW}${WAIT}${NC} %-30s installing..." "$ENGINE_ID"
+    printf "  ${YELLOW}${WAIT}${NC} %-35s installing...\n" "$ENGINE_ID"
 
-    RESULT=$(provision_engine_exec "$ENGINE_ID" 2>/dev/null || echo '{"ok":false}')
-    ENGINE_OK=$(echo "$RESULT" | grep -o '"ok":true' | head -1 || echo "")
+    RESULT=$(provision_engine_exec "$ENGINE_ID" || echo '{"ok":false}')
+    ENGINE_OK=$(echo "$RESULT" | grep -o '"ok":true' | head -1 || true)
 
     if [ -n "$ENGINE_OK" ]; then
-      printf "\r  ${GREEN}${OK}${NC} %-30s done\n" "$ENGINE_ID"
-      DONE_ENGINES="${DONE_ENGINES} ${ENGINE_ID}"
+      printf "  ${GREEN}${OK}${NC} %-35s done\n" "$ENGINE_ID"
     else
-      # Check if it became ready despite non-ok response
-      STATUS_JSON=$(backend_get "api/runtime/engines/${ENGINE_ID}/compatibility" 2>/dev/null || echo '{}')
-      IS_READY=$(echo "$STATUS_JSON" | grep -o '"status":"ready"' | head -1 || echo "")
+      # Double-check actual status in case provisioner returned error but engine is ready
+      STATUS_JSON=$(backend_get "api/runtime/engines/${ENGINE_ID}/compatibility" || echo '{}')
+      IS_READY=$(echo "$STATUS_JSON" | grep -o '"status":"ready"' | head -1 || true)
       if [ -n "$IS_READY" ]; then
-        printf "\r  ${GREEN}${OK}${NC} %-30s ready\n" "$ENGINE_ID"
-        DONE_ENGINES="${DONE_ENGINES} ${ENGINE_ID}"
+        printf "  ${GREEN}${OK}${NC} %-35s ready\n" "$ENGINE_ID"
       else
-        printf "\r  ${RED}${FAIL}${NC} %-30s FAILED\n" "$ENGINE_ID"
-        FAILED_ENGINES="${FAILED_ENGINES} ${ENGINE_ID}"
+        printf "  ${RED}${FAIL}${NC} %-35s FAILED\n" "$ENGINE_ID"
       fi
     fi
   done <<< "$ENGINES_TO_PROVISION"
@@ -145,31 +136,29 @@ fi
 # ------------------------------------------------------------------
 echo ""
 echo "[5/5] Final verification..."
-FINAL_PLAN=$(backend_get "api/runtime/completion/plan")
 
-REMAINING=$(echo "$FINAL_PLAN" \
-  | grep -o '"completionCount":[0-9]*' \
-  | grep -o '[0-9]*' \
-  | head -1 || echo "")
+FINAL_PLAN=$(backend_get "api/runtime/completion/plan")
+REMAINING=$(echo "$FINAL_PLAN" | grep -o '"completionCount":[0-9]*' | grep -o '[0-9]*' | head -1 || true)
 REMAINING="${REMAINING:-unknown}"
 
-# Recount ready engines
-FINAL_READY=$(backend_get "api/runtime/engines" \
-  | python3 -c "
+# Summary table using heredoc to avoid bash expansion of Python parens
+FINAL_ENGINES_JSON=$(backend_get "api/runtime/engines")
+echo "$FINAL_ENGINES_JSON" | python3 - << 'PYEOF'
 import json, sys
 data = json.load(sys.stdin)
 engines = data if isinstance(data, list) else data.get('engines', [])
-ready = [e['id'] for e in engines if e.get('status') == 'ready']
-print(f'  Ready engines   : {len(ready)}')
+ready   = [e['id'] for e in engines if e.get('status') == 'ready']
+blocked = [e['id'] for e in engines if e.get('status') != 'ready']
+print(f"  Ready   ({len(ready)}):")
 for e in ready:
-    print(f'    {e}')
-blocked = [e['id'] for e in engines if e.get('status') not in ('ready',)]
-print(f'  Not ready       : {len(blocked)}')
-for e in blocked:
-    print(f'    {e}  ({e.get(\"status\",\"?\")})')
-" 2>/dev/null || echo "  (could not parse engine list)")
+    print(f"    [OK] {e}")
+if blocked:
+    print(f"  Pending ({len(blocked)}):")
+    for e in blocked:
+        st = next((x.get('status','?') for x in engines if x['id'] == e), '?')
+        print(f"    [--] {e}  ({st})")
+PYEOF
 
-echo "$FINAL_READY"
 echo ""
 echo "  Engines still pending: ${REMAINING}"
 
@@ -178,9 +167,8 @@ if [ "$REMAINING" != "0" ] && [ "$REMAINING" != "unknown" ]; then
   echo "  Still missing:"
   echo "$FINAL_PLAN" \
     | grep -o '"engineId":"[^"]*"' \
-    | grep -o '[^"]*"$' \
-    | tr -d '"' \
-    | sed "s/^/    ${FAIL} /" || true
+    | sed 's/"engineId":"//;s/"//' \
+    | sed 's/^/    [!!] /' || true
   echo ""
   echo "ERROR: ${REMAINING} engine(s) could not be provisioned."
   exit 1
