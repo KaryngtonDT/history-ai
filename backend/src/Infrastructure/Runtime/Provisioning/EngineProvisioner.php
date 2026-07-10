@@ -237,7 +237,7 @@ final class EngineProvisioner
         $process = Process::fromShellCommandline(
             'pip3 install --break-system-packages '.escapeshellarg($packages).' 2>&1',
         );
-        $process->setTimeout(600);
+        $process->setTimeout(3600);
         $process->run();
         $output[] = trim($process->getOutput().$process->getErrorOutput());
 
@@ -252,7 +252,7 @@ final class EngineProvisioner
         $pip = Process::fromShellCommandline(
             'pip3 install --break-system-packages '.escapeshellarg($packages).' 2>&1',
         );
-        $pip->setTimeout(600);
+        $pip->setTimeout(3600);
         $pip->run();
         $output[] = trim($pip->getOutput().$pip->getErrorOutput());
         if (!$pip->isSuccessful()) {
