@@ -24,15 +24,21 @@ export function TranscriptTimeline({
 			return;
 		}
 
-		const activeElement = container.querySelector(
+		const activeElement = container.querySelector<HTMLElement>(
 			`[data-segment-index="${activeIndex}"]`,
 		);
 
-		if (
-			activeElement instanceof HTMLElement &&
-			typeof activeElement.scrollIntoView === "function"
-		) {
-			activeElement.scrollIntoView({ block: "nearest", behavior: "smooth" });
+		if (!activeElement) {
+			return;
+		}
+
+		const { offsetTop, offsetHeight } = activeElement;
+		const { scrollTop, clientHeight } = container;
+
+		if (offsetTop < scrollTop) {
+			container.scrollTop = offsetTop;
+		} else if (offsetTop + offsetHeight > scrollTop + clientHeight) {
+			container.scrollTop = offsetTop + offsetHeight - clientHeight;
 		}
 	}, [activeIndex]);
 
