@@ -21,7 +21,20 @@ mkdir -p \
 
 chown -R www-data:www-data /var/www/html/storage
 
-mkdir -p /models/whisper /models/parakeet /models/canary /models/f5 /models/kokoro /models/dia /models/openvoice /models/chatterbox /models/xtts /models/latentsync /models/echomimic /models/wav2lip /models/venvs /models/src
+mkdir -p \
+  /models/whisper /models/whisper-cpp \
+  /models/parakeet /models/canary \
+  /models/f5 /models/kokoro /models/dia \
+  /models/openvoice /models/chatterbox /models/xtts \
+  /models/latentsync /models/liveportrait /models/musetalk /models/echomimic \
+  /models/wav2lip /models/venvs /models/src \
+  /models/piper \
+  /models/paddleocr /models/easyocr \
+  /models/smolvlm /models/florence-2 /models/qwen2-vl \
+  /models/bge-m3 /models/jina-embeddings /models/e5-large /models/bge-reranker /models/jina-reranker \
+  /models/pip-packages \
+  /models/hf-cache
+chown -R www-data:www-data /models
 
 bash /opt/lumen/install-wav2lip.sh --system-only 2>/dev/null || true
 
