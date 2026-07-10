@@ -66,6 +66,10 @@ export const shellEn = {
 					label: "Pipeline Setup",
 					description: "Choose AI engines per processing stage.",
 				},
+				"runtime-engines": {
+					label: "Engine Manager",
+					description: "Install, benchmark, and select AI engines per capability.",
+				},
 				"runtime-settings": {
 					label: "Runtime Center",
 					description: "Discover, verify, and benchmark AI engines.",

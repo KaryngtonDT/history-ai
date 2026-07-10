@@ -9,6 +9,7 @@ import {
 } from "react";
 import {
 	hasRunningPipelineJobs,
+	DONE_PIPELINE_POLL_MS,
 	IDLE_PIPELINE_POLL_MS,
 	LIVE_PIPELINE_POLL_MS,
 } from "@/features/pipeline/pipelineLiveProgressUtils";
@@ -66,7 +67,7 @@ export function PipelineSourceProvider({
 
 				return next;
 			} catch {
-				setError("Failed to load pipeline status.");
+				setError("Could not load pipeline status.");
 
 				return null;
 			} finally {
@@ -84,12 +85,21 @@ export function PipelineSourceProvider({
 			return IDLE_PIPELINE_POLL_MS;
 		}
 
-		return hasRunningPipelineJobs([
+		const activeJobs = [
 			...(status.activeJobs ?? []),
 			...(status.jobsWaitingConfirmation ?? []),
-		])
-			? LIVE_PIPELINE_POLL_MS
-			: IDLE_PIPELINE_POLL_MS;
+		];
+
+		if (hasRunningPipelineJobs(activeJobs)) {
+			return LIVE_PIPELINE_POLL_MS;
+		}
+
+		const hasAnyQueued = (status.activeJobs ?? []).some((j) => j.status === "queued");
+		if (hasAnyQueued) {
+			return IDLE_PIPELINE_POLL_MS;
+		}
+
+		return DONE_PIPELINE_POLL_MS;
 	}, [status]);
 
 	useEffect(() => {

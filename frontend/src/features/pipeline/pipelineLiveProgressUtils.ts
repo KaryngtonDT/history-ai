@@ -179,4 +179,6 @@ export function hasRunningPipelineJobs(
 
 export const LIVE_PIPELINE_POLL_MS = 1000;
 export const IDLE_PIPELINE_POLL_MS = 5000;
+/** Poll interval when the pipeline is fully completed or has no active jobs */
+export const DONE_PIPELINE_POLL_MS = 30_000;
 export const LIVE_PIPELINE_TICK_MS = 1000;

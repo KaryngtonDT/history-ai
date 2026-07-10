@@ -539,6 +539,9 @@ export const pipelineFr: PipelineMessages = {
 			continue: "Continuer",
 			cancel: "Annuler",
 			restart: "Relancer l'étape",
+			stageFailed: "Étape échouée",
+			errorTitle: "Erreur",
+			staleWarning: "{{count}} artefact(s) peuvent être obsolètes après avoir relancé une étape antérieure.",
 			restartConfirm:
 				"Relancer cette étape invalidera les étapes suivantes. Continuer ?",
 			youtubeChoiceTitle: "Transcription YouTube originale trouvée",

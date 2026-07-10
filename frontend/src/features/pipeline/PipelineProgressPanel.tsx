@@ -5,6 +5,7 @@ import type {
 	PipelineJob,
 	PipelineSourceStatus,
 } from "@/services/pipeline/jobTypes";
+import { PIPELINE_STAGE_LABELS } from "@/services/pipeline/types";
 import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
 import {
 	StageNotification,
@@ -36,15 +37,18 @@ function PipelineStageCard({
 	onCancel,
 	onRestart,
 	continueLabel,
+	busy = false,
 }: {
 	job: PipelineJob;
 	onContinue?: (job: PipelineJob) => void;
 	onCancel?: (job: PipelineJob) => void;
 	onRestart?: (job: PipelineJob) => void;
 	continueLabel?: string;
+	busy?: boolean;
 }) {
 	const { t, locale } = useTranslation();
 	const liveJob = usePipelineLiveJob(job);
+	const displayStageLabel = PIPELINE_STAGE_LABELS[job.stage as keyof typeof PIPELINE_STAGE_LABELS] ?? job.stage.replaceAll("_", " ");
 	const timingLines = buildPipelineStageTimingLines(
 		liveJob,
 		{
@@ -80,7 +84,7 @@ function PipelineStageCard({
 			data-testid={`pipeline-stage-${job.stage}`}
 		>
 			<div className={styles.stageTitle}>
-				{job.stage.replaceAll("_", " ")}{" "}
+				{displayStageLabel}{" "}
 				<StageStatusBadge status={job.status} />
 			</div>
 			<StageProgressBar
@@ -93,7 +97,11 @@ function PipelineStageCard({
 				</p>
 			))}
 			{job.failureReason ? (
-				<StageNotification title="Stage failed" message={job.failureReason} />
+				<StageNotification
+					title={t("pipeline.progress.stageFailed")}
+					message={job.failureReason}
+					variant="error"
+				/>
 			) : null}
 			<div className={styles.actions}>
 				{job.status === "waiting_user_confirmation" && onContinue ? (
@@ -101,6 +109,7 @@ function PipelineStageCard({
 						type="button"
 						className={styles.buttonPrimary}
 						onClick={() => onContinue(job)}
+						disabled={busy}
 					>
 						{continueLabel ?? t("pipeline.progress.continue")}
 					</button>
@@ -110,6 +119,7 @@ function PipelineStageCard({
 						type="button"
 						className={styles.button}
 						onClick={() => onCancel(job)}
+						disabled={busy}
 					>
 						{t("pipeline.progress.cancel")}
 					</button>
@@ -119,6 +129,7 @@ function PipelineStageCard({
 						type="button"
 						className={styles.button}
 						onClick={() => onRestart(job)}
+						disabled={busy}
 					>
 						{t("pipeline.progress.restart")}
 					</button>
@@ -226,6 +237,8 @@ export function PipelineProgressPanel({
 	);
 	const [error, setError] = useState<string | null>(null);
 	const [choiceNotice, setChoiceNotice] = useState<string | null>(null);
+	const [busy, setBusy] = useState(false);
+	const [confirmRestartJobId, setConfirmRestartJobId] = useState<string | null>(null);
 	const status = usesSharedContext ? pipelineContext.status : localStatus;
 
 	const refresh = useCallback(async () => {
@@ -285,24 +298,38 @@ export function PipelineProgressPanel({
 	}, [effectivePollMs, refresh, status, usesSharedContext]);
 
 	const handleContinue = async (job: PipelineJob) => {
-		await pipelineJobService.continueStage(sourceId, job.stage);
-		await refresh();
+		setBusy(true);
+		try {
+			await pipelineJobService.continueStage(sourceId, job.stage);
+			await refresh();
+		} finally {
+			setBusy(false);
+		}
 	};
 
 	const handleCancel = async (job: PipelineJob) => {
-		await pipelineJobService.cancelStage(sourceId, job.stage);
-		await refresh();
+		setBusy(true);
+		try {
+			await pipelineJobService.cancelStage(sourceId, job.stage);
+			await refresh();
+		} finally {
+			setBusy(false);
+		}
 	};
 
-	const handleRestart = async (job: PipelineJob) => {
-		const confirmed = window.confirm(t("pipeline.progress.restartConfirm"));
+	const handleRestart = (job: PipelineJob) => {
+		setConfirmRestartJobId(job.jobId);
+	};
 
-		if (!confirmed) {
-			return;
+	const handleRestartConfirmed = async (job: PipelineJob) => {
+		setConfirmRestartJobId(null);
+		setBusy(true);
+		try {
+			await pipelineJobService.startStage(sourceId, job.stage, true);
+			await refresh();
+		} finally {
+			setBusy(false);
 		}
-
-		await pipelineJobService.startStage(sourceId, job.stage, true);
-		await refresh();
 	};
 
 	const waitingChoice = status ? resolveJobsWaitingUserChoice(status) : [];
@@ -351,7 +378,7 @@ export function PipelineProgressPanel({
 					{t("pipeline.progress.refreshSafe")}
 				</p>
 				{status?.message ? (
-					<StageNotification title="Pipeline" message={status.message} />
+					<StageNotification title={t("pipeline.progress.title")} message={status.message} />
 				) : null}
 				{choiceNotice ? (
 					<StageNotification
@@ -359,22 +386,46 @@ export function PipelineProgressPanel({
 						message={choiceNotice}
 					/>
 				) : null}
-				{error ? <StageNotification title="Error" message={error} /> : null}
+				{error ? <StageNotification title={t("pipeline.progress.errorTitle")} message={error} variant="error" /> : null}
 			</div>
 			<StaleArtifactWarning artifactIds={status?.staleArtifacts ?? []} />
 			{visibleJobs.map((job) => (
-				<PipelineStageCard
-					key={job.jobId}
-					job={job}
-					onContinue={handleContinue}
-					onCancel={handleCancel}
-					onRestart={handleRestart}
-					continueLabel={
-						job.stage === "speech_to_text"
-							? t("pipeline.progress.continueToTranslation")
-							: undefined
-					}
-				/>
+				<div key={job.jobId}>
+					<PipelineStageCard
+						job={job}
+						onContinue={handleContinue}
+						onCancel={handleCancel}
+						onRestart={handleRestart}
+						continueLabel={
+							job.stage === "speech_to_text"
+								? t("pipeline.progress.continueToTranslation")
+								: undefined
+						}
+						busy={busy}
+					/>
+					{confirmRestartJobId === job.jobId ? (
+						<div className={styles.confirmRestart}>
+							<p>{t("pipeline.progress.restartConfirm")}</p>
+							<div className={styles.confirmRestartActions}>
+								<button
+									type="button"
+									className={styles.buttonPrimary}
+									onClick={() => { void handleRestartConfirmed(job); }}
+									disabled={busy}
+								>
+									{t("pipeline.progress.restart")}
+								</button>
+								<button
+									type="button"
+									className={styles.button}
+									onClick={() => setConfirmRestartJobId(null)}
+								>
+									{t("pipeline.progress.cancel")}
+								</button>
+							</div>
+						</div>
+					) : null}
+				</div>
 			))}
 			<TranscriptSourceChoiceDialog
 				open={!hideChoiceDialog && waitingChoice.length > 0}

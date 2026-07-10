@@ -1,4 +1,14 @@
+import { useTranslation } from "@/i18n/useTranslation";
 import styles from "./PipelineComponents.module.css";
+
+const STATUS_STYLE: Record<string, string> = {
+	completed: styles.badgeCompleted,
+	running: styles.badgeRunning,
+	queued: styles.badgeQueued,
+	failed: styles.badgeFailed,
+	cancelled: styles.badgeCancelled,
+	waiting_user_confirmation: styles.badgeWaiting,
+};
 
 export function StageProgressBar({
 	progressPercent,
@@ -22,18 +32,28 @@ export function StageProgressBar({
 }
 
 export function StageStatusBadge({ status }: { status: string }) {
-	return <span className={styles.badge}>{status.replaceAll("_", " ")}</span>;
+	const { t } = useTranslation();
+	const labelKey = `pipeline.artifactJourney.status${status.replace(/(^|_)(.)/g, (_, _sep, c: string) => c.toUpperCase())}` as const;
+	const label = t(labelKey as Parameters<typeof t>[0]) ?? status.replaceAll("_", " ");
+	const statusClass = STATUS_STYLE[status] ?? "";
+	return (
+		<span className={`${styles.badge} ${statusClass}`}>
+			{label !== labelKey ? label : status.replaceAll("_", " ")}
+		</span>
+	);
 }
 
 export function StageNotification({
 	title,
 	message,
+	variant = "info",
 }: {
 	title: string;
 	message: string;
+	variant?: "info" | "error" | "warning";
 }) {
 	return (
-		<div className={styles.notification}>
+		<div className={`${styles.notification} ${styles[`notification${variant.charAt(0).toUpperCase()}${variant.slice(1)}`] ?? ""}`}>
 			<strong>{title}</strong>
 			<p>{message}</p>
 		</div>
@@ -45,14 +65,15 @@ export function StaleArtifactWarning({
 }: {
 	artifactIds: string[];
 }) {
+	const { t } = useTranslation();
+
 	if (artifactIds.length === 0) {
 		return null;
 	}
 
 	return (
 		<div className={styles.staleWarning}>
-			Later artifacts may be stale after restarting an earlier stage (
-			{artifactIds.length} marked).
+			{t("pipeline.progress.staleWarning", { count: String(artifactIds.length) })}
 		</div>
 	);
 }

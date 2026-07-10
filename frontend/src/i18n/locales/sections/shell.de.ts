@@ -71,6 +71,10 @@ export const shellDe: ShellMessages = {
 					label: "Pipeline-Einrichtung",
 					description: "KI-Engines pro Verarbeitungsschritt wählen.",
 				},
+				"runtime-engines": {
+					label: "Engine-Manager",
+					description: "KI-Engines installieren, benchmarken und auswählen.",
+				},
 				"runtime-settings": {
 					label: "Runtime-Center",
 					description: "KI-Engines entdecken, prüfen und benchmarken.",

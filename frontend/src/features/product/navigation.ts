@@ -7,7 +7,6 @@ export interface ProductNavItem {
 	end?: boolean;
 	kind?: NavItemKind;
 	requiresVideoId?: boolean;
-	sprint?: number;
 	description?: string;
 }
 
@@ -33,7 +32,6 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 				id: "upload",
 				label: "Upload Video",
 				to: "/video/upload",
-				sprint: 31,
 				description: "Upload a video and start the AI pipeline.",
 			},
 			{
@@ -46,7 +44,6 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 				id: "workspace",
 				label: "Workspace",
 				to: "/workspace",
-				sprint: 45,
 				description: "Projects, batch processing, team, and analytics.",
 			},
 		],
@@ -59,14 +56,12 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 				id: "pipeline-settings",
 				label: "Pipeline Setup",
 				to: "/settings/pipeline",
-				sprint: 39,
 				description: "Choose AI engines per processing stage.",
 			},
 			{
 				id: "runtime-engines",
 				label: "Engine Manager",
 				to: "/settings/runtime/engines",
-				sprint: 72,
 				description:
 					"Install, benchmark, and select AI engines per capability.",
 			},
@@ -74,14 +69,12 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 				id: "runtime-settings",
 				label: "Runtime Center",
 				to: "/settings/runtime",
-				sprint: 70,
 				description: "Discover, verify, and benchmark AI engines.",
 			},
 			{
 				id: "ai-engines",
 				label: "AI Models",
 				to: "/settings/ai",
-				sprint: 34,
 				description: "View available AI providers and capabilities.",
 			},
 		],
@@ -96,7 +89,6 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 				to: "/video/:videoId/transcript",
 				kind: "contextual",
 				requiresVideoId: true,
-				sprint: 32,
 			},
 			{
 				id: "translations",
@@ -104,7 +96,6 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 				to: "/video/:videoId/translations",
 				kind: "contextual",
 				requiresVideoId: true,
-				sprint: 33,
 			},
 			{
 				id: "audio",
@@ -112,7 +103,6 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 				to: "/video/:videoId/audio",
 				kind: "contextual",
 				requiresVideoId: true,
-				sprint: 35,
 			},
 			{
 				id: "voice-clone",
@@ -120,7 +110,6 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 				to: "/video/:videoId/voice-clone",
 				kind: "contextual",
 				requiresVideoId: true,
-				sprint: 36,
 			},
 			{
 				id: "lip-sync",
@@ -128,7 +117,6 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 				to: "/video/:videoId/lip-sync",
 				kind: "contextual",
 				requiresVideoId: true,
-				sprint: 37,
 			},
 			{
 				id: "render",
@@ -136,7 +124,6 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 				to: "/video/:videoId/render",
 				kind: "contextual",
 				requiresVideoId: true,
-				sprint: 38,
 			},
 			{
 				id: "shadow",
@@ -144,7 +131,6 @@ export const PRODUCT_NAV_GROUPS: ProductNavGroup[] = [
 				to: "/video/:videoId/watch",
 				kind: "contextual",
 				requiresVideoId: true,
-				sprint: 55,
 				description: "Watch with Shadow AI companion.",
 			},
 		],

@@ -536,6 +536,9 @@ export const pipelineDe: PipelineMessages = {
 			continue: "Weiter",
 			cancel: "Abbrechen",
 			restart: "Stufe neu starten",
+			stageFailed: "Stufe fehlgeschlagen",
+			errorTitle: "Fehler",
+			staleWarning: "{{count}} Artefakt(e) könnten nach dem Neustart einer früheren Stufe veraltet sein.",
 			restartConfirm: "Neustart invalidiert nachfolgende Stufen. Fortfahren?",
 			youtubeChoiceTitle: "Originales YouTube-Transkript gefunden",
 			youtubeChoiceDescription:
