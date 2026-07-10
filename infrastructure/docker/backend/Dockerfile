@@ -52,6 +52,8 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-s
 
 COPY backend/ .
 
+RUN composer dump-autoload --optimize --no-interaction
+
 RUN composer run-script post-install-cmd --no-interaction \
     && mkdir -p var/cache var/log storage \
     && chown -R www-data:www-data var storage

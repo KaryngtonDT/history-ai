@@ -39,7 +39,10 @@
     "autoload": {
         "psr-4": {
             "App\\": "src/"
-        }
+        },
+        "classmap": [
+            "src/Presentation/OpenApi/Schema/"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
