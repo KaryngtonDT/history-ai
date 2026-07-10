@@ -122,12 +122,27 @@ else
     if [ -n "$ENGINE_OK" ]; then
       printf "  ${GREEN}${OK}${NC} %-35s done\n" "$ENGINE_ID"
     else
-      STATUS_JSON=$(backend_get "api/runtime/engines/${ENGINE_ID}/compatibility" || echo '{}')
-      IS_READY=$(echo "$STATUS_JSON" | grep -o '"status":"ready"' | head -1 || true)
-      if [ -n "$IS_READY" ]; then
+      # Check if engine is now ready despite ok:false response
+      ENGINE_STATUS=$(echo "$RESULT" | grep -o '"status":"[^"]*"' | sed 's/"status":"//;s/"//' | head -1 || true)
+      if [ "$ENGINE_STATUS" = "ready" ]; then
         printf "  ${GREEN}${OK}${NC} %-35s ready\n" "$ENGINE_ID"
       else
         printf "  ${RED}${FAIL}${NC} %-35s FAILED\n" "$ENGINE_ID"
+        # Show first meaningful error line from output array
+        FAIL_REASON=$(echo "$RESULT" \
+          | parse_json "
+import json,sys
+r=json.load(sys.stdin)
+out=r.get('output',[])
+reason=r.get('blockedReason','')
+for line in (out if isinstance(out,list) else [out]):
+    s=str(line).strip()
+    if s and 'WARNING' not in s and 'DEPRECAT' not in s:
+        print('       '+s[-200:])
+        break
+if reason: print('       reason: '+reason[:200])
+" 2>/dev/null || true)
+        [ -n "$FAIL_REASON" ] && printf "%s\n" "$FAIL_REASON"
       fi
     fi
   done <<< "$ENGINES_TO_PROVISION"
