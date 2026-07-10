@@ -5,8 +5,8 @@ import type {
 	PipelineJob,
 	PipelineSourceStatus,
 } from "@/services/pipeline/jobTypes";
-import { PIPELINE_STAGE_LABELS } from "@/services/pipeline/types";
 import { pipelineJobService } from "@/services/pipeline/PipelineJobService";
+import { PIPELINE_STAGE_LABELS } from "@/services/pipeline/types";
 import {
 	StageNotification,
 	StageProgressBar,
@@ -48,7 +48,9 @@ function PipelineStageCard({
 }) {
 	const { t, locale } = useTranslation();
 	const liveJob = usePipelineLiveJob(job);
-	const displayStageLabel = PIPELINE_STAGE_LABELS[job.stage as keyof typeof PIPELINE_STAGE_LABELS] ?? job.stage.replaceAll("_", " ");
+	const displayStageLabel =
+		PIPELINE_STAGE_LABELS[job.stage as keyof typeof PIPELINE_STAGE_LABELS] ??
+		job.stage.replaceAll("_", " ");
 	const timingLines = buildPipelineStageTimingLines(
 		liveJob,
 		{
@@ -84,8 +86,7 @@ function PipelineStageCard({
 			data-testid={`pipeline-stage-${job.stage}`}
 		>
 			<div className={styles.stageTitle}>
-				{displayStageLabel}{" "}
-				<StageStatusBadge status={job.status} />
+				{displayStageLabel} <StageStatusBadge status={job.status} />
 			</div>
 			<StageProgressBar
 				progressPercent={liveJob.progressPercent}
@@ -238,7 +239,9 @@ export function PipelineProgressPanel({
 	const [error, setError] = useState<string | null>(null);
 	const [choiceNotice, setChoiceNotice] = useState<string | null>(null);
 	const [busy, setBusy] = useState(false);
-	const [confirmRestartJobId, setConfirmRestartJobId] = useState<string | null>(null);
+	const [confirmRestartJobId, setConfirmRestartJobId] = useState<string | null>(
+		null,
+	);
 	const status = usesSharedContext ? pipelineContext.status : localStatus;
 
 	const refresh = useCallback(async () => {
@@ -378,7 +381,10 @@ export function PipelineProgressPanel({
 					{t("pipeline.progress.refreshSafe")}
 				</p>
 				{status?.message ? (
-					<StageNotification title={t("pipeline.progress.title")} message={status.message} />
+					<StageNotification
+						title={t("pipeline.progress.title")}
+						message={status.message}
+					/>
 				) : null}
 				{choiceNotice ? (
 					<StageNotification
@@ -386,7 +392,13 @@ export function PipelineProgressPanel({
 						message={choiceNotice}
 					/>
 				) : null}
-				{error ? <StageNotification title={t("pipeline.progress.errorTitle")} message={error} variant="error" /> : null}
+				{error ? (
+					<StageNotification
+						title={t("pipeline.progress.errorTitle")}
+						message={error}
+						variant="error"
+					/>
+				) : null}
 			</div>
 			<StaleArtifactWarning artifactIds={status?.staleArtifacts ?? []} />
 			{visibleJobs.map((job) => (
@@ -410,7 +422,9 @@ export function PipelineProgressPanel({
 								<button
 									type="button"
 									className={styles.buttonPrimary}
-									onClick={() => { void handleRestartConfirmed(job); }}
+									onClick={() => {
+										void handleRestartConfirmed(job);
+									}}
 									disabled={busy}
 								>
 									{t("pipeline.progress.restart")}

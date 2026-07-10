@@ -74,7 +74,8 @@ export const shellFr: ShellMessages = {
 				},
 				"runtime-engines": {
 					label: "Gestionnaire de moteurs",
-					description: "Installer, benchmarker et sélectionner les moteurs IA par capacité.",
+					description:
+						"Installer, benchmarker et sélectionner les moteurs IA par capacité.",
 				},
 				"runtime-settings": {
 					label: "Centre Runtime",

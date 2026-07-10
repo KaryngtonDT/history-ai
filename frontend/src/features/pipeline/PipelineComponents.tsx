@@ -33,8 +33,10 @@ export function StageProgressBar({
 
 export function StageStatusBadge({ status }: { status: string }) {
 	const { t } = useTranslation();
-	const labelKey = `pipeline.artifactJourney.status${status.replace(/(^|_)(.)/g, (_, _sep, c: string) => c.toUpperCase())}` as const;
-	const label = t(labelKey as Parameters<typeof t>[0]) ?? status.replaceAll("_", " ");
+	const labelKey =
+		`pipeline.artifactJourney.status${status.replace(/(^|_)(.)/g, (_, _sep, c: string) => c.toUpperCase())}` as const;
+	const label =
+		t(labelKey as Parameters<typeof t>[0]) ?? status.replaceAll("_", " ");
 	const statusClass = STATUS_STYLE[status] ?? "";
 	return (
 		<span className={`${styles.badge} ${statusClass}`}>
@@ -53,7 +55,9 @@ export function StageNotification({
 	variant?: "info" | "error" | "warning";
 }) {
 	return (
-		<div className={`${styles.notification} ${styles[`notification${variant.charAt(0).toUpperCase()}${variant.slice(1)}`] ?? ""}`}>
+		<div
+			className={`${styles.notification} ${styles[`notification${variant.charAt(0).toUpperCase()}${variant.slice(1)}`] ?? ""}`}
+		>
 			<strong>{title}</strong>
 			<p>{message}</p>
 		</div>
@@ -73,7 +77,9 @@ export function StaleArtifactWarning({
 
 	return (
 		<div className={styles.staleWarning}>
-			{t("pipeline.progress.staleWarning", { count: String(artifactIds.length) })}
+			{t("pipeline.progress.staleWarning", {
+				count: String(artifactIds.length),
+			})}
 		</div>
 	);
 }

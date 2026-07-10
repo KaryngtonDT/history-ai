@@ -68,7 +68,8 @@ export const shellEn = {
 				},
 				"runtime-engines": {
 					label: "Engine Manager",
-					description: "Install, benchmark, and select AI engines per capability.",
+					description:
+						"Install, benchmark, and select AI engines per capability.",
 				},
 				"runtime-settings": {
 					label: "Runtime Center",

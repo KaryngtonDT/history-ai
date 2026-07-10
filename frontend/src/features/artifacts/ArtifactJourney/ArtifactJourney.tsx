@@ -89,7 +89,11 @@ export function ArtifactJourney({ videoId, title }: ArtifactJourneyProps) {
 					}
 				/>
 			) : null}
-			<div className={videoId && progress.loading ? styles.trackInvisible : styles.track}>
+			<div
+				className={
+					videoId && progress.loading ? styles.trackInvisible : styles.track
+				}
+			>
 				{steps.map((step, index) => (
 					<div key={step.id} style={{ display: "contents" }}>
 						<article className={styles.card}>

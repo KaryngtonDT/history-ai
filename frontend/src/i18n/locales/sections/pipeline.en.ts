@@ -526,7 +526,8 @@ export const pipelineEn = {
 			restart: "Restart stage",
 			stageFailed: "Stage failed",
 			errorTitle: "Error",
-			staleWarning: "{{count}} artifact(s) may be stale after restarting an earlier stage.",
+			staleWarning:
+				"{{count}} artifact(s) may be stale after restarting an earlier stage.",
 			restartConfirm:
 				"Restarting this stage will invalidate later dependent stages. Continue?",
 			youtubeChoiceTitle: "Original YouTube transcript found",

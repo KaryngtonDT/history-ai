@@ -8,8 +8,8 @@ import {
 	useState,
 } from "react";
 import {
-	hasRunningPipelineJobs,
 	DONE_PIPELINE_POLL_MS,
+	hasRunningPipelineJobs,
 	IDLE_PIPELINE_POLL_MS,
 	LIVE_PIPELINE_POLL_MS,
 } from "@/features/pipeline/pipelineLiveProgressUtils";
@@ -94,7 +94,9 @@ export function PipelineSourceProvider({
 			return LIVE_PIPELINE_POLL_MS;
 		}
 
-		const hasAnyQueued = (status.activeJobs ?? []).some((j) => j.status === "queued");
+		const hasAnyQueued = (status.activeJobs ?? []).some(
+			(j) => j.status === "queued",
+		);
 		if (hasAnyQueued) {
 			return IDLE_PIPELINE_POLL_MS;
 		}
