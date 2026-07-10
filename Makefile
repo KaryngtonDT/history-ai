@@ -1,7 +1,7 @@
 .PHONY: help install up down ps logs config \
 	dev dev-stop prod prod-stop prod-rebuild prod-fresh prod-restart setup-engines \
 	prod-backend prod-frontend prod-worker prod-migrate prod-prune-backend-run prod-logs \
-	test test-backend test-frontend test-worker test-all ci runtime-validate runtime-benchmark runtime-completion runtime-completion-execute provision-engines install-gpu-engines provision \
+	test test-backend test-frontend test-worker test-all ci runtime-validate runtime-benchmark runtime-completion runtime-completion-execute provision-engines install-gpu-engines provision provision-and-verify \
 	backup restore verify-backup health doctor status migrate shell-backend
 
 COMPOSE ?= docker compose
@@ -111,6 +111,9 @@ provision-engines:
 provision-compatible:
 	bash scripts/provision-compatible-engines.sh
 
+provision-and-verify:
+	bash scripts/provision-and-verify.sh
+
 install-gpu-engines:
 	$(BACKEND_EXEC) bash /opt/lumen/install-gpu-engines.sh --engine all
 
@@ -137,6 +140,8 @@ prod-redeploy:
 	$(MAKE) prod-rebuild
 	@echo "--- Running migrations ---"
 	$(MAKE) migrate
+	@echo "--- Provisioning all compatible engines ---"
+	$(MAKE) provision-and-verify
 	@echo "--- Doctor check ---"
 	$(MAKE) doctor || true
 	@echo "--- Validating runtime ---"
@@ -144,7 +149,6 @@ prod-redeploy:
 	$(MAKE) runtime-benchmark || true
 	@echo "--- Running tests ---"
 	$(MAKE) test
-	$(MAKE) runtime-completion-execute || true
 	cd frontend && npm run check && npm test
 	@echo "=== prod-redeploy complete ==="
 
@@ -153,8 +157,8 @@ prod-reset: prod-fresh
 	$(MAKE) prod-rebuild
 	@echo "--- Running migrations ---"
 	$(MAKE) migrate
-	@echo "--- Provisioning compatible engines ---"
-	$(MAKE) provision-compatible
+	@echo "--- Provisioning all compatible engines ---"
+	$(MAKE) provision-and-verify
 	@echo "--- Doctor check ---"
 	$(MAKE) doctor || true
 	@echo "--- Validating runtime ---"
@@ -162,7 +166,6 @@ prod-reset: prod-fresh
 	$(MAKE) runtime-benchmark || true
 	@echo "--- Running tests ---"
 	$(MAKE) test
-	$(MAKE) runtime-completion-execute || true
 	cd frontend && npm run check && npm test
 	@echo "=== prod-reset complete ==="
 
